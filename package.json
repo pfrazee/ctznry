@@ -1,0 +1,49 @@
+{
+  "name": "ctznry",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "A decentralized social networking webapp using CTZN.",
+  "main": "index.js",
+  "scripts": {
+    "build": "rollup -c",
+    "watch": "npm-watch build",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "watch": {
+    "build": {
+      "patterns": [
+        "static/**/*.js"
+      ],
+      "ignore": "static/js/*.build.js"
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pfrazee/ctznry.git"
+  },
+  "keywords": [
+    "ctzn",
+    "social",
+    "decentralized",
+    "p2p"
+  ],
+  "dependencies": {
+    "config": "^3.3.3",
+    "ejs": "^3.1.5",
+    "express": "^4.17.1",
+    "node-fetch": "^2.6.1",
+    "rpc-websockets": "^7.4.8",
+    "subcommand": "^2.1.1",
+    "ws": "^7.4.2"
+  },
+  "devDependencies": {
+    "npm-watch": "^0.7.0",
+    "rollup": "^2.36.1"
+  },
+  "author": "Paul Frazee <pfrazee@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/pfrazee/ctznry/issues"
+  },
+  "homepage": "https://github.com/pfrazee/ctznry#readme"
+}
