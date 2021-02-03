@@ -8,6 +8,15 @@ export function urlToKey (str) {
   }
 }
 
+export function parseUserId (userId) {
+  if (!userId) return {username: undefined, domain: undefined}
+  if (userId.includes('@')) {
+    const [username, domain] = userId.split('@')
+    return {username, domain}
+  }
+  return {username: userId, domain: userId}
+}
+
 export function ucfirst (str) {
   if (!str) str = ''
   if (typeof str !== 'string') str = '' + str
@@ -39,9 +48,6 @@ export function joinPath (...args) {
   return str
 }
 
-export function shortenAllKeys (str = '') {
-  return str.replace(/[0-9a-f]{64}/ig, (key) => `${key.slice(0, 4)}..${key.slice(-2)}`)
-}
 
 export function toDomain (str) {
   if (!str) return ''
@@ -108,32 +114,6 @@ export function slugifyUrl (str = '') {
     // ignore
   }
   return slugify(str)
-}
-
-export function createResourceSlug (href, title) {
-  var slug
-  try {
-    var hrefp = new URL(href)
-    if (hrefp.pathname === '/' && !hrefp.search && !hrefp.hash) {
-      // at the root path - use the hostname for the filename
-      if (DRIVE_KEY_REGEX.test(hrefp.hostname) && !!title.trim()) {
-        // ...unless it's a hyper key
-        slug = slugify(title.trim())
-      } else {
-        slug = slugify(hrefp.hostname)
-      }
-    } else if (typeof title === 'string' && !!title.trim()) {
-      // use the title if available on subpages
-      slug = slugify(title.trim())
-    } else {
-      // use parts of the url
-      slug = slugify(hrefp.hostname + hrefp.pathname + hrefp.search + hrefp.hash)
-    }
-  } catch (e) {
-    // weird URL, just use slugified version of it
-    slug = slugify(href)
-  }
-  return slug.toLowerCase()
 }
 
 const reservedChars = /[^\w]/g

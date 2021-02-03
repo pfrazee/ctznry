@@ -1,12 +1,11 @@
 import { LitElement, html } from '../../vendor/lit-element/lit-element.js'
-import { classMap } from '../../vendor/lit-element/lit-html/directives/class-map.js'
 import { asyncReplace } from '../../vendor/lit-element/lit-html/directives/async-replace.js'
-// import { SitesListPopup } from './popups/sites-list.js'
 import * as session from '../lib/session.js'
 import css from '../../css/com/notification.css.js'
+import { AVATAR_URL } from '../lib/const.js'
 import { emit } from '../lib/dom.js'
 import { extractSchemaId } from '../lib/strings.js'
-import * as toast from './toast.js'
+import { getPost, getComment } from '../lib/getters.js'
 import './post.js'
 import './user-list.js'
 
@@ -72,7 +71,7 @@ export class Notification extends LitElement {
   render () {
     const note = this.notification
     const schemaId = extractSchemaId(note.itemUrl)
-    const subjectSchemaId = extractSchemaId(note.item.subjectUrl)
+    const subjectSchemaId = extractSchemaId(note.item.subject.dbUrl)
 
     var icon
     var action = ''
@@ -112,14 +111,14 @@ export class Notification extends LitElement {
           <div class="notification ${schemaId === 'ctzn.network/follow' ? 'padded' : ''}">
             <span class=${icon}></span>
             <a class="author" href="/${note.author.userId}" title=${note.author.userId}>
-              <img src="${note.author.url}/avatar">
+              <img src=${AVATAR_URL(note.author.userId)}>
               ${note.author.userId}
             </a>
             ${action} ${target} &middot; ${relativeDate(note.createdAt)}
           </div>
           ${['ctzn.network/post', 'ctzn.network/comment'].includes(subjectSchemaId) ? html`
             <div class="subject">
-              ${asyncReplace(this.renderSubject(note.item.subjectUrl, subjectSchemaId))}
+              ${asyncReplace(this.renderSubject(note.item.subject, subjectSchemaId))}
             </div>
           ` : ''}
           ${schemaId === 'ctzn.network/follow' ? html`
@@ -133,14 +132,14 @@ export class Notification extends LitElement {
   }
 
 
-  async *renderSubject (url, schemaId) {
+  async *renderSubject ({dbUrl, authorId}, schemaId) {
     yield html`Loading...`
 
     let record
     if (schemaId === 'ctzn.network/post') {
-      record = await session.api.posts.get(url)
+      record = await getPost(authorId, dbUrl)
     } else {
-      record = await session.api.comments.get(url)
+      record = await getComment(authorId, dbUrl)
     }
 
     yield html`
@@ -179,10 +178,10 @@ export class Notification extends LitElement {
       const subject = await session.api.comments.get(this.notification.itemUrl)
       emit(this, 'view-thread', {detail: {subject}})
     } else if (schemaId === 'ctzn.network/vote') {
-      const subjectSchemaId = extractSchemaId(this.notification.item.subjectUrl)
+      const subjectSchemaId = extractSchemaId(this.notification.item.subject.dbUrl)
       const subject = subjectSchemaId === 'ctzn.network/post'
-        ? await session.api.posts.get(this.notification.item.subjectUrl)
-        : await session.api.comments.get(this.notification.item.subjectUrl)
+        ? await getPost(this.notification.item.subject.authorId, this.notification.item.subject.dbUrl)
+        : await getComment(this.notification.item.subject.authorId, this.notification.item.subject.dbUrl)
       emit(this, 'view-thread', {detail: {subject}})
     } else if (schemaId === 'ctzn.network/follow') {
       window.location = `/${this.notification.author.userId}`

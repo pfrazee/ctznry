@@ -152,7 +152,7 @@ class CtznNotifications extends LitElement {
 
   onViewThread (e) {
     ViewThreadPopup.create({
-      subjectUrl: e.detail.subject.url
+      subject: e.detail.subject
     })
   }
 

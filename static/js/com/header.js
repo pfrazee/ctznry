@@ -1,6 +1,7 @@
 import {LitElement, html} from '../../vendor/lit-element/lit-element.js'
 import * as contextMenu from './context-menu.js'
 import * as session from '../lib/session.js'
+import { AVATAR_URL } from '../lib/const.js'
 import css from '../../css/com/header.css.js'
 
 const CHECK_NOTIFICATIONS_INTERVAL = 5e3
@@ -60,7 +61,7 @@ export class Header extends LitElement {
       return html`
         <button class="primary" @click=${this.onClickNewPost}>New Post</button>
         <a class="profile ${this.getNavClass('/' + session.info.userId)}" href="/${session.info.userId}">
-          <img src="${session.info.url}/avatar">
+          <img src=${AVATAR_URL(session.info.userId)}>
           ${session.info.userId}
         </a>
         <a @click=${this.onClickSessionMenu}><span class="fas fa-caret-down"></span></a>

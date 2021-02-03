@@ -1,11 +1,5 @@
+import { DEBUG_ENDPOINTS } from './const.js'
 import { create as createRpcApi } from './rpc-api.js'
-
-const DEBUG_ENDPOINTS = {
-  'dev1.localhost': 'ws://localhost:15001/',
-  'dev2.localhost': 'ws://localhost:15002/',
-  'dev3.localhost': 'ws://localhost:15003/',
-  'dev4.localhost': 'ws://localhost:15004/'
-}
 
 let emitter = new EventTarget()
 export let info = undefined
@@ -60,8 +54,10 @@ export async function doLogout () {
   }
 }
 
-export function isActive () {
-  return !!info && !!api
+export function isActive (domain = undefined) {
+  if (!info || !api) return false
+  if (domain && info.domain !== domain) return false
+  return true
 }
 
 export function onChange (cb, opts) {
@@ -69,6 +65,6 @@ export function onChange (cb, opts) {
 }
 
 async function connectApi (domain) {
-  const wsEndpoint = (domain in DEBUG_ENDPOINTS) ? DEBUG_ENDPOINTS[domain] : `wss://${domain}/`
+  const wsEndpoint = (domain in DEBUG_ENDPOINTS) ? `ws://${DEBUG_ENDPOINTS[domain]}/` : `ws://${domain}/`
   return createRpcApi(wsEndpoint)
 }

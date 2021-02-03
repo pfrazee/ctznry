@@ -10,7 +10,7 @@ import '../thread.js'
 export class ViewThreadPopup extends BasePopup {
   constructor (opts) {
     super()
-    this.subjectUrl = opts.subjectUrl
+    this.subject = opts.subject
   }
 
   static get properties () {
@@ -55,7 +55,7 @@ export class ViewThreadPopup extends BasePopup {
   renderBody () {
     return html`
       <ctzn-thread
-        subject-url=${this.subjectUrl}
+        .subject=${this.subject}
         @load=${this.onLoadThread}
         @view-thread=${this.onViewThread}
       ></ctzn-thread>
@@ -70,7 +70,7 @@ export class ViewThreadPopup extends BasePopup {
   }
 
   onViewThread (e) {
-    this.subjectUrl = e.detail.subject.url
+    this.subject = e.detail.subject
     this.requestUpdate()
   }
 }

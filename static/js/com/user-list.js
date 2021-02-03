@@ -1,7 +1,9 @@
 import { LitElement, html } from '../../vendor/lit-element/lit-element.js'
 import { repeat } from '../../vendor/lit-element/lit-html/directives/repeat.js'
 import css from '../../css/com/user-list.css.js'
+import { AVATAR_URL } from '../lib/const.js'
 import * as session from '../lib/session.js'
+import { getProfile, listFollowers, listFollows } from '../lib/getters.js'
 import { pluralize } from '../lib/strings.js'
 
 export class UserList extends LitElement {
@@ -25,18 +27,18 @@ export class UserList extends LitElement {
   async load () {
     this.profiles = []
     for (let id of this.ids) {
-      const profile = await session.api.profiles.get(id)
+      const profile = await getProfile(id)
       this.profiles.push(profile)
       this.requestUpdate()
 
       const [followers, following] = await Promise.all([
-        session.api.follows.listFollowers(id).then(res => res.followerIds),
-        session.api.follows.listFollows(id)
+        listFollowers(id).then(res => res.followerIds),
+        listFollows(id)
       ])
       profile.numFollowers = followers.length
       profile.numFollowing = following.length
-      profile.isFollowingMe = !!following.find(f => f.value.subject.userId === session.info.userId)
-      profile.amIFollowing = !!followers.find(f => f === session.info.userId)
+      profile.isFollowingMe = session.isActive() && !!following.find(f => f.value.subject.userId === session.info.userId)
+      profile.amIFollowing = session.isActive() && !!followers.find(f => f === session.info.userId)
       this.requestUpdate()
     }
   }
@@ -64,7 +66,7 @@ export class UserList extends LitElement {
             <div class="profile">
               <div class="header">
                 <a class="avatar" href="/${profile.userId}" title=${profile.value.displayName}>
-                  <img src="${profile.url}/avatar">
+                  <img src=${AVATAR_URL(profile.userId)}>
                 </a>
                 ${this.renderProfileControls(profile)}
               </div>
@@ -96,7 +98,7 @@ export class UserList extends LitElement {
     if (!session.isActive()) return ''
     return html`
       <div class="ctrls">
-        ${profile.userId === session.info.userId ? html`
+        ${profile.userId === session?.info?.userId ? html`
           <span class="label">This is you</span>
         ` : profile.amIFollowing ? html`
           <button @click=${e => this.onClickUnfollow(e, profile)}>Unfollow</button>

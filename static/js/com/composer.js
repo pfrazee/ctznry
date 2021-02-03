@@ -11,8 +11,8 @@ class Composer extends LitElement {
     return {
       placeholder: {type: String},
       draftText: {type: String, attribute: 'draft-text'},
-      subjectUrl: {type: String, attribute: 'subject-url'},
-      parentUrl: {type: String, attribute: 'parent-url'},
+      subject: {type: Object},
+      parent: {type: Object},
       _visibility: {type: String}
     }
   }
@@ -21,8 +21,8 @@ class Composer extends LitElement {
     super()
     this.placeholder = 'What\'s new?'
     this.draftText = ''
-    this.subjectUrl = undefined
-    this.parentUrl = undefined
+    this.subject = undefined
+    this.parent = undefined
   }
 
   static get styles () {
@@ -100,10 +100,10 @@ class Composer extends LitElement {
 
     let res
     try {
-      if (this.subjectUrl || this.parentUrl) {
+      if (this.subject || this.parent) {
         res = await session.api.comments.create({
-          subjectUrl: this.subjectUrl,
-          parentCommentUrl: this.parentUrl && this.parentUrl !== this.subjectUrl ? this.parentUrl : undefined,
+          subject: this.subject,
+          parentComment: this.parent && this.parent.dbUrl !== this.subject.dbUrl ? this.parent : undefined,
           text: this.draftText
         })
       } else {

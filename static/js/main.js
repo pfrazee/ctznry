@@ -2,6 +2,7 @@ import { LitElement, html } from '../vendor/lit-element/lit-element.js'
 import { ViewThreadPopup } from './com/popups/view-thread.js'
 import * as toast from './com/toast.js'
 import { pluralize } from './lib/strings.js'
+import { AVATAR_URL } from './lib/const.js'
 import * as session from './lib/session.js'
 import css from '../css/main.css.js'
 import './com/header.js'
@@ -130,7 +131,7 @@ class CtznApp extends LitElement {
       <div class="twocol">
         <div>
           <div class="composer">
-            <img class="thumb" src="${session.info.url}/avatar">
+            <img class="thumb" src="${AVATAR_URL(session.info.userId)}">
             ${this.isComposingPost ? html`
               <ctzn-composer
                 @publish=${this.onPublishPost}
@@ -197,7 +198,7 @@ class CtznApp extends LitElement {
 
   onViewThread (e) {
     ViewThreadPopup.create({
-      subjectUrl: e.detail.subject.url
+      subject: e.detail.subject
     })
   }
 

@@ -1,6 +1,6 @@
 import { LitElement, html } from '../../vendor/lit-element/lit-element.js'
 import { classMap } from '../../vendor/lit-element/lit-html/directives/class-map.js'
-// import { SitesListPopup } from './popups/sites-list.js'
+import { AVATAR_URL } from '../lib/const.js'
 import * as session from '../lib/session.js'
 import css from '../../css/com/post.css.js'
 import { emit } from '../lib/dom.js'
@@ -89,7 +89,7 @@ export class Post extends LitElement {
         })}
       >
         <a class="thumb" href="/${this.post.author.userId}" title=${this.post.author.displayName} data-tooltip=${this.post.author.displayName}>
-          <img class="favicon" src="${this.post.author.url}/avatar">
+          <img class="favicon" src=${AVATAR_URL(this.post.author.userId)}>
         </a>
         <span class="arrow"></span>
         <div
@@ -185,7 +185,7 @@ export class Post extends LitElement {
     if (!this.viewContentOnClick && e.button === 0 && !e.metaKey && !e.ctrlKey) {
       e.preventDefault()
       e.stopPropagation()
-      emit(this, 'view-thread', {detail: {subject: this.post}})
+      emit(this, 'view-thread', {detail: {subject: {dbUrl: this.post.url, authorId: this.post.author.userId}}})
     }
   }
 
@@ -208,7 +208,7 @@ export class Post extends LitElement {
     if (!this.isMouseDragging) {
       e.preventDefault()
       e.stopPropagation()
-      emit(this, 'view-thread', {detail: {subject: this.post}})
+      emit(this, 'view-thread', {detail: {subject: {dbUrl: this.post.url, authorId: this.post.author.userId}}})
     }
     this.isMouseDown = false
     this.isMouseDragging = false
@@ -229,7 +229,7 @@ export class Post extends LitElement {
     } else {
       try {
         await session.api.votes.put({
-          subjectUrl: this.post.url, 
+          subject: {dbUrl: this.post.url, authorId: this.post.author.userId},
           vote: value
         })
       } catch (e) {

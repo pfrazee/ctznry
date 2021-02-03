@@ -1,6 +1,7 @@
 import { LitElement, html } from '../../vendor/lit-element/lit-element.js'
 import { repeat } from '../../vendor/lit-element/lit-html/directives/repeat.js'
 import * as session from '../lib/session.js'
+import { listUserFeed } from '../lib/getters.js'
 import css from '../../css/com/feed.css.js'
 import { emit } from '../lib/dom.js'
 import './post.js'
@@ -100,7 +101,7 @@ export class Feed extends LitElement {
     do {
       let subresults
       if (this.source) {
-        subresults = await session.api.posts.listUserFeed(this.source, {limit: this.limit, reverse: true, lt})
+        subresults = await listUserFeed(this.source, {limit: this.limit, reverse: true, lt})
       } else {
         subresults = await session.api.posts.listHomeFeed({limit: this.limit, reverse: true, lt})
       }

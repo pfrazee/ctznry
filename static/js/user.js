@@ -2,7 +2,9 @@ import { LitElement, html } from '../vendor/lit-element/lit-element.js'
 import { ViewThreadPopup } from './com/popups/view-thread.js'
 import { EditProfilePopup } from './com/popups/edit-profile.js'
 import * as toast from './com/toast.js'
+import { AVATAR_URL } from './lib/const.js'
 import * as session from './lib/session.js'
+import { getProfile, listFollowers, listFollows } from './lib/getters.js'
 import { pluralize } from './lib/strings.js'
 import css from '../css/user.css.js'
 import './com/header.js'
@@ -51,16 +53,14 @@ class CtznUser extends LitElement {
 
   async load () {
     await session.setup()
-    this.userProfile = await session.api.profiles.get(this.userId)
-    const [userProfile, followers, following] = await Promise.all([
-      session.api.profiles.get(this.userId),
-      session.api.follows.listFollowers(this.userId).then(res => res.followerIds),
-      session.api.follows.listFollows(this.userId)
+    this.userProfile = await getProfile(this.userId)
+    const [followers, following] = await Promise.all([
+      listFollowers(this.userId).then(res => res.followerIds),
+      listFollows(this.userId)
     ])
-    this.userProfile = userProfile
     this.followers = followers
     this.following = following
-    console.log({userProfile, followers, following})
+    console.log({userProfile: this.userProfile, followers, following})
   }
 
   get isLoading () {
@@ -88,7 +88,7 @@ class CtznUser extends LitElement {
         <ctzn-header></ctzn-header>
         <div class="profile-banner">
           <a href="/${this.userId}" title=${this.userProfile?.value.displayName} @click=${setView('feed')}>
-            <img class="avatar" src="${this.userProfile?.url}/avatar">
+            <img class="avatar" src=${AVATAR_URL(this.userProfile?.userId)}>
           </a>
           <h2 class="display-name">
             <a href="/${this.userId}" title=${this.userProfile?.value.displayName} @click=${setView('feed')}>
@@ -140,9 +140,6 @@ class CtznUser extends LitElement {
   }
 
   renderCurrentView () {
-    if (!session.isActive()) {
-      return ''
-    }
     if (this.currentView === 'followers') {
       return html`
         <div class="twocol">
@@ -184,7 +181,7 @@ class CtznUser extends LitElement {
   renderEmptyMessage () {
     return html`
       <div class="empty">
-        <div>${this.userProfile.value.displayName} hasn't posted anything yet.</div>
+        <div>${this.userProfile?.value?.displayName} hasn't posted anything yet.</div>
       </div>
     `
   }
@@ -200,7 +197,7 @@ class CtznUser extends LitElement {
   }
 
   async onClickEditProfile (e) {
-    let newProfile = await EditProfilePopup.create(this.userId, `${this.userProfile.url}/avatar`, this.userProfile.value)
+    let newProfile = await EditProfilePopup.create(this.userId, AVATAR_URL(this.userId), this.userProfile.value)
     try {
       await session.api.profiles.put(newProfile.profile)
       this.userProfile.value = newProfile.profile
@@ -221,21 +218,19 @@ class CtznUser extends LitElement {
   }
 
   async onClickFollow (e) {
-    console.log('following', this.userId)
     await session.api.follows.follow(this.userId)
-    console.log('followed', this.userId)
-    this.followers = await session.api.follows.listFollowers(this.userId).then(res => res.followerIds)
+    this.followers = await listFollowers(this.userId).then(res => res.followerIds)
     console.log(this.followers)
   }
 
   async onClickUnfollow (e) {
     await session.api.follows.unfollow(this.userId)
-    this.followers = await session.api.follows.listFollowers(this.userId).then(res => res.followerIds)
+    this.followers = await listFollowers(this.userId).then(res => res.followerIds)
   }
 
   onViewThread (e) {
     ViewThreadPopup.create({
-      subjectUrl: e.detail.subject.url
+      subject: e.detail.subject
     })
   }
 
