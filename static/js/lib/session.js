@@ -3,6 +3,7 @@ import { create as createRpcApi } from './rpc-api.js'
 
 let emitter = new EventTarget()
 export let info = undefined
+export let myCommunities = undefined
 export let api = undefined
 
 export async function setup () {
@@ -19,6 +20,8 @@ export async function setup () {
       localStorage.setItem('session-info', JSON.stringify(info))
       api = newApi
       emitter.dispatchEvent(new Event('change'))
+
+      myCommunities = await api.communities.listMemberships(info.userId).then(memberships => memberships.map(m => m.value.community))
     }
   } catch (e) {
     console.error('Failed to resume API session')
@@ -58,6 +61,10 @@ export function isActive (domain = undefined) {
   if (!info || !api) return false
   if (domain && info.domain !== domain) return false
   return true
+}
+
+export function isInCommunity (communityUserId) {
+  return !!myCommunities?.find(c => c.userId === communityUserId)
 }
 
 export function onChange (cb, opts) {

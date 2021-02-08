@@ -3,6 +3,7 @@ import { repeat } from '../../vendor/lit-element/lit-html/directives/repeat.js'
 import css from '../../css/com/thread.css.js'
 import * as toast from './toast.js'
 import { getPost, getThread } from '../lib/getters.js'
+import * as session from '../lib/session.js'
 import './post.js'
 import './composer.js'
 
@@ -132,11 +133,20 @@ export class Thread extends LitElement {
   }
 
   renderReplyBox () {
+    if (this.post?.value.community && !session.isInCommunity(this.post.value.community.userId)) {
+      return html`
+        <div class="reply-box">
+          <div class="reply-prompt">
+            Join <a href="/${this.post.value.community.userId}">${this.post.value.community.userId}</a> to reply.
+          </div>
+        </div>
+      `
+    }
     return html`
       <div class="reply-box">
         ${this.isReplying ? html`
           <ctzn-composer
-            .subject=${{dbUrl: this.post.url, authorId: this.post.author.userId}}
+            .subject=${{dbUrl: this.post.url, authorId: this.post.author.userId, community: this.post.value.community}}
             .parent=${this.subject}
             placeholder="Write your reply"
             @publish=${this.onPublishReply}
