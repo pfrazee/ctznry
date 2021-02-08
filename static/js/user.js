@@ -314,14 +314,34 @@ class CtznUser extends LitElement {
 
   async onClickFollow (e) {
     await session.api.follows.follow(this.userId)
-    this.followers = await listFollowers(this.userId).then(res => res.followerIds)
+    this.followers = await listFollowers(this.userId)
     this.uniqFollowers = Array.from(getUniqFollowers(followers))
   }
 
   async onClickUnfollow (e) {
     await session.api.follows.unfollow(this.userId)
-    this.followers = await listFollowers(this.userId).then(res => res.followerIds)
+    this.followers = await listFollowers(this.userId)
     this.uniqFollowers = Array.from(getUniqFollowers(followers))
+  }
+
+  async onClickJoin (e) {
+    try {
+      await session.api.communities.join(this.userId)
+      this.members = await listMembers(this.userId)
+    } catch (e) {
+      console.log(e)
+      toast.create(e.toString(), 'error')
+    }
+  }
+
+  async onClickLeave (e) {
+    try {
+      await session.api.communities.leave(this.userId)
+      this.members = await listMembers(this.userId)
+    } catch (e) {
+      console.log(e)
+      toast.create(e.toString(), 'error')
+    }
   }
 
   onViewThread (e) {
