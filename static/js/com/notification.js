@@ -71,11 +71,15 @@ export class Notification extends LitElement {
   render () {
     const note = this.notification
     const schemaId = extractSchemaId(note.itemUrl)
-    const subjectSchemaId = extractSchemaId(note.item.subject.dbUrl)
+
+    let subject
+    let subjectSchemaId
+    let replyPostInfo
 
     var icon
     var action = ''
     if (schemaId === 'ctzn.network/vote') {
+      subject = note.item.subject
       if (note.item.vote === 1) {
         action = 'upvoted'
         icon = 'fas fa-arrow-up'
@@ -84,13 +88,24 @@ export class Notification extends LitElement {
         icon = 'fas fa-arrow-down'
       }
     } else if (schemaId === 'ctzn.network/post') {
+      replyPostInfo = {
+        userId: note.author.userId,
+        dbUrl: note.itemUrl
+      }
+      if (note.item.reply?.parent && note.item.reply?.parent.dbUrl.startsWith(session.info.dbUrl)) {
+        subject = note.item.reply.parent
+      } else {
+        subject = note.item.reply.root
+      }
       action = 'replied to'
       icon = 'far fa-comment'
     } else if (schemaId === 'ctzn.network/follow') {
+      subject = note.item.subject
       action = 'followed'
       icon = 'fas fa-rss'
     }
 
+    subjectSchemaId = subject ? extractSchemaId(subject.dbUrl): undefined
     var target = ''
     if (subjectSchemaId === 'ctzn.network/post') {
       target = 'your post'
@@ -103,7 +118,7 @@ export class Notification extends LitElement {
       <div class="wrapper ${this.isUnread ? 'unread' : ''}" @click=${this.onClickWrapper}>
         ${schemaId === 'ctzn.network/post' ? html`
           <div class="reply">
-            ${asyncReplace(this.renderReplyPost(note.itemUrl, html`<span class="fas fa-reply"></span> ${action} ${target}`))}
+            ${asyncReplace(this.renderReplyPost(replyPostInfo, html`<span class="fas fa-reply"></span> ${action} ${target}`))}
           </div>
         ` : html`
           <div class="notification ${schemaId === 'ctzn.network/follow' ? 'padded' : ''}">
@@ -149,10 +164,10 @@ export class Notification extends LitElement {
     `
   }
 
-  async *renderReplyPost (url, context) {
+  async *renderReplyPost (postInfo, context) {
     yield html`Loading...`
 
-    let record = await getPost(url)
+    let record = await getPost(postInfo.userId, postInfo.dbUrl)
     yield html`
       <ctzn-post
         .post=${record}
