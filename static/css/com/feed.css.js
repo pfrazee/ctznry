@@ -75,6 +75,26 @@ h2 a:hover {
   margin: 0 0 var(--ctzn-feed--default-margin, 10px) 0;
 }
 
+.post.reply {
+  position: relative;
+  margin: 0 0 var(--ctzn-feed--default-margin, 10px) 0;
+}
+
+.post.reply:before {
+  content: "";
+  position: absolute;
+  display: block;
+  width: 2px;
+  left: 14px;
+  top: 44px;
+  height: 28%;
+  background: rgb(193 193 193);
+}
+
+.post.reply ctzn-post {
+  margin: 0;
+}
+
 .empty {
   font-size: 16px;
   letter-spacing: 0.7px;

@@ -161,8 +161,8 @@ a:hover {
   height: 8px;
   z-index: 10;
   background: var(--bg-color--default);
-  border-top: 1px solid var(--border-color--very-light);
-  border-left: 1px solid var(--border-color--very-light);
+  border-top: 1px solid var(--border-color--light);
+  border-left: 1px solid var(--border-color--light);
   transform: rotate(-45deg);
 }
 
@@ -175,7 +175,7 @@ a:hover {
 }
 
 .post.card .container {
-  border: 1px solid var(--border-color--very-light);
+  border: 1px solid var(--border-color--light);
   border-radius: 4px;
   background: var(--bg-color--default);
   padding: 2px;
@@ -289,6 +289,22 @@ a:hover {
 
 :host([noborders]) .post.card ctzn-composer {
   margin-left: -36px;
+}
+
+:host(.parent-post) .post.card .container {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  border-bottom: 0;
+}
+
+:host(.parent-post) .post.card .ctrls {
+  padding-bottom: 0;
+}
+
+:host(.child-post) .post.card .container {
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  border-top: 0;
 }
 
 `

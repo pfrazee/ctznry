@@ -1,7 +1,7 @@
 import { LitElement, html } from '../../vendor/lit-element/lit-element.js'
 import { repeat } from '../../vendor/lit-element/lit-html/directives/repeat.js'
 import * as session from '../lib/session.js'
-import { listUserFeed } from '../lib/getters.js'
+import { listUserFeed, getPost } from '../lib/getters.js'
 import css from '../../css/com/feed.css.js'
 import { emit } from '../lib/dom.js'
 import './post.js'
@@ -117,6 +117,18 @@ export class Feed extends LitElement {
     this.results = results
     this.activeQuery = undefined
     emit(this, 'load-state-updated', {detail: {isEmpty: this.results.length === 0}})
+
+    this.loadPostParents()
+  }
+
+  async loadPostParents () {
+    for (let post of this.results) {
+      if (post.parentPost) continue
+      if (!post.value.reply) continue
+      let parentInfo = post.value.reply.parent || post.value.reply.root
+      post.parentPost = await getPost(parentInfo.authorId, parentInfo.dbUrl)
+      this.requestUpdate()
+    }
   }
 
   // rendering
@@ -179,10 +191,18 @@ export class Feed extends LitElement {
   
   renderNormalResult (post) {
     return html`
-      <ctzn-post
-        .post=${post}
-        class=${this.recordClass}
-      ></ctzn-post>
+      <div class="post ${post.parentPost ? 'reply' : ''}">
+        ${post.parentPost ? html`
+          <ctzn-post
+            .post=${post.parentPost}
+            class="${this.recordClass} parent-post"
+          ></ctzn-post>
+        ` : ''}
+        <ctzn-post
+          .post=${post}
+          class="${this.recordClass} ${post.parentPost ? 'child-post' : ''}"
+        ></ctzn-post>
+      </div>
     `
   }
 
