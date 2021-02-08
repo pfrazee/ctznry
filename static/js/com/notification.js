@@ -109,6 +109,9 @@ export class Notification extends LitElement {
     var target = ''
     if (subjectSchemaId === 'ctzn.network/post') {
       target = 'your post'
+      if (note.item.community) {
+        target += ' in ' + note.item.community.userId
+      }
     } else if (!subjectSchemaId) {
       target = 'you'
     }

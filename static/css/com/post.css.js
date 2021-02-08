@@ -301,6 +301,10 @@ a:hover {
   background: none;
 }
 
+:host([noborders]) .post.card .community {
+  display: none;
+}
+
 :host([nothumb]) .post.card {
   display: block;
 }
