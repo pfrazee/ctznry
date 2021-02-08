@@ -100,15 +100,21 @@ class Composer extends LitElement {
 
     let res
     try {
+      let reply = undefined
       if (this.subject || this.parent) {
-        res = await session.api.comments.create({
-          subject: this.subject,
-          parentComment: this.parent && this.parent.dbUrl !== this.subject.dbUrl ? this.parent : undefined,
-          text: this.draftText
-        })
-      } else {
-        res = await session.api.posts.create({text: this.draftText})
+        let root = this.subject || this.parent
+        reply = {
+          root,
+          parent: undefined
+        }
+        if (this.parent && this.parent.dbUrl !== root.dbUrl) {
+          reply.parent = this.parent
+        }
       }
+      res = await session.api.posts.create({
+        text: this.draftText,
+        reply
+      })
     } catch (e) {
       toast.create(e.message, 'error')
       return

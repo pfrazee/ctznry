@@ -80,7 +80,7 @@ export class UserList extends LitElement {
               </div>
               <div class="description">${profile.value.description}</div>
               <div class="stats">
-                <span class="stat"><span class="stat-number">${nFollowers}</span> ${pluralize(nFollowers, 'Follower')}</span>
+                <span class="stat"><span class="stat-number">${nFollowers}</span> Known ${pluralize(nFollowers, 'Follower')}</span>
                 &middot;
                 <span class="stat"><span class="stat-number">${nFollowing}</span> Following</span>
                 ${profile.isFollowingMe ? html`

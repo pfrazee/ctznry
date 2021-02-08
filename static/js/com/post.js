@@ -56,9 +56,9 @@ export class Post extends LitElement {
     return this.post?.votes.downvoterIds.length
   }
 
-  get commentCount () {
-    if (typeof this.post?.commentCount !== 'undefined') {
-      return this.post.commentCount
+  get replyCount () {
+    if (typeof this.post?.replyCount !== 'undefined') {
+      return this.post.replyCount
     }
     if (typeof this.post?.replies !== 'undefined') {
       return this.post.replies.length
@@ -121,7 +121,7 @@ export class Post extends LitElement {
           </div>
           ${this.noctrls ? '' : html`<div class="ctrls">
             ${this.renderVoteCtrl()}
-            ${this.renderCommentsCtrl()}
+            ${this.renderRepliesCtrl()}
           </div>`}
         </div>
       </div>
@@ -144,11 +144,11 @@ export class Post extends LitElement {
     `
   }
 
-  renderCommentsCtrl () {
+  renderRepliesCtrl () {
     return html`
-      <a class="comment-ctrl" @click=${this.onViewThread}>
+      <a class="reply-ctrl" @click=${this.onViewThread}>
         <span class="far fa-comment"></span>
-        ${this.commentCount}
+        ${this.replyCount}
       </a>
     `
   }

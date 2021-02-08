@@ -104,7 +104,7 @@ class CtznUser extends LitElement {
             <p class="bio">${this.userProfile?.value.description}</p>
           ` : ''}
           <p class="stats">
-            <a class="stat" @click=${setView('followers')}><span class="stat-number">${nFollowers}</span> ${pluralize(nFollowers, 'Follower')}</a>
+            <a class="stat" @click=${setView('followers')}><span class="stat-number">${nFollowers}</span> Known ${pluralize(nFollowers, 'Follower')}</a>
             &middot;
             <a class="stat" @click=${setView('following')}><span class="stat-number">${nFollowing}</span> Following</a>
           </p>

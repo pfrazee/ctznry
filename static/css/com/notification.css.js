@@ -83,7 +83,7 @@ a:hover {
   --text-color--post-content: var(--text-color--light);
 }
 
-.comment {
+.reply {
   padding: 2px 10px;
 }
 

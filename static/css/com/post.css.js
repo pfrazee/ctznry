@@ -66,7 +66,7 @@ a:hover {
   font-size: 13px;
 }
 
-.comment-ctrl {
+.reply-ctrl {
   display: inline-block;
   padding: 0 4px;
   border-radius: 4px;
@@ -74,12 +74,12 @@ a:hover {
   color: var(--text-color--pretty-light);
 }
 
-.comment-ctrl:hover {
+.reply-ctrl:hover {
   text-decoration: none;
   background: var(--bg-color--semi-light);
 }
 
-.comment-ctrl .far {
+.reply-ctrl .far {
   margin-right: 2px;
   font-size: 12px;
 }
@@ -102,7 +102,7 @@ a:hover {
   color: var(--text-color--light);
 }
 
-:host([render-mode="comment"]) .notification {
+:host([render-mode="reply"]) .notification {
   padding: 0 12px 5px;
 }
 
@@ -289,152 +289,6 @@ a:hover {
 
 :host([noborders]) .post.card ctzn-composer {
   margin-left: -36px;
-}
-
-/** COMMENT STYLES **/
-
-.post.comment {
-  position: relative;
-  padding: 10px 14px 8px;
-  border-radius: 4px;
-}
-
-.post.comment::before {
-  content: "";
-  display: block;
-  position: absolute;
-  left: 19px;
-  top: 32px;
-  width: 1px;
-  height: calc(100% - 32px);
-  background: var(--border-color--semi-light);
-}
-
-.post.comment.unread {
-  background: var(--bg-color--unread);
-  box-shadow: 0 0 0 5px var(--bg-color--unread);
-  border-radius: 1px;
-  border: 1px solid var(--border-color--unread);
-}
-
-.post.comment .header {
-  display: flex;
-  align-items: center;
-  font-size: 13px;
-  padding: 0 0 4px;
-}
-
-.post.comment .header > * {
-  margin-right: 5px;
-  white-space: nowrap;
-}
-
-.post.comment .header a {
-  color: var(--text-color--light);
-}
-
-.post.comment .thumb {
-  width: 14px;
-  height: 14px;
-  background: var(--bg-color--semi-light);
-  border-radius: 50%;
-}
-
-.post.comment .thumb img {
-  display: block;
-  width: 14px;
-  height: 14px;
-  object-fit: cover;
-}
-
-.post.comment .origin .author {
-  color: var(--text-color--default);
-}
-
-.post.comment .title {
-  font-weight: normal;
-  letter-spacing: 0.5px;
-}
-
-.post.comment .title a {
-  color: var(--text-color--result-link);
-}
-
-.post.comment .action {
-  color: var(--text-color--light);
-}
-
-.post.comment .context {
-  box-sizing: border-box;
-  font-size: 12px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.post.comment .content {
-  white-space: initial;
-  color: var(--text-color--default);
-  line-height: 1.3125;
-  font-size: 14px;
-  letter-spacing: 0.1px;
-  padding-left: 18px;
-}
-
-.post.comment.constrain-height .content {
-  max-height: 50px;
-  overflow: hidden;
-}
-
-.post.comment .content > :first-child { margin-top: 0; }
-.post.comment .content > :last-child { margin-bottom: 0; }
-
-.post.comment .read-more {
-  padding: 4px 18px 0;
-}
-
-.post.comment .read-more a {
-  color: var(--text-color--link);
-}
-
-.post.comment .ctrls {
-  padding: 6px 0 0 18px;
-}
-
-.post.comment .ctrls a {
-  display: inline-block;
-  color: var(--text-color--light);
-  font-size: 13px;
-}
-
-.post.comment .ctrls a:hover {
-  cursor: pointer;
-  color: var(--text-color--default);
-}
-
-.post.comment .ctrls a.reply {
-  margin-right: 18px;
-}
-
-.post.comment .ctrls a :-webkit-any(.far, .fas) {
-  color: var(--text-color--very-light);
-}
-
-.post.comment .ctrls a .fa-tag {
-  color: transparent;
-  -webkit-text-stroke: 1px var(--text-color--very-light);
-}
-
-.post.comment .ctrls a small {
-  position: relative;
-  top: -1px;
-  letter-spacing: 0.5px;
-  font-weight: 500;
-}
-
-.post.comment ctzn-composer {
-  display: block;
-  padding: 10px 20px;
 }
 
 `

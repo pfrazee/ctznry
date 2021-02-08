@@ -34,7 +34,7 @@ ctzn-record {
   margin-right: 10px;
 }
 
-.comments-loading {
+.replies-loading {
   padding: 0 10px;
 }
 
@@ -51,11 +51,11 @@ ctzn-record {
   border-color: var(--border-color--highlight);
 }
 
-.comment-box {
+.reply-box {
   margin: 2px 0px 10px 48px;
 }
 
-.comment-prompt {
+.reply-prompt {
   cursor: text;
   padding: 10px 14px;
   border-radius: 4px;

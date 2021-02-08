@@ -187,20 +187,20 @@ export class Feed extends LitElement {
   }
 
   renderSearchResult (result) {
-    var renderMode = this.forceRenderMode || ({
-      'comment': 'card',
-      'microblogpost': 'card',
-      'subscription': 'action',
-    })[getRecordType(result)] || 'expanded-link'
-    return html`
-      <ctzn-record
-        .record=${result}
-        class=${this.recordClass}
-        render-mode=${renderMode}
-        search-terms=${this.filter}
-        show-context
-      ></ctzn-record>
-    `
+    // var renderMode = this.forceRenderMode || ({
+    //   'comment': 'card',
+    //   'microblogpost': 'card',
+    //   'subscription': 'action',
+    // })[getRecordType(result)] || 'expanded-link'
+    // return html`
+    //   <ctzn-record
+    //     .record=${result}
+    //     class=${this.recordClass}
+    //     render-mode=${renderMode}
+    //     search-terms=${this.filter}
+    //     show-context
+    //   ></ctzn-record>
+    // `
   }
 
   // events

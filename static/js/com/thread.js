@@ -2,8 +2,7 @@ import { LitElement, html } from '../../vendor/lit-element/lit-element.js'
 import { repeat } from '../../vendor/lit-element/lit-html/directives/repeat.js'
 import css from '../../css/com/thread.css.js'
 import * as toast from './toast.js'
-import * as session from '../lib/session.js'
-import { getPost, getComment, getThread } from '../lib/getters.js'
+import { getPost, getThread } from '../lib/getters.js'
 import './post.js'
 import './composer.js'
 
@@ -15,7 +14,7 @@ export class Thread extends LitElement {
       setDocumentTitle: {type: Boolean, attribute: 'set-document-title'},
       post: {type: Object},
       thread: {type: Array},
-      isCommenting: {type: Boolean}
+      isReplying: {type: Boolean}
     }
   }
 
@@ -28,17 +27,17 @@ export class Thread extends LitElement {
     this.subject = undefined
     this.isFullPage = false
     this.setDocumentTitle = false
-    this.commentCount = 0
+    this.replyCount = 0
     this.post = undefined
     this.thread = undefined
-    this.isCommenting = false
+    this.isReplying = false
     this.isLoading = false
   }
 
   reset () {
     this.post = undefined
     this.thread = undefined
-    this.commentCount = 0
+    this.replyCount = 0
   }
 
   get subjectSchemaId () {
@@ -52,13 +51,13 @@ export class Thread extends LitElement {
     // this.reset() TODO causes a flash of the loading spinner, needed?
     console.log('loading', this.subject)
     try {
-      if (this.subjectSchemaId === 'ctzn.network/post') {
-        this.post = await getPost(this.subject.authorId, this.subject.dbUrl)
+      let post = await getPost(this.subject.authorId, this.subject.dbUrl)
+      if (post.value.reply) {
+        this.post = await getPost(post.value.reply.root.authorId, post.value.reply.root.dbUrl)
+        this.thread = await getThread(post.value.reply.root.authorId, post.value.reply.root.dbUrl)
+      } else {
+        this.post = post
         this.thread = await getThread(this.subject.authorId, this.subject.dbUrl)
-      } else if (this.subjectSchemaId === 'ctzn.network/comment') {
-        let comment = await getComment(this.subject.authorId, this.subject.dbUrl)
-        this.post = await getPost(comment.value.subject.authorId, comment.value.subject.dbUrl)
-        this.thread = await getThread(comment.value.subject.authorId, comment.value.subject.dbUrl)
       }
     } catch (e) {
       toast.create(e.message, 'error')
@@ -96,13 +95,13 @@ export class Thread extends LitElement {
             view-content-on-click
             @publish-reply=${this.onPublishReply}
           ></ctzn-post>
-          ${this.subject.dbUrl === this.post?.url ? this.renderCommentBox() : ''}
+          ${this.subject.dbUrl === this.post?.url ? this.renderReplyBox() : ''}
         ` : html`
           <span class="spinner"></span>
         `}
       </div>
       ${this.thread ? html`
-        <div class="comments">
+        <div class="replies">
           ${this.renderReplies(this.thread)}
         </div>
       ` : ''}
@@ -123,7 +122,7 @@ export class Thread extends LitElement {
                 thread-view
                 @publish-reply=${this.onPublishReply}
               ></ctzn-post>
-              ${isSubject ? this.renderCommentBox() : ''}
+              ${isSubject ? this.renderReplyBox() : ''}
             </div>
             ${reply.replies?.length ? this.renderReplies(reply.replies) : ''}
           `
@@ -132,20 +131,20 @@ export class Thread extends LitElement {
     `
   }
 
-  renderCommentBox () {
+  renderReplyBox () {
     return html`
-      <div class="comment-box">
-        ${this.isCommenting ? html`
+      <div class="reply-box">
+        ${this.isReplying ? html`
           <ctzn-composer
             .subject=${{dbUrl: this.post.url, authorId: this.post.author.userId}}
             .parent=${this.subject}
-            placeholder="Write your comment"
-            @publish=${this.onPublishComment}
-            @cancel=${this.onCancelComment}
+            placeholder="Write your reply"
+            @publish=${this.onPublishReply}
+            @cancel=${this.onCancelReply}
           ></ctzn-composer>
         ` : html`
-          <div class="comment-prompt" @click=${this.onStartComment}>
-            Write your comment
+          <div class="reply-prompt" @click=${this.onStartReply}>
+            Write your reply
           </div>
         `}
       </div>
@@ -155,24 +154,18 @@ export class Thread extends LitElement {
   // events
   // =
 
-  onStartComment (e) {
-    this.isCommenting = true
+  onStartReply (e) {
+    this.isReplying = true
   }
 
-  onPublishComment (e) {
-    toast.create('Comment published', '', 10e3)
-    console.log(1)
-    this.load()
-    this.isCommenting = false
-  }
-
-  onCancelComment (e) {
-    this.isCommenting = false
-  }
-  
   onPublishReply (e) {
     toast.create('Reply published', '', 10e3)
     this.load()
+    this.isReplying = false
+  }
+
+  onCancelReply (e) {
+    this.isReplying = false
   }
 }
 
