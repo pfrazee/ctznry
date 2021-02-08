@@ -1,4 +1,5 @@
 @import "./fontawesome.css";
+@import "./tailwind.css";
 
 body {
   --system-font: -apple-system, BlinkMacSystemFont, system-ui, "Segoe UI", Ubuntu, Cantarell, "Oxygen Sans", "Helvetica Neue", sans-serif;
@@ -85,4 +86,37 @@ body {
     --bg-color--unread: #333658;
     --bg-color--error: #fee;
   }
+}
+
+.spinner {
+  display: inline-block;
+  height: 14px;
+  width: 14px;
+  animation: rotate 1s infinite linear;
+  border: 2px solid;
+  border-right-color: transparent;
+  border-radius: 50%;
+  transition: color 0.25s;
+}
+
+.spinner.reverse {
+  animation: rotate 2s infinite linear reverse;
+}
+
+@keyframes rotate {
+  0%    { transform: rotate(0deg); }
+  100%  { transform: rotate(360deg); }
+}
+
+.reload-page {
+  transition: height 0.2s;
+  height: 0px;
+}
+
+.reload-page.expanded {
+  height: 40px;
+}
+
+.reload-page:hover {
+  text-decoration: underline;
 }

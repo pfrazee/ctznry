@@ -6,8 +6,8 @@ import { AVATAR_URL } from './lib/const.js'
 import * as session from './lib/session.js'
 import { getProfile, listFollowers, listFollows } from './lib/getters.js'
 import { pluralize } from './lib/strings.js'
-import css from '../css/user.css.js'
 import './com/header.js'
+import './com/button.js'
 import './com/feed.js'
 import './com/user-list.js'
 
@@ -22,8 +22,8 @@ class CtznUser extends LitElement {
     }
   }
 
-  static get styles () {
-    return css
+  createRenderRoot() {
+    return this // dont use shadow dom
   }
 
   constructor () {
@@ -82,32 +82,33 @@ class CtznUser extends LitElement {
       e.preventDefault()
       this.setView(str)
     }
+    
     return html`
       <link rel="stylesheet" href="/css/fontawesome.css">
       <main>
         <ctzn-header></ctzn-header>
-        <div class="profile-banner">
+        <div class="text-center pb-4 border-b border-solid border-gray-200 mb-8">
           <a href="/${this.userId}" title=${this.userProfile?.value.displayName} @click=${setView('feed')}>
-            <img class="avatar" src=${AVATAR_URL(this.userProfile?.userId)}>
+            <img class="block mx-auto mb-8 w-40 rounded-full shadow-md" src=${AVATAR_URL(this.userProfile?.userId)}>
           </a>
-          <h2 class="display-name">
+          <h2 class="text-4xl semibold">
             <a href="/${this.userId}" title=${this.userProfile?.value.displayName} @click=${setView('feed')}>
               ${this.userProfile?.value.displayName}
             </a>
           </h2>
-          <h2 class="username">
+          <h2 class="text-gray-500 bold">
             <a href="/${this.userId}" title="${this.userId}" @click=${setView('feed')}>
               ${this.userId}
             </a>
           </h2>
           ${this.userProfile?.value.description ? html`
-            <p class="bio">${this.userProfile?.value.description}</p>
+            <div class="my-4">${this.userProfile?.value.description}</div>
           ` : ''}
-          <p class="stats">
-            <a class="stat" @click=${setView('followers')}><span class="stat-number">${nFollowers}</span> Known ${pluralize(nFollowers, 'Follower')}</a>
+          <div>
+            <a class="text-xs medium text-gray-500 cursor-pointer" @click=${setView('followers')}><span class="text-lg">${nFollowers}</span> Known ${pluralize(nFollowers, 'Follower')}</a>
             &middot;
-            <a class="stat" @click=${setView('following')}><span class="stat-number">${nFollowing}</span> Following</a>
-          </p>
+            <a class="text-xs medium text-gray-500 cursor-pointer" @click=${setView('following')}><span class="text-lg">${nFollowing}</span> Following</a>
+          </div>
         </div>
         ${this.renderCurrentView()}
       </main>
@@ -122,12 +123,12 @@ class CtznUser extends LitElement {
           <section class="user-controls">
             ${session.isActive() ? html`
               ${session.info.userId === this.userId ? html`
-                <button class="primary" @click=${this.onClickEditProfile}>Edit profile</button>
+                <ctzn-button primary @click=${this.onClickEditProfile} label="Edit profile"></ctzn-button>
               ` : html`
                 ${this.amIFollowing === true ? html`
-                  <button @click=${this.onClickUnfollow}>Unfollow ${displayName}</button>
+                  <ctzn-button @click=${this.onClickUnfollow} label="Unfollow ${displayName}"></ctzn-button>
                 ` : this.amIFollowing === false ? html`
-                  <button class="primary" @click=${this.onClickFollow}>Follow ${displayName}</button>
+                  <ctzn-button primary @click=${this.onClickFollow} label="Follow ${displayName}"></ctzn-button>
                 ` : ``}
               `}
             ` : html`
@@ -142,7 +143,7 @@ class CtznUser extends LitElement {
   renderCurrentView () {
     if (this.currentView === 'followers') {
       return html`
-        <div class="twocol">
+        <div class="max-w-3xl mx-auto grid grid-cols-layout-twocol gap-8">
           <div>
             <h3>${this.followers?.length} ${pluralize(this.followers?.length, 'follower')}</h3>
             <ctzn-user-list .ids=${this.followers}></ctzn-user-list>
@@ -152,7 +153,7 @@ class CtznUser extends LitElement {
       `
     } else if (this.currentView === 'following') {
       return html`
-        <div class="twocol">
+        <div class="max-w-3xl mx-auto grid grid-cols-layout-twocol gap-8">
           <div>
             <h3>Following ${this.following?.length} ${pluralize(this.following?.length, 'account')}</h3>
             <ctzn-user-list .ids=${this.following.map(f => f.value.subject.userId)}></ctzn-user-list>
@@ -162,7 +163,7 @@ class CtznUser extends LitElement {
       `      
     }
     return html`
-      <div class="twocol">
+      <div class="max-w-3xl mx-auto grid grid-cols-layout-twocol gap-8">
         <div>
           ${this.isEmpty ? this.renderEmptyMessage() : ''}
           <ctzn-feed
@@ -180,7 +181,7 @@ class CtznUser extends LitElement {
 
   renderEmptyMessage () {
     return html`
-      <div class="empty">
+      <div class="bg-gray-100 text-gray-500 py-44 text-center my-5">
         <div>${this.userProfile?.value?.displayName} hasn't posted anything yet.</div>
       </div>
     `

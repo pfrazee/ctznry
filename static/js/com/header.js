@@ -2,7 +2,7 @@ import {LitElement, html} from '../../vendor/lit-element/lit-element.js'
 import * as contextMenu from './context-menu.js'
 import * as session from '../lib/session.js'
 import { AVATAR_URL } from '../lib/const.js'
-import css from '../../css/com/header.css.js'
+import './button.js'
 
 const CHECK_NOTIFICATIONS_INTERVAL = 5e3
 
@@ -13,8 +13,8 @@ export class Header extends LitElement {
     }
   }
 
-  static get styles () {
-    return css
+  createRenderRoot() {
+    return this // dont use shadow dom
   }
 
   constructor () {
@@ -35,41 +35,44 @@ export class Header extends LitElement {
   }
 
   getNavClass (str) {
-    return str === location.pathname ? 'current' : ''
+    const additions = str === location.pathname ? 'border-blue-500' : ''
+    return `p-3.5 pb-3 border-b-2 border-solid border-transparent hover:bg-gray-100 ${additions}`
   }
 
   render () {
     return html`
       <link rel="stylesheet" href="/css/fontawesome.css">
-      <header>
-        <a href="/" class=${this.getNavClass('/')}>
-          <span class="fas navicon fa-stream"></span>
-          Home
-        </a>
-        <a href="/notifications" class=${this.getNavClass('/notifications')}>
-          <span class="far navicon fa-bell"></span>
-          Notifications ${this.unreadNotificationsCount > 0 ? `(${this.unreadNotificationsCount})` : ''}
-        </a>
-        <span class="spacer"></span>
-        ${this.renderSessionCtrls()}
-      </header>
+      <div class="border-b border-gray-200 border-solid mb-4">
+        <header class="max-w-3xl mx-auto flex items-center ph-2 leading-none">
+          <a href="/" class=${this.getNavClass('/')}>
+            <span class="fas navicon fa-stream"></span>
+            Home
+          </a>
+          <a href="/notifications" class=${this.getNavClass('/notifications')}>
+            <span class="far navicon fa-bell"></span>
+            Notifications ${this.unreadNotificationsCount > 0 ? `(${this.unreadNotificationsCount})` : ''}
+          </a>
+          <span class="flex-grow"></span>
+          ${this.renderSessionCtrls()}
+        </header>
+      </div>
     `
   }
 
   renderSessionCtrls () {
     if (session.isActive()) {
       return html`
-        <button class="primary" @click=${this.onClickNewPost}>New Post</button>
-        <a class="profile ${this.getNavClass('/' + session.info.userId)}" href="/${session.info.userId}">
-          <img src=${AVATAR_URL(session.info.userId)}>
+        <ctzn-button primary @click=${this.onClickNewPost} label="New Post"></ctzn-button>
+        <a class="inline-flex items-center ${this.getNavClass('/' + session.info.userId)} pt-3 pb-2.5 ml-3" href="/${session.info.userId}">
+          <img class="inline-block w-5 h-5 mr-2 rounded-full" src=${AVATAR_URL(session.info.userId)}>
           ${session.info.userId}
         </a>
-        <a @click=${this.onClickSessionMenu}><span class="fas fa-caret-down"></span></a>
+        <a @click=${this.onClickSessionMenu} class=${this.getNavClass()} href="#"><span class="fas fa-caret-down"></span></a>
       `
     } else {
       return html`
-        <a href="/login">Login</a>
-        <a href="/signup"><strong>Signup</strong></a>
+        <a class=${this.getNavClass()} href="/login">Login</a>
+        <a class=${this.getNavClass()} href="/signup"><strong>Signup</strong></a>
       `
     }
   }

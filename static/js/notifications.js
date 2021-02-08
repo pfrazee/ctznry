@@ -3,7 +3,6 @@ import { ViewThreadPopup } from './com/popups/view-thread.js'
 import * as toast from './com/toast.js'
 import * as session from './lib/session.js'
 import { pluralize } from './lib/strings.js'
-import css from '../css/notifications.css.js'
 import './com/header.js'
 import './com/notifications-feed.js'
 import './com/img-fallbacks.js'
@@ -17,8 +16,8 @@ class CtznNotifications extends LitElement {
     }
   }
 
-  static get styles () {
-    return css
+  createRenderRoot() {
+    return this // dont use shadow dom
   }
 
   constructor () {
@@ -39,10 +38,10 @@ class CtznNotifications extends LitElement {
       return this.requestUpdate()
     }
     this.notificationsClearedAt = Number(new Date(await session.api.notifications.getNotificationsClearedAt()))
-    if (this.shadowRoot.querySelector('ctzn-notifications-feed')) {
+    if (this.querySelector('ctzn-notifications-feed')) {
       this.loadTime = Date.now()
       this.numNewItems = 0
-      this.shadowRoot.querySelector('ctzn-notifications-feed').load({clearCurrent})
+      this.querySelector('ctzn-notifications-feed').load({clearCurrent})
     }
     await session.api.notifications.updateNotificationsClearedAt()
     return this.requestUpdate()
@@ -64,7 +63,7 @@ class CtznNotifications extends LitElement {
   }
 
   get isLoading () {
-    let queryViewEls = Array.from(this.shadowRoot.querySelectorAll('ctzn-notifications-feed'))
+    let queryViewEls = Array.from(this.querySelectorAll('ctzn-notifications-feed'))
     return !!queryViewEls.find(el => el.isLoading)
   }
 
@@ -102,10 +101,10 @@ class CtznNotifications extends LitElement {
       return ''
     }
     return html`
-      <div class="twocol">
+      <div class="max-w-3xl mx-auto grid grid-cols-layout-twocol gap-8">
         <div>
           ${this.isEmpty ? this.renderEmptyMessage() : ''}
-          <div class="reload-page ${this.numNewItems > 0 ? 'visible' : ''}" @click=${e => this.load()}>
+          <div class="reload-page mx-4 mb-4 rounded cursor-pointer overflow-hidden leading-10 ${this.numNewItems > 0 ? 'visible' : ''}" @click=${e => this.load()}>
             ${this.numNewItems} new ${pluralize(this.numNewItems, 'update')}
           </div>
           <ctzn-notifications-feed
@@ -123,8 +122,8 @@ class CtznNotifications extends LitElement {
 
   renderEmptyMessage () {
     return html`
-      <div class="empty">
-        <div class="fas fa-bell"></div>
+      <div class="bg-gray-100 text-gray-500 py-44 text-center my-5">
+        <div class="fas fa-bell text-6xl text-gray-300 mb-8"></div>
         <div>You have no notifications!</div>
       </div>
     `

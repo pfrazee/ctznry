@@ -4,7 +4,6 @@ import * as toast from './com/toast.js'
 import { pluralize } from './lib/strings.js'
 import { AVATAR_URL } from './lib/const.js'
 import * as session from './lib/session.js'
-import css from '../css/main.css.js'
 import './com/header.js'
 import './com/composer.js'
 import './com/feed.js'
@@ -20,8 +19,8 @@ class CtznApp extends LitElement {
     }
   }
 
-  static get styles () {
-    return css
+  createRenderRoot() {
+    return this // dont use shadow dom
   }
 
   constructor () {
@@ -117,7 +116,7 @@ class CtznApp extends LitElement {
 
   renderNoSession () {
     return html`
-      <div class="twocol">
+      <div class="max-w-3xl mx-auto grid grid-cols-layout-twocol gap-8">
         <div>
           <h1>Welcome to the CTZN network</h1>
           <p>The hottest place to get your memes</p>
@@ -128,23 +127,23 @@ class CtznApp extends LitElement {
 
   renderWithSession () {
     return html`
-      <div class="twocol">
+      <div class="max-w-3xl mx-auto grid grid-cols-layout-twocol gap-8">
         <div>
-          <div class="composer">
-            <img class="thumb" src="${AVATAR_URL(session.info.userId)}">
+          <div class="grid grid-cols-composer gap-3.5">
+            <img class="w-8 h-8 rounded-full object-cover mt-2" src="${AVATAR_URL(session.info.userId)}">
             ${this.isComposingPost ? html`
               <ctzn-composer
                 @publish=${this.onPublishPost}
                 @cancel=${this.onCancelPost}
               ></ctzn-composer>
             ` : html`
-              <div class="compose-post-prompt" @click=${this.onComposePost}>
+              <div class="border border-solid border-gray-200 py-4 px-5 rounded cursor-text" @click=${this.onComposePost}>
                 What's new?
               </div>
             `}
           </div>
           ${this.isEmpty ? this.renderEmptyMessage() : ''}
-          <div class="reload-page ${this.numNewItems > 0 ? 'visible' : ''}" @click=${e => this.load()}>
+          <div class="reload-page mx-4 mb-4 rounded cursor-pointer overflow-hidden leading-10 ${this.numNewItems > 0 ? 'expanded' : ''}" @click=${e => this.load()}>
             ${this.numNewItems} new ${pluralize(this.numNewItems, 'update')}
           </div>
           <ctzn-feed
