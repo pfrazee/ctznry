@@ -141,7 +141,11 @@ a:hover {
   background: var(--bg-color--semi-light);
   border-radius: 50%;
   position: relative;
-  top: 8px;
+  top: 7px;
+}
+
+.post.card.in-community .thumb {
+  top: 26px;
 }
 
 .post.card .thumb img {
@@ -155,7 +159,7 @@ a:hover {
   content: '';
   display: block;
   position: absolute;
-  top: 20px;
+  top: 18px;
   left: 41px;
   width: 8px;
   height: 8px;
@@ -164,6 +168,10 @@ a:hover {
   border-top: 1px solid var(--border-color--light);
   border-left: 1px solid var(--border-color--light);
   transform: rotate(-45deg);
+}
+
+.post.card.in-community .arrow {
+  top: 36px;
 }
 
 .post.card.is-notification .arrow {
@@ -236,6 +244,20 @@ a:hover {
   color: var(--text-color--pretty-light);
 }
 
+.post.card .community {
+  margin: -2px -2px -2px;
+  background: var(--bg-color--semi-light);
+  padding: 4px 12px;
+  font-size: 10px;
+  border-top-left-radius: 4px;
+  border-top-right-radius: 4px;
+  font-weight: 500;
+}
+
+.post.card .community a {
+  color: inherit;
+}
+
 .post.card .content {
   white-space: initial;
   word-break: break-word;
@@ -305,6 +327,10 @@ a:hover {
   border-top-left-radius: 0;
   border-top-right-radius: 0;
   border-top: 0;
+}
+
+:host(.child-post) .post.card .community {
+  display: none;
 }
 
 `

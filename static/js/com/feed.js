@@ -191,7 +191,7 @@ export class Feed extends LitElement {
   
   renderNormalResult (post) {
     return html`
-      <div class="post ${post.parentPost ? 'reply' : ''}">
+      <div class="post ${post.parentPost ? 'reply' : ''} ${post.value.community ? 'in-community' : ''}">
         ${post.parentPost ? html`
           <ctzn-post
             .post=${post.parentPost}

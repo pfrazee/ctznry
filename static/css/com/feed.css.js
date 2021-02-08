@@ -87,8 +87,13 @@ h2 a:hover {
   width: 2px;
   left: 14px;
   top: 44px;
-  height: 28%;
+  height: 23%;
   background: rgb(193 193 193);
+}
+
+.post.in-community.reply:before {
+  top: 64px;
+  height: 20%;
 }
 
 .post.reply ctzn-post {

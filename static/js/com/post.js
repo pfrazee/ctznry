@@ -85,7 +85,8 @@ export class Post extends LitElement {
       <div
         class=${classMap({
           post: true,
-          card: true
+          card: true,
+          'in-community': !!this.post?.value.community && !this.post?.value.reply
         })}
       >
         <a class="thumb" href="/${this.post.author.userId}" title=${this.post.author.displayName} data-tooltip=${this.post.author.displayName}>
@@ -99,22 +100,31 @@ export class Post extends LitElement {
           @mouseup=${this.onMouseupCard}
           @mousemove=${this.onMousemoveCard}
         >
-          ${this.nometa ? '' : html`<div class="header">
-            <div class="origin">
-              <a class="author displayname" href="/${this.post.author.userId}" title=${this.post.author.displayName}>
-                ${this.post.author.displayName}
-              </a>
-              <a class="author username" href="/${this.post.author.userId}" title=${this.post.author.userId}>
-                ${this.post.author.userId}
-              </a>
+          ${this.nometa ? '' : html`
+            ${this.post.value.community ? html`
+              <div class="community">
+                <a href="/${this.post.value.community.userId}">
+                  <span class="fas fa-fw fa-users"></span> ${this.post.value.community.userId}
+                </a>
+              </div>
+            ` : ''}
+            <div class="header">
+              <div class="origin">
+                <a class="author displayname" href="/${this.post.author.userId}" title=${this.post.author.displayName}>
+                  ${this.post.author.displayName}
+                </a>
+                <a class="author username" href="/${this.post.author.userId}" title=${this.post.author.userId}>
+                  ${this.post.author.userId}
+                </a>
+              </div>
+              <span>&middot;</span>
+              <div class="date">
+                <a href=${this.post.url} data-tooltip=${(new Date(this.post.value.createdAt)).toLocaleString()}>
+                  ${relativeDate(this.post.value.createdAt)}
+                </a>
+              </div>
             </div>
-            <span>&middot;</span>
-            <div class="date">
-              <a href=${this.post.url} data-tooltip=${(new Date(this.post.value.createdAt)).toLocaleString()}>
-                ${relativeDate(this.post.value.createdAt)}
-              </a>
-            </div>
-          </div>`}
+          `}
           ${this.context ? html`<div class="context">${this.context}</div>` : ''}
           <div class="content markdown">
             ${this.post.value.text ? (this.renderMatchText() || this.post.value.text) : ''}
