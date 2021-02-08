@@ -1,10 +1,13 @@
 import { LitElement, html } from '../vendor/lit-element/lit-element.js'
+import { repeat } from '../vendor/lit-element/lit-html/directives/repeat.js'
 import { ViewThreadPopup } from './com/popups/view-thread.js'
+import { CreateCommunityPopup } from './com/popups/create-community.js'
 import * as toast from './com/toast.js'
 import { pluralize } from './lib/strings.js'
 import { AVATAR_URL } from './lib/const.js'
 import * as session from './lib/session.js'
 import './com/header.js'
+import './com/button.js'
 import './com/composer.js'
 import './com/feed.js'
 import './com/img-fallbacks.js'
@@ -30,6 +33,12 @@ class CtznApp extends LitElement {
     this.isEmpty = false
     this.numNewItems = 0
     this.loadTime = Date.now()
+    this.myCommunities = [
+      {userId: 'test@dev1.localhost', displayName: 'Test Community 1', avatarUrl: 'http://localhost:15001/ctzn/avatar/test'},
+      {userId: 'test2@dev1.localhost', displayName: 'Test Community 2', avatarUrl: 'http://localhost:15001/ctzn/avatar/test2'},
+      {userId: 'test3@dev1.localhost', displayName: 'Test Community 3', avatarUrl: 'http://localhost:15001/ctzn/avatar/test3'},
+      {userId: 'test4@dev1.localhost', displayName: 'Test Community 4', avatarUrl: 'http://localhost:15001/ctzn/avatar/test4'}
+    ]
 
     this.load()
 
@@ -93,16 +102,37 @@ class CtznApp extends LitElement {
 
   renderRightSidebar () {
     return html`
-      <div class="sidebar">
-        <div class="sticky">
-          <div class="search-ctrl">
-            <span class="fas fa-search"></span>
-            ${!!this.searchQuery ? html`
-              <a class="clear-search" @click=${this.onClickClearSearch}><span class="fas fa-times"></span></a>
-            ` : ''}
-            <input @keyup=${this.onKeyupSearch} placeholder="Search" value=${this.searchQuery}>
-          </div>
-        </div>
+      <div>
+        <section class="mb-4">
+          <span class="fas fa-search"></span>
+          ${!!this.searchQuery ? html`
+            <a class="clear-search" @click=${this.onClickClearSearch}><span class="fas fa-times"></span></a>
+          ` : ''}
+          <input @keyup=${this.onKeyupSearch} placeholder="Search" value=${this.searchQuery}>
+        </section>
+        <section class="mb-4">
+          <h3 class="mb-1 font-bold text-gray-600">My Communities</h3>
+          ${this.myCommunities?.length ? html`
+            <div class="mt-2">
+              ${repeat(this.myCommunities, community => html`
+                <a href="/${community.userId}" data-tooltip=${community.displayName}>
+                  <img class="inline-block rounded-full w-10 h-10 object-cover" src="${community.avatarUrl}">
+                </a>
+              `)}
+            </div>
+          ` : html`
+            <div class="px-3 py-2 bg-gray-200 text-gray-600 text-xs">
+              Join a community to get connected to more people!
+            </div>
+          `}
+        </section>
+        <section>
+          <ctzn-button
+            class="text-gray-600 text-sm font-semibold w-full"
+            label="Create Community"
+            @click=${this.onClickCreateCommunity}
+          ></ctzn-button>
+        </section>
       </div>
     `
   }
@@ -137,7 +167,7 @@ class CtznApp extends LitElement {
                 @cancel=${this.onCancelPost}
               ></ctzn-composer>
             ` : html`
-              <div class="border border-solid border-gray-200 py-4 px-5 rounded cursor-text" @click=${this.onComposePost}>
+              <div class="border border-solid border-gray-300 py-4 px-5 rounded cursor-text" @click=${this.onComposePost}>
                 What's new?
               </div>
             `}
@@ -218,6 +248,14 @@ class CtznApp extends LitElement {
   onPublishReply (e) {
     toast.create('Reply published', '', 10e3)
     this.load()
+  }
+
+  async onClickCreateCommunity (e) {
+    e.preventDefault()
+    e.stopPropagation()
+    const res = await CreateCommunityPopup.create()
+    console.log(res)
+    window.location = `/${res.userId}`
   }
 }
 
