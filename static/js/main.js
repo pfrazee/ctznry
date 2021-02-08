@@ -6,6 +6,7 @@ import * as toast from './com/toast.js'
 import { pluralize } from './lib/strings.js'
 import { AVATAR_URL } from './lib/const.js'
 import * as session from './lib/session.js'
+import { listMemberships } from './lib/getters.js'
 import './com/header.js'
 import './com/button.js'
 import './com/composer.js'
@@ -18,6 +19,7 @@ class CtznApp extends LitElement {
       isComposingPost: {type: Boolean},
       searchQuery: {type: String},
       isEmpty: {type: Boolean},
+      memberships: {type: Array},
       numNewItems: {type: Number}
     }
   }
@@ -33,12 +35,7 @@ class CtznApp extends LitElement {
     this.isEmpty = false
     this.numNewItems = 0
     this.loadTime = Date.now()
-    this.myCommunities = [
-      {userId: 'test@dev1.localhost', displayName: 'Test Community 1', avatarUrl: 'http://localhost:15001/ctzn/avatar/test'},
-      {userId: 'test2@dev1.localhost', displayName: 'Test Community 2', avatarUrl: 'http://localhost:15001/ctzn/avatar/test2'},
-      {userId: 'test3@dev1.localhost', displayName: 'Test Community 3', avatarUrl: 'http://localhost:15001/ctzn/avatar/test3'},
-      {userId: 'test4@dev1.localhost', displayName: 'Test Community 4', avatarUrl: 'http://localhost:15001/ctzn/avatar/test4'}
-    ]
+    this.memberships = undefined
 
     this.load()
 
@@ -51,14 +48,15 @@ class CtznApp extends LitElement {
 
   async load ({clearCurrent} = {clearCurrent: false}) {
     await session.setup()
-    if (!session.active) {
+    if (!session.isActive()) {
       return this.requestUpdate()
     }
+    this.memberships = await listMemberships(session.info.userId)
 
-    if (this.shadowRoot.querySelector('ctzn-feed')) {
+    if (this.querySelector('ctzn-feed')) {
       this.loadTime = Date.now()
       this.numNewItems = 0
-      this.shadowRoot.querySelector('ctzn-feed').load({clearCurrent})
+      this.querySelector('ctzn-feed').load({clearCurrent})
     }
     
     if ((new URL(window.location)).searchParams.has('composer')) {
@@ -83,7 +81,7 @@ class CtznApp extends LitElement {
   }
 
   get isLoading () {
-    let queryViewEls = Array.from(this.shadowRoot.querySelectorAll('ctzn-feed'))
+    let queryViewEls = Array.from(this.querySelectorAll('ctzn-feed'))
     return !!queryViewEls.find(el => el.isLoading)
   }
 
@@ -112,11 +110,11 @@ class CtznApp extends LitElement {
         </section>
         <section class="mb-4">
           <h3 class="mb-1 font-bold text-gray-600">My Communities</h3>
-          ${this.myCommunities?.length ? html`
+          ${this.memberships?.length ? html`
             <div class="mt-2">
-              ${repeat(this.myCommunities, community => html`
-                <a href="/${community.userId}" data-tooltip=${community.displayName}>
-                  <img class="inline-block rounded-full w-10 h-10 object-cover" src="${community.avatarUrl}">
+              ${repeat(this.memberships, membership => html`
+                <a href="/${membership.value.community.userId}" data-tooltip=${membership.value.community.userId}>
+                  <img class="inline-block rounded-full w-10 h-10 object-cover" src="${AVATAR_URL(membership.value.community.userId)}">
                 </a>
               `)}
             </div>
