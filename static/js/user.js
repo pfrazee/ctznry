@@ -1,4 +1,5 @@
 import { LitElement, html } from '../vendor/lit-element/lit-element.js'
+import { repeat } from '../vendor/lit-element/lit-html/directives/repeat.js'
 import { ViewThreadPopup } from './com/popups/view-thread.js'
 import { EditProfilePopup } from './com/popups/edit-profile.js'
 import * as toast from './com/toast.js'
@@ -31,6 +32,7 @@ class CtznUser extends LitElement {
     this.userProfile = undefined
     this.currentView = 'feed'
     this.followers = undefined
+    this.uniqFollowers = undefined
     this.following = undefined
     this.isEmpty = false
 
@@ -40,7 +42,7 @@ class CtznUser extends LitElement {
   }
 
   get amIFollowing () {
-    return !!this.followers?.find?.(id => id === session.info.userId)
+    return !!this.uniqFollowers?.find?.(id => id === session.info.userId)
   }
 
   get isFollowingMe () {
@@ -55,12 +57,13 @@ class CtznUser extends LitElement {
     await session.setup()
     this.userProfile = await getProfile(this.userId)
     const [followers, following] = await Promise.all([
-      listFollowers(this.userId).then(res => res.followerIds),
+      listFollowers(this.userId),
       listFollows(this.userId)
     ])
     this.followers = followers
+    this.uniqFollowers = Array.from(getUniqFollowers(followers))
     this.following = following
-    console.log({userProfile: this.userProfile, followers, following})
+    console.log({userProfile: this.userProfile, followers, following, numFollowers: this.numFollowers})
   }
 
   get isLoading () {
@@ -76,8 +79,8 @@ class CtznUser extends LitElement {
   // =
 
   render () {
-    const nFollowers = this.followers?.length || 0
     const nFollowing = this.following?.length || 0
+    const nFollowers = this.uniqFollowers?.length || 0
     const setView = (str) => e => {
       e.preventDefault()
       this.setView(str)
@@ -91,12 +94,12 @@ class CtznUser extends LitElement {
           <a href="/${this.userId}" title=${this.userProfile?.value.displayName} @click=${setView('feed')}>
             <img class="block mx-auto mb-8 w-40 rounded-full shadow-md" src=${AVATAR_URL(this.userProfile?.userId)}>
           </a>
-          <h2 class="text-4xl semibold">
+          <h2 class="text-4xl font-semibold">
             <a href="/${this.userId}" title=${this.userProfile?.value.displayName} @click=${setView('feed')}>
               ${this.userProfile?.value.displayName}
             </a>
           </h2>
-          <h2 class="text-gray-500 bold">
+          <h2 class="text-gray-500 font-semibold">
             <a href="/${this.userId}" title="${this.userId}" @click=${setView('feed')}>
               ${this.userId}
             </a>
@@ -105,7 +108,7 @@ class CtznUser extends LitElement {
             <div class="my-4">${this.userProfile?.value.description}</div>
           ` : ''}
           <div>
-            <a class="text-xs medium text-gray-500 cursor-pointer" @click=${setView('followers')}><span class="text-lg">${nFollowers}</span> Known ${pluralize(nFollowers, 'Follower')}</a>
+            <a class="text-xs medium text-gray-500 cursor-pointer" @click=${setView('followers')}><span class="text-lg">${nFollowers}</span> ${pluralize(nFollowers, 'Follower')}</a>
             &middot;
             <a class="text-xs medium text-gray-500 cursor-pointer" @click=${setView('following')}><span class="text-lg">${nFollowing}</span> Following</a>
           </div>
@@ -116,26 +119,43 @@ class CtznUser extends LitElement {
   }
 
   renderRightSidebar () {
+    const nSharedFollowers = this.followers?.myFollowed?.length || 0
     const displayName = this.userProfile?.value.displayName || this.userId
     return html`
-      <div class="sidebar">
-        <div class="sticky">
-          <section class="user-controls">
-            ${session.isActive() ? html`
-              ${session.info.userId === this.userId ? html`
-                <ctzn-button primary @click=${this.onClickEditProfile} label="Edit profile"></ctzn-button>
-              ` : html`
-                ${this.amIFollowing === true ? html`
-                  <ctzn-button @click=${this.onClickUnfollow} label="Unfollow ${displayName}"></ctzn-button>
-                ` : this.amIFollowing === false ? html`
-                  <ctzn-button primary @click=${this.onClickFollow} label="Follow ${displayName}"></ctzn-button>
-                ` : ``}
-              `}
+      <div>
+        <section class="mb-2">
+          ${session.isActive() ? html`
+            ${session.info.userId === this.userId ? html`
+              <ctzn-button primary @click=${this.onClickEditProfile} label="Edit profile"></ctzn-button>
             ` : html`
-              TODO logged out UI
+              ${this.amIFollowing === true ? html`
+                <ctzn-button @click=${this.onClickUnfollow} label="Unfollow ${displayName}"></ctzn-button>
+              ` : this.amIFollowing === false ? html`
+                <ctzn-button primary @click=${this.onClickFollow} label="Follow ${displayName}"></ctzn-button>
+              ` : ``}
             `}
-          </section>
-        </div>
+          ` : html`
+            TODO logged out UI
+          `}
+        </section>
+        <section class="mb-2">
+          ${nSharedFollowers ? html`
+            Followed by ${repeat(this.followers?.myFollowed, userId => html`
+              <a class="inline-block bg-gray-100 rounded p-1 mr-1 mb-1 text-xs hover:bg-gray-200" href="/${userId}">${userId}</a>
+            `)}
+          ` : ''}
+        </section>
+        <section class="mb-2">
+          ${nSharedFollowers ? html`
+            Communities: ${repeat(this.followers?.myFollowed, userId => html`
+              <a class="inline-block bg-gray-100 rounded p-1 mr-1 mb-1 text-xs hover:bg-gray-200" href="/${userId}">${userId}</a>
+            `)}
+          ` : html`
+            <div class="py-2 px-3 text-sm text-gray-600 bg-gray-100">
+              Not a member of any communities
+            </div>
+          `}
+        </section>
       </div>
     `
   }
@@ -145,8 +165,8 @@ class CtznUser extends LitElement {
       return html`
         <div class="max-w-3xl mx-auto grid grid-cols-layout-twocol gap-8">
           <div>
-            <h3>${this.followers?.length} ${pluralize(this.followers?.length, 'follower')}</h3>
-            <ctzn-user-list .ids=${this.followers}></ctzn-user-list>
+            <h3>${this.uniqFollowers?.length} ${pluralize(this.uniqFollowers?.length, 'follower')}</h3>
+            <ctzn-user-list .ids=${this.uniqFollowers}></ctzn-user-list>
           </div>
           ${this.renderRightSidebar()}
         </div>
@@ -181,7 +201,7 @@ class CtznUser extends LitElement {
 
   renderEmptyMessage () {
     return html`
-      <div class="bg-gray-100 text-gray-500 py-44 text-center my-5">
+      <div class="bg-gray-100 text-gray-500 py-44 text-center">
         <div>${this.userProfile?.value?.displayName} hasn't posted anything yet.</div>
       </div>
     `
@@ -221,12 +241,13 @@ class CtznUser extends LitElement {
   async onClickFollow (e) {
     await session.api.follows.follow(this.userId)
     this.followers = await listFollowers(this.userId).then(res => res.followerIds)
-    console.log(this.followers)
+    this.uniqFollowers = Array.from(getUniqFollowers(followers))
   }
 
   async onClickUnfollow (e) {
     await session.api.follows.unfollow(this.userId)
     this.followers = await listFollowers(this.userId).then(res => res.followerIds)
+    this.uniqFollowers = Array.from(getUniqFollowers(followers))
   }
 
   onViewThread (e) {
@@ -242,3 +263,7 @@ class CtznUser extends LitElement {
 }
 
 customElements.define('ctzn-user', CtznUser)
+
+function getUniqFollowers (followers) {
+  return new Set(followers.community.concat(followers.myCommunity).concat(followers.myFollowed))
+}

@@ -32,13 +32,14 @@ export class UserList extends LitElement {
       this.requestUpdate()
 
       const [followers, following] = await Promise.all([
-        listFollowers(id).then(res => res.followerIds),
+        listFollowers(id),
         listFollows(id)
       ])
-      profile.numFollowers = followers.length
+      let uniqFollowers = getUniqFollowers(followers)
+      profile.numFollowers = uniqFollowers.length
       profile.numFollowing = following.length
       profile.isFollowingMe = session.isActive() && !!following.find(f => f.value.subject.userId === session.info.userId)
-      profile.amIFollowing = session.isActive() && !!followers.find(f => f === session.info.userId)
+      profile.amIFollowing = session.isActive() && !!uniqFollowers.find(f => f === session.info.userId)
       this.requestUpdate()
     }
   }
@@ -80,7 +81,7 @@ export class UserList extends LitElement {
               </div>
               <div class="description">${profile.value.description}</div>
               <div class="stats">
-                <span class="stat"><span class="stat-number">${nFollowers}</span> Known ${pluralize(nFollowers, 'Follower')}</span>
+                <span class="stat"><span class="stat-number">${nFollowers}</span> ${pluralize(nFollowers, 'Follower')}</span>
                 &middot;
                 <span class="stat"><span class="stat-number">${nFollowing}</span> Following</span>
                 ${profile.isFollowingMe ? html`
@@ -128,3 +129,7 @@ export class UserList extends LitElement {
 }
 
 customElements.define('ctzn-user-list', UserList)
+
+function getUniqFollowers (followers) {
+  return [...new Set(followers.community.concat(followers.myCommunity).concat(followers.myFollowed))]
+}

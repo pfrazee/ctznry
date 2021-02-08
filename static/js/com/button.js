@@ -18,7 +18,7 @@ export class Button extends LitElement {
   }
 
   getClass () {
-    let colors = 'bg-gray-200 hover:bg-gray-300'
+    let colors = 'bg-white border border-gray-200 hover:bg-gray-100'
     if (this.hasAttribute('primary')) {
       colors = 'bg-blue-600 text-white hover:bg-blue-700'
       if (this.disable) {
