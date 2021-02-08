@@ -52,6 +52,22 @@ export async function listFollows (userId) {
   return httpGet(domain, `/ctzn/follows/${encodeURIComponent(userId)}`)
 }
 
+export async function listMembers (userId) {
+  const domain = getDomain(userId)
+  if (session.isActive(domain)) {
+    return session.api.communities.listMembers(userId)
+  }
+  return httpGet(domain, `/ctzn/members/${encodeURIComponent(userId)}`)
+}
+
+export async function listMemberships (userId) {
+  const domain = getDomain(userId)
+  if (session.isActive(domain)) {
+    return session.api.communities.listMemberships(userId)
+  }
+  return httpGet(domain, `/ctzn/memberships/${encodeURIComponent(userId)}`)
+}
+
 function getDomain (userId) {
   return userId.split('@')[1] || userId
 }
