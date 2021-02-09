@@ -35,6 +35,7 @@ class CtznNotifications extends LitElement {
   async load ({clearCurrent} = {clearCurrent: false}) {
     await session.setup()
     if (!session.isActive()) {
+      window.location = '/'
       return this.requestUpdate()
     }
     this.notificationsClearedAt = Number(new Date(await session.api.notifications.getNotificationsClearedAt()))
