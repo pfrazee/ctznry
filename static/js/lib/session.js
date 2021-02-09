@@ -102,6 +102,6 @@ export function onChange (cb, opts) {
 }
 
 async function connectApi (domain) {
-  const wsEndpoint = (domain in DEBUG_ENDPOINTS) ? `ws://${DEBUG_ENDPOINTS[domain]}/` : `ws://${domain}/`
+  const wsEndpoint = (domain in DEBUG_ENDPOINTS) ? `ws://${DEBUG_ENDPOINTS[domain]}/` : `wss://${domain}/`
   return createRpcApi(wsEndpoint)
 }

@@ -94,7 +94,7 @@ function toKey (key) {
 }
 
 async function httpGet (domain, path, query = undefined) {
-  const origin = DEBUG_ENDPOINTS[domain] ? `http://${DEBUG_ENDPOINTS[domain]}/` : `http://${domain}/`
+  const origin = DEBUG_ENDPOINTS[domain] ? `http://${DEBUG_ENDPOINTS[domain]}/` : `https://${domain}/`
   let url = joinPath(origin, path)
   if (query) {
     url += '?' + (new URLSearchParams(query)).toString()
