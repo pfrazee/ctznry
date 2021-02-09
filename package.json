@@ -7,7 +7,7 @@
   "scripts": {
     "build": "rollup -c",
     "tailwind": "npx tailwindcss-cli@latest build -o static/css/tailwind.css",
-    "build-prod": "npm run buid && NODE_ENV=production npm run tailwind",
+    "build-prod": "npm run build && NODE_ENV=production npm run tailwind",
     "watch": "npm-watch build",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
