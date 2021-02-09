@@ -41,7 +41,17 @@ export async function listFollowers (userId) {
   if (session.isActive(domain)) {
     return session.api.follows.listFollowers(userId)
   }
-  return httpGet(domain, `/ctzn/followers/${encodeURIComponent(userId)}`)
+  let [mine, theirs] = await Promise.all([
+    session.isActive() ? session.api.follows.listFollowers(userId) : undefined,
+    httpGet(domain, `/ctzn/followers/${encodeURIComponent(userId)}`).catch(e => undefined)
+  ])
+  if (!mine && !theirs) throw new Error('Failed to fetch any follower information')
+  return {
+    subject: theirs?.subject || mine.subject,
+    community: theirs?.community,
+    myCommunity: mine?.myCommunity,
+    myFollowed: mine?.myFollowed
+  }
 }
 
 export async function listFollows (userId) {

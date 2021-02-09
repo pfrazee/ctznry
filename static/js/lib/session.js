@@ -27,6 +27,9 @@ export async function setup () {
     console.error('Failed to resume API session')
     console.error(e)
   }
+
+  // DEBUG
+  window.api = api
 }
 
 export async function doLogin ({userId, password}) {

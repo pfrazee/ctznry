@@ -119,7 +119,7 @@ class CtznApp extends LitElement {
               `)}
             </div>
           ` : html`
-            <div class="px-3 py-2 bg-gray-200 text-gray-600 text-xs">
+            <div class="px-3 py-2 bg-gray-100 text-gray-500 text-xs">
               Join a community to get connected to more people!
             </div>
           `}
@@ -189,16 +189,16 @@ class CtznApp extends LitElement {
   renderEmptyMessage () {
     if (this.searchQuery) {
       return html`
-        <div class="empty">
-            <div class="fas fa-search"></div>
+        <div class="bg-gray-100 text-gray-500 py-44 text-center my-5">
+            <div class="fas fa-search text-6xl text-gray-300 mb-8"></div>
           <div>No results found for "${this.searchQuery}"</div>
         </div>
       `
     }
     return html`
-      <div class="empty">
-        <div class="fas fa-stream"></div>
-        <div>Subscribe to sites to see what's new</div>
+      <div class="bg-gray-100 text-gray-500 py-44 text-center my-5">
+        <div class="fas fa-stream text-6xl text-gray-300 mb-8"></div>
+        <div>Subscribe to citizens<br>or join communities to see what's new.</div>
       </div>
     `
   }

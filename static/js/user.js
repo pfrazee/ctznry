@@ -315,13 +315,13 @@ class CtznUser extends LitElement {
   async onClickFollow (e) {
     await session.api.follows.follow(this.userId)
     this.followers = await listFollowers(this.userId)
-    this.uniqFollowers = Array.from(getUniqFollowers(followers))
+    this.uniqFollowers = Array.from(getUniqFollowers(this.followers))
   }
 
   async onClickUnfollow (e) {
     await session.api.follows.unfollow(this.userId)
     this.followers = await listFollowers(this.userId)
-    this.uniqFollowers = Array.from(getUniqFollowers(followers))
+    this.uniqFollowers = Array.from(getUniqFollowers(this.followers))
   }
 
   async onClickJoin (e) {
@@ -359,5 +359,5 @@ class CtznUser extends LitElement {
 customElements.define('ctzn-user', CtznUser)
 
 function getUniqFollowers (followers) {
-  return new Set(followers.community.concat(followers.myCommunity).concat(followers.myFollowed))
+  return new Set(followers.community.concat(followers.myCommunity || []).concat(followers.myFollowed || []))
 }
