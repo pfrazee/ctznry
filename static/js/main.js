@@ -144,10 +144,14 @@ class CtznApp extends LitElement {
 
   renderNoSession () {
     return html`
-      <div class="max-w-3xl mx-auto grid grid-cols-layout-twocol gap-8">
-        <div>
-          <h1>Welcome to the CTZN network</h1>
-          <p>The hottest place to get your memes</p>
+      <div class="max-w-3xl mx-auto">
+        <div class="text-center py-20 text-gray-600 text-lg">
+          <h1 class="font-semibold mb-4 text-4xl">Welcome to the <strong>CTZN</strong> network</h1>
+          <div class="mb-4">A decentralized social network.</div>
+          <div>
+            <ctzn-button class="py-1" label="Log in" href="/login"></ctzn-button>
+            <ctzn-button class="py-1" primary label="Sign up" href="/signup"></ctzn-button>
+          </div>
         </div>
       </div>
     `

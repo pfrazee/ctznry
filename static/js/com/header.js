@@ -48,10 +48,12 @@ export class Header extends LitElement {
             <span class="fas navicon fa-stream"></span>
             Home
           </a>
-          <a href="/notifications" class=${this.getNavClass('/notifications')}>
-            <span class="far navicon fa-bell"></span>
-            Notifications ${this.unreadNotificationsCount > 0 ? `(${this.unreadNotificationsCount})` : ''}
-          </a>
+          ${session.isActive() ? html`
+            <a href="/notifications" class=${this.getNavClass('/notifications')}>
+              <span class="far navicon fa-bell"></span>
+              Notifications ${this.unreadNotificationsCount > 0 ? `(${this.unreadNotificationsCount})` : ''}
+            </a>
+          ` : ''}
           <span class="flex-grow"></span>
           ${this.renderSessionCtrls()}
         </header>
@@ -71,8 +73,8 @@ export class Header extends LitElement {
       `
     } else {
       return html`
-        <a class=${this.getNavClass()} href="/login">Login</a>
-        <a class=${this.getNavClass()} href="/signup"><strong>Signup</strong></a>
+        <a class=${this.getNavClass()} href="/login">Log in</a>
+        <a class=${this.getNavClass()} href="/signup"><strong>Sign up</strong></a>
       `
     }
   }

@@ -4,6 +4,7 @@ export class Button extends LitElement {
   static get properties () {
     return {
       label: {type: String},
+      href: {type: String},
       disable: {type: Boolean},
       spinner: {type: Boolean}
     }
@@ -28,7 +29,10 @@ export class Button extends LitElement {
     } else if (this.disable) {
       colors = 'bg-gray-100 text-gray-50'
     }
-    return `rounded border-1 ${colors} py-2 px-4 shadow-sm ${parentClass}`
+    let paddings = ''
+    if (!/p(x|l|r)-/.test(parentClass)) paddings += 'px-4'
+    if (!/p(y|t|b)-/.test(parentClass)) paddings += 'py-2'
+    return `rounded border-1 ${colors} ${paddings} shadow-sm ${parentClass}`
   }
 
   renderSpinner () {
@@ -40,6 +44,11 @@ export class Button extends LitElement {
   }
 
   render () {
+    if (this.href) {
+      return html`
+        <a href=${this.href} class="inline-block ${this.getClass()}" ?disable=${this.disable}>${this.spinner ? this.renderSpinner() : this.label}</a>
+      `
+    }
     return html`
       <button class=${this.getClass()} ?disable=${this.disable}>${this.spinner ? this.renderSpinner() : this.label}</button>
     `
