@@ -70,7 +70,10 @@ class CtznUser extends LitElement {
 
   async load () {
     await session.setup()
-    this.userProfile = await getProfile(this.userId)
+    this.userProfile = await getProfile(this.userId).catch(e => ({error: true, message: e.toString()}))
+    if (this.userProfile.error) {
+      return this.requestUpdate()
+    }
     if (this.isCitizen) {
       const [followers, following, memberships] = await Promise.all([
         listFollowers(this.userId),
@@ -107,6 +110,10 @@ class CtznUser extends LitElement {
     const setView = (str) => e => {
       e.preventDefault()
       this.setView(str)
+    }
+
+    if (this.userProfile?.error) {
+      return this.renderError()
     }
     
     return html`
@@ -145,6 +152,24 @@ class CtznUser extends LitElement {
           ` : ''}
         </div>
         ${this.renderCurrentView()}
+      </main>
+    `
+  }
+
+  renderError () {
+    return html`
+      <link rel="stylesheet" href="/css/fontawesome.css">
+      <main class="bg-gray-100 min-h-screen">
+        <ctzn-header></ctzn-header>
+        <div class="text-center py-48">
+          <h2 class="text-5xl text-gray-600 font-semibold mb-4">404 Not Found</h2>
+          <div class="text-lg text-gray-600 mb-4">We couldn't find ${this.userId}</div>
+          <div class="text-lg text-gray-600">
+            <a class="text-blue-600 hover:underline" href="/" title="Back to home">
+              <span class="fas fa-arrow-left fa-fw"></span> Home</div>
+            </a>
+          </div>
+        </div>
       </main>
     `
   }
@@ -221,6 +246,9 @@ class CtznUser extends LitElement {
   }
 
   renderCurrentView () {
+    if (!this.userProfile) {
+      return ''
+    }
     if (this.currentView === 'followers') {
       return html`
         <div class="max-w-3xl mx-auto grid grid-cols-layout-twocol gap-8">

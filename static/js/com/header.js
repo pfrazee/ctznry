@@ -42,7 +42,7 @@ export class Header extends LitElement {
   render () {
     return html`
       <link rel="stylesheet" href="/css/fontawesome.css">
-      <div class="border-b border-gray-300 border-solid mb-4">
+      <div class="bg-white border-b border-gray-300 border-solid mb-4">
         <header class="max-w-3xl mx-auto flex items-center ph-2 leading-none">
           <a href="/" class=${this.getNavClass('/')}>
             <span class="fas navicon fa-stream"></span>
