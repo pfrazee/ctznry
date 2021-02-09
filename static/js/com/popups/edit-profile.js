@@ -117,7 +117,6 @@ export class EditProfilePopup extends BasePopup {
     e.preventDefault()
     e.stopPropagation()
 
-    let uploadedAvatar = undefined
     if (this.uploadedAvatar) {
       let dataUrl = this.shadowRoot.getElementById('avatar-canvas').toDataURL()
       this.uploadedAvatar.ext = 'png'

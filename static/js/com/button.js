@@ -30,7 +30,7 @@ export class Button extends LitElement {
       colors = 'bg-gray-100 text-gray-50'
     }
     let paddings = ''
-    if (!/p(x|l|r)-/.test(parentClass)) paddings += 'px-4'
+    if (!/p(x|l|r)-/.test(parentClass)) paddings += 'px-4 '
     if (!/p(y|t|b)-/.test(parentClass)) paddings += 'py-2'
     return `rounded border-1 ${colors} ${paddings} shadow-sm ${parentClass}`
   }

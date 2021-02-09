@@ -60,6 +60,33 @@ export async function doLogout () {
   }
 }
 
+export async function doSignup ({domain, username, displayName, description, avatarBase64, email, password}) {
+  const newApi = await connectApi(domain)
+  const newSessionInfo = await newApi.accounts.register({
+    username,
+    displayName,
+    description,
+    email,
+    password
+  })
+  if (newSessionInfo) {
+    // override a couple items to be safe
+    newSessionInfo.userId = `${username}@${domain}`
+    newSessionInfo.username = username
+    newSessionInfo.domain = domain
+
+    if (avatarBase64) {
+      await newApi.profiles.putAvatar(avatarBase64).catch(e => console.log(e))
+    }
+
+    localStorage.setItem('session-info', JSON.stringify(newSessionInfo))
+    info = newSessionInfo
+    api = newApi
+    emitter.dispatchEvent(new Event('change'))
+  }
+  return newSessionInfo
+}
+
 export function isActive (domain = undefined) {
   if (!info || !api) return false
   if (domain && info.domain !== domain) return false
