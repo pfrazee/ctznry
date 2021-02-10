@@ -97,11 +97,12 @@ class Composer extends LitElement {
           <div>
             <button @click=${this.onCancel} tabindex="4">Cancel</button>
             <button
+              class="community"
               @click=${this.onClickSelectCommunity}
               data-tooltip=${ifDefined(!this.canChangeCommunity ? 'Must reply in the same community as the original post' : undefined)}
               ?disabled=${!this.canChangeCommunity}
             >
-              Post to: ${this.communityIcon} ${this.communityName}
+              Post to: ${this.communityIcon} <span>${this.communityName}</span>
               <span class="fas fa-caret-down"></span>
             </button>
             <button type="submit" class="primary" tabindex="3" ?disabled=${!this.canPost}>

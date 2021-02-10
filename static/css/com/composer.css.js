@@ -45,5 +45,16 @@ textarea {
 button {
   font-size: 15px;
 }
+
+button.community {
+  display: inline-flex;
+}
+
+button.community span {
+  max-width: 150px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-left: 4px;
+}
 `
 export default cssStr

@@ -73,6 +73,12 @@ a:hover {
   margin-right: 10px;
 }
 
+.notification a.author span {
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .subject {
   margin-left: 44px;
   margin-top: 3px;

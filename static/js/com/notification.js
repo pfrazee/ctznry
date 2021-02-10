@@ -128,7 +128,7 @@ export class Notification extends LitElement {
             <span class=${icon}></span>
             <a class="author" href="/${note.author.userId}" title=${note.author.userId}>
               <img src=${AVATAR_URL(note.author.userId)}>
-              ${note.author.userId}
+              <span>${note.author.userId}</span>
             </a>
             ${action} ${target} &middot; ${relativeDate(note.createdAt)}
           </div>
