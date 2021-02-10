@@ -1,6 +1,5 @@
 import { LitElement, html } from '../../vendor/lit-element/lit-element.js'
 import { repeat } from '../../vendor/lit-element/lit-html/directives/repeat.js'
-import css from '../../css/com/thread.css.js'
 import * as toast from './toast.js'
 import { getPost, getThread } from '../lib/getters.js'
 import * as session from '../lib/session.js'
@@ -19,8 +18,8 @@ export class Thread extends LitElement {
     }
   }
 
-  static get styles () {
-    return css
+  createRenderRoot() {
+    return this // dont use shadow dom
   }
 
   constructor () {
@@ -88,7 +87,9 @@ export class Thread extends LitElement {
 
   render () {
     return html`
-      <div class="item ${this.subject.dbUrl === this.post?.url ? 'highlight' : ''}">
+      <div
+        class="border border-gray-300 rounded px-4 mb-2 ${this.subject.dbUrl === this.post?.url ? 'highlight' : ''}"
+      >
         ${this.post ? html`
           <ctzn-post
             .post=${this.post}
@@ -102,7 +103,7 @@ export class Thread extends LitElement {
         `}
       </div>
       ${this.thread ? html`
-        <div class="replies">
+        <div class="pl-4 border-l border-gray-200">
           ${this.renderReplies(this.thread)}
         </div>
       ` : ''}
@@ -112,11 +113,11 @@ export class Thread extends LitElement {
   renderReplies (replies) {
     if (!replies?.length) return ''
     return html`
-      <div class="replies">
+      <div class="pl-4 border-l border-gray-200">
         ${repeat(replies, r => r.url, reply => {
           const isSubject = this.subject.dbUrl === reply.url
           return html`
-          <div class="item ${isSubject ? 'highlight' : ''}">
+          <div class="border border-gray-300 rounded px-4 mb-2 ${isSubject ? 'highlight' : ''}">
               <ctzn-post
                 .post=${reply}
                 noborders
@@ -135,15 +136,15 @@ export class Thread extends LitElement {
   renderReplyBox () {
     if (this.post?.value.community && !session.isInCommunity(this.post.value.community.userId)) {
       return html`
-        <div class="reply-box">
-          <div class="reply-prompt">
+        <div class="mt-1 mb-4 ml-10">
+          <div class="cursor-text py-2 px-5 rounded bg-white border border-gray-300 italic text-gray-500">
             Join <a href="/${this.post.value.community.userId}">${this.post.value.community.userId}</a> to reply.
           </div>
         </div>
       `
     }
     return html`
-      <div class="reply-box">
+      <div class="mt-1 mb-4 ml-10">
         ${this.isReplying ? html`
           <ctzn-composer
             .subject=${{dbUrl: this.post.url, authorId: this.post.author.userId, community: this.post.value.community}}
@@ -153,7 +154,7 @@ export class Thread extends LitElement {
             @cancel=${this.onCancelReply}
           ></ctzn-composer>
         ` : html`
-          <div class="reply-prompt" @click=${this.onStartReply}>
+          <div class="cursor-text py-2 px-5 rounded bg-white border border-gray-300 italic text-gray-500" @click=${this.onStartReply}>
             Write your reply
           </div>
         `}

@@ -85,6 +85,11 @@ body {
   }
 }
 
+.highlight {
+  background: rgb(248, 249, 255) !important;
+  border-color: rgb(156, 156, 255) !important;
+}
+
 .spinner {
   display: inline-block;
   height: 14px;

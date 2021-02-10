@@ -1,6 +1,5 @@
 /* globals beaker monaco */
 import { LitElement, html } from '../../vendor/lit-element/lit-element.js'
-import { ifDefined } from '../../vendor/lit-element/lit-html/directives/if-defined.js'
 import * as toast from './toast.js'
 import * as session from '../lib/session.js'
 import * as contextMenu from './context-menu.js'
@@ -101,19 +100,20 @@ class Composer extends LitElement {
               @click=${this.onCancel}
               tabindex="4"
             >Cancel</button>
-            <button
-              class="inline-flex items-center rounded px-3 py-1 shadow-sm bg-white border border-gray-300 hover:bg-gray-100"
-              @click=${this.onClickSelectCommunity}
-              data-tooltip=${ifDefined(!this.canChangeCommunity ? 'Must reply in the same community as the original post' : undefined)}
-              ?disabled=${!this.canChangeCommunity}
-            >
-              Post to: ${this.communityIcon}
-              <span class="truncate ml-1" style="max-width: 150px">${this.communityName}</span>
-              <span class="fas fa-caret-down ml-1"></span>
-            </button>
+            ${this.canChangeCommunity ? html`
+              <button
+                class="inline-flex items-center rounded px-3 py-1 shadow-sm bg-white border border-gray-300 hover:bg-gray-100"
+                @click=${this.onClickSelectCommunity}
+                ?disabled=${!this.canChangeCommunity}
+              >
+                Post to: ${this.communityIcon}
+                <span class="truncate ml-1" style="max-width: 150px">${this.communityName}</span>
+                <span class="fas fa-caret-down ml-1"></span>
+              </button>
+            ` : ''}
             <button
               type="submit"
-              class="inline-block rounded px-3 py-1 shadow-sm bg-white border border-gray-300 hover:bg-gray-100"
+              class="inline-block rounded px-3 py-1 shadow-sm bg-blue-600 text-white hover:bg-blue-700"
               tabindex="3"
               ?disabled=${!this.canPost}
             >Post</button>

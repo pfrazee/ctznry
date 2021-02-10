@@ -74,6 +74,8 @@ export class BasePopup extends LitElement {
 
   render () {
     return html`
+      <link rel="stylesheet" href="/css/common.css">
+      <link rel="stylesheet" href="/css/tailwind.css">
       <div class="popup-wrapper" @click=${this.onClickWrapper}>
         <div class="popup-inner">
           ${this.shouldShowHead ? html`
