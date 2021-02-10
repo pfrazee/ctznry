@@ -191,7 +191,7 @@ export class Feed extends LitElement {
   
   renderNormalResult (post) {
     return html`
-      <div class="post ${post.parentPost ? 'reply' : ''} ${post.value.community ? 'in-community' : ''}">
+      <div class="post ${post.value.reply ? 'reply' : ''} ${post.value.community ? 'in-community' : ''}">
         ${post.parentPost ? html`
           <ctzn-post
             .post=${post.parentPost}
@@ -200,7 +200,7 @@ export class Feed extends LitElement {
         ` : ''}
         <ctzn-post
           .post=${post}
-          class="${this.recordClass} ${post.parentPost ? 'child-post' : ''}"
+          class="${this.recordClass} ${post.value.reply ? 'child-post' : ''}"
         ></ctzn-post>
       </div>
     `

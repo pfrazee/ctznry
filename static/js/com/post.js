@@ -79,14 +79,13 @@ export class Post extends LitElement {
       return html``
     }
 
-
     return html`
       <link rel="stylesheet" href=${(new URL('../../css/fontawesome.css', import.meta.url)).toString()}>
       <div
         class=${classMap({
           post: true,
           card: true,
-          'in-community': !!this.post?.value.community && !this.post?.value.reply
+          'in-community': !!this.post?.value.community && !this.classList.contains('child-post')
         })}
       >
         <a class="thumb" href="/${this.post.author.userId}" title=${this.post.author.displayName} data-tooltip=${this.post.author.displayName}>

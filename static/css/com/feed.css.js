@@ -76,24 +76,26 @@ h2 a:hover {
 }
 
 .post.reply {
-  position: relative;
   margin: 0 0 var(--ctzn-feed--default-margin, 10px) 0;
 }
 
-.post.reply:before {
+.post.reply .parent-post {
+  position: relative;
+}
+
+.post.reply .parent-post:before {
   content: "";
   position: absolute;
   display: block;
   width: 2px;
   left: 14px;
   top: 44px;
-  height: 23%;
+  height: 100%;
   background: rgb(193 193 193);
 }
 
-.post.in-community.reply:before {
+.post.in-community.reply .parent-post:before {
   top: 64px;
-  height: 20%;
 }
 
 .post.reply ctzn-post {
