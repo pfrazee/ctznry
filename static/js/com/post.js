@@ -141,11 +141,11 @@ export class Post extends LitElement {
     var myVote = this.myVote
     return html`
       <span class="vote-ctrl">
-        <a class="up ${myVote === 1 ? 'pressed' : ''}" data-tooltip="Upvote" @click=${e => this.onToggleVote(e, 1)}>
+        <a class="up ${myVote === 1 ? 'pressed' : ''}" title="Upvote" @click=${e => this.onToggleVote(e, 1)}>
           <span class="far fa-thumbs-up"></span>
           <span class="count">${this.upvoteCount}</span>
         </a>
-        <a class="down ${myVote === -1 ? 'pressed' : ''}" data-tooltip="Downvote" @click=${e => this.onToggleVote(e, -1)}>
+        <a class="down ${myVote === -1 ? 'pressed' : ''}" title="Downvote" @click=${e => this.onToggleVote(e, -1)}>
           <span class="far fa-thumbs-down"></span>
           <span class="count">${this.downvoteCount}</span>
         </a>
