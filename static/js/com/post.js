@@ -95,7 +95,7 @@ export class Post extends LitElement {
         <span class="arrow"></span>
         <div
           class="container"
-          @click=${e => { e.preventDefault(); e.stopPropagation() }}
+          @click=${this.onClickCard}
           @mousedown=${this.onMousedownCard}
           @mouseup=${this.onMouseupCard}
           @mousemove=${this.onMousemoveCard}
@@ -119,7 +119,7 @@ export class Post extends LitElement {
               </div>
               <span>&middot;</span>
               <div class="date">
-                <a href=${this.post.url} data-tooltip=${(new Date(this.post.value.createdAt)).toLocaleString()}>
+                <a href="#todo" data-tooltip=${(new Date(this.post.value.createdAt)).toLocaleString()}>
                   ${relativeDate(this.post.value.createdAt)}
                 </a>
               </div>
@@ -197,6 +197,14 @@ export class Post extends LitElement {
       e.stopPropagation()
       emit(this, 'view-thread', {detail: {subject: {dbUrl: this.post.url, authorId: this.post.author.userId}}})
     }
+  }
+
+  onClickCard (e) {
+    for (let el of e.path) {
+      if (el.tagName === 'A' || el.tagName === 'CTZN-COMPOSER') return
+    }
+    e.preventDefault()
+    e.stopPropagation()
   }
 
   onMousedownCard (e) {
