@@ -4,7 +4,6 @@ import { ifDefined } from '../../vendor/lit-element/lit-html/directives/if-defin
 import * as toast from './toast.js'
 import * as session from '../lib/session.js'
 import * as contextMenu from './context-menu.js'
-import css from '../../css/com/composer.css.js'
 
 const CHAR_LIMIT = 256
 
@@ -29,8 +28,8 @@ class Composer extends LitElement {
     this.parent = undefined
   }
 
-  static get styles () {
-    return css
+  createRenderRoot() {
+    return this // dont use shadow dom
   }
 
   get canPost () {
@@ -55,7 +54,7 @@ class Composer extends LitElement {
   }
 
   get communityIcon () {
-    return this.community ? html`<span class="fas fa-fw fa-users"></span>` : html`<span class="fas fa-fw fa-user"></span>`
+    return this.community ? html`<span class="fas fa-fw fa-users ml-1"></span>` : html`<span class="fas fa-fw fa-user ml-1"></span>`
   }
 
   get canChangeCommunity () {
@@ -63,17 +62,17 @@ class Composer extends LitElement {
   }
 
   firstUpdated () {
-    this.shadowRoot.querySelector('textarea').focus()
+    this.querySelector('textarea').focus()
   }
 
-  get charLimitDanger () {
+  get charLimitClass () {
     if (this.draftText.length > CHAR_LIMIT) {
-      return 'over'
+      return 'font-semibold text-red-600'
     }
     if (this.draftText.length > CHAR_LIMIT - 50) {
-      return 'close'
+      return 'font-semibold text-yellow-500'
     }
-    return 'fine'
+    return 'text-gray-500'
   }
 
   // rendering
@@ -81,32 +80,43 @@ class Composer extends LitElement {
 
   render () {
     return html`
-      <link rel="stylesheet" href="/css/fontawesome.css">
       <form @submit=${this.onSubmit}>
-        <div class="editor">
-          <textarea placeholder=${this.placeholder} @keyup=${this.onTextareaKeyup}></textarea>
+        <div class="mb-2">
+          <textarea
+            class="py-4 px-5 w-full box-border resize-none border border-gray-300 rounded"
+            placeholder=${this.placeholder}
+            @keyup=${this.onTextareaKeyup}
+          ></textarea>
         </div>
 
-        <div class="actions">
-          <div class="ctrls">
-            <span class="char-limit ${this.charLimitDanger}">
+        <div class="flex justify-between">
+          <div class="">
+            <span class="px-4 ${this.charLimitClass}">
               ${this.draftText.length} / ${CHAR_LIMIT}
             </span>
           </div>
           <div>
-            <button @click=${this.onCancel} tabindex="4">Cancel</button>
             <button
-              class="community"
+              class="inline-block rounded px-3 py-1 shadow-sm bg-white border border-gray-300 hover:bg-gray-100"
+              @click=${this.onCancel}
+              tabindex="4"
+            >Cancel</button>
+            <button
+              class="inline-flex items-center rounded px-3 py-1 shadow-sm bg-white border border-gray-300 hover:bg-gray-100"
               @click=${this.onClickSelectCommunity}
               data-tooltip=${ifDefined(!this.canChangeCommunity ? 'Must reply in the same community as the original post' : undefined)}
               ?disabled=${!this.canChangeCommunity}
             >
-              Post to: ${this.communityIcon} <span>${this.communityName}</span>
-              <span class="fas fa-caret-down"></span>
+              Post to: ${this.communityIcon}
+              <span class="truncate ml-1" style="max-width: 150px">${this.communityName}</span>
+              <span class="fas fa-caret-down ml-1"></span>
             </button>
-            <button type="submit" class="primary" tabindex="3" ?disabled=${!this.canPost}>
-              Post
-            </button>
+            <button
+              type="submit"
+              class="inline-block rounded px-3 py-1 shadow-sm bg-white border border-gray-300 hover:bg-gray-100"
+              tabindex="3"
+              ?disabled=${!this.canPost}
+            >Post</button>
           </div>
         </div>
       </form>

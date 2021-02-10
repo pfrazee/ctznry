@@ -179,7 +179,7 @@ class CtznApp extends LitElement {
                 @cancel=${this.onCancelPost}
               ></ctzn-composer>
             ` : html`
-              <div class="border border-solid border-gray-300 py-4 px-5 rounded cursor-text" @click=${this.onComposePost}>
+              <div class="border border-gray-300 py-4 px-5 rounded cursor-text" @click=${this.onComposePost}>
                 What's new?
               </div>
             `}
