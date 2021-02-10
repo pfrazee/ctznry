@@ -146,7 +146,7 @@ export class Feed extends LitElement {
     if (!this.results.length) {
       if (!this.emptyMessage) return html``
       return html`
-        <link rel="stylesheet" href=${(new URL('../../css/fontawesome.css', import.meta.url)).toString()}>
+        <link rel="stylesheet" href="/css/fontawesome.css">
         ${this.title ? html`<h2  class="results-header"><span>${this.title}</span></h2>` : ''}
         <div class="results empty">
           <span>${this.emptyMessage}</div></span>
@@ -154,7 +154,7 @@ export class Feed extends LitElement {
       `
     }
     return html`
-      <link rel="stylesheet" href=${(new URL('../../css/fontawesome.css', import.meta.url)).toString()}>
+      <link rel="stylesheet" href="/css/fontawesome.css">
       ${this.title ? html`<h2  class="results-header"><span>${this.title}</span></h2>` : ''}
       ${this.renderResults()}
     `

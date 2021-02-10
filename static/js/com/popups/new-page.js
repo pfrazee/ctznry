@@ -201,7 +201,7 @@ export class NewPagePopup extends BasePopup {
     `
 
     return html`
-      <link rel="stylesheet" href=${(new URL('../../../css/fontawesome.css', import.meta.url)).toString()}>
+      <link rel="stylesheet" href="/css/fontawesome.css">
       <nav>
         ${navItem('page', html`<span class="far fa-fw fa-file"></span> Page`)}
         ${navItem('blogpost', html`<span class="fas fa-fw fa-blog"></span> Blogpost`)}

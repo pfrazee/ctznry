@@ -105,7 +105,7 @@ export class NotificationsFeed extends LitElement {
       return html``
     }
     return html`
-      <link rel="stylesheet" href=${(new URL('../../css/fontawesome.css', import.meta.url)).toString()}>
+      <link rel="stylesheet" href="/css/fontawesome.css">
       ${this.title ? html`<h2  class="results-header"><span>${this.title}</span></h2>` : ''}
       ${this.renderResults()}
     `

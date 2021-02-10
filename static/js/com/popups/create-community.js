@@ -65,7 +65,7 @@ export class CreateCommunityPopup extends BasePopup {
 
   renderBody () {
     return html`
-      <link rel="stylesheet" href=${(new URL('../../../css/fontawesome.css', import.meta.url)).toString()}>
+      <link rel="stylesheet" href="/css/fontawesome.css">
       <h2>Create a community</h2>
       <form @submit=${this.onSubmit}>
         <section>

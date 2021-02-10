@@ -21,7 +21,10 @@ export async function listUserFeed (userId, opts) {
 export async function getPost (userId, key) {
   const domain = getDomain(userId)
   if (session.isActive(domain)) {
-    return session.api.posts.get(key)
+    if (key.startsWith('hyper://')) {
+      return session.api.posts.get(key)
+    }
+    return session.api.posts.get(userId, key)
   }
   const username = getUsername(userId)
   key = toKey(key)

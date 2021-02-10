@@ -29,6 +29,10 @@ a:hover {
   grid-gap: 10px;
 }
 
+:host([cols="1"]) .profiles {
+  grid-template-columns: 1fr;
+}
+
 .profile {
   border: 1px solid var(--border-color--light);
   background: var(--bg-color--default);

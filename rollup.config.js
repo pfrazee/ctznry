@@ -28,6 +28,13 @@ export default [
     }
   },
   {
+    input: 'static/js/post.js',
+    output: {
+      file: 'static/js/post.build.js',
+      format: 'iife'
+    }
+  },
+  {
     input: 'static/js/notifications.js',
     output: {
       file: 'static/js/notifications.build.js',

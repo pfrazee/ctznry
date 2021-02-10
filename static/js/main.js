@@ -144,7 +144,7 @@ class CtznApp extends LitElement {
 
   renderLoading () {
     return html`
-      <div class="max-w-3xl mx-auto">
+      <div class="max-w-4xl mx-auto">
         <div class="py-32 text-center text-gray-400">
           <span class="spinner h-7 w-7"></span>
         </div>
@@ -154,7 +154,7 @@ class CtznApp extends LitElement {
 
   renderNoSession () {
     return html`
-      <div class="max-w-3xl mx-auto">
+      <div class="max-w-4xl mx-auto">
         <div class="text-center py-20 text-gray-600 text-lg">
           <h1 class="font-semibold mb-4 text-4xl">Welcome to the <strong>CTZN</strong> network</h1>
           <div class="mb-4">A decentralized social network.</div>
@@ -169,7 +169,7 @@ class CtznApp extends LitElement {
 
   renderWithSession () {
     return html`
-      <div class="max-w-3xl mx-auto grid grid-cols-layout-twocol gap-8">
+      <div class="max-w-4xl mx-auto grid grid-cols-layout-twocol gap-8">
         <div>
           <div class="grid grid-cols-composer gap-3.5">
             <img class="w-8 h-8 rounded-full object-cover mt-2" src="${AVATAR_URL(session.info.userId)}">

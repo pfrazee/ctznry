@@ -44,6 +44,10 @@ export async function start ({port, configDir, domain}) {
     res.render('search')
   })
 
+  app.get('/:username([^\/]{3,})/ctzn.network/post/:key', (req, res) => {
+    res.render('post')
+  })
+
   app.get('/:username([^\/]{3,})', (req, res) => {
     res.render('user')
   })

@@ -81,8 +81,7 @@ class Composer extends LitElement {
 
   render () {
     return html`
-      <link rel="stylesheet" href=${(new URL('../../css/fontawesome.css', import.meta.url)).toString()}>
-      <link rel="stylesheet" href=${(new URL('../vs/editor/editor.main.css', import.meta.url)).toString()}>
+      <link rel="stylesheet" href="/css/fontawesome.css">
       <form @submit=${this.onSubmit}>
         <div class="editor">
           <textarea placeholder=${this.placeholder} @keyup=${this.onTextareaKeyup}></textarea>

@@ -117,7 +117,7 @@ export class Notification extends LitElement {
     }
 
     return html`
-      <link rel="stylesheet" href=${(new URL('../../css/fontawesome.css', import.meta.url)).toString()}>
+      <link rel="stylesheet" href="/css/fontawesome.css">
       <div class="wrapper ${this.isUnread ? 'unread' : ''}" @click=${this.onClickWrapper}>
         ${schemaId === 'ctzn.network/post' ? html`
           <div class="reply">

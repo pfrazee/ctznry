@@ -102,7 +102,7 @@ class CtznNotifications extends LitElement {
       return ''
     }
     return html`
-      <div class="max-w-3xl mx-auto grid grid-cols-layout-twocol gap-8">
+      <div class="max-w-4xl mx-auto grid grid-cols-layout-twocol gap-8">
         <div>
           ${this.isEmpty ? this.renderEmptyMessage() : ''}
           <div class="reload-page mx-4 mb-4 rounded cursor-pointer overflow-hidden leading-10 ${this.numNewItems > 0 ? 'visible' : ''}" @click=${e => this.load()}>

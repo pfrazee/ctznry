@@ -15,3 +15,7 @@ export function AVATAR_URL (userId) {
   const {domain, username} = parseUserId(userId)
   return joinPath(HTTP_ENDPOINT(domain), 'ctzn/avatar', username)
 }
+
+export function POST_URL (post) {
+  return '/' + joinPath(post.author.userId, 'ctzn.network/post', post.key)
+}

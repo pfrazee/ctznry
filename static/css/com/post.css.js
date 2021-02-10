@@ -289,6 +289,7 @@ a:hover {
   margin: 5px 0 0;
   width: 36px;
   height: 36px;
+  top: 7px !important;
 }
 
 :host([noborders]) .post.card .arrow,

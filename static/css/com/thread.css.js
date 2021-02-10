@@ -66,7 +66,6 @@ ctzn-record {
 }
 
 .replies {
-  margin: 0 0 0 10px;
   padding-left: 10px;
   border-left: 1px solid var(--border-color--semi-light);
 }

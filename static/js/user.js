@@ -251,7 +251,7 @@ class CtznUser extends LitElement {
     }
     if (this.currentView === 'followers') {
       return html`
-        <div class="max-w-3xl mx-auto grid grid-cols-layout-twocol gap-8">
+        <div class="max-w-4xl mx-auto grid grid-cols-layout-twocol gap-8">
           <div>
             <h3 class="text-lg mb-4 font-semibold">${this.uniqFollowers?.length} ${pluralize(this.uniqFollowers?.length, 'Follower')}</h3>
             <ctzn-user-list .ids=${this.uniqFollowers}></ctzn-user-list>
@@ -261,7 +261,7 @@ class CtznUser extends LitElement {
       `
     } else if (this.currentView === 'following') {
       return html`
-        <div class="max-w-3xl mx-auto grid grid-cols-layout-twocol gap-8">
+        <div class="max-w-4xl mx-auto grid grid-cols-layout-twocol gap-8">
           <div>
             <h3 class="text-lg mb-4 font-semibold">Following ${this.following?.length} ${pluralize(this.following?.length, 'Citizen')}</h3>
             <ctzn-user-list .ids=${this.following.map(f => f.value.subject.userId)}></ctzn-user-list>
@@ -271,7 +271,7 @@ class CtznUser extends LitElement {
       `      
     } else if (this.currentView === 'members') {
       return html`
-        <div class="max-w-3xl mx-auto grid grid-cols-layout-twocol gap-8">
+        <div class="max-w-4xl mx-auto grid grid-cols-layout-twocol gap-8">
           <div>
             <h3 class="text-lg mb-4 font-semibold">${this.members?.length} ${pluralize(this.members?.length, 'Member')}</h3>
             <ctzn-user-list .ids=${this.members.map(f => f.value.user.userId)}></ctzn-user-list>
@@ -281,7 +281,7 @@ class CtznUser extends LitElement {
       `      
     }
     return html`
-      <div class="max-w-3xl mx-auto grid grid-cols-layout-twocol gap-8">
+      <div class="max-w-4xl mx-auto grid grid-cols-layout-twocol gap-8">
         <div>
           ${this.isEmpty ? this.renderEmptyMessage() : ''}
           <ctzn-feed

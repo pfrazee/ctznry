@@ -1,6 +1,6 @@
 import { LitElement, html } from '../../vendor/lit-element/lit-element.js'
 import { classMap } from '../../vendor/lit-element/lit-html/directives/class-map.js'
-import { AVATAR_URL } from '../lib/const.js'
+import { AVATAR_URL, POST_URL } from '../lib/const.js'
 import * as session from '../lib/session.js'
 import css from '../../css/com/post.css.js'
 import { emit } from '../lib/dom.js'
@@ -80,7 +80,7 @@ export class Post extends LitElement {
     }
 
     return html`
-      <link rel="stylesheet" href=${(new URL('../../css/fontawesome.css', import.meta.url)).toString()}>
+      <link rel="stylesheet" href="/css/fontawesome.css">
       <div
         class=${classMap({
           post: true,
@@ -118,7 +118,7 @@ export class Post extends LitElement {
               </div>
               <span>&middot;</span>
               <div class="date">
-                <a href="#todo" data-tooltip=${(new Date(this.post.value.createdAt)).toLocaleString()}>
+                <a href="${POST_URL(this.post)}" data-tooltip=${(new Date(this.post.value.createdAt)).toLocaleString()}>
                   ${relativeDate(this.post.value.createdAt)}
                 </a>
               </div>
