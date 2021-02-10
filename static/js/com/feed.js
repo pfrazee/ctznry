@@ -2,7 +2,6 @@ import { LitElement, html } from '../../vendor/lit-element/lit-element.js'
 import { repeat } from '../../vendor/lit-element/lit-html/directives/repeat.js'
 import * as session from '../lib/session.js'
 import { listUserFeed, getPost } from '../lib/getters.js'
-import css from '../../css/com/feed.css.js'
 import { emit } from '../lib/dom.js'
 import './post.js'
 
@@ -26,8 +25,8 @@ export class Feed extends LitElement {
     }
   }
 
-  static get styles () {
-    return css
+  createRenderRoot() {
+    return this // dont use shadow dom
   }
 
   constructor () {
@@ -138,7 +137,7 @@ export class Feed extends LitElement {
     if (!this.results) {
       return html`
         ${this.title ? html`<h2  class="results-header"><span>${this.title}</span></h2>` : ''}
-        <div class="results empty">
+        <div class="bg-gray-100 text-gray-500 py-44 text-center my-5">
           <span class="spinner"></span>
         </div>
       `
@@ -148,8 +147,8 @@ export class Feed extends LitElement {
       return html`
         <link rel="stylesheet" href="/css/fontawesome.css">
         ${this.title ? html`<h2  class="results-header"><span>${this.title}</span></h2>` : ''}
-        <div class="results empty">
-          <span>${this.emptyMessage}</div></span>
+        <div class="bg-gray-100 text-gray-500 py-44 text-center my-5">
+          <div>${this.emptyMessage}</div>
         </div>
       `
     }
@@ -164,18 +163,14 @@ export class Feed extends LitElement {
     this.lastResultNiceDate = undefined // used by renderDateTitle
     if (!this.filter) {
       return html`
-        <div class="results">
-          ${repeat(this.results, result => result.url, result => html`
-            ${this.renderDateTitle(result)}
-            ${this.renderNormalResult(result)}
-          `)}
-        </div>
+        ${repeat(this.results, result => result.url, result => html`
+          ${this.renderDateTitle(result)}
+          ${this.renderNormalResult(result)}
+        `)}
       `
     }
     return html`
-      <div class="results">
-        ${repeat(this.results, result => result.url, result => this.renderSearchResult(result))}
-      </div>
+      ${repeat(this.results, result => result.url, result => this.renderSearchResult(result))}
     `
   }
 
@@ -190,8 +185,12 @@ export class Feed extends LitElement {
   }
   
   renderNormalResult (post) {
+    const isReply = !!post.value.reply
+    const inComm = !!post.value.community
     return html`
-      <div class="post ${post.value.reply ? 'reply' : ''} ${post.value.community ? 'in-community' : ''}">
+      <div
+        class="post ${isReply ? 'reply mb-2' : ''} ${inComm ? 'in-community' : ''}"
+      >
         ${post.parentPost ? html`
           <ctzn-post
             .post=${post.parentPost}
@@ -200,7 +199,7 @@ export class Feed extends LitElement {
         ` : ''}
         <ctzn-post
           .post=${post}
-          class="${this.recordClass} ${post.value.reply ? 'child-post' : ''}"
+          class="${this.recordClass} ${isReply ? 'child-post' : 'mb-2'}"
         ></ctzn-post>
       </div>
     `

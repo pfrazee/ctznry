@@ -229,3 +229,23 @@ body {
   border-right: 6px solid transparent;
   border-top: 6px solid rgba(17, 17, 17, 0.95);
 }
+
+ctzn-feed > .post.reply .parent-post {
+  position: relative;
+}
+
+ctzn-feed > .post.reply .parent-post:before {
+  content: "";
+  position: absolute;
+  display: block;
+  width: 2px;
+  left: 14px;
+  top: 44px;
+  height: calc(100% - 48px);
+  background: rgb(193 193 193);
+}
+
+ctzn-feed > .post.in-community.reply .parent-post:before {
+  top: 64px;
+  height: calc(100% - 68px);
+}
