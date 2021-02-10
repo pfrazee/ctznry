@@ -199,7 +199,7 @@ export class Post extends LitElement {
   }
 
   onClickCard (e) {
-    for (let el of e.path) {
+    for (let el of e.composedPath()) {
       if (el.tagName === 'A' || el.tagName === 'CTZN-COMPOSER') return
     }
     e.preventDefault()
@@ -207,7 +207,7 @@ export class Post extends LitElement {
   }
 
   onMousedownCard (e) {
-    for (let el of e.path) {
+    for (let el of e.composedPath()) {
       if (el.tagName === 'A' || el.tagName === 'CTZN-COMPOSER') return
     }
     this.isMouseDown = true
