@@ -65,9 +65,12 @@ export class Header extends LitElement {
     if (session.isActive()) {
       return html`
         <ctzn-button primary @click=${this.onClickNewPost} label="New Post"></ctzn-button>
-        <a class="inline-flex items-center ${this.getNavClass('/' + session.info.userId)} pt-3 pb-2.5 ml-3" href="/${session.info.userId}">
-          <img class="inline-block w-5 h-5 object-cover mr-2 rounded-full" src=${AVATAR_URL(session.info.userId)}>
-          ${session.info.userId}
+        <a
+          class="inline-flex items-center px-1 ml-2.5"
+          href="/${session.info.userId}"
+          title=${session.info.userId}
+        >
+          <img class="inline-block w-7 h-7 object-cover rounded-full" src=${AVATAR_URL(session.info.userId)}>
         </a>
         <a @click=${this.onClickSessionMenu} class=${this.getNavClass()} href="#"><span class="fas fa-caret-down"></span></a>
       `
