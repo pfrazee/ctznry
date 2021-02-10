@@ -117,7 +117,6 @@ class CtznUser extends LitElement {
     }
     
     return html`
-      <link rel="stylesheet" href="/css/fontawesome.css">
       <main>
         <ctzn-header></ctzn-header>
         <div class="text-center pb-4 border-b border-solid border-gray-200 mb-8">
@@ -158,7 +157,6 @@ class CtznUser extends LitElement {
 
   renderError () {
     return html`
-      <link rel="stylesheet" href="/css/fontawesome.css">
       <main class="bg-gray-100 min-h-screen">
         <ctzn-header></ctzn-header>
         <div class="text-center py-48">

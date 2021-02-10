@@ -235,11 +235,30 @@ body {
   border-top: 6px solid rgba(17, 17, 17, 0.95);
 }
 
-ctzn-feed > .post.reply .parent-post {
+ctzn-post {
+  display: block;
+}
+
+.post-author-arrow {
+  content: '';
+  display: block;
+  position: absolute;
+  top: 20px;
+  left: 41px;
+  width: 8px;
+  height: 8px;
+  z-index: 10;
+  background: var(--bg-color--default);
+  border-top: 1px solid var(--border-color--light);
+  border-left: 1px solid var(--border-color--light);
+  transform: rotate(-45deg);
+}
+
+ctzn-feed > .post.reply ctzn-post[as-reply-parent] {
   position: relative;
 }
 
-ctzn-feed > .post.reply .parent-post:before {
+ctzn-feed > .post.reply ctzn-post[as-reply-parent]:before {
   content: "";
   position: absolute;
   display: block;
@@ -250,7 +269,7 @@ ctzn-feed > .post.reply .parent-post:before {
   background: rgb(193 193 193);
 }
 
-ctzn-feed > .post.in-community.reply .parent-post:before {
+ctzn-feed > .post.in-community.reply ctzn-post[as-reply-parent]:before {
   top: 64px;
   height: calc(100% - 68px);
 }

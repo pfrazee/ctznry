@@ -87,7 +87,6 @@ class CtznApp extends LitElement {
 
   render () {
     return html`
-      <link rel="stylesheet" href="/css/fontawesome.css">
       <main>
         <ctzn-header></ctzn-header>
         ${this.renderCurrentView()}

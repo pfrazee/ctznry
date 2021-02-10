@@ -145,7 +145,6 @@ export class Feed extends LitElement {
     if (!this.results.length) {
       if (!this.emptyMessage) return html``
       return html`
-        <link rel="stylesheet" href="/css/fontawesome.css">
         ${this.title ? html`<h2  class="results-header"><span>${this.title}</span></h2>` : ''}
         <div class="bg-gray-100 text-gray-500 py-44 text-center my-5">
           <div>${this.emptyMessage}</div>
@@ -153,7 +152,6 @@ export class Feed extends LitElement {
       `
     }
     return html`
-      <link rel="stylesheet" href="/css/fontawesome.css">
       ${this.title ? html`<h2  class="results-header"><span>${this.title}</span></h2>` : ''}
       ${this.renderResults()}
     `
@@ -194,12 +192,13 @@ export class Feed extends LitElement {
         ${post.parentPost ? html`
           <ctzn-post
             .post=${post.parentPost}
-            class="${this.recordClass} parent-post"
+            as-reply-parent
           ></ctzn-post>
         ` : ''}
         <ctzn-post
           .post=${post}
-          class="${this.recordClass} ${isReply ? 'child-post' : 'mb-2'}"
+          class="${isReply ? '' : 'mb-2'}"
+          ?as-reply-child=${isReply}
         ></ctzn-post>
       </div>
     `

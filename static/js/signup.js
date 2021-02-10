@@ -35,7 +35,6 @@ class CtznSignup extends LitElement {
 
   render () {
     return html`
-      <link rel="stylesheet" href="/css/fontawesome.css">
       <main>
         <ctzn-header></ctzn-header>
         <div class="mx-auto my-12 max-w-md border border-gray-200 p-8 bg-gray-50">

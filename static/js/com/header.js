@@ -41,7 +41,6 @@ export class Header extends LitElement {
 
   render () {
     return html`
-      <link rel="stylesheet" href="/css/fontawesome.css">
       <div class="bg-white border-b border-gray-300 border-solid mb-4">
         <header class="max-w-4xl mx-auto flex items-center ph-2 leading-none">
           <a href="/" class=${this.getNavClass('/')}>

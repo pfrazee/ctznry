@@ -2,10 +2,103 @@ import { LitElement, html } from '../../vendor/lit-element/lit-element.js'
 import { classMap } from '../../vendor/lit-element/lit-html/directives/class-map.js'
 import { AVATAR_URL, POST_URL } from '../lib/const.js'
 import * as session from '../lib/session.js'
-import css from '../../css/com/post.css.js'
 import { emit } from '../lib/dom.js'
 import * as toast from './toast.js'
 import './composer.js'
+
+/*
+.post.card .arrow {
+  content: '';
+  display: block;
+  position: absolute;
+  top: 18px;
+  left: 41px;
+  width: 8px;
+  height: 8px;
+  z-index: 10;
+  background: var(--bg-color--default);
+  border-top: 1px solid var(--border-color--light);
+  border-left: 1px solid var(--border-color--light);
+  transform: rotate(-45deg);
+}
+
+.post.card.in-community .arrow {
+  top: 36px;
+}
+
+.post.card.is-notification .arrow {
+  background: var(--bg-color--light);
+}
+
+.post.card.unread .arrow {
+  border-color: var(--border-color--unread);
+}
+
+.post.card .ctrls {
+}
+
+.post.card ctzn-composer {
+  display: block;
+  padding: 10px;
+}
+
+:host([noborders]) .post.card {
+  grid-template-columns: 34px 1fr;
+}
+
+:host([noborders]) .post.card .thumb {
+  margin: 5px 0 0;
+  width: 36px;
+  height: 36px;
+  top: 7px !important;
+}
+
+:host([noborders]) .post.card .arrow,
+:host([nothumb]) .post.card .arrow {
+  display: none;
+}
+
+:host([noborders]) .post.card .container {
+  border-color: transparent !important;
+  background: none;
+}
+
+:host([noborders]) .post.card .community {
+  display: none;
+}
+
+:host([nothumb]) .post.card {
+  display: block;
+}
+
+:host([nothumb]) .post.card .thumb {
+  display: none;
+}
+
+:host([noborders]) .post.card ctzn-composer {
+  margin-left: -36px;
+}
+
+:host(.parent-post) .post.card .container {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  border-bottom: 0;
+}
+
+:host(.parent-post) .post.card .ctrls {
+  padding-bottom: 0;
+}
+
+:host(.child-post) .post.card .container {
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  border-top: 0;
+}
+
+:host(.child-post) .post.card .community {
+  display: none;
+}
+*/
 
 export class Post extends LitElement {
   static get properties () {
@@ -13,15 +106,19 @@ export class Post extends LitElement {
       post: {type: Object},
       context: {type: String},
       searchTerms: {type: String, attribute: 'search-terms'},
-      isReplyOpen: {type: Boolean},
+      asReplyParent: {type: Boolean, attribute: 'as-reply-parent'},
+      asReplyChild: {type: Boolean, attribute: 'as-reply-child'},
+      nothumb: {type: Boolean},
+      noborders: {type: Boolean},
       nometa: {type: Boolean},
       noctrls: {type: Boolean},
+      isReplyOpen: {type: Boolean},
       viewContentOnClick: {type: Boolean, attribute: 'view-content-on-click'}
     }
   }
 
-  static get styles () {
-    return css
+  createRenderRoot() {
+    return this // dont use shadow dom
   }
 
   constructor () {
@@ -79,56 +176,62 @@ export class Post extends LitElement {
       return html``
     }
 
+    let gridCls = 'grid grid-cols-post'
+    if (this.noborders) gridCls = 'grid grid-cols-post-tight'
+    if (this.nothumb) gridCls = ''
+
+    let borderCls = 'border border-gray-300 rounded'
+    if (this.noborders) {
+      borderCls = ''
+    } else if (this.asReplyParent) {
+      borderCls = 'border border-gray-300 border-b-0 rounded-t'
+    } else if (this.asReplyChild) {
+      borderCls = 'border border-gray-300 border-t-0 rounded-b'
+    }
+
     return html`
-      <link rel="stylesheet" href="/css/fontawesome.css">
-      <div
-        class=${classMap({
-          post: true,
-          card: true,
-          'in-community': !!this.post?.value.community && !this.classList.contains('child-post')
-        })}
-      >
-        <a class="thumb" href="/${this.post.author.userId}" title=${this.post.author.displayName} data-tooltip=${this.post.author.displayName}>
-          <img class="favicon" src=${AVATAR_URL(this.post.author.userId)}>
-        </a>
-        <span class="arrow"></span>
+      <div class="relative grid ${gridCls} text-gray-600">
+        ${this.nothumb ? '' : html`
+          <a class="block relative" href="/${this.post.author.userId}" title=${this.post.author.displayName}>
+            <img class="block w-8 h-8 object-cover rounded-full mr-2 mt-2" src=${AVATAR_URL(this.post.author.userId)}>
+          </a>
+        `}
+        ${this.noborders || this.nothumb ? '' : html`<span class="post-author-arrow"></span>`}
         <div
-          class="container"
+          class="${borderCls} p-1 min-w-0 cursor-pointer hover:border-gray-400"
           @click=${this.onClickCard}
           @mousedown=${this.onMousedownCard}
           @mouseup=${this.onMouseupCard}
           @mousemove=${this.onMousemoveCard}
         >
           ${this.nometa ? '' : html`
-            ${this.post.value.community ? html`
-              <div class="community">
+            ${!this.noborders && !this.asReplyChild && this.post.value.community ? html`
+              <div class="bg-gray-100 py-1 px-2 mb-1 text-xs rounded font-medium">
                 <a href="/${this.post.value.community.userId}">
                   <span class="fas fa-fw fa-users"></span> ${this.post.value.community.userId}
                 </a>
               </div>
             ` : ''}
-            <div class="header">
-              <div class="origin">
-                <a class="author displayname" href="/${this.post.author.userId}" title=${this.post.author.displayName}>
+            <div class="flex pt-1 px-2.5 text-gray-600 text-xs items-baseline">
+              <div class="mr-2 whitespace-nowrap">
+                <a class="text-gray-700 font-bold text-sm hover:underline" href="/${this.post.author.userId}" title=${this.post.author.displayName}>
                   ${this.post.author.displayName}
                 </a>
-                <a class="author username" href="/${this.post.author.userId}" title=${this.post.author.userId}>
+                <a class="hover:underline" href="/${this.post.author.userId}" title=${this.post.author.userId}>
                   ${this.post.author.userId}
                 </a>
               </div>
-              <span>&middot;</span>
-              <div class="date">
-                <a href="${POST_URL(this.post)}" data-tooltip=${(new Date(this.post.value.createdAt)).toLocaleString()}>
+              <span class="mr-2 whitespace-nowrap">&middot;</span>
+              <div class="whitespace-nowrap">
+                <a class="hover:underline" href="${POST_URL(this.post)}" data-tooltip=${(new Date(this.post.value.createdAt)).toLocaleString()}>
                   ${relativeDate(this.post.value.createdAt)}
                 </a>
               </div>
             </div>
           `}
-          ${this.context ? html`<div class="context">${this.context}</div>` : ''}
-          <div class="content markdown">
-            ${this.post.value.text ? (this.renderMatchText() || this.post.value.text) : ''}
-          </div>
-          ${this.noctrls ? '' : html`<div class="ctrls">
+          ${this.context ? html`<div class="py-2 px-2.5 text-sm">${this.context}</div>` : ''}
+          <div class="whitespace-pre-wrap break-words text-base pt-1.5 pb-2.5 px-2.5">${this.post.value.text ? (this.renderMatchText() || this.post.value.text) : ''}</div>
+          ${this.noctrls ? '' : html`<div class="px-1 pb-1 text-sm">
             ${this.renderVoteCtrl()}
             ${this.renderRepliesCtrl()}
           </div>`}
@@ -139,13 +242,14 @@ export class Post extends LitElement {
 
   renderVoteCtrl () {
     var myVote = this.myVote
+    const aCls = `inline-block cursor-pointer text-gray-600 px-2 mr-5 rounded hover:bg-gray-100`
     return html`
       <span class="vote-ctrl">
-        <a class="up ${myVote === 1 ? 'pressed' : ''}" title="Upvote" @click=${e => this.onToggleVote(e, 1)}>
+        <a class="${aCls} ${myVote === 1 ? 'font-bold text-blue-600' : ''}" title="Upvote" @click=${e => this.onToggleVote(e, 1)}>
           <span class="far fa-thumbs-up"></span>
           <span class="count">${this.upvoteCount}</span>
         </a>
-        <a class="down ${myVote === -1 ? 'pressed' : ''}" title="Downvote" @click=${e => this.onToggleVote(e, -1)}>
+        <a class="${aCls} ${myVote === -1 ? 'font-bold text-blue-600' : ''}" title="Downvote" @click=${e => this.onToggleVote(e, -1)}>
           <span class="far fa-thumbs-down"></span>
           <span class="count">${this.downvoteCount}</span>
         </a>
@@ -155,7 +259,7 @@ export class Post extends LitElement {
 
   renderRepliesCtrl () {
     return html`
-      <a class="reply-ctrl" @click=${this.onViewThread}>
+      <a class="inline-block cursor-pointer text-gray-600 px-2 mr-5 rounded hover:bg-gray-100" @click=${this.onViewThread}>
         <span class="far fa-comment"></span>
         ${this.replyCount}
       </a>
