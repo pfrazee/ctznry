@@ -90,12 +90,13 @@ h2 a:hover {
   width: 2px;
   left: 14px;
   top: 44px;
-  height: 100%;
+  height: calc(100% - 48px);
   background: rgb(193 193 193);
 }
 
 .post.in-community.reply .parent-post:before {
   top: 64px;
+  height: calc(100% - 68px);
 }
 
 .post.reply ctzn-post {
