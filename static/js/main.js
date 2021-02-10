@@ -30,6 +30,7 @@ class CtznApp extends LitElement {
 
   constructor () {
     super()
+    this.isLoading = true
     this.isComposingPost = false
     this.searchQuery = ''
     this.isEmpty = false
@@ -48,6 +49,7 @@ class CtznApp extends LitElement {
 
   async load ({clearCurrent} = {clearCurrent: false}) {
     await session.setup()
+    this.isLoading = false
     if (!session.isActive()) {
       return this.requestUpdate()
     }
@@ -78,11 +80,6 @@ class CtznApp extends LitElement {
     //   }
     // `, {paths: query, loadTime: this.loadTime})
     // this.numNewItems = count
-  }
-
-  get isLoading () {
-    let queryViewEls = Array.from(this.querySelectorAll('ctzn-feed'))
-    return !!queryViewEls.find(el => el.isLoading)
   }
 
   // rendering
@@ -136,10 +133,23 @@ class CtznApp extends LitElement {
   }
 
   renderCurrentView () {
+    if (this.isLoading) {
+      return this.renderLoading()
+    }
     if (!session.isActive()) {
       return this.renderNoSession()
     }
     return this.renderWithSession()
+  }
+
+  renderLoading () {
+    return html`
+      <div class="max-w-3xl mx-auto">
+        <div class="py-32 text-center text-gray-400">
+          <span class="spinner h-7 w-7"></span>
+        </div>
+      </div>
+    `
   }
 
   renderNoSession () {
