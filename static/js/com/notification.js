@@ -1,13 +1,13 @@
 import { LitElement, html } from '../../vendor/lit-element/lit-element.js'
 import { asyncReplace } from '../../vendor/lit-element/lit-html/directives/async-replace.js'
 import * as session from '../lib/session.js'
-import css from '../../css/com/notification.css.js'
 import { AVATAR_URL } from '../lib/const.js'
 import { emit } from '../lib/dom.js'
 import { extractSchemaId } from '../lib/strings.js'
 import { getPost } from '../lib/getters.js'
 import './post.js'
 import './user-list.js'
+
 
 export class Notification extends LitElement {
   static get properties () {
@@ -19,8 +19,8 @@ export class Notification extends LitElement {
     }
   }
 
-  static get styles () {
-    return css
+  createRenderRoot() {
+    return this // dont use shadow dom
   }
 
   constructor () {
@@ -115,20 +115,20 @@ export class Notification extends LitElement {
     } else if (!subjectSchemaId) {
       target = 'you'
     }
-
+    
     return html`
       <link rel="stylesheet" href="/css/fontawesome.css">
-      <div class="wrapper ${this.isUnread ? 'unread' : ''}" @click=${this.onClickWrapper}>
+      <div class="cursor-pointer hover:bg-gray-50 ${this.isUnread ? 'unread' : ''}" @click=${this.onClickWrapper}>
         ${schemaId === 'ctzn.network/post' ? html`
           <div class="reply">
             ${asyncReplace(this.renderReplyPost(replyPostInfo, html`<span class="fas fa-reply"></span> ${action} ${target}`))}
           </div>
         ` : html`
-          <div class="notification ${schemaId === 'ctzn.network/follow' ? 'padded' : ''}">
-            <span class=${icon}></span>
-            <a class="author" href="/${note.author.userId}" title=${note.author.userId}>
-              <img src=${AVATAR_URL(note.author.userId)}>
-              <span>${note.author.userId}</span>
+          <div class="flex items-center ${schemaId === 'ctzn.network/follow' ? 'py-4 px-4' : 'pt-4 px-4 pb-2'}">
+            <span class="${icon} text-2xl mr-4 ml-1 text-gray-300"></span>
+            <a class="inline-flex items-center font-bold" href="/${note.author.userId}" title=${note.author.userId}>
+              <img class="w-6 h-6 rounded-full object-cover mr-2" src=${AVATAR_URL(note.author.userId)}>
+              <span class="truncate mr-2" style="max-width: 200px">${note.author.userId}</span>
             </a>
             ${action} ${target} &middot; ${relativeDate(note.createdAt)}
           </div>
@@ -138,7 +138,7 @@ export class Notification extends LitElement {
             </div>
           ` : ''}
           ${schemaId === 'ctzn.network/follow' ? html`
-            <div class="user-card">
+            <div class="mx-4 mb-2">
               <ctzn-user-list .ids=${[note.author.userId]}></ctzn-user-list>
             </div>
           ` : ''}

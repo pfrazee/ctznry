@@ -90,6 +90,15 @@ body {
   border-color: rgb(156, 156, 255) !important;
 }
 
+.unread {
+  background: #f2f3ff !important;
+  border-color: #e0e1ff !important;
+}
+
+.unread:hover {
+  background: #f8f9ff !important;
+}
+
 .spinner {
   display: inline-block;
   height: 14px;

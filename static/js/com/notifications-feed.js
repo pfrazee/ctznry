@@ -1,6 +1,5 @@
 import { LitElement, html } from '../../vendor/lit-element/lit-element.js'
 import { repeat } from '../../vendor/lit-element/lit-html/directives/repeat.js'
-import css from '../../css/com/notifications-feed.css.js'
 import { emit } from '../lib/dom.js'
 import * as session from '../lib/session.js'
 import './notification.js'
@@ -18,8 +17,8 @@ export class NotificationsFeed extends LitElement {
     }
   }
 
-  static get styles () {
-    return css
+  createRenderRoot() {
+    return this // dont use shadow dom
   }
 
   constructor () {
@@ -46,7 +45,6 @@ export class NotificationsFeed extends LitElement {
       session.onChange(() => this.load({clearCurrent}), {once: true})
       return
     }
-    console.log('ready')
     if (clearCurrent) this.results = undefined
     this.queueQuery()
   }
@@ -114,12 +112,10 @@ export class NotificationsFeed extends LitElement {
   renderResults () {
     this.lastResultNiceDate = undefined // used by renderDateTitle
     return html`
-      <div class="results">
-        ${repeat(this.results, result => result.url, result => html`
-          ${this.renderDateTitle(result)}
-          ${this.renderNotification(result)}
-        `)}
-      </div>
+      ${repeat(this.results, result => result.url, result => html`
+        ${this.renderDateTitle(result)}
+        ${this.renderNotification(result)}
+      `)}
     `
   }
 
@@ -136,6 +132,7 @@ export class NotificationsFeed extends LitElement {
   renderNotification (notification) {
     return html`
       <ctzn-notification
+        class="block border-t border-gray-300"
         .notification=${notification}
         ?is-unread=${Number(new Date(notification.createdAt)) > this.clearedAt}
       ></ctzn-notification>
