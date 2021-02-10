@@ -8,7 +8,7 @@ export const DEBUG_ENDPOINTS = {
 }
 
 export function HTTP_ENDPOINT (domain) {
-  return DEBUG_ENDPOINTS[domain] ? `http://${DEBUG_ENDPOINTS[domain]}` : `http://${domain}` // TODO https
+  return DEBUG_ENDPOINTS[domain] ? `http://${DEBUG_ENDPOINTS[domain]}` : `https://${domain}`
 }
 
 export function AVATAR_URL (userId) {
