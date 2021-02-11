@@ -3,6 +3,7 @@ import { repeat } from '../../vendor/lit-element/lit-html/directives/repeat.js'
 import * as toast from './toast.js'
 import { getPost, getThread } from '../lib/getters.js'
 import * as session from '../lib/session.js'
+import * as displayNames from '../lib/display-names.js'
 import './post.js'
 import './composer.js'
 
@@ -140,7 +141,7 @@ export class Thread extends LitElement {
         return html`
           <div class="mt-1 mb-2 ml-10">
             <div class="cursor-text py-2 px-5 rounded bg-white border border-gray-300 italic text-gray-500 text-sm">
-              Join <a href="/${this.post.value.community.userId}" class="hover:underline">${this.post.value.community.userId}</a> to reply.
+              Join <a href="/${this.post.value.community.userId}" class="hover:underline">${displayNames.render(this.post.value.community.userId)}</a> to reply.
             </div>
           </div>
         `

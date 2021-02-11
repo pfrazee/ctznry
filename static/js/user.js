@@ -6,6 +6,7 @@ import * as toast from './com/toast.js'
 import { AVATAR_URL } from './lib/const.js'
 import * as session from './lib/session.js'
 import { getProfile, listFollowers, listFollows, listMembers, listMemberships } from './lib/getters.js'
+import * as displayNames from './lib/display-names.js'
 import { pluralize } from './lib/strings.js'
 import './com/header.js'
 import './com/button.js'
@@ -205,14 +206,14 @@ class CtznUser extends LitElement {
         <section class="mb-2">
           ${nSharedFollowers ? html`
             Followed by ${repeat(this.followers?.myFollowed, userId => html`
-              <a class="inline-block bg-gray-100 rounded p-1 mr-1 mb-1 text-xs hover:bg-gray-200" href="/${userId}">${userId}</a>
+              <a class="inline-block bg-gray-100 rounded p-1 mr-1 mb-1 text-xs hover:bg-gray-200" href="/${userId}">${displayNames.render(userId)}</a>
             `)}
           ` : ''}
         </section>
         <section class="mb-2">
           ${nMemberships ? html`
             Communities: ${repeat(this.memberships, membership => html`
-              <a class="inline-block bg-gray-100 rounded p-1 mr-1 mb-1 text-xs hover:bg-gray-200" href="/${membership.value.community.userId}">${membership.value.community.userId}</a>
+              <a class="inline-block bg-gray-100 rounded p-1 mr-1 mb-1 text-xs hover:bg-gray-200" href="/${membership.value.community.userId}">${displayNames.render(membership.value.community.userId)}</a>
             `)}
           ` : html`
             <div class="py-2 px-3 text-sm text-gray-600 bg-gray-100">

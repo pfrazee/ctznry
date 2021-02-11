@@ -4,6 +4,7 @@ import { AVATAR_URL, POST_URL } from '../lib/const.js'
 import * as session from '../lib/session.js'
 import { emit } from '../lib/dom.js'
 import { makeSafe, linkify } from '../lib/strings.js'
+import * as displayNames from '../lib/display-names.js'
 import * as toast from './toast.js'
 import './composer.js'
 
@@ -81,7 +82,7 @@ export class Post extends LitElement {
   get ctrlTooltip () {
     if (this.canInteract) return undefined
     if (this.post?.value?.community?.userId) {
-      return `Only members of ${this.post.value.community.userId} can interact with this post`
+      return `Only members of ${displayNames.render(this.post.value.community.userId)} can interact with this post`
     }
     return `Only people followed by ${this.post.author.displayName} can interact with this post`
   }
@@ -133,18 +134,10 @@ export class Post extends LitElement {
                 <a class="text-gray-700 font-bold text-sm hover:underline" href="/${this.post.author.userId}" title=${this.post.author.displayName}>
                   ${this.post.author.displayName}
                 </a>
+                <a class="hover:underline" href="/${this.post.author.userId}" title=${this.post.author.userId}>
+                  ${this.post.author.userId}
+                </a>
               </div>
-              ${!this.nocommunity ? html`
-                ${this.post.value.community ? html`
-                  <a href="/${this.post.value.community.userId}" class="mr-2 whitespace-nowrap text-gray-600 hover:underline">
-                    <span class="fas fa-fw fa-users"></span> ${this.post.value.community.userId}
-                  </a>
-                ` : html`
-                  <a href="/${this.post.author.userId}" class="mr-2 whitespace-nowrap text-gray-600 hover:underline">
-                    <span class="fas fa-fw fa-user"></span> Self-post
-                  </a>
-                `}
-              ` : ''}
               <span class="mr-2 whitespace-nowrap">&middot;</span>
               <div class="mr-2 whitespace-nowrap">
                 <a class="hover:underline" href="${POST_URL(this.post)}" data-tooltip=${(new Date(this.post.value.createdAt)).toLocaleString()}>
@@ -158,6 +151,17 @@ export class Post extends LitElement {
           ${this.noctrls ? '' : html`<div class="px-1 pb-1 text-sm">
             ${this.renderVoteCtrl()}
             ${this.renderRepliesCtrl()}
+            ${!this.nocommunity ? html`
+              ${this.post.value.community ? html`
+                <a href="/${this.post.value.community.userId}" class="mr-2 whitespace-nowrap text-xs text-gray-600 hover:underline">
+                  <span class="fas fa-fw fa-users"></span> ${displayNames.render(this.post.value.community.userId)}
+                </a>
+              ` : html`
+                <a href="/${this.post.author.userId}" class="mr-2 whitespace-nowrap text-xs text-gray-600 hover:underline">
+                  <span class="fas fa-fw fa-user"></span> Self post
+                </a>
+              `}
+            ` : ''}
           </div>`}
         </div>
       </div>
