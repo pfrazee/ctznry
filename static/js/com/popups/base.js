@@ -1,5 +1,4 @@
-import {LitElement, html} from '../../../vendor/lit-element/lit-element.js'
-import popupsCSS from '../../../css/com/popups.css.js'
+import { LitElement, html } from '../../../vendor/lit-element/lit-element.js'
 
 // exported api
 // =
@@ -22,6 +21,10 @@ export class BasePopup extends LitElement {
     }
   }
 
+  createRenderRoot() {
+    return this // dont use shadow dom
+  }
+
   get shouldShowHead () {
     return true
   }
@@ -32,6 +35,10 @@ export class BasePopup extends LitElement {
 
   get shouldCloseOnEscape () {
     return true
+  }
+
+  get maxWidth () {
+    return '450px'
   }
 
   // management
@@ -74,17 +81,19 @@ export class BasePopup extends LitElement {
 
   render () {
     return html`
-      <link rel="stylesheet" href="/css/common.css">
-      <link rel="stylesheet" href="/css/tailwind.css">
-      <div class="popup-wrapper" @click=${this.onClickWrapper}>
-        <div class="popup-inner">
+      <div
+        class="popup-wrapper fixed left-0 top-0 w-full h-full z-50 overflow-y-auto"
+        style="background: rgba(0,0,0,0.45)"
+        @click=${this.onClickWrapper}
+      >
+        <div class="popup-inner bg-white shadow border border-gray-400 rounded overflow-hidden" style="margin: 80px auto; max-width: ${this.maxWidth}">
           ${this.shouldShowHead ? html`
-            <div class="head">
-              <span class="title">${this.renderTitle()}</span>
-              <span title="Cancel" @click=${this.onReject} class="close-btn square">&times;</span>
+            <div class="flex justify-between box-border relative bg-gray-100 py-2 px-3 w-full border-b border-gray-400 rounded-t">
+              <span class="font-semibold">${this.renderTitle()}</span>
+              <span title="Close" @click=${this.onReject} class="close-btn cursor-pointer">&times;</span>
             </div>
           ` : ''}
-          <div class="body">
+          <div class="p-4">
             ${this.renderBody()}
           </div>
         </div>
@@ -114,5 +123,3 @@ export class BasePopup extends LitElement {
     this.dispatchEvent(new CustomEvent('reject'))
   }
 }
-
-BasePopup.styles = [popupsCSS]

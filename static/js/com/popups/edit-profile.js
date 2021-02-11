@@ -1,11 +1,12 @@
-import { html, css } from '../../../vendor/lit-element/lit-element.js'
+import { html } from '../../../vendor/lit-element/lit-element.js'
 import { BasePopup } from './base.js'
-import popupsCSS from '../../../css/com/popups.css.js'
+import '../button.js'
 
 const CANVAS_SIZE = 200
 
 // exported api
 // =
+
 
 export class EditProfilePopup extends BasePopup {
   constructor (userId, avatarUrl, profile) {
@@ -32,7 +33,7 @@ export class EditProfilePopup extends BasePopup {
   async updateCanvas () {
     this.avatarUrl = undefined
     await this.requestUpdate()
-    var canvas = this.shadowRoot.getElementById('avatar-canvas')
+    var canvas = document.getElementById('avatar-canvas')
     if (canvas) {
       var ctx = canvas.getContext('2d')
       ctx.globalCompositeOperation = 'source-over'
@@ -66,27 +67,44 @@ export class EditProfilePopup extends BasePopup {
   renderBody () {
     return html`
       <form @submit=${this.onSubmit}>      
-        <div class="controls">
+        <div class="">
           ${this.avatarUrl ? html`
-            <img class="avatar" src=${this.avatarUrl} @click=${this.onClickAvatar}>
+            <img class="block mx-auto my-4 w-48 h48 rounded-full cursor-pointer hover:opacity-50" src=${this.avatarUrl} @click=${this.onClickAvatar}>
           ` : html`
-            <canvas class="avatar" id="avatar-canvas" width=${CANVAS_SIZE} height=${CANVAS_SIZE} @click=${this.onClickAvatar}></canvas>
+            <canvas class="block mx-auto my-4 w-48 h48 rounded-full cursor-pointer hover:opacity-50" id="avatar-canvas" width=${CANVAS_SIZE} height=${CANVAS_SIZE} @click=${this.onClickAvatar}></canvas>
           `}
-          <div class="change-avatar">
-            <button class="btn" tabindex="1" @click=${this.onClickAvatar}>Change Avatar</button>
-            <input type="file" accept=".jpg,.jpeg,.png" @change=${this.onChooseAvatarFile}>
+          <div class="text-center mb-4">
+            <ctzn-button tabindex="1" @click=${this.onClickAvatar} label="Change Avatar"></ctzn-button>
+            <input class="hidden" type="file" accept=".jpg,.jpeg,.png" @change=${this.onChooseAvatarFile}>
           </div>
 
-          <label for="displayName-input">Display Name</label>
-          <input autofocus type="text" id="displayName-input" name="displayName" value="${this.profile.displayName}" placeholder="Anonymous" />
+          <label class="block font-semibold p-1" for="displayName-input">Display Name</label>
+          <input
+            autofocus
+            type="text"
+            id="displayName-input"
+            name="displayName"
+            value="${this.profile.displayName}"
+            class="block box-border w-full border border-gray-300 rounded p-3 mb-1"
+            placeholder="Anonymous"
+          />
 
-          <label for="description-input">Bio</label>
-          <textarea id="description-input" name="description">${this.profile.description}</textarea>
+          <label class="block font-semibold p-1" for="description-input">Bio</label>
+          <textarea
+            id="description-input"
+            name="description"
+            class="block box-border w-full border border-gray-300 rounded p-3"
+          >${this.profile.description}</textarea>
         </div>
 
-        <div class="actions">
-          <button type="button" class="btn ${this.isCreate ? 'hidden' : ''}" @click=${this.onReject} tabindex="2">Cancel</button>
-          <button type="submit" class="btn primary" tabindex="1">Save</button>
+        <div class="flex justify-between mt-4">
+          <ctzn-button @click=${this.onReject} tabindex="3" label="Cancel"></ctzn-button>
+          <ctzn-button
+            primary
+            type="submit"
+            tabindex="2"
+            label="Save"
+          ></ctzn-button>
         </div>
       </form>
     `
@@ -97,7 +115,7 @@ export class EditProfilePopup extends BasePopup {
 
   async onClickAvatar (e) {
     e.preventDefault()
-    this.shadowRoot.querySelector('input[type="file"]').click()
+    this.querySelector('input[type="file"]').click()
   }
 
   onChooseAvatarFile (e) {
@@ -118,7 +136,7 @@ export class EditProfilePopup extends BasePopup {
     e.stopPropagation()
 
     if (this.uploadedAvatar) {
-      let dataUrl = this.shadowRoot.getElementById('avatar-canvas').toDataURL()
+      let dataUrl = document.getElementById('avatar-canvas').toDataURL()
       this.uploadedAvatar.ext = 'png'
       this.uploadedAvatar.base64buf = dataUrl.split(',').pop()
     }
@@ -134,64 +152,5 @@ export class EditProfilePopup extends BasePopup {
     }))
   }
 }
-EditProfilePopup.styles = [popupsCSS, css`
-input,
-textarea {
-  font-size: 17px;
-}
-
-input {
-  padding: 0 8px;
-  line-height: 32px;
-}
-
-textarea {
-  padding: 4px 8px;
-}
-
-.avatar {
-  display: block;
-  margin: 10px auto;
-  width: 200px;
-  height: 200px;
-  border-radius: 50%;
-  cursor: pointer;
-}
-
-.avatar:hover {
-  opacity: 0.5;
-}
-
-.change-avatar {
-  text-align: center;
-  margin-bottom: 10px;
-}
-
-input[type="file"] {
-  display: none;
-}
-
-.controls {
-  max-width: 460px;
-  margin: 20px auto 40px;
-}
-
-.popup-inner {
-  width: 560px;
-}
-
-.popup-inner textarea,
-.popup-inner input {
-  margin-bottom: 20px;
-}
-
-.popup-inner .actions {
-  justify-content: space-between;
-}
-
-.hidden {
-  visibility: hidden;
-}
-`]
 
 customElements.define('ctzn-edit-profile', EditProfilePopup)

@@ -1,9 +1,8 @@
 /* globals beaker */
-import { html, css } from '../../../vendor/lit-element/lit-element.js'
+import { html } from '../../../vendor/lit-element/lit-element.js'
 import { BasePopup } from './base.js'
 import * as session from '../../lib/session.js'
-import popupsCSS from '../../../css/com/popups.css.js'
-import spinnerCSS from '../../../css/com/spinner.css.js'
+import '../button.js'
 
 // exported api
 // =
@@ -32,21 +31,8 @@ export class CreateCommunityPopup extends BasePopup {
     return false
   }
 
-  static get styles () {
-    return [popupsCSS, spinnerCSS, css`
-    .popup-inner {
-      width: 520px;
-      border-radius: 8px;
-    }
-
-    .popup-inner .body {
-      padding: 6px 22px 22px;
-    }
-
-    input[type="text"] {
-      padding: 10px;
-    }
-    `]
+  get maxWidth () {
+    return '520px'
   }
 
   // management
@@ -65,41 +51,44 @@ export class CreateCommunityPopup extends BasePopup {
 
   renderBody () {
     return html`
-      <link rel="stylesheet" href="/css/fontawesome.css">
-      <h2>Create a community</h2>
-      <form @submit=${this.onSubmit}>
-        <section>
-          <label for="username-input">Community ID</label>
+      <form class="px-2" @submit=${this.onSubmit}>
+        <h2 class="text-3xl py-4">Create a community</h2>
+
+        <section class="mb-2">
+          <label class="block font-semibold p-1" for="username-input">Community ID</label>
           <input
             required
             type="text"
             id="username-input"
             name="username"
+            class="block box-border w-full border border-gray-300 rounded p-3"
             placeholder="e.g. 'friends' or 'cool-hackers'"
             value=${this.username}
             @keyup=${this.onKeyupUsername}
           />
         </section>
 
-        <section>
-          <label for="displayName-input">Display name</label>
+        <section class="mb-2">
+          <label class="block font-semibold p-1" for="displayName-input">Display name</label>
           <input
             required
             type="text"
             id="displayName-input"
             name="displayName"
+            class="block box-border w-full border border-gray-300 rounded p-3"
             placeholder="e.g. 'Friends' or 'Cool Hackers'"
             value=${this.displayName}
             @keyup=${this.onKeyupDisplayName}
           />
         </section>
 
-        <section>
-          <label for="description-input">Description</label>
+        <section class="mb-2">
+          <label class="block font-semibold p-1" for="description-input">Description</label>
           <input
             type="text"
             id="description-input"
             name="description"
+            class="block box-border w-full border border-gray-300 rounded p-3"
             placeholder="e.g. 'A cool place for cool people'"
             value=${this.description}
             @keyup=${this.onKeyupDescription}
@@ -110,21 +99,23 @@ export class CreateCommunityPopup extends BasePopup {
           <div class="error">${this.currentError}</div>
         ` : ''}
 
-        <div class="actions">
-          <button type="button" class="btn" @click=${this.onReject} tabindex="2">Cancel</button>
-          <button type="submit" class="btn primary" tabindex="1" ?disabled=${this.isCreating || !this.username || !this.displayName}>
-            ${this.isCreating ? html`<span class="spinner"></span>` : html`
-              <span class="fas fa-fw fa-users"></span>
-              Create Community
-            `}
-          </button>
+        <div class="flex justify-between border-t border-gray-200 mt-4 pt-4">
+          <ctzn-button @click=${this.onReject} tabindex="2" label="Cancel"></ctzn-button>
+          <ctzn-button
+            primary
+            type="submit"
+            tabindex="1"
+            ?disabled=${this.isCreating || !this.username || !this.displayName}
+            ?spinner=${this.isCreating}
+            label="Create Community"
+          ></ctzn-button>
         </div>
       </form>
     `
   }
 
   firstUpdated () {
-    this.shadowRoot.querySelector('input').focus()
+    this.querySelector('input').focus()
   }
 
   // events

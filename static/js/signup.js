@@ -76,7 +76,7 @@ class CtznSignup extends LitElement {
               <ctzn-button
                 primary
                 type="submit"
-                ?disable=${this.isSigningUp}
+                ?disabled=${this.isSigningUp}
                 ?spinner=${this.isSigningUp}
                 label="Sign up"
               ></ctzn-button>

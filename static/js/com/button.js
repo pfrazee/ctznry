@@ -5,7 +5,7 @@ export class Button extends LitElement {
     return {
       label: {type: String},
       href: {type: String},
-      disable: {type: Boolean},
+      disabled: {type: Boolean},
       spinner: {type: Boolean}
     }
   }
@@ -23,10 +23,10 @@ export class Button extends LitElement {
     let colors = 'bg-white border border-gray-300 hover:bg-gray-100'
     if (this.hasAttribute('primary')) {
       colors = 'bg-blue-600 text-white hover:bg-blue-700'
-      if (this.disable) {
+      if (this.disabled) {
         colors = 'bg-blue-400 text-blue-50'
       }
-    } else if (this.disable) {
+    } else if (this.disabled) {
       colors = 'bg-gray-100 text-gray-50'
     }
     let paddings = ''
@@ -46,11 +46,16 @@ export class Button extends LitElement {
   render () {
     if (this.href) {
       return html`
-        <a href=${this.href} class="inline-block ${this.getClass()}" ?disable=${this.disable}>${this.spinner ? this.renderSpinner() : this.label}</a>
+        <a href=${this.href} class="inline-block ${this.getClass()}" ?disabled=${this.disabled}>${this.spinner ? this.renderSpinner() : this.label}</a>
       `
     }
     return html`
-      <button class=${this.getClass()} ?disable=${this.disable}>${this.spinner ? this.renderSpinner() : this.label}</button>
+      <button
+        type=${this.getAttribute('type') || 'button'}
+        tabindex=${this.getAttribute('tabindex')}
+        class=${this.getClass()}
+        ?disabled=${this.disabled}
+      >${this.spinner ? this.renderSpinner() : this.label}</button>
     `
   }
 }
