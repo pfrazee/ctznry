@@ -4,6 +4,7 @@ import { create as createRpcApi } from './rpc-api.js'
 let emitter = new EventTarget()
 export let info = undefined
 export let myCommunities = undefined
+export let myFollowers = undefined
 export let api = undefined
 
 export async function setup () {
@@ -21,7 +22,14 @@ export async function setup () {
       api = newApi
       emitter.dispatchEvent(new Event('change'))
 
-      myCommunities = await api.communities.listMemberships(info.userId).then(memberships => memberships.map(m => m.value.community))
+      {
+        let [memberships, followers] = await Promise.all([
+          api.communities.listMemberships(info.userId),
+          api.follows.listFollowers(info.userId)
+        ])
+        myCommunities = memberships.map(m => m.value.community)
+        myFollowers = getUniqFollowers(followers)
+      }
     }
   } catch (e) {
     console.error('Failed to resume API session')
@@ -94,7 +102,11 @@ export function isActive (domain = undefined) {
 }
 
 export function isInCommunity (communityUserId) {
-  return !!myCommunities?.find(c => c.userId === communityUserId)
+  return !!myCommunities?.find?.(c => c.userId === communityUserId)
+}
+
+export function isFollowingMe (citizenUserId) {
+  return !!myFollowers?.has?.(citizenUserId)
 }
 
 export function onChange (cb, opts) {
@@ -104,4 +116,10 @@ export function onChange (cb, opts) {
 async function connectApi (domain) {
   const wsEndpoint = (domain in DEBUG_ENDPOINTS) ? `ws://${DEBUG_ENDPOINTS[domain]}/` : `wss://${domain}/`
   return createRpcApi(wsEndpoint)
+}
+
+function getUniqFollowers (followers) {
+  const s = new Set(followers.community.concat(followers.myCommunity || []).concat(followers.myFollowed || []))
+  s.add(followers.subject.userId)
+  return s
 }

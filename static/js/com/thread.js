@@ -121,6 +121,7 @@ export class Thread extends LitElement {
               <ctzn-post
                 .post=${reply}
                 noborders
+                nocommunity
                 thread-view
                 @publish-reply=${this.onPublishReply}
               ></ctzn-post>
@@ -134,17 +135,29 @@ export class Thread extends LitElement {
   }
 
   renderReplyBox () {
-    if (this.post?.value.community && !session.isInCommunity(this.post.value.community.userId)) {
-      return html`
-        <div class="mt-1 mb-4 ml-10">
-          <div class="cursor-text py-2 px-5 rounded bg-white border border-gray-300 italic text-gray-500">
-            Join <a href="/${this.post.value.community.userId}">${this.post.value.community.userId}</a> to reply.
+    if (this.post?.value.community) {
+      if (!session.isInCommunity(this.post.value.community.userId)) {
+        return html`
+          <div class="mt-1 mb-2 ml-10">
+            <div class="cursor-text py-2 px-5 rounded bg-white border border-gray-300 italic text-gray-500 text-sm">
+              Join <a href="/${this.post.value.community.userId}" class="hover:underline">${this.post.value.community.userId}</a> to reply.
+            </div>
           </div>
-        </div>
-      `
+        `
+      }
+    } else {
+      if (!session.isFollowingMe(this.post.author.userId)) {
+        return html`
+          <div class="mt-1 mb-2 ml-10">
+            <div class="cursor-text py-2 px-5 rounded bg-white border border-gray-300 italic text-gray-500 text-sm">
+              Only people followed by <a href="/${this.post.author.userId}" class="hover:underline">${this.post.author.displayName}</a> can reply.
+            </div>
+          </div>
+        `
+      }
     }
     return html`
-      <div class="mt-1 mb-4 ml-10">
+      <div class="mt-1 mb-2 ml-10">
         ${this.isReplying ? html`
           <ctzn-composer
             .subject=${{dbUrl: this.post.url, authorId: this.post.author.userId, community: this.post.value.community}}

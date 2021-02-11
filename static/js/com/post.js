@@ -18,6 +18,7 @@ export class Post extends LitElement {
       nothumb: {type: Boolean},
       noborders: {type: Boolean},
       nometa: {type: Boolean},
+      nocommunity: {type: Boolean},
       noctrls: {type: Boolean},
       isReplyOpen: {type: Boolean},
       viewContentOnClick: {type: Boolean, attribute: 'view-content-on-click'}
@@ -70,6 +71,21 @@ export class Post extends LitElement {
     return 0
   }
 
+  get canInteract () {
+    if (this.post?.value?.community?.userId) {
+      return session.isInCommunity(this.post.value.community.userId)
+    }
+    return session.isFollowingMe(this.post.author.userId)
+  }
+
+  get ctrlTooltip () {
+    if (this.canInteract) return undefined
+    if (this.post?.value?.community?.userId) {
+      return `Only members of ${this.post.value.community.userId} can interact with this post`
+    }
+    return `Only people followed by ${this.post.author.displayName} can interact with this post`
+  }
+
   async reloadSignals () {
     this.post.votes = await session.api.votes.getVotesForSubject(this.post.url)
     this.requestUpdate()
@@ -112,24 +128,25 @@ export class Post extends LitElement {
           @mousemove=${this.onMousemoveCard}
         >
           ${this.nometa ? '' : html`
-            ${!this.noborders && !this.asReplyChild && this.post.value.community ? html`
-              <div class="bg-gray-100 py-1 px-2 mb-1 text-xs rounded font-medium">
-                <a href="/${this.post.value.community.userId}">
-                  <span class="fas fa-fw fa-users"></span> ${this.post.value.community.userId}
-                </a>
-              </div>
-            ` : ''}
             <div class="flex pt-1 px-2.5 text-gray-600 text-xs items-baseline">
               <div class="mr-2 whitespace-nowrap">
                 <a class="text-gray-700 font-bold text-sm hover:underline" href="/${this.post.author.userId}" title=${this.post.author.displayName}>
                   ${this.post.author.displayName}
                 </a>
-                <a class="hover:underline" href="/${this.post.author.userId}" title=${this.post.author.userId}>
-                  ${this.post.author.userId}
-                </a>
               </div>
+              ${!this.nocommunity ? html`
+                ${this.post.value.community ? html`
+                  <a href="/${this.post.value.community.userId}" class="mr-2 whitespace-nowrap text-gray-600 hover:underline">
+                    <span class="fas fa-fw fa-users"></span> ${this.post.value.community.userId}
+                  </a>
+                ` : html`
+                  <a href="/${this.post.author.userId}" class="mr-2 whitespace-nowrap text-gray-600 hover:underline">
+                    <span class="fas fa-fw fa-user"></span> Self-post
+                  </a>
+                `}
+              ` : ''}
               <span class="mr-2 whitespace-nowrap">&middot;</span>
-              <div class="whitespace-nowrap">
+              <div class="mr-2 whitespace-nowrap">
                 <a class="hover:underline" href="${POST_URL(this.post)}" data-tooltip=${(new Date(this.post.value.createdAt)).toLocaleString()}>
                   ${relativeDate(this.post.value.createdAt)}
                 </a>
@@ -149,14 +166,32 @@ export class Post extends LitElement {
 
   renderVoteCtrl () {
     var myVote = this.myVote
-    const aCls = `inline-block cursor-pointer text-gray-600 px-2 mr-5 rounded hover:bg-gray-100`
+    let aCls = `inline-block px-2 mr-5 rounded`
+    if (this.canInteract) {
+      aCls += ` text-gray-600 cursor-pointer hover:bg-gray-100`
+    } else {
+      aCls += ` text-gray-400`
+    }
+    const onClick = (v) => {
+      if (this.canInteract) {
+        return e => this.onToggleVote(e, v)
+      }
+    }
     return html`
       <span class="vote-ctrl">
-        <a class="${aCls} ${myVote === 1 ? 'font-bold text-blue-600' : ''}" title="Upvote" @click=${e => this.onToggleVote(e, 1)}>
+        <a
+          class="${aCls} tooltip-right ${myVote === 1 ? 'font-bold text-blue-600' : ''}"
+          @click=${onClick(1)}
+          data-tooltip=${this.ctrlTooltip || 'Upvote'}
+        >
           <span class="far fa-thumbs-up"></span>
           <span class="count">${this.upvoteCount}</span>
         </a>
-        <a class="${aCls} ${myVote === -1 ? 'font-bold text-blue-600' : ''}" title="Downvote" @click=${e => this.onToggleVote(e, -1)}>
+        <a
+          class="${aCls} tooltip-right ${myVote === -1 ? 'font-bold text-blue-600' : ''}"
+          @click=${onClick(-1)}
+          data-tooltip=${this.ctrlTooltip || 'Downvote'}
+        >
           <span class="far fa-thumbs-down"></span>
           <span class="count">${this.downvoteCount}</span>
         </a>
@@ -165,8 +200,14 @@ export class Post extends LitElement {
   }
 
   renderRepliesCtrl () {
+    let aCls = `inline-block px-2 mr-5 tooltip-right`
+    if (this.canInteract) {
+      aCls += ` text-gray-600 cursor-pointer hover:bg-gray-100`
+    } else {
+      aCls += ` text-gray-400`
+    }
     return html`
-      <a class="inline-block cursor-pointer text-gray-600 px-2 mr-5 rounded hover:bg-gray-100" @click=${this.onViewThread}>
+      <a class=${aCls} @click=${this.onViewThread} data-tooltip=${this.ctrlTooltip || 'Replies'}>
         <span class="far fa-comment"></span>
         ${this.replyCount}
       </a>
