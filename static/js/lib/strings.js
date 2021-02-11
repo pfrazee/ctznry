@@ -82,8 +82,20 @@ export function toNiceUrl (str) {
   return str
 }
 
+const MAKE_SAFE_MAP = {
+  '"': '&quot;',
+  "'": '&#39;',
+  '<': '&lt;',
+  '>': '&gt;',
+  '&': '&amp;'
+}
 export function makeSafe (str = '') {
-  return str.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+  return str.replace(/["'&<>]/g, (match) => MAKE_SAFE_MAP[match] || '')
+}
+
+export function linkify (str = '') {
+  const re = /((?<!\+)(?:https?(?::\/\/))(?:www\.)?(?:[a-zA-Z\d-_.]+(?:(?:\.|@)[a-zA-Z\d]{2,})|localhost)(?:(?:[-a-zA-Z\d:%_+.~#*$!?&//=@]*)(?:[,](?![\s]))*)*)/g
+  return str.replace(re, match => `<a class="text-blue-600 hover:underline" href="${match}" target="_blank">${match}</a>`)
 }
 
 export function extractSchemaId (str = '') {

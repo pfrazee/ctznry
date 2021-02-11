@@ -1,104 +1,11 @@
 import { LitElement, html } from '../../vendor/lit-element/lit-element.js'
-import { classMap } from '../../vendor/lit-element/lit-html/directives/class-map.js'
+import { unsafeHTML } from '../../vendor/lit-element/lit-html/directives/unsafe-html.js'
 import { AVATAR_URL, POST_URL } from '../lib/const.js'
 import * as session from '../lib/session.js'
 import { emit } from '../lib/dom.js'
+import { makeSafe, linkify } from '../lib/strings.js'
 import * as toast from './toast.js'
 import './composer.js'
-
-/*
-.post.card .arrow {
-  content: '';
-  display: block;
-  position: absolute;
-  top: 18px;
-  left: 41px;
-  width: 8px;
-  height: 8px;
-  z-index: 10;
-  background: var(--bg-color--default);
-  border-top: 1px solid var(--border-color--light);
-  border-left: 1px solid var(--border-color--light);
-  transform: rotate(-45deg);
-}
-
-.post.card.in-community .arrow {
-  top: 36px;
-}
-
-.post.card.is-notification .arrow {
-  background: var(--bg-color--light);
-}
-
-.post.card.unread .arrow {
-  border-color: var(--border-color--unread);
-}
-
-.post.card .ctrls {
-}
-
-.post.card ctzn-composer {
-  display: block;
-  padding: 10px;
-}
-
-:host([noborders]) .post.card {
-  grid-template-columns: 34px 1fr;
-}
-
-:host([noborders]) .post.card .thumb {
-  margin: 5px 0 0;
-  width: 36px;
-  height: 36px;
-  top: 7px !important;
-}
-
-:host([noborders]) .post.card .arrow,
-:host([nothumb]) .post.card .arrow {
-  display: none;
-}
-
-:host([noborders]) .post.card .container {
-  border-color: transparent !important;
-  background: none;
-}
-
-:host([noborders]) .post.card .community {
-  display: none;
-}
-
-:host([nothumb]) .post.card {
-  display: block;
-}
-
-:host([nothumb]) .post.card .thumb {
-  display: none;
-}
-
-:host([noborders]) .post.card ctzn-composer {
-  margin-left: -36px;
-}
-
-:host(.parent-post) .post.card .container {
-  border-bottom-left-radius: 0;
-  border-bottom-right-radius: 0;
-  border-bottom: 0;
-}
-
-:host(.parent-post) .post.card .ctrls {
-  padding-bottom: 0;
-}
-
-:host(.child-post) .post.card .container {
-  border-top-left-radius: 0;
-  border-top-right-radius: 0;
-  border-top: 0;
-}
-
-:host(.child-post) .post.card .community {
-  display: none;
-}
-*/
 
 export class Post extends LitElement {
   static get properties () {
@@ -230,7 +137,7 @@ export class Post extends LitElement {
             </div>
           `}
           ${this.context ? html`<div class="py-2 px-2.5 text-sm">${this.context}</div>` : ''}
-          <div class="whitespace-pre-wrap break-words text-base pt-1.5 pb-2.5 px-2.5">${this.post.value.text ? (this.renderMatchText() || this.post.value.text) : ''}</div>
+          <div class="whitespace-pre-wrap break-words text-base pt-1.5 pb-2.5 px-2.5">${this.renderPostText()}</div>
           ${this.noctrls ? '' : html`<div class="px-1 pb-1 text-sm">
             ${this.renderVoteCtrl()}
             ${this.renderRepliesCtrl()}
@@ -264,6 +171,10 @@ export class Post extends LitElement {
         ${this.replyCount}
       </a>
     `
+  }
+
+  renderPostText () {
+    return unsafeHTML(linkify(makeSafe(this.post.value.text)))
   }
 
   renderMatchText () {
