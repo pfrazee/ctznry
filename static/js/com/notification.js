@@ -189,13 +189,13 @@ export class Notification extends LitElement {
     const schemaId = extractSchemaId(this.notification.itemUrl)
     if (schemaId === 'ctzn.network/post'){
       const subject = await getPost(this.notification.itemUrl)
-      emit(this, 'view-thread', {detail: {subject}})
+      emit(this, 'view-thread', {detail: {subject: {dbUrl: subject.url, authorId: subject.author.userId}}})
     } else if (schemaId === 'ctzn.network/vote') {
       const subjectSchemaId = extractSchemaId(this.notification.item.subject.dbUrl)
       const subject = subjectSchemaId === 'ctzn.network/post'
         ? await getPost(this.notification.item.subject.authorId, this.notification.item.subject.dbUrl)
         : undefined
-      emit(this, 'view-thread', {detail: {subject}})
+      emit(this, 'view-thread', {detail: {subject: {dbUrl: subject.url, authorId: subject.author.userId}}})
     } else if (schemaId === 'ctzn.network/follow') {
       window.location = `/${this.notification.author.userId}`
     }
