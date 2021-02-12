@@ -171,7 +171,9 @@ class CtznApp extends LitElement {
       <div class="max-w-4xl mx-auto grid grid-cols-layout-twocol gap-8">
         <div>
           <div class="grid grid-cols-composer gap-3.5">
-            <img class="w-8 h-8 rounded-full object-cover mt-2" src="${AVATAR_URL(session.info.userId)}">
+            <a class="block" href="/${session.info.userId}">
+              <img class="block w-8 h-8 rounded-full object-cover mt-2" src="${AVATAR_URL(session.info.userId)}">
+            </a>
             ${this.isComposingPost ? html`
               <ctzn-composer
                 @publish=${this.onPublishPost}
