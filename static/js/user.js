@@ -188,7 +188,7 @@ class CtznUser extends LitElement {
     const displayName = this.userProfile?.value.displayName || this.userId
     return html`
       <div>
-        <section class="mb-2">
+        <section class="mb-4">
           ${session.isActive() ? html`
             ${session.info.userId === this.userId ? html`
               <ctzn-button primary class="w-full" @click=${this.onClickEditProfile} label="Edit profile"></ctzn-button>
@@ -200,20 +200,22 @@ class CtznUser extends LitElement {
               ` : ``}
             `}
           ` : html`
-            TODO logged out UI
+            ${''/*TODO logged out UI*/}
           `}
         </section>
         <section class="mb-2">
           ${nSharedFollowers ? html`
-            Followed by ${repeat(this.followers?.myFollowed, userId => html`
-              <a class="inline-block bg-gray-100 rounded p-1 mr-1 mb-1 text-xs hover:bg-gray-200" href="/${userId}">${displayNames.render(userId)}</a>
+            <div class="font-medium mb-1">Followed by</div>
+            ${repeat(this.followers?.myFollowed, userId => html`
+              <a class="inline-block bg-gray-100 rounded p-1 mr-.5 mb-.5 text-xs hover:bg-gray-200" href="/${userId}">${displayNames.render(userId)}</a>
             `)}
           ` : ''}
         </section>
         <section class="mb-2">
           ${nMemberships ? html`
-            Communities: ${repeat(this.memberships, membership => html`
-              <a class="inline-block bg-gray-100 rounded p-1 mr-1 mb-1 text-xs hover:bg-gray-200" href="/${membership.value.community.userId}">${displayNames.render(membership.value.community.userId)}</a>
+            <div class="font-medium mb-1">Communities</div>
+            ${repeat(this.memberships, membership => html`
+              <a class="inline-block bg-gray-100 rounded p-1 mr-.5 mb-.5 text-xs hover:bg-gray-200" href="/${membership.value.community.userId}">${displayNames.render(membership.value.community.userId)}</a>
             `)}
           ` : html`
             <div class="py-2 px-3 text-sm text-gray-600 bg-gray-100">
