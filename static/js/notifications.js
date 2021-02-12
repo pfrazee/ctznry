@@ -81,6 +81,7 @@ class CtznNotifications extends LitElement {
   }
 
   renderRightSidebar () {
+    return '' // todo
     return html`
       <div class="sidebar">
         <div class="sticky">

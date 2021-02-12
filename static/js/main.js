@@ -97,13 +97,13 @@ class CtznApp extends LitElement {
   renderRightSidebar () {
     return html`
       <div>
-        <section class="mb-4">
+        ${''/*todo <section class="mb-4">
           <span class="fas fa-search"></span>
           ${!!this.searchQuery ? html`
             <a class="clear-search" @click=${this.onClickClearSearch}><span class="fas fa-times"></span></a>
           ` : ''}
           <input @keyup=${this.onKeyupSearch} placeholder="Search" value=${this.searchQuery}>
-        </section>
+        </section>*/}
         <section class="mb-4">
           <h3 class="mb-1 font-bold text-gray-600">My Communities</h3>
           ${this.memberships?.length ? html`
