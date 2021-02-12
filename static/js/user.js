@@ -122,7 +122,7 @@ class CtznUser extends LitElement {
         <ctzn-header></ctzn-header>
         <div class="text-center pb-4 border-b border-solid border-gray-200 mb-8">
           <a href="/${this.userId}" title=${this.userProfile?.value.displayName} @click=${setView('feed')}>
-            <img class="block mx-auto mb-8 w-40 h-40 object-cover rounded-full shadow-md" src=${AVATAR_URL(this.userProfile?.userId)}>
+            <img class="block mx-auto mb-8 w-40 h-40 object-cover rounded-full shadow-md" src=${AVATAR_URL(this.userId)}>
           </a>
           <h2 class="text-4xl font-semibold">
             <a href="/${this.userId}" title=${this.userProfile?.value.displayName} @click=${setView('feed')}>
