@@ -113,6 +113,28 @@ export class Post extends LitElement {
       borderCls = 'border border-gray-300 border-t-0 rounded-b'
     }
 
+    if (this.post.error) {
+      return html`
+        <div class="grid ${gridCls} ${this.noborders ? 'bg-gray-50' : ''}">
+          ${this.nothumb ? '' : html`
+            <div class="text-xl pl-1 pt-2 text-gray-500">
+              <span class="fas fa-fw fa-exclamation-circle"></span>
+            </div>
+          `}
+          <div class="${borderCls} px-4 py-2 min-w-0 bg-gray-50">
+            <div class="font-semibold text-gray-600">
+              Failed to load post
+            </div>
+            ${this.post.message ? html`
+              <div class="text-gray-500 text-sm">
+                ${this.post.message}
+              </div>
+            ` : ''}
+          </div>
+        </div>
+      `
+    }
+
     return html`
       <div class="relative grid ${gridCls} text-gray-600">
         ${this.nothumb ? '' : html`

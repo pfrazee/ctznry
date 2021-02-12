@@ -40,6 +40,15 @@ a:hover {
   padding: 10px;
 }
 
+.profile.error {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+  background: #fafafa;
+  color: #888;
+}
+
 .header {
   display: flex;
   justify-content: space-between;
@@ -87,6 +96,11 @@ a:hover {
   font-size: 11px;
   padding: 2px 5px;
   border-radius: 2px;
+}
+
+.error-info {
+  font-size: 19px;
+  margin-bottom: 10px;
 }
 `
 export default cssStr

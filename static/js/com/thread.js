@@ -89,7 +89,7 @@ export class Thread extends LitElement {
   render () {
     return html`
       <div
-        class="border border-gray-300 rounded px-4 mb-2 ${this.subject.dbUrl === this.post?.url ? 'highlight' : ''}"
+        class="border border-gray-300 rounded px-4 mb-2 ${this.subject.dbUrl === this.post?.url ? 'highlight' : ''} ${this.post?.error ? 'bg-gray-50' : ''}"
       >
         ${this.post ? html`
           <ctzn-post
@@ -112,6 +112,21 @@ export class Thread extends LitElement {
   }
 
   renderReplies (replies) {
+    if (replies?.error) {
+      return html`
+        <div class="pl-4 py-2 border-l border-gray-200">
+          <div class="font-semibold text-gray-500">
+            <span class="fas fa-fw fa-exclamation-circle"></span>
+            Failed to load thread
+          </div>
+          ${replies.message ? html`
+            <div class="pl-6 text-sm text-gray-400">
+              ${replies.message}
+            </div>
+          ` : ''}
+        </div>
+      `
+    }
     if (!replies?.length) return ''
     return html`
       <div class="pl-4 border-l border-gray-200">

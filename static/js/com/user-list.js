@@ -28,18 +28,25 @@ export class UserList extends LitElement {
     this.profiles = []
     for (let id of this.ids) {
       const profile = await getProfile(id)
+      if (profile.error) {
+        profile.userId = id
+      }
       this.profiles.push(profile)
       this.requestUpdate()
+      
+      if (profile.error) {
+        continue
+      }
 
       const [followers, following] = await Promise.all([
-        listFollowers(id),
-        listFollows(id)
+        listFollowers(id).catch(e => undefined),
+        listFollows(id).catch(e => undefined)
       ])
-      let uniqFollowers = getUniqFollowers(followers)
-      profile.numFollowers = uniqFollowers.length
-      profile.numFollowing = following.length
-      profile.isFollowingMe = session.isActive() && !!following.find(f => f.value.subject.userId === session.info.userId)
-      profile.amIFollowing = session.isActive() && !!uniqFollowers.find(f => f === session.info.userId)
+      let uniqFollowers = followers ? getUniqFollowers(followers) : []
+      profile.numFollowers = uniqFollowers?.length
+      profile.numFollowing = following?.length
+      profile.isFollowingMe = session.isActive() && !!following?.find(f => f.value.subject.userId === session.info.userId)
+      profile.amIFollowing = session.isActive() && !!uniqFollowers?.find(f => f === session.info.userId)
       this.requestUpdate()
     }
   }
@@ -58,8 +65,25 @@ export class UserList extends LitElement {
       return html`<span class="spinner"></span>`
     }
     return html`
+      <link rel="stylesheet" href="/css/fontawesome.css">
       <div class="profiles">
         ${repeat(this.profiles, profile => {
+          if (profile.error) {
+            return html`
+              <div class="profile error">
+                <div class="error-info">
+                  <span class="fas fa-exclamation-circle"></span>
+                  Failed to load profile
+                </div>
+                <div class="id">
+                  <a class="username" href="/${profile.userId}" title=${profile.userId}>
+                    ${profile.userId}
+                  </a>
+                </div>
+                <div class="description">${profile.message}</div>
+              </div>
+            `
+          }
           const nFollowers = profile.numFollowers
           const nFollowing = profile.numFollowing
           const userId = (new URL(profile.url)).pathname.split('/')[1]
