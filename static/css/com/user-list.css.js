@@ -85,7 +85,6 @@ a:hover {
   background: var(--bg-color--dark);
   font-weight: bold;
   font-size: 11px;
-  margin-left: 10px;
   padding: 2px 5px;
   border-radius: 2px;
 }

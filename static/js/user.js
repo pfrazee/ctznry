@@ -41,6 +41,15 @@ class CtznUser extends LitElement {
     this.isEmpty = false
 
     this.userId = (new URL(location)).pathname.split('/')[1]
+    if (location.hash === '#followers') {
+      this.currentView = 'followers'
+    }
+    if (location.hash === '#following') {
+      this.currentView = 'following'
+    }
+    window.addEventListener('popstate', e => {
+      this.currentView = location.hash.slice(1) || 'feed'
+    })
 
     this.load()
   }
@@ -99,6 +108,11 @@ class CtznUser extends LitElement {
 
   setView (str) {
     this.currentView = str
+    if (str === 'feed') {
+      history.pushState('', document.title, location.pathname + location.search)
+    } else {
+      history.pushState('', document.title, location.pathname + location.search + `#${str}`)
+    }
   }
 
   // rendering

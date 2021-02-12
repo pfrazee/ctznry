@@ -75,19 +75,23 @@ export class UserList extends LitElement {
                 <a class="display-name" href="/${profile.userId}" title=${profile.value.displayName}>
                   ${profile.value.displayName}
                 </a>
+              </div>
+              <div class="id">
                 <a class="username" href="/${profile.userId}" title=${profile.value.displayName}>
                   ${userId}
                 </a>
               </div>
               <div class="description">${profile.value.description}</div>
               <div class="stats">
-                <span class="stat"><span class="stat-number">${nFollowers}</span> ${pluralize(nFollowers, 'Follower')}</span>
+                <a class="stat" href="/${profile.userId}#followers"><span class="stat-number">${nFollowers}</span> ${pluralize(nFollowers, 'Follower')}</a>
                 &middot;
-                <span class="stat"><span class="stat-number">${nFollowing}</span> Following</span>
-                ${profile.isFollowingMe ? html`
-                  <span class="label">Follows you</span>
-                ` : ''}
+                <a class="stat" href="/${profile.userId}#following"><span class="stat-number">${nFollowing}</span> Following</a>
               </div>
+              ${profile.isFollowingMe ? html`
+                <div>
+                  <span class="label">Follows you</span>
+                </div>
+              ` : ''}
             </div>
           `
         })}
