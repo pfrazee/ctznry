@@ -22,7 +22,8 @@ class CtznUser extends LitElement {
       following: {type: Array},
       memberships: {type: Array},
       members: {type: Array},
-      isEmpty: {type: Boolean}
+      isEmpty: {type: Boolean},
+      isJoiningOrLeaving: {type: Boolean}
     }
   }
 
@@ -39,6 +40,7 @@ class CtznUser extends LitElement {
     this.following = undefined
     this.members = undefined
     this.isEmpty = false
+    this.isJoiningOrLeaving = false
 
     this.userId = (new URL(location)).pathname.split('/')[1]
     if (location.hash === '#followers') {
@@ -248,9 +250,9 @@ class CtznUser extends LitElement {
         <section class="mb-2">
           ${session.isActive() ? html`
             ${this.amIAMember === true ? html`
-              <ctzn-button class="w-full" @click=${this.onClickLeave} label="Leave ${displayName}"></ctzn-button>
+              <ctzn-button class="w-full" @click=${this.onClickLeave} label="Leave ${displayName}" ?spinner=${this.isJoiningOrLeaving}></ctzn-button>
             ` : this.amIAMember === false ? html`
-              <ctzn-button primary class="w-full" @click=${this.onClickJoin} label="Join ${displayName}"></ctzn-button>
+              <ctzn-button primary class="w-full" @click=${this.onClickJoin} label="Join ${displayName}" ?spinner=${this.isJoiningOrLeaving}></ctzn-button>
             ` : ``}
           ` : html`
             TODO logged out UI
@@ -369,22 +371,26 @@ class CtznUser extends LitElement {
 
   async onClickJoin (e) {
     try {
+      this.isJoiningOrLeaving = true
       await session.api.communities.join(this.userId)
       this.members = await listMembers(this.userId)
     } catch (e) {
       console.log(e)
       toast.create(e.toString(), 'error')
     }
+    this.isJoiningOrLeaving = false
   }
 
   async onClickLeave (e) {
     try {
+      this.isJoiningOrLeaving = true
       await session.api.communities.leave(this.userId)
       this.members = await listMembers(this.userId)
     } catch (e) {
       console.log(e)
       toast.create(e.toString(), 'error')
     }
+    this.isJoiningOrLeaving = false
   }
 
   onViewThread (e) {
