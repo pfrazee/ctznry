@@ -85,12 +85,33 @@ body {
   }
 }
 
-header {
+header .menu {
+  position: fixed;
+  z-index: 101;
+  top: 10px;
+  left: 0;
+  padding-left: 20px;
+  height: calc(100vh - 10px);
+}
+
+header .mobile-top {
+  display: none;
+  position: fixed;
+  z-index: 102;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 50px;
+}
+
+header .mobile-bot {
+  display: none;
   position: fixed;
   z-index: 100;
-  top: 10px;
-  left: 20px;
-  height: calc(100vh - 20px);
+  bottom: 0;
+  left: 0;
+  width: 100vw;
+  height: 50px;
 }
 
 main {
@@ -116,6 +137,36 @@ main {
 
   main > :nth-child(2) {
     display: none;
+  }
+}
+
+@media (max-width: 1000px) {
+  body {
+    padding: 50px 0;
+  }
+
+  main {
+    margin: 0 auto;
+  }
+
+  header .menu {
+    padding-left: 10px;
+    padding-right: 10px;
+    transform: translateX(-100%);
+    transition: transform 0.5s;
+  }
+
+  header .menu.open {
+    transform: translateX(0%);
+    border-right: 1px solid #ccc;
+  }
+
+  header .mobile-top {
+    display: flex;
+  }
+
+  header .mobile-bot {
+    display: flex;
   }
 }
 
