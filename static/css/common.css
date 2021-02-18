@@ -85,6 +85,14 @@ body {
   }
 }
 
+main {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 220px;
+  grid-gap: 20px;
+  margin: 0 auto;
+  max-width: 840px;
+}
+
 .unread {
   background: #f2f3ff !important;
   border-color: #e0e1ff !important;
@@ -252,9 +260,9 @@ ctzn-feed > .post.reply ctzn-post[as-reply-parent]:before {
   position: absolute;
   display: block;
   width: 2px;
-  left: 67px;
-  top: 70px;
-  height: calc(100% - 65px);
+  left: 34px;
+  top: 90px;
+  height: calc(100% - 84px);
   background: rgb(193 193 193);
   z-index: 1;
 }

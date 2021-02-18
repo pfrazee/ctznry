@@ -159,6 +159,7 @@ export class Notification extends LitElement {
     yield html`
       <ctzn-post
         .post=${record}
+        nocommunity
         nometa
         noctrls
       ></ctzn-post>

@@ -19,7 +19,6 @@ export class Post extends LitElement {
       nometa: {type: Boolean},
       nocommunity: {type: Boolean},
       noctrls: {type: Boolean},
-      voteBgColor: {type: String, attribute: 'vote-bg-color'},
       hoverBgColor: {type: String, attribute: 'hover-bg-color'},
       isReplyOpen: {type: Boolean},
       viewContentOnClick: {type: Boolean, attribute: 'view-content-on-click'}
@@ -39,7 +38,6 @@ export class Post extends LitElement {
     this.nometa = false
     this.nocommunity = false
     this.noctrls = false
-    this.voteBgColor = 'gray-100'
     this.hoverBgColor = 'gray-50'
     this.viewContentOnClick = false
 
@@ -128,55 +126,59 @@ export class Post extends LitElement {
       `
     }
 
+    const showingCommunity = !this.nocommunity && !this.asReplyChild && this.post.value.community
     return html`
       <div
-        class="relative ${gridCls} text-gray-600 cursor-pointer hover:bg-${this.hoverBgColor}"
+        class="relative text-gray-600 cursor-pointer hover:bg-${this.hoverBgColor}"
         @click=${this.onClickCard}
         @mousedown=${this.onMousedownCard}
         @mouseup=${this.onMouseupCard}
         @mousemove=${this.onMousemoveCard}
       >
-        ${this.noctrls ? '' : this.renderVoteCtrl()}
-        ${this.noctrls ? '' : html`
-          <a class="block relative" href="/${this.post.author.userId}" title=${this.post.author.displayName}>
-            <img class="block w-14 h-14 object-cover rounded-full ml-2.5 mt-2.5" src=${AVATAR_URL(this.post.author.userId)}>
-          </a>
-        `}
-        <div class="p-1 min-w-0">
-          ${this.nometa ? '' : html`
-            <div class="flex pt-1 px-2.5 text-gray-600 text-xs items-baseline">
-              <div class="mr-2 whitespace-nowrap">
-                <a class="text-gray-700 font-bold text-sm hover:underline" href="/${this.post.author.userId}" title=${this.post.author.displayName}>
-                  ${this.post.author.displayName}
-                </a>
-                <a class="hover:underline" href="/${this.post.author.userId}" title=${this.post.author.userId}>
-                  ${this.post.author.userId}
-                </a>
-              </div>
-              <span class="mr-2 whitespace-nowrap">&middot;</span>
-              <div class="mr-2 whitespace-nowrap">
-                <a class="hover:underline" href="${POST_URL(this.post)}" data-tooltip=${(new Date(this.post.value.createdAt)).toLocaleString()}>
-                  ${relativeDate(this.post.value.createdAt)}
-                </a>
-              </div>
-            </div>
+        ${this.context ? html`
+          <div class="pt-2 pb-1 pl-6 text-sm text-gray-500 font-bold">
+            ${this.context}
+          </div>
+        ` : showingCommunity ? html`
+          <div class="pt-2 pb-1 pl-6 text-sm text-gray-500 font-bold">
+            <span class="fas fa-fw fa-users mr-1"></span>
+            Posted to
+            <a href="/${this.post.value.community.userId}" class="whitespace-nowrap hover:underline">
+              ${displayNames.render(this.post.value.community.userId)}
+            </a>
+          </div>
+        ` : ''}
+        <div class="${gridCls} ${!showingCommunity ? 'pt-2' : ''} ">
+          ${this.noctrls ? '' : html`
+            <a class="block relative" href="/${this.post.author.userId}" title=${this.post.author.displayName}>
+              <img class="block w-12 h-12 object-cover rounded-full ml-3 mt-1" src=${AVATAR_URL(this.post.author.userId)}>
+            </a>
           `}
-          ${this.context ? html`<div class="py-2 px-2.5 text-sm">${this.context}</div>` : ''}
-          <div class="whitespace-pre-wrap break-words text-base pt-.5 pb-1.5 px-2.5">${this.renderPostText()}</div>
-          ${this.noctrls ? '' : html`<div class="px-1 pb-1 text-sm">
-            ${this.renderRepliesCtrl()}
-            ${!this.nocommunity ? html`
-              ${this.post.value.community ? html`
-                <a href="/${this.post.value.community.userId}" class="mr-2 whitespace-nowrap text-xs text-gray-600 hover:underline">
-                  <span class="fas fa-fw fa-users"></span> ${displayNames.render(this.post.value.community.userId)}
-                </a>
-              ` : html`
-                <a href="/${this.post.author.userId}" class="mr-2 whitespace-nowrap text-xs text-gray-600 hover:underline">
-                  <span class="fas fa-fw fa-user"></span> Self post
-                </a>
-              `}
-            ` : ''}
-          </div>`}
+          <div class="px-1 pb-2 min-w-0">
+            ${this.nometa ? '' : html`
+              <div class="flex pl-1 pr-2.5 text-gray-500 text-sm items-baseline">
+                <div class="mr-2 whitespace-nowrap">
+                  <a class="text-gray-700 font-bold text-base hover:underline" href="/${this.post.author.userId}" title=${this.post.author.displayName}>
+                    ${this.post.author.displayName}
+                  </a>
+                  <a class="hover:underline" href="/${this.post.author.userId}" title=${this.post.author.userId}>
+                    ${this.post.author.userId}
+                  </a>
+                </div>
+                <span class="mr-2 whitespace-nowrap">&middot;</span>
+                <div class="mr-2 whitespace-nowrap">
+                  <a class="hover:underline" href="${POST_URL(this.post)}" data-tooltip=${(new Date(this.post.value.createdAt)).toLocaleString()}>
+                    ${relativeDate(this.post.value.createdAt)}
+                  </a>
+                </div>
+              </div>
+            `}
+            <div class="whitespace-pre-wrap break-words text-base text-gray-700 pt-.5 pb-1.5 pl-1 pr-2.5">${this.renderPostText()}</div>
+            ${this.noctrls ? '' : html`<div class="pr-1 pb-1 text-base">
+              ${this.renderRepliesCtrl()}
+              ${this.renderVoteCtrl()}
+            </div>`}
+          </div>
         </div>
       </div>
     `
@@ -184,7 +186,7 @@ export class Post extends LitElement {
 
   renderVoteCtrl () {
     var myVote = this.myVote
-    let aCls = `block px-2`
+    let aCls = `inline-block px-2`
     if (this.canInteract) {
       aCls += ` text-gray-500 cursor-pointer hover:bg-gray-200`
     } else {
@@ -196,30 +198,28 @@ export class Post extends LitElement {
       }
     }
     return html`
-      <div class="bg-${this.voteBgColor} text-center text-sm pt-2">
-        <a
-          class="${aCls} tooltip-right ${myVote === 1 ? 'font-bold text-blue-600' : ''}"
-          @click=${onClick(1)}
-          data-tooltip=${this.ctrlTooltip || 'Upvote'}
-        >
-          <span class="fas fa-caret-up"></span>
-        </a>
-        <div class="${myVote ? 'font-bold' : ''} ${myVote === 1 ? 'text-blue-600' : ''} ${myVote === -1 ? 'text-red-600' : ''}">
-          ${this.upvoteCount - this.downvoteCount}
-        </div>
-        <a
-          class="${aCls} tooltip-right ${myVote === -1 ? 'font-bold text-red-600' : ''}"
-          @click=${onClick(-1)}
-          data-tooltip=${this.ctrlTooltip || 'Downvote'}
-        >
-          <span class="fas fa-caret-down"></span>
-        </a>
-      </div>
+      <a
+        class="${aCls} tooltip-right ${myVote === 1 ? 'font-bold text-blue-600' : ''}"
+        @click=${onClick(1)}
+        data-tooltip=${this.ctrlTooltip || 'Upvote'}
+      >
+        <span class="fas fa-caret-up"></span>
+      </a>
+      <span class="${myVote ? 'font-bold' : ''} ${myVote === 1 ? 'text-blue-600' : ''} ${myVote === -1 ? 'text-red-600' : ''}">
+        ${this.upvoteCount - this.downvoteCount}
+      </span>
+      <a
+        class="${aCls} tooltip-right ${myVote === -1 ? 'font-bold text-red-600' : ''}"
+        @click=${onClick(-1)}
+        data-tooltip=${this.ctrlTooltip || 'Downvote'}
+      >
+        <span class="fas fa-caret-down"></span>
+      </a>
     `
   }
 
   renderRepliesCtrl () {
-    let aCls = `inline-block px-2 mr-5 tooltip-right`
+    let aCls = `inline-block px-2 mr-8 tooltip-right`
     if (this.canInteract) {
       aCls += ` text-gray-500 cursor-pointer hover:bg-gray-100`
     } else {

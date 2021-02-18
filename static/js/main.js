@@ -86,10 +86,8 @@ class CtznApp extends LitElement {
 
   render () {
     return html`
-      <main>
-        <ctzn-header></ctzn-header>
-        ${this.renderCurrentView()}
-      </main>
+      <ctzn-header></ctzn-header>
+      ${this.renderCurrentView()}
     `
   }
 
@@ -169,9 +167,9 @@ class CtznApp extends LitElement {
 
   renderWithSession () {
     return html`
-      <div class="max-w-4xl mx-auto grid grid-cols-layout-twocol gap-8">
+      <main>
         <div>
-          <div class="grid grid-cols-composer border border-gray-300 border-t-0 py-2 px-4">
+          <div class="grid grid-cols-composer border border-gray-200 border-t-0 py-2 px-4">
             <a class="block" href="/${session.info.userId}">
               <img class="block w-10 h-10 rounded-full object-cover mt-2" src="${AVATAR_URL(session.info.userId)}">
             </a>
@@ -180,7 +178,7 @@ class CtznApp extends LitElement {
               @publish=${this.onPublishPost}
             ></ctzn-composer>
           </div>
-          <div class="border border-t-0 border-gray-300 text-xl font-semibold px-4 py-2 sticky top-0 z-10 bg-white">
+          <div class="border border-t-0 border-gray-200 text-xl font-semibold px-4 py-2 sticky top-0 z-10 bg-white">
             Latest Posts
           </div>
           ${this.isEmpty ? this.renderEmptyMessage() : ''}
@@ -195,7 +193,7 @@ class CtznApp extends LitElement {
           ></ctzn-feed>
         </div>
         ${this.renderRightSidebar()}
-      </div>
+      </main>
     `
   }
 

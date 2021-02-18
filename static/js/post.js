@@ -48,10 +48,8 @@ class CtznPostPage extends LitElement {
 
   render () {
     return html`
-      <main>
-        <ctzn-header></ctzn-header>
-        ${this.renderCurrentView()}
-      </main>
+      <ctzn-header></ctzn-header>
+      ${this.renderCurrentView()}
     `
   }
 
@@ -84,7 +82,7 @@ class CtznPostPage extends LitElement {
 
   renderThread () {
     return html`
-      <div class="max-w-4xl mx-auto grid grid-cols-layout-twocol gap-4">
+      <main>
         <div class="py-2">
           ${this.subject ? html`
             <ctzn-thread
@@ -95,7 +93,7 @@ class CtznPostPage extends LitElement {
           ` : ''}
         </div>
         ${this.renderRightSidebar()}
-      </div>
+      </main>
     `
   }
 

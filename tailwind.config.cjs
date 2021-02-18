@@ -8,7 +8,7 @@ module.exports = {
     extend: {
       gridTemplateColumns: {
         'layout-twocol': 'minmax(0, 1fr) 260px',
-        post: '30px 65px 1fr',
+        post: '65px 1fr',
         'post-tight': '30px 65px 1fr',
         composer: '42px 1fr',
       }

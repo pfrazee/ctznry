@@ -73,10 +73,8 @@ class CtznNotifications extends LitElement {
 
   render () {
     return html`
-      <main>
-        <ctzn-header></ctzn-header>
-        ${this.renderCurrentView()}
-      </main>
+      <ctzn-header></ctzn-header>
+      ${this.renderCurrentView()}
     `
   }
 
@@ -102,13 +100,13 @@ class CtznNotifications extends LitElement {
       return ''
     }
     return html`
-      <div class="max-w-4xl mx-auto grid grid-cols-layout-twocol gap-8">
+      <main>
         <div>
           ${this.isEmpty ? this.renderEmptyMessage() : ''}
           ${''/* TODO<div class="reload-page mx-4 mb-4 rounded cursor-pointer overflow-hidden leading-10 ${this.numNewItems > 0 ? 'visible' : ''}" @click=${e => this.load()}>
             ${this.numNewItems} new ${pluralize(this.numNewItems, 'update')}
           </div>*/}
-          <div class="border border-gray-300 border-t-0 text-xl font-semibold px-4 py-2 sticky top-0 z-10 bg-white">
+          <div class="border border-gray-200 border-t-0 text-xl font-semibold px-4 py-2 sticky top-0 z-10 bg-white">
             Notifications
           </div>
           <ctzn-notifications-feed
@@ -120,7 +118,7 @@ class CtznNotifications extends LitElement {
           ></ctzn-notifications-feed>
         </div>
         ${this.renderRightSidebar()}
-      </div>
+      </main>
     `
   }
 

@@ -92,12 +92,11 @@ export class Thread extends LitElement {
   render () {
     return html`
       <div
-        class="border mb-1 ${this.subject.dbUrl === this.post?.url ? 'highlight bg-indigo-50 border-indigo-300' : 'border-gray-300'} ${this.post?.error ? 'bg-gray-50' : ''}"
+        class="border mb-1 ${this.subject.dbUrl === this.post?.url ? 'highlight bg-indigo-50 border-indigo-300' : 'border-gray-200'} ${this.post?.error ? 'bg-gray-50' : ''}"
       >
         ${this.post ? html`
           <ctzn-post
             .post=${this.post}
-            vote-bg-color=${this.subject.dbUrl === this.post?.url ? 'indigo-100' : 'gray-100'}
             hover-bg-color=${this.subject.dbUrl === this.post?.url ? 'indigo-100' : 'gray-50'}
             noborders
             view-content-on-click
@@ -138,10 +137,9 @@ export class Thread extends LitElement {
         ${repeat(replies, r => r.url, reply => {
           const isSubject = this.subject.dbUrl === reply.url
           return html`
-          <div class="border mb-1 ${isSubject ? 'highlight bg-indigo-50 border-indigo-300' : 'border-gray-300'}">
+          <div class="border mb-1 ${isSubject ? 'highlight bg-indigo-50 border-indigo-300' : 'border-gray-200'}">
               <ctzn-post
                 .post=${reply}
-                vote-bg-color=${isSubject ? 'indigo-100' : 'gray-100'}
                 hover-bg-color=${isSubject ? 'indigo-100' : 'gray-50'}
                 noborders
                 nocommunity

@@ -186,7 +186,7 @@ export class Feed extends LitElement {
     const isReply = !!post.value.reply
     return html`
       <div
-        class="post ${isReply ? 'reply' : ''} border border-gray-300 border-t-0"
+        class="post ${isReply ? 'reply' : ''} border border-gray-200 border-t-0"
       >
         ${post.parentPost ? html`
           <ctzn-post

@@ -139,49 +139,47 @@ class CtznUser extends LitElement {
     `.replace('\n', '')
     
     return html`
+      <ctzn-header></ctzn-header>
       <main>
-        <ctzn-header></ctzn-header>
-        <div class="max-w-4xl mx-auto grid grid-cols-layout-twocol gap-8">
-          <div class="relative">
-            <div class="absolute" style="top: 8px; right: 10px">
-              ${this.renderProfileControls()}
-            </div>
-            <div class="flex items-center py-4 px-4 border border-gray-300 border-t-0 border-b-0">
-              <a href="/${this.userId}" title=${this.userProfile?.value.displayName} @click=${setView('feed')}>
-                <img class="block mx-auto ml-2 mr-6 w-32 h-32 object-cover rounded-full shadow-md" src=${AVATAR_URL(this.userId)}>
-              </a>
-              <div class="flex-1">
-                <h2 class="text-3xl font-semibold">
-                  <a href="/${this.userId}" title=${this.userProfile?.value.displayName} @click=${setView('feed')}>
-                    ${this.userProfile?.value.displayName}
-                  </a>
-                </h2>
-                <h2 class="text-gray-500 font-semibold">
-                  <a href="/${this.userId}" title="${this.userId}" @click=${setView('feed')}>
-                    ${this.isCitizen ? html`<span class="fas fa-fw fa-user"></span>` : ''}
-                    ${this.isCommunity ? html`<span class="fas fa-fw fa-users"></span>` : ''}
-                    ${this.userId}
-                  </a>
-                </h2>
-                ${this.userProfile?.value.description ? html`
-                  <div class="mt-4">${this.userProfile?.value.description}</div>
-                ` : ''}
-              </div>
-            </div>
-            <div class="flex border border-gray-300 border-t-0 bg-white text-gray-400 sticky top-0 z-10">
-              <a class="${navCls('feed')}" @click=${setView('feed')}>Feed</a>
-              ${this.isCitizen ? html`
-                <a class="${navCls('followers')}" @click=${setView('followers')}>${nFollowers} ${pluralize(nFollowers, 'Follower')}</a>
-                <a class="${navCls('following')}" @click=${setView('following')}>${nFollowing} Following</a>
-              ` : this.isCommunity ? html`
-                <a class="${navCls('members')}" @click=${setView('members')}>${nMembers} ${pluralize(nMembers, 'Member')}</a>
+        <div class="relative">
+          <div class="absolute" style="top: 8px; right: 10px">
+            ${this.renderProfileControls()}
+          </div>
+          <div class="flex items-center py-4 px-4 border border-gray-200 border-t-0 border-b-0">
+            <a href="/${this.userId}" title=${this.userProfile?.value.displayName} @click=${setView('feed')}>
+              <img class="block mx-auto ml-2 mr-6 w-32 h-32 object-cover rounded-full shadow-md" src=${AVATAR_URL(this.userId)}>
+            </a>
+            <div class="flex-1">
+              <h2 class="text-3xl font-semibold">
+                <a href="/${this.userId}" title=${this.userProfile?.value.displayName} @click=${setView('feed')}>
+                  ${this.userProfile?.value.displayName}
+                </a>
+              </h2>
+              <h2 class="text-gray-500 font-semibold">
+                <a href="/${this.userId}" title="${this.userId}" @click=${setView('feed')}>
+                  ${this.isCitizen ? html`<span class="fas fa-fw fa-user"></span>` : ''}
+                  ${this.isCommunity ? html`<span class="fas fa-fw fa-users"></span>` : ''}
+                  ${this.userId}
+                </a>
+              </h2>
+              ${this.userProfile?.value.description ? html`
+                <div class="mt-4">${this.userProfile?.value.description}</div>
               ` : ''}
             </div>
-            ${this.renderCurrentView()}
           </div>
-          <div>
-            ${this.renderRightSidebar()}
+          <div class="flex border border-gray-200 border-t-0 bg-white text-gray-400 sticky top-0 z-10">
+            <a class="${navCls('feed')}" @click=${setView('feed')}>Feed</a>
+            ${this.isCitizen ? html`
+              <a class="${navCls('followers')}" @click=${setView('followers')}>${nFollowers} ${pluralize(nFollowers, 'Follower')}</a>
+              <a class="${navCls('following')}" @click=${setView('following')}>${nFollowing} Following</a>
+            ` : this.isCommunity ? html`
+              <a class="${navCls('members')}" @click=${setView('members')}>${nMembers} ${pluralize(nMembers, 'Member')}</a>
+            ` : ''}
           </div>
+          ${this.renderCurrentView()}
+        </div>
+        <div>
+          ${this.renderRightSidebar()}
         </div>
       </main>
     `
@@ -292,19 +290,19 @@ class CtznUser extends LitElement {
     }
     if (this.currentView === 'followers') {
       return html`
-        <div class="border border-gray-300 border-t-0 p-2 bg-gray-50">
+        <div class="border border-gray-200 border-t-0 p-2 bg-gray-50">
           <ctzn-user-list .ids=${this.uniqFollowers}></ctzn-user-list>
         </div>
       `
     } else if (this.currentView === 'following') {
       return html`
-        <div class="border border-gray-300 border-t-0 p-2 bg-gray-50">
+        <div class="border border-gray-200 border-t-0 p-2 bg-gray-50">
           <ctzn-user-list .ids=${this.following?.map(f => f.value.subject.userId)}></ctzn-user-list>
         </div>
       `      
     } else if (this.currentView === 'members') {
       return html`
-        <div class="border border-gray-300 border-t-0 p-2 bg-gray-50">
+        <div class="border border-gray-200 border-t-0 p-2 bg-gray-50">
           <ctzn-user-list .ids=${this.members?.map(f => f.value.user.userId)}></ctzn-user-list>
         </div>
       `      
@@ -325,7 +323,7 @@ class CtznUser extends LitElement {
 
   renderEmptyMessage () {
     return html`
-      <div class="bg-gray-100 text-gray-500 py-44 text-center border border-t-0 border-gray-300">
+      <div class="bg-gray-100 text-gray-500 py-44 text-center border border-t-0 border-gray-200">
         ${this.isCitizen ? html`
           <div>${this.userProfile?.value?.displayName} hasn't posted anything yet.</div>
         ` : this.isCommunity ? html`

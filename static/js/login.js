@@ -35,35 +35,33 @@ class CtznLogin extends LitElement {
 
   render () {
     return html`
-      <main>
-        <ctzn-header></ctzn-header>
-        <div class="mx-auto my-12 max-w-md border border-gray-200 p-8 bg-gray-50">
-          <form @submit=${this.onSubmit}>
-            <h2 class="mb-6 text-xl">Login</h2>
-            <div class="mb-6">
-              <label class="block w-full box-border mb-1" for="userid">Your address</label>
-              <input class="block w-full box-border mb-1 p-4 border border-gray-300" id="userid" name="userid" required placeholder="E.g. bob@home.com">
-            </div>
-            <div class="mb-6">
-              <label class="block w-full box-border mb-1" for="password">Password</label>
-              <input class="block w-full box-border mb-1 p-4 border border-gray-300" id="password" type="password" name="password" required>
-            </div>
-            ${this.currentError ? html`
-              <div class="bg-red-100 p-6 text-red-600">${this.currentError}</div>
-            ` : ''}
-            <div class="flex justify-between items-center border-t border-gray-300 mt-10 pt-6">
-              <a href="/forgot-password">Forgot Password</a>
-              <ctzn-button
-                primary
-                type="submit"
-                ?disabled=${this.isLoggingIn}
-                ?spinner=${this.isLoggingIn}
-                label="Login"
-              ></ctzn-button>
-            </div>
-          </form>
-        </div>
-      </main>
+      <ctzn-header></ctzn-header>
+      <div class="mx-auto my-12 max-w-md border border-gray-200 p-8 bg-gray-50">
+        <form @submit=${this.onSubmit}>
+          <h2 class="mb-6 text-xl">Login</h2>
+          <div class="mb-6">
+            <label class="block w-full box-border mb-1" for="userid">Your address</label>
+            <input class="block w-full box-border mb-1 p-4 border border-gray-300" id="userid" name="userid" required placeholder="E.g. bob@home.com">
+          </div>
+          <div class="mb-6">
+            <label class="block w-full box-border mb-1" for="password">Password</label>
+            <input class="block w-full box-border mb-1 p-4 border border-gray-300" id="password" type="password" name="password" required>
+          </div>
+          ${this.currentError ? html`
+            <div class="bg-red-100 p-6 text-red-600">${this.currentError}</div>
+          ` : ''}
+          <div class="flex justify-between items-center border-t border-gray-300 mt-10 pt-6">
+            <a href="/forgot-password">Forgot Password</a>
+            <ctzn-button
+              primary
+              type="submit"
+              ?disabled=${this.isLoggingIn}
+              ?spinner=${this.isLoggingIn}
+              label="Login"
+            ></ctzn-button>
+          </div>
+        </form>
+      </div>
     `
   }
 
