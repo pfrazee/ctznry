@@ -3,6 +3,7 @@ import { LitElement, html } from '../../vendor/lit-element/lit-element.js'
 import * as toast from './toast.js'
 import * as session from '../lib/session.js'
 import * as contextMenu from './context-menu.js'
+import * as displayNames from '../lib/display-names.js'
 
 const CHAR_LIMIT = 256
 
@@ -49,14 +50,6 @@ class Composer extends LitElement {
     if (this.canChangeCommunity) {
       this._community = v
     }
-  }
-
-  get communityName () {
-    return this.community?.userId || 'Self'
-  }
-
-  get communityIcon () {
-    return this.community ? html`<span class="fas fa-fw fa-users ml-1"></span>` : html`<span class="fas fa-fw fa-user ml-1"></span>`
   }
 
   get canChangeCommunity () {
@@ -107,21 +100,21 @@ class Composer extends LitElement {
             >Cancel</button>`}
             ${this.canChangeCommunity ? html`
               <button
-                class="inline-flex items-center rounded px-3 py-1 text-gray-500 bg-white hover:bg-gray-100"
-                @click=${this.onClickSelectCommunity}
-                ?disabled=${!this.canChangeCommunity}
+                class="inline-flex items-center rounded px-3 py-1 shadow-sm text-white ${this.canPost ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-300 cursor-default'}"
+                @click=${this.onClickPostTo}
+                ?disabled=${!this.canPost}
               >
-                Post to: ${this.communityIcon}
-                <span class="truncate ml-1" style="max-width: 150px">${this.communityName}</span>
+                Post to
                 <span class="fas fa-caret-down ml-1"></span>
               </button>
-            ` : ''}
-            <button
-              type="submit"
-              class="inline-block rounded px-3 py-1 shadow-sm text-white ${this.canPost ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-300 cursor-default'}"
-              tabindex="3"
-              ?disabled=${!this.canPost}
-            >Post</button>
+            ` : html`
+              <button
+                type="submit"
+                class="inline-block rounded px-3 py-1 shadow-sm text-white ${this.canPost ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-300 cursor-default'}"
+                tabindex="3"
+                ?disabled=${!this.canPost}
+              >Post</button>
+            `}
           </div>
         </div>
       </form>
@@ -142,7 +135,7 @@ class Composer extends LitElement {
     this.dispatchEvent(new CustomEvent('cancel'))
   }
 
-  onClickSelectCommunity (e) {
+  onClickPostTo (e) {
     e.preventDefault()
     e.stopPropagation()
     const rect = e.currentTarget.getClientRects()[0]
@@ -157,21 +150,23 @@ class Composer extends LitElement {
           label: 'Self',
           click: async () => {
             this.community = undefined
+            this.onSubmit()
           }
         }
       ].concat(session.myCommunities.map(community => ({
         icon: 'fas fa-fw fa-users',
-        label: community.userId,
+        label: displayNames.render(community.userId),
         click: async () => {
           this.community = community
+          this.onSubmit()
         }
       })))
     })
   }
 
   async onSubmit (e) {
-    e.preventDefault()
-    e.stopPropagation()
+    e?.preventDefault()
+    e?.stopPropagation()
 
     if (!this.canPost) {
       return
