@@ -1,3 +1,4 @@
+import urlRegexSafe from './url-regex-safe.js'
 export const DRIVE_KEY_REGEX = /[0-9a-f]{64}/i
 
 export function urlToKey (str) {
@@ -94,8 +95,7 @@ export function makeSafe (str = '') {
 }
 
 export function linkify (str = '') {
-  const re = /((?<!\+)(?:https?(?::\/\/))(?:www\.)?(?:[a-zA-Z\d-_.]+(?:(?:\.|@)[a-zA-Z\d]{2,})|localhost)(?:(?:[-a-zA-Z\d:%_+.~#*$!?&//=@]*)(?:[,](?![\s]))*)*)/g
-  return str.replace(re, match => `<a class="text-blue-600 hover:underline" href="${match}" target="_blank">${match}</a>`)
+  return str.replace(urlRegexSafe(), match => `<a class="text-blue-600 hover:underline" href="${match}" target="_blank">${match}</a>`)
 }
 
 export function extractSchemaId (str = '') {
