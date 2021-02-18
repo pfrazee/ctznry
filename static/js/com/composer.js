@@ -201,6 +201,7 @@ class Composer extends LitElement {
     }
     
     this.draftText = ''
+    this.querySelector('textarea').value = ''
     this.dispatchEvent(new CustomEvent('publish', {detail: res}))
   }
 }
