@@ -16,7 +16,6 @@ import './com/img-fallbacks.js'
 class CtznApp extends LitElement {
   static get properties () {
     return {
-      isComposingPost: {type: Boolean},
       searchQuery: {type: String},
       isEmpty: {type: Boolean},
       memberships: {type: Array},
@@ -31,7 +30,6 @@ class CtznApp extends LitElement {
   constructor () {
     super()
     this.isLoading = true
-    this.isComposingPost = false
     this.searchQuery = ''
     this.isEmpty = false
     this.numNewItems = 0
@@ -62,7 +60,8 @@ class CtznApp extends LitElement {
     }
     
     if ((new URL(window.location)).searchParams.has('composer')) {
-      this.isComposingPost = true
+      await this.requestUpdate()
+      document.querySelector('ctzn-composer').focus()
       window.history.replaceState({}, null, '/')
     }
   }
@@ -97,36 +96,38 @@ class CtznApp extends LitElement {
   renderRightSidebar () {
     return html`
       <div>
-        ${''/*todo <section class="mb-4">
-          <span class="fas fa-search"></span>
-          ${!!this.searchQuery ? html`
-            <a class="clear-search" @click=${this.onClickClearSearch}><span class="fas fa-times"></span></a>
-          ` : ''}
-          <input @keyup=${this.onKeyupSearch} placeholder="Search" value=${this.searchQuery}>
-        </section>*/}
-        <section class="mb-4">
-          <h3 class="mb-1 font-bold text-gray-600">My Communities</h3>
-          ${this.memberships?.length ? html`
-            <div class="mt-2">
-              ${repeat(this.memberships, membership => html`
-                <a href="/${membership.value.community.userId}" data-tooltip=${membership.value.community.userId}>
-                  <img class="inline-block rounded-full w-10 h-10 object-cover" src="${AVATAR_URL(membership.value.community.userId)}">
-                </a>
-              `)}
-            </div>
-          ` : html`
-            <div class="px-3 py-2 bg-gray-100 text-gray-500 text-xs">
-              Join a community to get connected to more people!
-            </div>
-          `}
-        </section>
-        <section>
-          <ctzn-button
-            class="text-gray-600 text-sm font-semibold w-full"
-            label="Create Community"
-            @click=${this.onClickCreateCommunity}
-          ></ctzn-button>
-        </section>
+        <div class="sticky top-0 py-4">
+          ${''/*todo <section class="mb-4">
+            <span class="fas fa-search"></span>
+            ${!!this.searchQuery ? html`
+              <a class="clear-search" @click=${this.onClickClearSearch}><span class="fas fa-times"></span></a>
+            ` : ''}
+            <input @keyup=${this.onKeyupSearch} placeholder="Search" value=${this.searchQuery}>
+          </section>*/}
+          <section class="mb-4">
+            <ctzn-button
+              class="text-gray-600 text-sm font-semibold w-full"
+              label="Create Community"
+              @click=${this.onClickCreateCommunity}
+            ></ctzn-button>
+          </section>
+          <section class="mb-4">
+            <h3 class="mb-1 font-bold text-gray-600">My Communities</h3>
+            ${this.memberships?.length ? html`
+              <div class="mt-2">
+                ${repeat(this.memberships, membership => html`
+                  <a href="/${membership.value.community.userId}" data-tooltip=${membership.value.community.userId}>
+                    <img class="inline-block rounded-full w-10 h-10 object-cover" src="${AVATAR_URL(membership.value.community.userId)}">
+                  </a>
+                `)}
+              </div>
+            ` : html`
+              <div class="px-3 py-2 bg-gray-100 text-gray-500 text-xs">
+                Join a community to get connected to more people!
+              </div>
+            `}
+          </section>
+        </div>
       </div>
     `
   }
@@ -170,25 +171,22 @@ class CtznApp extends LitElement {
     return html`
       <div class="max-w-4xl mx-auto grid grid-cols-layout-twocol gap-8">
         <div>
-          <div class="grid grid-cols-composer gap-3.5">
+          <div class="grid grid-cols-composer border border-gray-300 border-t-0 py-2 px-4">
             <a class="block" href="/${session.info.userId}">
-              <img class="block w-8 h-8 rounded-full object-cover mt-2" src="${AVATAR_URL(session.info.userId)}">
+              <img class="block w-10 h-10 rounded-full object-cover mt-2" src="${AVATAR_URL(session.info.userId)}">
             </a>
-            ${this.isComposingPost ? html`
-              <ctzn-composer
-                @publish=${this.onPublishPost}
-                @cancel=${this.onCancelPost}
-              ></ctzn-composer>
-            ` : html`
-              <div class="border border-gray-300 py-4 px-5 rounded cursor-text" @click=${this.onComposePost}>
-                What's new?
-              </div>
-            `}
+            <ctzn-composer
+              nocancel
+              @publish=${this.onPublishPost}
+            ></ctzn-composer>
+          </div>
+          <div class="border border-t-0 border-gray-300 text-xl font-semibold px-4 py-2 sticky top-0 z-10 bg-white">
+            Latest Posts
           </div>
           ${this.isEmpty ? this.renderEmptyMessage() : ''}
-          <div class="reload-page mx-4 mb-4 rounded cursor-pointer overflow-hidden leading-10 ${this.numNewItems > 0 ? 'expanded' : ''}" @click=${e => this.load()}>
+          ${''/*TODO<div class="reload-page mx-4 mb-4 rounded cursor-pointer overflow-hidden leading-10 ${this.numNewItems > 0 ? 'expanded' : ''}" @click=${e => this.load()}>
             ${this.numNewItems} new ${pluralize(this.numNewItems, 'update')}
-          </div>
+          </div>*/}
           <ctzn-feed
             limit="50"
             @load-state-updated=${this.onFeedLoadStateUpdated}
@@ -244,16 +242,7 @@ class CtznApp extends LitElement {
     })
   }
 
-  onComposePost (e) {
-    this.isComposingPost = true
-  }
-
-  onCancelPost (e) {
-    this.isComposingPost = false
-  }
-
   onPublishPost (e) {
-    this.isComposingPost = false
     toast.create('Post published', '', 10e3)
     this.load()
   }

@@ -9,6 +9,8 @@ const CHAR_LIMIT = 256
 class Composer extends LitElement {
   static get properties () {
     return {
+      nocancel: {type: Boolean},
+      autofocus: {type: Boolean},
       placeholder: {type: String},
       draftText: {type: String, attribute: 'draft-text'},
       _community: {type: Object},
@@ -20,6 +22,7 @@ class Composer extends LitElement {
 
   constructor () {
     super()
+    this.nocancel = false
     this.placeholder = 'What\'s new?'
     this.draftText = ''
     this._community = undefined
@@ -61,7 +64,9 @@ class Composer extends LitElement {
   }
 
   firstUpdated () {
-    this.querySelector('textarea').focus()
+    if (this.autofocus) {
+      this.querySelector('textarea').focus()
+    }
   }
 
   get charLimitClass () {
@@ -82,7 +87,7 @@ class Composer extends LitElement {
       <form @submit=${this.onSubmit}>
         <div class="mb-2">
           <textarea
-            class="py-4 px-5 w-full box-border resize-none border border-gray-300 rounded"
+            class="pt-2 px-3 w-full box-border resize-none outline-none mh-16 text-base"
             placeholder=${this.placeholder}
             @keyup=${this.onTextareaKeyup}
           ></textarea>
@@ -91,18 +96,18 @@ class Composer extends LitElement {
         <div class="flex justify-between">
           <div class="">
             <span class="px-4 ${this.charLimitClass}">
-              ${this.draftText.length} / ${CHAR_LIMIT}
+              ${this.draftText.length > 0 ? `${this.draftText.length} / ${CHAR_LIMIT}` : ''}
             </span>
           </div>
           <div>
-            <button
-              class="inline-block rounded px-3 py-1 shadow-sm bg-white border border-gray-300 hover:bg-gray-100"
+            ${this.nocancel ? '' : html`<button
+              class="inline-block rounded px-3 py-1 text-gray-500 bg-white hover:bg-gray-100"
               @click=${this.onCancel}
               tabindex="4"
-            >Cancel</button>
+            >Cancel</button>`}
             ${this.canChangeCommunity ? html`
               <button
-                class="inline-flex items-center rounded px-3 py-1 shadow-sm bg-white border border-gray-300 hover:bg-gray-100"
+                class="inline-flex items-center rounded px-3 py-1 text-gray-500 bg-white hover:bg-gray-100"
                 @click=${this.onClickSelectCommunity}
                 ?disabled=${!this.canChangeCommunity}
               >
@@ -113,7 +118,7 @@ class Composer extends LitElement {
             ` : ''}
             <button
               type="submit"
-              class="inline-block rounded px-3 py-1 shadow-sm bg-blue-600 text-white hover:bg-blue-700"
+              class="inline-block rounded px-3 py-1 shadow-sm text-white ${this.canPost ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-300 cursor-default'}"
               tabindex="3"
               ?disabled=${!this.canPost}
             >Post</button>

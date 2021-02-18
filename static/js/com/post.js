@@ -16,11 +16,11 @@ export class Post extends LitElement {
       searchTerms: {type: String, attribute: 'search-terms'},
       asReplyParent: {type: Boolean, attribute: 'as-reply-parent'},
       asReplyChild: {type: Boolean, attribute: 'as-reply-child'},
-      nothumb: {type: Boolean},
-      noborders: {type: Boolean},
       nometa: {type: Boolean},
       nocommunity: {type: Boolean},
       noctrls: {type: Boolean},
+      voteBgColor: {type: String, attribute: 'vote-bg-color'},
+      hoverBgColor: {type: String, attribute: 'hover-bg-color'},
       isReplyOpen: {type: Boolean},
       viewContentOnClick: {type: Boolean, attribute: 'view-content-on-click'}
     }
@@ -37,7 +37,10 @@ export class Post extends LitElement {
     this.searchTerms = undefined
     this.isReplyOpen = false
     this.nometa = false
+    this.nocommunity = false
     this.noctrls = false
+    this.voteBgColor = 'gray-100'
+    this.hoverBgColor = 'gray-50'
     this.viewContentOnClick = false
 
     // helper state
@@ -101,22 +104,12 @@ export class Post extends LitElement {
     }
 
     let gridCls = 'grid grid-cols-post'
-    if (this.noborders) gridCls = 'grid grid-cols-post-tight'
-    if (this.nothumb) gridCls = ''
-
-    let borderCls = 'border border-gray-300 rounded'
-    if (this.noborders) {
-      borderCls = ''
-    } else if (this.asReplyParent) {
-      borderCls = 'border border-gray-300 border-b-0 rounded-t'
-    } else if (this.asReplyChild) {
-      borderCls = 'border border-gray-300 border-t-0 rounded-b'
-    }
+    if (this.noctrls) gridCls = ''
 
     if (this.post.error) {
       return html`
-        <div class="grid ${gridCls} ${this.noborders ? 'bg-gray-50' : ''}">
-          ${this.nothumb ? '' : html`
+        <div class="grid ${gridCls}">
+          ${this.noctrls ? '' : html`
             <div class="text-xl pl-1 pt-2 text-gray-500">
               <span class="fas fa-fw fa-exclamation-circle"></span>
             </div>
@@ -136,20 +129,20 @@ export class Post extends LitElement {
     }
 
     return html`
-      <div class="relative grid ${gridCls} text-gray-600">
-        ${this.nothumb ? '' : html`
+      <div
+        class="relative ${gridCls} text-gray-600 cursor-pointer hover:bg-${this.hoverBgColor}"
+        @click=${this.onClickCard}
+        @mousedown=${this.onMousedownCard}
+        @mouseup=${this.onMouseupCard}
+        @mousemove=${this.onMousemoveCard}
+      >
+        ${this.noctrls ? '' : this.renderVoteCtrl()}
+        ${this.noctrls ? '' : html`
           <a class="block relative" href="/${this.post.author.userId}" title=${this.post.author.displayName}>
-            <img class="block w-8 h-8 object-cover rounded-full mr-2 mt-2" src=${AVATAR_URL(this.post.author.userId)}>
+            <img class="block w-14 h-14 object-cover rounded-full ml-2.5 mt-2.5" src=${AVATAR_URL(this.post.author.userId)}>
           </a>
         `}
-        ${this.noborders || this.nothumb ? '' : html`<span class="post-author-arrow"></span>`}
-        <div
-          class="${borderCls} p-1 min-w-0 cursor-pointer hover:border-gray-400"
-          @click=${this.onClickCard}
-          @mousedown=${this.onMousedownCard}
-          @mouseup=${this.onMouseupCard}
-          @mousemove=${this.onMousemoveCard}
-        >
+        <div class="p-1 min-w-0">
           ${this.nometa ? '' : html`
             <div class="flex pt-1 px-2.5 text-gray-600 text-xs items-baseline">
               <div class="mr-2 whitespace-nowrap">
@@ -169,9 +162,8 @@ export class Post extends LitElement {
             </div>
           `}
           ${this.context ? html`<div class="py-2 px-2.5 text-sm">${this.context}</div>` : ''}
-          <div class="whitespace-pre-wrap break-words text-base pt-1.5 pb-2.5 px-2.5">${this.renderPostText()}</div>
+          <div class="whitespace-pre-wrap break-words text-base pt-.5 pb-1.5 px-2.5">${this.renderPostText()}</div>
           ${this.noctrls ? '' : html`<div class="px-1 pb-1 text-sm">
-            ${this.renderVoteCtrl()}
             ${this.renderRepliesCtrl()}
             ${!this.nocommunity ? html`
               ${this.post.value.community ? html`
@@ -192,9 +184,9 @@ export class Post extends LitElement {
 
   renderVoteCtrl () {
     var myVote = this.myVote
-    let aCls = `inline-block px-2 mr-5 rounded`
+    let aCls = `block px-2`
     if (this.canInteract) {
-      aCls += ` text-gray-600 cursor-pointer hover:bg-gray-100`
+      aCls += ` text-gray-500 cursor-pointer hover:bg-gray-200`
     } else {
       aCls += ` text-gray-400`
     }
@@ -204,31 +196,32 @@ export class Post extends LitElement {
       }
     }
     return html`
-      <span class="vote-ctrl">
+      <div class="bg-${this.voteBgColor} text-center text-sm pt-2">
         <a
           class="${aCls} tooltip-right ${myVote === 1 ? 'font-bold text-blue-600' : ''}"
           @click=${onClick(1)}
           data-tooltip=${this.ctrlTooltip || 'Upvote'}
         >
-          <span class="far fa-thumbs-up"></span>
-          <span class="count">${this.upvoteCount}</span>
+          <span class="fas fa-caret-up"></span>
         </a>
+        <div class="${myVote ? 'font-bold' : ''} ${myVote === 1 ? 'text-blue-600' : ''} ${myVote === -1 ? 'text-red-600' : ''}">
+          ${this.upvoteCount - this.downvoteCount}
+        </div>
         <a
-          class="${aCls} tooltip-right ${myVote === -1 ? 'font-bold text-blue-600' : ''}"
+          class="${aCls} tooltip-right ${myVote === -1 ? 'font-bold text-red-600' : ''}"
           @click=${onClick(-1)}
           data-tooltip=${this.ctrlTooltip || 'Downvote'}
         >
-          <span class="far fa-thumbs-down"></span>
-          <span class="count">${this.downvoteCount}</span>
+          <span class="fas fa-caret-down"></span>
         </a>
-      </span>
+      </div>
     `
   }
 
   renderRepliesCtrl () {
     let aCls = `inline-block px-2 mr-5 tooltip-right`
     if (this.canInteract) {
-      aCls += ` text-gray-600 cursor-pointer hover:bg-gray-100`
+      aCls += ` text-gray-500 cursor-pointer hover:bg-gray-100`
     } else {
       aCls += ` text-gray-400`
     }

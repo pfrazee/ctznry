@@ -5,6 +5,7 @@ export class Button extends LitElement {
     return {
       label: {type: String},
       href: {type: String},
+      btnClass: {type: String, attribute: 'btn-class'},
       disabled: {type: Boolean},
       spinner: {type: Boolean}
     }
@@ -16,10 +17,11 @@ export class Button extends LitElement {
 
   constructor () {
     super()
+    this.btnClass = ''
   }
 
   getClass () {
-    let parentClass = this.className || ''
+    let parentClass = this.btnClass || this.className || ''
     let colors = 'bg-white border border-gray-300 hover:bg-gray-100'
     if (this.hasAttribute('primary')) {
       colors = 'bg-blue-600 text-white hover:bg-blue-700'

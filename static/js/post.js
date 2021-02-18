@@ -58,7 +58,9 @@ class CtznPostPage extends LitElement {
   renderRightSidebar () {
     return html`
       <div>
-        <ctzn-user-list cols="1" .ids=${[this.authorProfile.userId]}></ctzn-user-list>
+        <section class="sticky top-0 py-2">
+          <ctzn-user-list cols="1" .ids=${[this.authorProfile.userId]}></ctzn-user-list>
+        </section>
       </div>
     `
   }
@@ -83,7 +85,7 @@ class CtznPostPage extends LitElement {
   renderThread () {
     return html`
       <div class="max-w-4xl mx-auto grid grid-cols-layout-twocol gap-4">
-        <div>
+        <div class="py-2">
           ${this.subject ? html`
             <ctzn-thread
               .subject=${this.subject}
@@ -110,7 +112,7 @@ class CtznPostPage extends LitElement {
   // =
 
   onLoadThread () {
-    this.shadowRoot.querySelector('ctzn-thread').scrollHighlightedPostIntoView()
+    this.querySelector('ctzn-thread').scrollHighlightedPostIntoView()
   }
 
   onViewThread (e) {

@@ -36,8 +36,8 @@ export class ViewThreadPopup extends BasePopup {
   // rendering
   // =
 
-  renderTitle () {
-    return `Thread`
+  get shouldShowHead () {
+    return false
   }
 
   renderBody () {
@@ -54,7 +54,7 @@ export class ViewThreadPopup extends BasePopup {
   // =
 
   onLoadThread () {
-    this.shadowRoot.querySelector('ctzn-thread').scrollHighlightedPostIntoView()
+    this.querySelector('ctzn-thread').scrollHighlightedPostIntoView()
   }
 
   onViewThread (e) {

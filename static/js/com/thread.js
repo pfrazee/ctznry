@@ -2,6 +2,7 @@ import { LitElement, html } from '../../vendor/lit-element/lit-element.js'
 import { repeat } from '../../vendor/lit-element/lit-html/directives/repeat.js'
 import * as toast from './toast.js'
 import { getPost, getThread } from '../lib/getters.js'
+import { emit } from '../lib/dom.js'
 import * as session from '../lib/session.js'
 import * as displayNames from '../lib/display-names.js'
 import './post.js'
@@ -64,6 +65,8 @@ export class Thread extends LitElement {
       toast.create(e.message, 'error')
       console.error(e)
     }
+    await this.updateComplete
+    emit(this, 'load')
     console.log(this.post)
     console.log(this.thread)
     this.isLoading = false
@@ -79,8 +82,8 @@ export class Thread extends LitElement {
 
   scrollHighlightedPostIntoView () {
     try {
-      this.shadowRoot.querySelector('.highlight').scrollIntoView()
-    } catch {}
+      this.querySelector('.highlight').scrollIntoView()
+    } catch (e) { console.log(e) }
   }
 
   // rendering
@@ -89,11 +92,13 @@ export class Thread extends LitElement {
   render () {
     return html`
       <div
-        class="border border-gray-300 rounded px-4 mb-2 ${this.subject.dbUrl === this.post?.url ? 'highlight' : ''} ${this.post?.error ? 'bg-gray-50' : ''}"
+        class="border mb-1 ${this.subject.dbUrl === this.post?.url ? 'highlight bg-indigo-50 border-indigo-300' : 'border-gray-300'} ${this.post?.error ? 'bg-gray-50' : ''}"
       >
         ${this.post ? html`
           <ctzn-post
             .post=${this.post}
+            vote-bg-color=${this.subject.dbUrl === this.post?.url ? 'indigo-100' : 'gray-100'}
+            hover-bg-color=${this.subject.dbUrl === this.post?.url ? 'indigo-100' : 'gray-50'}
             noborders
             view-content-on-click
             @publish-reply=${this.onPublishReply}
@@ -104,7 +109,7 @@ export class Thread extends LitElement {
         `}
       </div>
       ${this.thread ? html`
-        <div class="pl-4 border-l border-gray-200">
+        <div class="pl-1 border-l border-gray-200">
           ${this.renderReplies(this.thread)}
         </div>
       ` : ''}
@@ -114,7 +119,7 @@ export class Thread extends LitElement {
   renderReplies (replies) {
     if (replies?.error) {
       return html`
-        <div class="pl-4 py-2 border-l border-gray-200">
+        <div class="pl-1 py-2 border-l border-gray-200">
           <div class="font-semibold text-gray-500">
             <span class="fas fa-fw fa-exclamation-circle"></span>
             Failed to load thread
@@ -129,13 +134,15 @@ export class Thread extends LitElement {
     }
     if (!replies?.length) return ''
     return html`
-      <div class="pl-4 border-l border-gray-200">
+      <div class="pl-1 border-l border-gray-200">
         ${repeat(replies, r => r.url, reply => {
           const isSubject = this.subject.dbUrl === reply.url
           return html`
-          <div class="border border-gray-300 rounded px-4 mb-2 ${isSubject ? 'highlight' : ''}">
+          <div class="border mb-1 ${isSubject ? 'highlight bg-indigo-50 border-indigo-300' : 'border-gray-300'}">
               <ctzn-post
                 .post=${reply}
+                vote-bg-color=${isSubject ? 'indigo-100' : 'gray-100'}
+                hover-bg-color=${isSubject ? 'indigo-100' : 'gray-50'}
                 noborders
                 nocommunity
                 thread-view
@@ -154,8 +161,8 @@ export class Thread extends LitElement {
     if (this.post?.value.community) {
       if (!session.isInCommunity(this.post.value.community.userId)) {
         return html`
-          <div class="mt-1 mb-2 ml-10">
-            <div class="cursor-text py-2 px-5 rounded bg-white border border-gray-300 italic text-gray-500 text-sm">
+          <div class="bg-white border-t border-indigo-300 py-2 px-3">
+            <div class="italic text-gray-500 text-sm">
               Join <a href="/${this.post.value.community.userId}" class="hover:underline">${displayNames.render(this.post.value.community.userId)}</a> to reply.
             </div>
           </div>
@@ -164,8 +171,8 @@ export class Thread extends LitElement {
     } else {
       if (!session.isFollowingMe(this.post.author.userId)) {
         return html`
-          <div class="mt-1 mb-2 ml-10">
-            <div class="cursor-text py-2 px-5 rounded bg-white border border-gray-300 italic text-gray-500 text-sm">
+          <div class="bg-white border-t border-indigo-300 py-2 px-3">
+            <div class="italic text-gray-500 text-sm">
               Only people followed by <a href="/${this.post.author.userId}" class="hover:underline">${this.post.author.displayName}</a> can reply.
             </div>
           </div>
@@ -173,9 +180,10 @@ export class Thread extends LitElement {
       }
     }
     return html`
-      <div class="mt-1 mb-2 ml-10">
+      <div class="bg-white border-t border-indigo-300 pb-2 pr-3">
         ${this.isReplying ? html`
           <ctzn-composer
+            autofocus
             .subject=${{dbUrl: this.post.url, authorId: this.post.author.userId, community: this.post.value.community}}
             .parent=${this.subject}
             placeholder="Write your reply"
@@ -183,7 +191,7 @@ export class Thread extends LitElement {
             @cancel=${this.onCancelReply}
           ></ctzn-composer>
         ` : html`
-          <div class="cursor-text py-2 px-5 rounded bg-white border border-gray-300 italic text-gray-500" @click=${this.onStartReply}>
+          <div class="cursor-text pt-2 pl-3 italic text-gray-500" @click=${this.onStartReply}>
             Write your reply
           </div>
         `}

@@ -95,6 +95,14 @@ export async function doSignup ({domain, username, displayName, description, ava
   return newSessionInfo
 }
 
+export function hasOneSaved () {
+  return !!localStorage.getItem('session-info')
+}
+
+export function getSavedInfo () {
+  return JSON.parse(localStorage.getItem('session-info'))
+}
+
 export function isActive (domain = undefined) {
   if (!info || !api) return false
   if (domain && info.domain !== domain) return false

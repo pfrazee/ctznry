@@ -1,5 +1,4 @@
 import {LitElement, html} from '../../vendor/lit-element/lit-element.js'
-import * as contextMenu from './context-menu.js'
 import * as session from '../lib/session.js'
 import { AVATAR_URL } from '../lib/const.js'
 import './button.js'
@@ -35,25 +34,27 @@ export class Header extends LitElement {
   }
 
   getNavClass (str) {
-    const additions = str === location.pathname ? 'border-blue-500' : ''
-    return `p-3.5 pb-3 border-b-2 border-solid border-transparent hover:bg-gray-100 ${additions}`
+    const additions = str === location.pathname ? 'text-blue-700' : ''
+    return `pl-3 pr-4 py-3 font-semibold rounded hover:bg-gray-100 ${additions}`
   }
 
   render () {
     return html`
-      <div class="bg-white border-b border-gray-300 border-solid mb-4">
-        <header class="max-w-4xl mx-auto flex items-center ph-2 leading-none">
+      <div class="fixed z-10" style="top: 10px; left: calc(50vw - 680px); height: calc(100vh - 20px)">
+        <header class="max-w-4xl mx-auto flex flex-col leading-none text-lg h-full">
+          <span class="font-bold px-3 py-2 text-3xl text-gray-600">
+            C T Z N R Y
+          </span>
           <a href="/" class=${this.getNavClass('/')}>
-            <span class="fas navicon fa-stream"></span>
+            <span class="fas mr-1.5 fa-fw navicon fa-stream"></span>
             Home
           </a>
           ${session.isActive() ? html`
             <a href="/notifications" class=${this.getNavClass('/notifications')}>
-              <span class="far navicon fa-bell"></span>
+              <span class="far mr-1.5 fa-fw navicon fa-bell"></span>
               Notifications ${this.unreadNotificationsCount > 0 ? `(${this.unreadNotificationsCount})` : ''}
             </a>
           ` : ''}
-          <span class="flex-grow"></span>
           ${this.renderSessionCtrls()}
         </header>
       </div>
@@ -61,22 +62,27 @@ export class Header extends LitElement {
   }
 
   renderSessionCtrls () {
-    if (session.isActive()) {
+    if (session.hasOneSaved()) {
+      let info = session.getSavedInfo()
       return html`
-        <ctzn-button primary @click=${this.onClickNewPost} label="New Post"></ctzn-button>
         <a
-          class="inline-flex items-center px-1 ml-2.5"
-          href="/${session.info.userId}"
-          title=${session.info.userId}
+          class="relative ${this.getNavClass()} mt-1"
+          href="/${info.userId}"
+          title=${info.userId}
         >
-          <img class="inline-block w-7 h-7 object-cover rounded-full" src=${AVATAR_URL(session.info.userId)}>
+          <img class="absolute inline-block w-7 h-7 object-cover rounded-full" src=${AVATAR_URL(info.userId)} style="left: 10px; top: 6px">
+          <span class="inline-block" style="width: 29px"></span>
+          Profile
         </a>
-        <a @click=${this.onClickSessionMenu} class=${this.getNavClass()} href="#"><span class="fas fa-caret-down"></span></a>
+        <span class="flex-grow"></span>
+        <a class=${this.getNavClass()} href="#" @click=${this.onLogOut}>
+          <span class="fas fa-fw fa-sign-out-alt mr-1.5"></span> Log out
+        </a>
       `
     } else {
       return html`
-        <a class=${this.getNavClass()} href="/login">Log in</a>
-        <a class=${this.getNavClass()} href="/signup"><strong>Sign up</strong></a>
+        <a class=${this.getNavClass()} href="/login"><span class="fas fa-fw fa-sign-in-alt mr-1.5"></span> Log in</a>
+        <a class=${this.getNavClass()} href="/signup"><span class="fas fa-fw fa-user-plus mr-1.5"></span> <strong>Sign up</strong></a>
       `
     }
   }
@@ -89,25 +95,9 @@ export class Header extends LitElement {
     window.location = '/?composer'
   }
 
-  onClickSessionMenu (e) {
-    e.preventDefault()
-    e.stopPropagation()
-    const rect = e.currentTarget.getClientRects()[0]
-    contextMenu.create({
-      x: rect.right,
-      y: rect.bottom,
-      right: true,
-      roomy: true,
-      items: [
-        {
-          label: 'Log out',
-          click: async () => {
-            await session.doLogout()
-            location.reload()
-          }
-        }
-      ]
-    })
+  async onLogOut () {
+    await session.doLogout()
+    location.reload()
   }
 }
 

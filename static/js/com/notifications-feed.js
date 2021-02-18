@@ -94,7 +94,7 @@ export class NotificationsFeed extends LitElement {
     if (!this.results) {
       return html`
         ${this.title ? html`<h2  class="results-header"><span>${this.title}</span></h2>` : ''}
-        <div class="results empty">
+        <div class="border border-gray-300">
           <span class="spinner"></span>
         </div>
       `
@@ -105,7 +105,9 @@ export class NotificationsFeed extends LitElement {
     return html`
       <link rel="stylesheet" href="/css/fontawesome.css">
       ${this.title ? html`<h2  class="results-header"><span>${this.title}</span></h2>` : ''}
-      ${this.renderResults()}
+      <div class="border border-gray-300 border-b-0">
+        ${this.renderResults()}
+      </div>
     `
   }
 

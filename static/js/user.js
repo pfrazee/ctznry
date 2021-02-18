@@ -132,42 +132,57 @@ class CtznUser extends LitElement {
     if (this.userProfile?.error) {
       return this.renderError()
     }
+
+    const navCls = id => `
+      text-center pt-2 pb-2.5 px-8 font-semibold cursor-pointer hover:bg-gray-50 hover:text-blue-600
+      ${id === this.currentView ? 'border-b-2 border-blue-600 text-blue-600' : ''}
+    `.replace('\n', '')
     
     return html`
       <main>
         <ctzn-header></ctzn-header>
-        <div class="text-center pb-4 border-b border-solid border-gray-200 mb-8">
-          <a href="/${this.userId}" title=${this.userProfile?.value.displayName} @click=${setView('feed')}>
-            <img class="block mx-auto mb-8 w-40 h-40 object-cover rounded-full shadow-md" src=${AVATAR_URL(this.userId)}>
-          </a>
-          <h2 class="text-4xl font-semibold">
-            <a href="/${this.userId}" title=${this.userProfile?.value.displayName} @click=${setView('feed')}>
-              ${this.userProfile?.value.displayName}
-            </a>
-          </h2>
-          <h2 class="text-gray-500 font-semibold">
-            <a href="/${this.userId}" title="${this.userId}" @click=${setView('feed')}>
-              ${this.isCitizen ? html`<span class="fas fa-fw fa-user"></span>` : ''}
-              ${this.isCommunity ? html`<span class="fas fa-fw fa-users"></span>` : ''}
-              ${this.userId}
-            </a>
-          </h2>
-          ${this.userProfile?.value.description ? html`
-            <div class="my-4">${this.userProfile?.value.description}</div>
-          ` : ''}
-          ${this.isCitizen ? html`
-            <div>
-              <a class="text-xs medium text-gray-500 cursor-pointer" @click=${setView('followers')}><span class="text-lg">${nFollowers}</span> ${pluralize(nFollowers, 'Follower')}</a>
-              &middot;
-              <a class="text-xs medium text-gray-500 cursor-pointer" @click=${setView('following')}><span class="text-lg">${nFollowing}</span> Following</a>
+        <div class="max-w-4xl mx-auto grid grid-cols-layout-twocol gap-8">
+          <div class="relative">
+            <div class="absolute" style="top: 8px; right: 10px">
+              ${this.renderProfileControls()}
             </div>
-          ` : this.isCommunity ? html`
-            <div>
-              <a class="text-sm medium text-gray-500 cursor-pointer" @click=${setView('members')}><span class="text-lg">${nMembers}</span> ${pluralize(nMembers, 'Member')}</a>
+            <div class="flex items-center py-4 px-4 border border-gray-300 border-t-0 border-b-0">
+              <a href="/${this.userId}" title=${this.userProfile?.value.displayName} @click=${setView('feed')}>
+                <img class="block mx-auto ml-2 mr-6 w-32 h-32 object-cover rounded-full shadow-md" src=${AVATAR_URL(this.userId)}>
+              </a>
+              <div class="flex-1">
+                <h2 class="text-3xl font-semibold">
+                  <a href="/${this.userId}" title=${this.userProfile?.value.displayName} @click=${setView('feed')}>
+                    ${this.userProfile?.value.displayName}
+                  </a>
+                </h2>
+                <h2 class="text-gray-500 font-semibold">
+                  <a href="/${this.userId}" title="${this.userId}" @click=${setView('feed')}>
+                    ${this.isCitizen ? html`<span class="fas fa-fw fa-user"></span>` : ''}
+                    ${this.isCommunity ? html`<span class="fas fa-fw fa-users"></span>` : ''}
+                    ${this.userId}
+                  </a>
+                </h2>
+                ${this.userProfile?.value.description ? html`
+                  <div class="mt-4">${this.userProfile?.value.description}</div>
+                ` : ''}
+              </div>
             </div>
-          ` : ''}
+            <div class="flex border border-gray-300 border-t-0 bg-white text-gray-400 sticky top-0 z-10">
+              <a class="${navCls('feed')}" @click=${setView('feed')}>Feed</a>
+              ${this.isCitizen ? html`
+                <a class="${navCls('followers')}" @click=${setView('followers')}>${nFollowers} ${pluralize(nFollowers, 'Follower')}</a>
+                <a class="${navCls('following')}" @click=${setView('following')}>${nFollowing} Following</a>
+              ` : this.isCommunity ? html`
+                <a class="${navCls('members')}" @click=${setView('members')}>${nMembers} ${pluralize(nMembers, 'Member')}</a>
+              ` : ''}
+            </div>
+            ${this.renderCurrentView()}
+          </div>
+          <div>
+            ${this.renderRightSidebar()}
+          </div>
         </div>
-        ${this.renderCurrentView()}
       </main>
     `
   }
@@ -189,6 +204,43 @@ class CtznUser extends LitElement {
     `
   }
 
+  renderProfileControls () {
+    if (this.isCitizen) {
+      return html`
+        <div>
+          ${session.isActive() ? html`
+            ${session.info.userId === this.userId ? html`
+              <ctzn-button btn-class="font-semibold px-5 py-1 rounded-full text-base" primary @click=${this.onClickEditProfile} label="Edit profile"></ctzn-button>
+            ` : html`
+              ${this.amIFollowing === true ? html`
+                <ctzn-button btn-class="font-semibold px-5 py-1 rounded-full text-base" @click=${this.onClickUnfollow} label="Unfollow"></ctzn-button>
+              ` : this.amIFollowing === false ? html`
+                <ctzn-button btn-class="font-semibold px-6 py-1 rounded-full text-base" primary @click=${this.onClickFollow} label="Follow"></ctzn-button>
+              ` : ``}
+            `}
+          ` : html`
+            ${''/*TODO logged out UI*/}
+          `}
+        </div>
+      `
+    }
+    if (this.isCommunity) {
+      return html`
+        <div>
+          ${session.isActive() ? html`
+            ${this.amIAMember === true ? html`
+              <ctzn-button btn-class="font-semibold px-5 py-1 rounded-full text-base" @click=${this.onClickLeave} label="Leave" ?spinner=${this.isJoiningOrLeaving}></ctzn-button>
+            ` : this.amIAMember === false ? html`
+              <ctzn-button btn-class="font-semibold px-5 py-1 rounded-full text-base" primary @click=${this.onClickJoin} label="Join" ?spinner=${this.isJoiningOrLeaving}></ctzn-button>
+            ` : ``}
+          ` : html`
+            ${''/*TODO logged out UI*/}
+          `}
+        </div>
+      `
+    }
+  }
+
   renderRightSidebar () {
     if (this.isCitizen) {
       return this.renderCitizenRightSidebar()
@@ -201,24 +253,8 @@ class CtznUser extends LitElement {
   renderCitizenRightSidebar () {
     const nSharedFollowers = this.followers?.myFollowed?.length || 0
     const nMemberships = this.memberships?.length
-    const displayName = this.userProfile?.value.displayName || this.userId
     return html`
-      <div>
-        <section class="mb-4">
-          ${session.isActive() ? html`
-            ${session.info.userId === this.userId ? html`
-              <ctzn-button primary class="w-full" @click=${this.onClickEditProfile} label="Edit profile"></ctzn-button>
-            ` : html`
-              ${this.amIFollowing === true ? html`
-                <ctzn-button class="w-full" @click=${this.onClickUnfollow} label="Unfollow ${displayName}"></ctzn-button>
-              ` : this.amIFollowing === false ? html`
-                <ctzn-button primary class="w-full" @click=${this.onClickFollow} label="Follow ${displayName}"></ctzn-button>
-              ` : ``}
-            `}
-          ` : html`
-            ${''/*TODO logged out UI*/}
-          `}
-        </section>
+      <div class="pt-4 sticky top-0">
         <section class="mb-2">
           ${nSharedFollowers ? html`
             <div class="font-medium mb-1">Followed by</div>
@@ -229,7 +265,7 @@ class CtznUser extends LitElement {
         </section>
         <section class="mb-2">
           ${nMemberships ? html`
-            <div class="font-medium mb-1">Communities</div>
+            <div class="font-medium mb-1">Member of</div>
             ${repeat(this.memberships, membership => html`
               <a class="inline-block bg-gray-100 rounded p-1 mr-.5 mb-.5 text-xs hover:bg-gray-200" href="/${membership.value.community.userId}">${displayNames.render(membership.value.community.userId)}</a>
             `)}
@@ -244,20 +280,8 @@ class CtznUser extends LitElement {
   }
 
   renderCommunityRightSidebar () {
-    const displayName = this.userProfile?.value.displayName || this.userId
     return html`
       <div>
-        <section class="mb-2">
-          ${session.isActive() ? html`
-            ${this.amIAMember === true ? html`
-              <ctzn-button class="w-full" @click=${this.onClickLeave} label="Leave ${displayName}" ?spinner=${this.isJoiningOrLeaving}></ctzn-button>
-            ` : this.amIAMember === false ? html`
-              <ctzn-button primary class="w-full" @click=${this.onClickJoin} label="Join ${displayName}" ?spinner=${this.isJoiningOrLeaving}></ctzn-button>
-            ` : ``}
-          ` : html`
-            TODO logged out UI
-          `}
-        </section>
       </div>
     `
   }
@@ -268,55 +292,40 @@ class CtznUser extends LitElement {
     }
     if (this.currentView === 'followers') {
       return html`
-        <div class="max-w-4xl mx-auto grid grid-cols-layout-twocol gap-8">
-          <div>
-            <h3 class="text-lg mb-4 font-semibold">${this.uniqFollowers?.length} ${pluralize(this.uniqFollowers?.length, 'Follower')}</h3>
-            <ctzn-user-list .ids=${this.uniqFollowers}></ctzn-user-list>
-          </div>
-          ${this.renderRightSidebar()}
+        <div class="border border-gray-300 border-t-0 p-2 bg-gray-50">
+          <ctzn-user-list .ids=${this.uniqFollowers}></ctzn-user-list>
         </div>
       `
     } else if (this.currentView === 'following') {
       return html`
-        <div class="max-w-4xl mx-auto grid grid-cols-layout-twocol gap-8">
-          <div>
-            <h3 class="text-lg mb-4 font-semibold">Following ${this.following?.length} ${pluralize(this.following?.length, 'Citizen')}</h3>
-            <ctzn-user-list .ids=${this.following?.map(f => f.value.subject.userId)}></ctzn-user-list>
-          </div>
-          ${this.renderRightSidebar()}
+        <div class="border border-gray-300 border-t-0 p-2 bg-gray-50">
+          <ctzn-user-list .ids=${this.following?.map(f => f.value.subject.userId)}></ctzn-user-list>
         </div>
       `      
     } else if (this.currentView === 'members') {
       return html`
-        <div class="max-w-4xl mx-auto grid grid-cols-layout-twocol gap-8">
-          <div>
-            <h3 class="text-lg mb-4 font-semibold">${this.members?.length} ${pluralize(this.members?.length, 'Member')}</h3>
-            <ctzn-user-list .ids=${this.members?.map(f => f.value.user.userId)}></ctzn-user-list>
-          </div>
-          ${this.renderRightSidebar()}
+        <div class="border border-gray-300 border-t-0 p-2 bg-gray-50">
+          <ctzn-user-list .ids=${this.members?.map(f => f.value.user.userId)}></ctzn-user-list>
         </div>
       `      
     }
     return html`
-      <div class="max-w-4xl mx-auto grid grid-cols-layout-twocol gap-8">
-        <div>
-          ${this.isEmpty ? this.renderEmptyMessage() : ''}
-          <ctzn-feed
-            .source=${this.userId}
-            limit="50"
-            @load-state-updated=${this.onFeedLoadStateUpdated}
-            @view-thread=${this.onViewThread}
-            @publish-reply=${this.onPublishReply}
-          ></ctzn-feed>
-        </div>
-        ${this.renderRightSidebar()}
+      <div>
+        ${this.isEmpty ? this.renderEmptyMessage() : ''}
+        <ctzn-feed
+          .source=${this.userId}
+          limit="50"
+          @load-state-updated=${this.onFeedLoadStateUpdated}
+          @view-thread=${this.onViewThread}
+          @publish-reply=${this.onPublishReply}
+        ></ctzn-feed>
       </div>
     `
   }
 
   renderEmptyMessage () {
     return html`
-      <div class="bg-gray-100 text-gray-500 py-44 text-center">
+      <div class="bg-gray-100 text-gray-500 py-44 text-center border border-t-0 border-gray-300">
         ${this.isCitizen ? html`
           <div>${this.userProfile?.value?.displayName} hasn't posted anything yet.</div>
         ` : this.isCommunity ? html`

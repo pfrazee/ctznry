@@ -184,10 +184,9 @@ export class Feed extends LitElement {
   
   renderNormalResult (post) {
     const isReply = !!post.value.reply
-    const inComm = !!post.value.community
     return html`
       <div
-        class="post ${isReply ? 'reply mb-2' : ''} ${inComm ? 'in-community' : ''}"
+        class="post ${isReply ? 'reply' : ''} border border-gray-300 border-t-0"
       >
         ${post.parentPost ? html`
           <ctzn-post
@@ -197,7 +196,6 @@ export class Feed extends LitElement {
         ` : ''}
         <ctzn-post
           .post=${post}
-          class="${isReply ? '' : 'mb-2'}"
           ?as-reply-child=${isReply}
         ></ctzn-post>
       </div>

@@ -105,8 +105,11 @@ class CtznNotifications extends LitElement {
       <div class="max-w-4xl mx-auto grid grid-cols-layout-twocol gap-8">
         <div>
           ${this.isEmpty ? this.renderEmptyMessage() : ''}
-          <div class="reload-page mx-4 mb-4 rounded cursor-pointer overflow-hidden leading-10 ${this.numNewItems > 0 ? 'visible' : ''}" @click=${e => this.load()}>
+          ${''/* TODO<div class="reload-page mx-4 mb-4 rounded cursor-pointer overflow-hidden leading-10 ${this.numNewItems > 0 ? 'visible' : ''}" @click=${e => this.load()}>
             ${this.numNewItems} new ${pluralize(this.numNewItems, 'update')}
+          </div>*/}
+          <div class="border border-gray-300 border-t-0 text-xl font-semibold px-4 py-2 sticky top-0 z-10 bg-white">
+            Notifications
           </div>
           <ctzn-notifications-feed
             cleared-at=${this.notificationsClearedAt}
