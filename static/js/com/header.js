@@ -51,7 +51,7 @@ export class Header extends LitElement {
       <header>
         <div class="menu ${this.isMenuOpen ? 'open' : 'closed'} flex flex-col leading-none text-lg bg-white">
           <span class="font-bold px-3 py-2 text-3xl text-gray-600">
-            C T Z N R Y
+            C T Z N
           </span>
           <a href="/" class=${this.getMenuNavClass('/')}>
             <span class="fas mr-1.5 fa-fw navicon fa-home"></span>
@@ -71,7 +71,7 @@ export class Header extends LitElement {
           </a>
           <span class="flex-grow"></span>
           <a class="font-bold px-3 py-2 text-2xl text-gray-600" href="/">
-            C T Z N R Y
+            C T Z N
           </a>
           <span class="flex-grow"></span>
           ${session.hasOneSaved() ? html`
