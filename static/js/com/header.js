@@ -40,24 +40,22 @@ export class Header extends LitElement {
 
   render () {
     return html`
-      <div class="fixed z-10" style="top: 10px; left: 20px; height: calc(100vh - 20px)">
-        <header class="max-w-4xl mx-auto flex flex-col leading-none text-lg h-full">
-          <span class="font-bold px-3 py-2 text-3xl text-gray-600">
-            C T Z N R Y
-          </span>
-          <a href="/" class=${this.getNavClass('/')}>
-            <span class="fas mr-1.5 fa-fw navicon fa-stream"></span>
-            Home
+      <header class="flex flex-col leading-none text-lg">
+        <span class="font-bold px-3 py-2 text-3xl text-gray-600">
+          C T Z N R Y
+        </span>
+        <a href="/" class=${this.getNavClass('/')}>
+          <span class="fas mr-1.5 fa-fw navicon fa-stream"></span>
+          Home
+        </a>
+        ${session.hasOneSaved() ? html`
+          <a href="/notifications" class=${this.getNavClass('/notifications')}>
+            <span class="far mr-1.5 fa-fw navicon fa-bell"></span>
+            Notifications ${this.unreadNotificationsCount > 0 ? `(${this.unreadNotificationsCount})` : ''}
           </a>
-          ${session.hasOneSaved() ? html`
-            <a href="/notifications" class=${this.getNavClass('/notifications')}>
-              <span class="far mr-1.5 fa-fw navicon fa-bell"></span>
-              Notifications ${this.unreadNotificationsCount > 0 ? `(${this.unreadNotificationsCount})` : ''}
-            </a>
-          ` : ''}
-          ${this.renderSessionCtrls()}
-        </header>
-      </div>
+        ` : ''}
+        ${this.renderSessionCtrls()}
+      </header>
     `
   }
 
