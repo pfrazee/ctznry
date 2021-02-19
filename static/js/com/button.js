@@ -22,7 +22,7 @@ export class Button extends LitElement {
 
   getClass () {
     let parentClass = this.btnClass || this.className || ''
-    let colors = 'bg-white border border-gray-300 hover:bg-gray-100'
+    let colors = 'bg-white hover:bg-gray-100'
     if (this.hasAttribute('primary')) {
       colors = 'bg-blue-600 text-white hover:bg-blue-700'
       if (this.disabled) {
@@ -34,7 +34,9 @@ export class Button extends LitElement {
     let paddings = ''
     if (!/p(x|l|r)-/.test(parentClass)) paddings += 'px-4 '
     if (!/p(y|t|b)-/.test(parentClass)) paddings += 'py-2'
-    return `rounded border-1 ${colors} ${paddings} shadow-sm ${parentClass}`
+    let borders = `border border-${this.hasAttribute('primary') ? 'blue-800' : 'gray-300'}`
+    if (/border/.test(parentClass)) borders = ''
+    return `rounded ${colors} ${paddings} ${borders} shadow-sm ${parentClass}`
   }
 
   renderSpinner () {

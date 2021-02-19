@@ -2,6 +2,7 @@ import { LitElement, html } from '../vendor/lit-element/lit-element.js'
 import { repeat } from '../vendor/lit-element/lit-html/directives/repeat.js'
 import { ViewThreadPopup } from './com/popups/view-thread.js'
 import { EditProfilePopup } from './com/popups/edit-profile.js'
+import { EditRolePopup } from './com/popups/edit-role.js'
 import * as toast from './com/toast.js'
 import { AVATAR_URL, PERM_DESCRIPTIONS } from './lib/const.js'
 import * as session from './lib/session.js'
@@ -342,7 +343,15 @@ class CtznUser extends LitElement {
         let members = this.getMembersWithRole(roleId)
         return html`
           <div class="px-4 py-2 border-b border-gray-300">
-            <div class="font-semibold">${roleId}</div>
+            <div class="flex items-center">
+              <span class="font-semibold text-lg flex-1"><span class="text-sm far fa-fw fa-user"></span> ${roleId}</span>
+              ${roleId !== 'admin' && this.hasPermission('ctzn.network/perm-community-manage-roles') ? html`
+                <ctzn-button btn-class="text-sm px-2 py-0" label="Remove" @click=${e => this.onRemoveRole(e, roleId)}></ctzn-button>
+              ` : ''}
+              ${this.hasPermission('ctzn.network/perm-community-manage-roles') ? html`
+                <ctzn-button btn-class="text-sm px-2 py-0 ml-1" label="Edit" @click=${e => this.onEditRole(e, roleId, permissions)}></ctzn-button>
+              ` : ''}
+            </div>
             <div class="text-gray-500">
               ${roleId === 'admin' ? html`
                 <div>&bull; Runs this joint. Full permissions.</div>
@@ -367,12 +376,29 @@ class CtznUser extends LitElement {
         `
       }
       return html`
-        <div class="border border-t-0 border-gray-200 text-lg font-semibold px-4 py-2">
-          Member Roles
+        <div class="flex items-center border border-t-0 border-gray-200 px-4 py-2">
+          <div class="flex-1 text-lg font-semibold">Member Roles</div>
+          ${this.hasPermission('ctzn.network/perm-community-manage-roles') ? html`
+            <ctzn-button btn-class="text-sm px-2 py-0 ml-1" label="Create Role" @click=${this.onCreateRole}></ctzn-button>
+          ` : ''}
         </div>
         <div class="border border-gray-200 border-t-0 border-b-0">
           ${renderRole('admin')}
           ${repeat(this.roles, r => r.value.roleId, r => renderRole(r.value.roleId, r.value.permissions))}
+          <div class="px-4 py-2 border-b border-gray-300">
+            <div class="flex items-center">
+              <span class="font-semibold text-lg flex-1"><span class="text-sm far fa-fw fa-user"></span> default</span>
+            </div>
+            <div class="text-gray-500">
+              <div>&bull; Can join or leave the community.</div>
+              <div>&bull; Can create new posts.</div>
+              <div>&bull; Can edit and delete their posts.</div>
+              <div>&bull; Can vote on posts.</div>
+            </div>
+            <div class="flex px-4 py-2 mt-2 rounded bg-gray-100 text-gray-500">
+              This role includes everybody.
+            </div>
+          </div>
         </div>
       `      
     }
@@ -486,6 +512,43 @@ class CtznUser extends LitElement {
   onPublishReply (e) {
     toast.create('Reply published', '', 10e3)
     this.load()
+  }
+
+  async onCreateRole (e) {
+    try {
+      await EditRolePopup.create({communityId: this.userId})
+      this.load()
+    } catch (e) {
+      // ignore
+    }
+  }
+
+  async onEditRole (e, roleId, permissions) {
+    try {
+      await EditRolePopup.create({
+        communityId: this.userId,
+        roleId,
+        permissions,
+        members: this.getMembersWithRole(roleId)
+      })
+      this.load()
+    } catch (e) {
+      // ignore
+    }
+  }
+
+  async onRemoveRole (e, roleId) {
+    if (!confirm('Remove this role?')) {
+      return
+    }
+    try {
+      await session.api.communities.deleteRole(this.userId, roleId)
+      toast.create(`${roleId} role removed`)
+      this.load()
+    } catch (e) {
+      console.log(e)
+      toast.create(e.toString(), 'error')
+    }
   }
 }
 
