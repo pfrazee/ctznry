@@ -34,8 +34,8 @@ a:hover {
 }
 
 .profile {
-  border: 1px solid var(--border-color--light);
-  background: var(--bg-color--default);
+  border: 1px solid #ddd;
+  background: #fff;
   border-radius: 4px;
   padding: 10px;
 }
@@ -64,12 +64,12 @@ a:hover {
 }
 
 .display-name {
-  color: var(--text-color--default);
+  color: #333;
   font-size: 19px;
 }
 
 .username {
-  color: var(--text-color--light);
+  color: #666;
   font-weight: 500;
 }
 
@@ -80,7 +80,7 @@ a:hover {
 .stat {
   font-size: 13px;
   font-weight: 500;
-  color: var(--text-color--pretty-light);
+  color: #888;
   cursor: pointer;
 }
 
@@ -90,8 +90,8 @@ a:hover {
 
 .label {
   display: inline-block;
-  color: var(--text-color--light);
-  background: var(--bg-color--dark);
+  color: #666;
+  background: #eee;
   font-weight: bold;
   font-size: 11px;
   padding: 2px 5px;

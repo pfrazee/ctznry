@@ -19,3 +19,11 @@ export function AVATAR_URL (userId) {
 export function POST_URL (post) {
   return '/' + joinPath(post.author.userId, 'ctzn.network/post', post.key)
 }
+
+export const PERM_DESCRIPTIONS = {
+  'ctzn.network/perm-community-ban': `Can remove, ban, and unban members from a community.`,
+  'ctzn.network/perm-community-remove-post': `Can remove posts from the community's feed index.`,
+  'ctzn.network/perm-community-edit-profile': `Can edit the profile of the community.`,
+  'ctzn.network/perm-community-manage-roles': `Can create, edit, and delete roles.`,
+  'ctzn.network/perm-community-assign-roles': `Can assign roles to community members.`
+}

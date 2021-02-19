@@ -3,9 +3,9 @@ import { repeat } from '../vendor/lit-element/lit-html/directives/repeat.js'
 import { ViewThreadPopup } from './com/popups/view-thread.js'
 import { EditProfilePopup } from './com/popups/edit-profile.js'
 import * as toast from './com/toast.js'
-import { AVATAR_URL } from './lib/const.js'
+import { AVATAR_URL, PERM_DESCRIPTIONS } from './lib/const.js'
 import * as session from './lib/session.js'
-import { getProfile, listFollowers, listFollows, listMembers, listMemberships } from './lib/getters.js'
+import { getProfile, listFollowers, listFollows, listMembers, listMemberships, listRoles } from './lib/getters.js'
 import * as displayNames from './lib/display-names.js'
 import { pluralize } from './lib/strings.js'
 import './com/header.js'
@@ -22,6 +22,7 @@ class CtznUser extends LitElement {
       following: {type: Array},
       memberships: {type: Array},
       members: {type: Array},
+      roles: {type: Array},
       isEmpty: {type: Boolean},
       isJoiningOrLeaving: {type: Boolean}
     }
@@ -39,6 +40,7 @@ class CtznUser extends LitElement {
     this.uniqFollowers = undefined
     this.following = undefined
     this.members = undefined
+    this.roles = undefined
     this.isEmpty = false
     this.isJoiningOrLeaving = false
 
@@ -80,6 +82,26 @@ class CtznUser extends LitElement {
     return `${(new URL(location)).origin}/${this.userId}`
   }
 
+  getMembersWithRole (roleId) {
+    return this.members?.filter(m => m.value.roles?.includes(roleId)) || []
+  }
+
+  hasPermission (permId) {
+    let memberRecord = this.members?.find?.(m => m.value.user.userId === session.info.userId)
+    if (!memberRecord) return false
+    if (!memberRecord.value.roles?.length) return false
+    if (memberRecord.value.roles.includes('admin')) {
+      return true
+    }
+    for (let roleId of memberRecord.value.roles) {
+      let roleRecord = this.roles.find(r => r.value.roleId === roleId)
+      if (roleRecord && roleRecord.value.permissions?.includes(p => p.permId === permId)) {
+        return true
+      }
+    }
+    return false
+  }
+
   async load () {
     await session.setup()
     this.userProfile = await getProfile(this.userId).catch(e => ({error: true, message: e.toString()}))
@@ -98,8 +120,13 @@ class CtznUser extends LitElement {
       this.memberships = memberships
       console.log({userProfile: this.userProfile, followers, following, memberships})
     } else if (this.isCommunity) {
-      this.members = await listMembers(this.userId)
-      console.log({userProfile: this.userProfile, members: this.members})
+      const [members, roles] = await Promise.all([
+        listMembers(this.userId),
+        listRoles(this.userId)
+      ])
+      this.members = members
+      this.roles = roles
+      console.log({userProfile: this.userProfile, members, roles})
     }
   }
 
@@ -174,6 +201,7 @@ class CtznUser extends LitElement {
               <a class="${navCls('following')}" @click=${setView('following')}>${nFollowing} Following</a>
             ` : this.isCommunity ? html`
               <a class="${navCls('members')}" @click=${setView('members')}>${nMembers} ${pluralize(nMembers, 'Member')}</a>
+              <a class="${navCls('about')}" @click=${setView('about')}>About</a>
             ` : ''}
           </div>
           ${this.renderCurrentView()}
@@ -226,6 +254,9 @@ class CtznUser extends LitElement {
       return html`
         <div>
           ${session.isActive() ? html`
+            ${this.hasPermission('ctzn.network/perm-community-edit-profile') ? html`
+              <ctzn-button btn-class="font-semibold px-5 py-1 rounded-full text-base" primary @click=${this.onClickEditProfile} label="Edit profile"></ctzn-button>
+            ` : ''}
             ${this.amIAMember === true ? html`
               <ctzn-button btn-class="font-semibold px-5 py-1 rounded-full text-base" @click=${this.onClickLeave} label="Leave" ?spinner=${this.isJoiningOrLeaving}></ctzn-button>
             ` : this.amIAMember === false ? html`
@@ -306,6 +337,44 @@ class CtznUser extends LitElement {
           <ctzn-user-list .ids=${this.members?.map(f => f.value.user.userId)}></ctzn-user-list>
         </div>
       `      
+    } else if (this.currentView === 'about') {
+      const renderRole = (roleId, permissions) => {
+        let members = this.getMembersWithRole(roleId)
+        return html`
+          <div class="px-4 py-2 border-b border-gray-300">
+            <div class="font-semibold">${roleId}</div>
+            <div class="text-gray-500">
+              ${roleId === 'admin' ? html`
+                <div>&bull; Runs this joint. Full permissions.</div>
+              ` : permissions.length ? html`
+                ${repeat(permissions, p => p.permId, p => html`
+                  <div>&bull; ${PERM_DESCRIPTIONS[p.permId] || p.permId}</div>
+                `)}
+              ` : html`
+                <em>This role has no permissions</em>
+              `}
+            </div>
+            ${members.length > 0 ? html`
+              <div class="flex px-2 py-1 mt-2 rounded bg-gray-100">
+                ${repeat(members, member => html`
+                  <a href="/${member.value.user.userId}" data-tooltip=${member.value.user.userId}>
+                    <img class="block rounded-full object-cover w-10 h-10" src=${AVATAR_URL(member.value.user.userId)}>
+                  </a>
+                `)}
+              </div>
+            ` : ''}
+          </div>
+        `
+      }
+      return html`
+        <div class="border border-t-0 border-gray-200 text-lg font-semibold px-4 py-2">
+          Member Roles
+        </div>
+        <div class="border border-gray-200 border-t-0 border-b-0">
+          ${renderRole('admin')}
+          ${repeat(this.roles, r => r.value.roleId, r => renderRole(r.value.roleId, r.value.permissions))}
+        </div>
+      `      
     }
     return html`
       <div>
@@ -346,11 +415,19 @@ class CtznUser extends LitElement {
   async onClickEditProfile (e) {
     let newProfile = await EditProfilePopup.create(this.userId, AVATAR_URL(this.userId), this.userProfile.value)
     try {
-      await session.api.profiles.put(newProfile.profile)
+      if (this.isCitizen) {
+        await session.api.profiles.put(newProfile.profile)
+      } else if (this.isCommunity) {
+        await session.api.communities.putProfile(this.userId, newProfile.profile)
+      }
       this.userProfile.value = newProfile.profile
       if (newProfile.uploadedAvatar) {
         toast.create('Uploading avatar...')
-        await session.api.profiles.putAvatar(newProfile.uploadedAvatar.base64buf)
+        if (this.isCitizen) {
+          await session.api.profiles.putAvatar(newProfile.uploadedAvatar.base64buf)
+        } else if (this.isCommunity) {
+          await session.api.communities.putAvatar(this.userId, newProfile.uploadedAvatar.base64buf)
+        }
       }
       toast.create('Profile updated', 'success')
       this.requestUpdate()
