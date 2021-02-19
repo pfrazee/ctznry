@@ -140,7 +140,7 @@ export class Post extends LitElement {
             ${this.context}
           </div>
         ` : showingCommunity ? html`
-          <div class="pt-2 pb-1 pl-6 text-sm text-gray-500 font-bold">
+          <div class="pt-2 pb-1 text-sm text-gray-500 font-bold" style="padding-left: 33px">
             <span class="fas fa-fw fa-users mr-1"></span>
             Posted to
             <a href="/${this.post.value.community.userId}" class="whitespace-nowrap hover:underline">
@@ -151,7 +151,7 @@ export class Post extends LitElement {
         <div class="${gridCls} ${!showingCommunity ? 'pt-2' : ''} ">
           ${this.noctrls ? '' : html`
             <a class="block relative" href="/${this.post.author.userId}" title=${this.post.author.displayName}>
-              <img class="block w-12 h-12 object-cover rounded-full ml-3 mt-1" src=${AVATAR_URL(this.post.author.userId)}>
+              <img class="block w-10 h-10 object-cover rounded-full ml-2.5 mt-1" src=${AVATAR_URL(this.post.author.userId)}>
             </a>
           `}
           <div class="px-1 pb-2 min-w-0">
@@ -160,9 +160,6 @@ export class Post extends LitElement {
                 <div class="mr-2 whitespace-nowrap">
                   <a class="text-gray-700 font-bold text-base hover:underline" href="/${this.post.author.userId}" title=${this.post.author.displayName}>
                     ${this.post.author.displayName}
-                  </a>
-                  <a class="hover:underline" href="/${this.post.author.userId}" title=${this.post.author.userId}>
-                    ${this.post.author.userId}
                   </a>
                 </div>
                 <span class="mr-2 whitespace-nowrap">&middot;</span>

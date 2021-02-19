@@ -261,8 +261,8 @@ ctzn-feed > .post.reply ctzn-post[as-reply-parent]:before {
   position: absolute;
   display: block;
   width: 2px;
-  left: 34px;
-  top: 90px;
+  left: 28px;
+  top: 85px;
   height: calc(100% - 84px);
   background: rgb(193 193 193);
   z-index: 1;
