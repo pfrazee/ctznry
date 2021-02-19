@@ -364,10 +364,10 @@ class CtznUser extends LitElement {
               `}
             </div>
             ${members.length > 0 ? html`
-              <div class="flex px-2 py-1 mt-2 rounded bg-gray-100">
+              <div class="flex px-1 py-1 mt-2 rounded bg-gray-100">
                 ${repeat(members, member => html`
-                  <a href="/${member.value.user.userId}" data-tooltip=${member.value.user.userId}>
-                    <img class="block rounded-full object-cover w-10 h-10" src=${AVATAR_URL(member.value.user.userId)}>
+                  <a class="block" href="/${member.value.user.userId}" data-tooltip=${member.value.user.userId}>
+                    <img class="block rounded object-cover w-10 h-10" src=${AVATAR_URL(member.value.user.userId)}>
                   </a>
                 `)}
               </div>

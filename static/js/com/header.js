@@ -50,7 +50,7 @@ export class Header extends LitElement {
     return html`
       <header>
         <div class="menu ${this.isMenuOpen ? 'open' : 'closed'} flex flex-col leading-none text-lg bg-white">
-          <span class="font-bold px-3 py-2 text-3xl text-gray-600">
+          <span class="font-bold px-3 py-2 text-3xl text-gray-800">
             C T Z N
           </span>
           <a href="/" class=${this.getMenuNavClass('/')}>
@@ -70,7 +70,7 @@ export class Header extends LitElement {
             <span class="fas fa-fw fa-bars"></span>
           </a>
           <span class="flex-grow"></span>
-          <a class="font-bold px-3 py-2 text-2xl text-gray-600" href="/">
+          <a class="font-bold px-3 py-2 text-2xl text-gray-800" href="/" @click=${this.onClickTopNavCTZN}>
             C T Z N
           </a>
           <span class="flex-grow"></span>
@@ -141,6 +141,13 @@ export class Header extends LitElement {
   async onLogOut () {
     await session.doLogout()
     location.reload()
+  }
+
+  onClickTopNavCTZN (e) {
+    if (window.location.pathname === '/') {
+      e.preventDefault()
+      window.scrollTo(0, 0)
+    }
   }
 }
 
