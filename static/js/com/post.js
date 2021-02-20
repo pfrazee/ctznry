@@ -182,6 +182,8 @@ export class Post extends LitElement {
   }
 
   renderVoteCtrl () {
+    // DISABLED until we know better what we're doing
+    return ''
     var myVote = this.myVote
     let aCls = `inline-block px-2`
     if (this.canInteract) {
