@@ -152,8 +152,6 @@ class CtznUser extends LitElement {
   // =
 
   render () {
-    const nFollowing = this.following?.length || 0
-    const nFollowers = this.uniqFollowers?.length || 0
     const nMembers = this.members?.length || 0
     const setView = (str) => e => {
       e.preventDefault()
@@ -201,8 +199,8 @@ class CtznUser extends LitElement {
           <div class="flex border border-gray-200 border-t-0 bg-white text-gray-400 sticky top-0 z-10">
             <a class="${navCls('feed')}" @click=${setView('feed')}>Feed</a>
             ${this.isCitizen ? html`
-              <a class="${navCls('followers')}" @click=${setView('followers')}>${nFollowers} ${pluralize(nFollowers, 'Follower')}</a>
-              <a class="${navCls('following')}" @click=${setView('following')}>${nFollowing} Following</a>
+              <a class="${navCls('followers')}" @click=${setView('followers')}>Followers</a>
+              <a class="${navCls('following')}" @click=${setView('following')}>Following</a>
             ` : this.isCommunity ? html`
               <a class="${navCls('members')}" @click=${setView('members')}>${nMembers} ${pluralize(nMembers, 'Member')}</a>
               <a class="${navCls('about')}" @click=${setView('about')}>About</a>

@@ -43,8 +43,6 @@ export class UserList extends LitElement {
         listFollows(id).catch(e => undefined)
       ])
       let uniqFollowers = followers ? getUniqFollowers(followers) : []
-      profile.numFollowers = uniqFollowers?.length
-      profile.numFollowing = following?.length
       profile.isFollowingMe = session.isActive() && !!following?.find(f => f.value.subject.userId === session.info.userId)
       profile.amIFollowing = session.isActive() && !!uniqFollowers?.find(f => f === session.info.userId)
       this.requestUpdate()
@@ -84,8 +82,6 @@ export class UserList extends LitElement {
               </div>
             `
           }
-          const nFollowers = profile.numFollowers
-          const nFollowing = profile.numFollowing
           const userId = (new URL(profile.url)).pathname.split('/')[1]
           return html`
             <div class="profile">
@@ -106,11 +102,6 @@ export class UserList extends LitElement {
                 </a>
               </div>
               <div class="description">${profile.value.description}</div>
-              <div class="stats">
-                <a class="stat" href="/${profile.userId}#followers"><span class="stat-number">${nFollowers}</span> ${pluralize(nFollowers, 'Follower')}</a>
-                &middot;
-                <a class="stat" href="/${profile.userId}#following"><span class="stat-number">${nFollowing}</span> Following</a>
-              </div>
               ${profile.isFollowingMe ? html`
                 <div>
                   <span class="label">Follows you</span>
