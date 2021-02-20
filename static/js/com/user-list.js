@@ -4,7 +4,6 @@ import css from '../../css/com/user-list.css.js'
 import { AVATAR_URL } from '../lib/const.js'
 import * as session from '../lib/session.js'
 import { getProfile, listFollowers, listFollows } from '../lib/getters.js'
-import { pluralize } from '../lib/strings.js'
 
 export class UserList extends LitElement {
   static get properties () {

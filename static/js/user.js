@@ -14,7 +14,7 @@ import { pluralize } from './lib/strings.js'
 import './com/header.js'
 import './com/button.js'
 import './com/feed.js'
-import './com/user-list.js'
+import './com/simple-user-list.js'
 import './com/members-list.js'
 
 class CtznUser extends LitElement {
@@ -323,14 +323,14 @@ class CtznUser extends LitElement {
     }
     if (this.currentView === 'followers') {
       return html`
-        <div class="border border-gray-200 border-t-0 p-2 bg-gray-50">
-          <ctzn-user-list .ids=${this.uniqFollowers}></ctzn-user-list>
+        <div class="border border-gray-200 border-t-0 border-b-0">
+          <ctzn-simple-user-list .ids=${this.uniqFollowers}></ctzn-simple-user-list>
         </div>
       `
     } else if (this.currentView === 'following') {
       return html`
-        <div class="border border-gray-200 border-t-0 p-2 bg-gray-50">
-          <ctzn-user-list .ids=${this.following?.map(f => f.value.subject.userId)}></ctzn-user-list>
+        <div class="border border-gray-200 border-t-0 border-b-0">
+          <ctzn-simple-user-list .ids=${this.following?.map(f => f.value.subject.userId)}></ctzn-simple-user-list>
         </div>
       `      
     } else if (this.currentView === 'members') {
