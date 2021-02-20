@@ -8,7 +8,8 @@ export class SimpleUserList extends LitElement {
   static get properties () {
     return {
       ids: {type: Array},
-      myFollows: {type: Array}
+      myFollows: {type: Array},
+      emptyMessage: {type: String, attribute: 'empty-message'}
     }
   }
 
@@ -20,6 +21,7 @@ export class SimpleUserList extends LitElement {
     super()
     this.ids = []
     this.myFollows = []
+    this.emptyMessage = 'No users found.'
   }
 
   async load () {
@@ -42,6 +44,11 @@ export class SimpleUserList extends LitElement {
       return html`<span class="spinner"></span>`
     }
     return html`
+      ${this.ids.length === 0 ? html`
+        <div class="border-b border-gray-200 px-3 py-3 text-gray-500 bg-gray-50">
+          ${this.emptyMessage}
+        </div>
+      ` : ''}
       ${repeat(this.ids, userId => {
         const [username, domain] = userId.split('@')
         return html`

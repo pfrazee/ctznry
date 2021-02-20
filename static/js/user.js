@@ -324,13 +324,13 @@ class CtznUser extends LitElement {
     if (this.currentView === 'followers') {
       return html`
         <div class="border border-gray-200 border-t-0 border-b-0">
-          <ctzn-simple-user-list .ids=${this.uniqFollowers}></ctzn-simple-user-list>
+          <ctzn-simple-user-list .ids=${this.uniqFollowers} empty-message="${this.userProfile.value.displayName} has no followers."></ctzn-simple-user-list>
         </div>
       `
     } else if (this.currentView === 'following') {
       return html`
         <div class="border border-gray-200 border-t-0 border-b-0">
-          <ctzn-simple-user-list .ids=${this.following?.map(f => f.value.subject.userId)}></ctzn-simple-user-list>
+          <ctzn-simple-user-list .ids=${this.following?.map(f => f.value.subject.userId)} empty-message="${this.userProfile.value.displayName} is not following anybody."></ctzn-simple-user-list>
         </div>
       `      
     } else if (this.currentView === 'members') {
