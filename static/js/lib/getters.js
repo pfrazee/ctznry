@@ -89,6 +89,14 @@ export async function listRoles (userId) {
   return httpGet(domain, `/ctzn/roles/${encodeURIComponent(userId)}`)
 }
 
+export async function listBans (userId) {
+  const domain = getDomain(userId)
+  if (session.isActive(domain)) {
+    return session.api.communities.listBans(userId)
+  }
+  return httpGet(domain, `/ctzn/bans/${encodeURIComponent(userId)}`)
+}
+
 function getDomain (userId) {
   return userId.split('@')[1] || userId
 }

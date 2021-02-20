@@ -3,6 +3,8 @@ import { repeat } from '../vendor/lit-element/lit-html/directives/repeat.js'
 import { ViewThreadPopup } from './com/popups/view-thread.js'
 import { EditProfilePopup } from './com/popups/edit-profile.js'
 import { EditRolePopup } from './com/popups/edit-role.js'
+import { BanPopup } from './com/popups/ban.js'
+import { ManageBansPopup } from './com/popups/manage-bans.js'
 import * as toast from './com/toast.js'
 import { AVATAR_URL, PERM_DESCRIPTIONS } from './lib/const.js'
 import * as session from './lib/session.js'
@@ -13,6 +15,7 @@ import './com/header.js'
 import './com/button.js'
 import './com/feed.js'
 import './com/user-list.js'
+import './com/members-list.js'
 
 class CtznUser extends LitElement {
   static get properties () {
@@ -123,7 +126,7 @@ class CtznUser extends LitElement {
     } else if (this.isCommunity) {
       const [members, roles] = await Promise.all([
         listMembers(this.userId),
-        listRoles(this.userId)
+        listRoles(this.userId).catch(e => [])
       ])
       this.members = members
       this.roles = roles
@@ -334,8 +337,12 @@ class CtznUser extends LitElement {
       `      
     } else if (this.currentView === 'members') {
       return html`
-        <div class="border border-gray-200 border-t-0 p-2 bg-gray-50">
-          <ctzn-user-list .ids=${this.members?.map(f => f.value.user.userId)}></ctzn-user-list>
+        <div class="border border-gray-200 border-t-0 border-b-0">
+          <ctzn-members-list
+            .members=${this.members}
+            ?canban=${this.hasPermission('ctzn.network/perm-community-ban')}
+            @ban=${this.onBan}
+          ></ctzn-members-list>
         </div>
       `      
     } else if (this.currentView === 'about') {
@@ -400,6 +407,11 @@ class CtznUser extends LitElement {
             </div>
           </div>
         </div>
+        ${this.hasPermission('ctzn.network/perm-community-ban') ? html`
+          <div class="border border-t-0 border-gray-200 px-4 py-2">
+          <ctzn-button btn-class="text-sm px-2 py-0 ml-1" label="Manage Banned Users" @click=${this.onClickManageBans}></ctzn-button>
+          </div>
+        ` : ''}
       `      
     }
     return html`
@@ -548,6 +560,30 @@ class CtznUser extends LitElement {
     } catch (e) {
       console.log(e)
       toast.create(e.toString(), 'error')
+    }
+  }
+
+  async onBan (e) {
+    try {
+      await BanPopup.create({
+        communityId: this.userId,
+        citizenId: e.detail.userId
+      })
+      this.load()
+    } catch (e) {
+      // ignore
+    }
+  }
+
+  async onClickManageBans (e) {
+    try {
+      await ManageBansPopup.create({
+        communityId: this.userId,
+        citizenId: e.detail.userId
+      })
+      this.load()
+    } catch (e) {
+      // ignore
     }
   }
 }

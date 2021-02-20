@@ -151,12 +151,6 @@ export class EditRolePopup extends BasePopup {
     this.requestUpdate()
   }
 
-  onKeyupDescription (e) {
-    this.description = e.currentTarget.value.slice(0, 256)
-    e.currentTarget.value = this.description
-    this.requestUpdate()
-  }
-
   async onSubmit (e) {
     e.preventDefault()
     e.stopPropagation()
@@ -194,20 +188,7 @@ export class EditRolePopup extends BasePopup {
         }
       }
     } catch (e) {
-      let error = e.toString()
-      if (0 && error.includes('Validation Error')) {
-        if (error.includes('/roleId')) {
-          this.currentError = 'roleId must be 2 to 64 characters long, only include characters or numbers, and start with a letter.'
-        } else if (error.includes('/displayName')) {
-          this.currentError = 'Display name must be 1 to 64 characters long.'
-        } else if (error.includes('/desc')) {
-          this.currentError = 'Description must be 256 characters or less.'
-        } else {
-          this.currentError = error
-        }
-      } else {
-        this.currentError = error
-      }
+      this.currentError = e.toString()
       return
     } finally {
       this.isProcessing = false
