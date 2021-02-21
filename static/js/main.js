@@ -1,15 +1,14 @@
 import { LitElement, html } from '../vendor/lit-element/lit-element.js'
 import { repeat } from '../vendor/lit-element/lit-html/directives/repeat.js'
 import { ViewThreadPopup } from './com/popups/view-thread.js'
+import { ComposerPopup } from './com/popups/composer.js'
 import { CreateCommunityPopup } from './com/popups/create-community.js'
 import * as toast from './com/toast.js'
-import { pluralize } from './lib/strings.js'
 import { AVATAR_URL } from './lib/const.js'
 import * as session from './lib/session.js'
 import { listMemberships } from './lib/getters.js'
 import './com/header.js'
 import './com/button.js'
-import './com/composer.js'
 import './com/feed.js'
 import './com/img-fallbacks.js'
 
@@ -104,6 +103,12 @@ class CtznApp extends LitElement {
           </section>*/}
           <section class="mb-4">
             <ctzn-button
+              primary
+              class="text-sm font-semibold w-full mb-1"
+              label="Create Post"
+              @click=${this.onClickCreatePost}
+            ></ctzn-button>
+            <ctzn-button
               class="text-gray-600 text-sm font-semibold w-full"
               label="Create Community"
               @click=${this.onClickCreateCommunity}
@@ -169,15 +174,6 @@ class CtznApp extends LitElement {
     return html`
       <main>
         <div>
-          <div class="grid grid-cols-composer border border-gray-200 border-t-0 py-2 px-4">
-            <a class="block" href="/${session.info.userId}">
-              <img class="block w-10 h-10 rounded-full object-cover mt-2" src="${AVATAR_URL(session.info.userId)}">
-            </a>
-            <ctzn-composer
-              nocancel
-              @publish=${this.onPublishPost}
-            ></ctzn-composer>
-          </div>
           <div class="border border-t-0 border-gray-200 text-xl font-semibold px-4 py-2 sticky top-0 z-10 bg-white">
             Latest Posts
           </div>
@@ -240,14 +236,22 @@ class CtznApp extends LitElement {
     })
   }
 
-  onPublishPost (e) {
-    toast.create('Post published', '', 10e3)
-    this.load()
-  }
-
   onPublishReply (e) {
     toast.create('Reply published', '', 10e3)
     this.load()
+  }
+
+  async onClickCreatePost (e) {
+    e.preventDefault()
+    e.stopPropagation()
+    try {
+      await ComposerPopup.create()
+      toast.create('Post published', '', 10e3)
+      this.load()
+    } catch (e) {
+      // ignore
+      console.log(e)
+    }
   }
 
   async onClickCreateCommunity (e) {

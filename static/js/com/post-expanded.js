@@ -5,8 +5,9 @@ import * as session from '../lib/session.js'
 import { emit } from '../lib/dom.js'
 import { makeSafe, linkify } from '../lib/strings.js'
 import * as displayNames from '../lib/display-names.js'
+import * as toast from './toast.js'
 
-export class Post extends LitElement {
+export class PostExpanded extends LitElement {
   static get properties () {
     return {
       post: {type: Object},
@@ -37,11 +38,6 @@ export class Post extends LitElement {
     this.nocommunity = false
     this.noctrls = false
     this.hoverBgColor = 'gray-50'
-    this.viewContentOnClick = false
-
-    // helper state
-    this.isMouseDown = false
-    this.isMouseDragging = false
   }
 
   get replyCount () {
@@ -70,6 +66,7 @@ export class Post extends LitElement {
   }
 
   async reloadSignals () {
+    this.post.votes = await session.api.votes.getVotesForSubject(this.post.url)
     this.requestUpdate()
   }
 
@@ -108,64 +105,50 @@ export class Post extends LitElement {
 
     const [username, domain] = this.post.author.userId.split('@')
     return html`
-      <div
-        class="relative text-gray-600 cursor-pointer hover:bg-${this.hoverBgColor}"
-        @click=${this.onClickCard}
-        @mousedown=${this.onMousedownCard}
-        @mouseup=${this.onMouseupCard}
-        @mousemove=${this.onMousemoveCard}
-      >
-        ${this.context ? html`
-          <div class="pt-2 pb-1 pl-6 text-sm text-gray-500 font-bold">
-            ${this.context}
-          </div>
-        ` : ''}
-        <div class="pt-3">
-          <div class="px-2 pb-2 min-w-0">
-            <div class="whitespace-pre-wrap break-words text-lg leading-snug font-medium text-gray-700 pb-1 pl-1 pr-2.5">${this.renderPostText()}</div>
-            ${this.nometa ? '' : html`
-              <div class="flex pl-1 pr-2.5 text-gray-500 text-sm items-center">
-                <a class="block relative" href="/${this.post.author.userId}" title=${this.post.author.displayName}>
-                  <img class="block w-4 h-4 object-cover rounded-full mr-1" src=${AVATAR_URL(this.post.author.userId)}>
-                </a>
-                <div class="mr-1 whitespace-nowrap">
-                  <a class="hover:underline" href="/${this.post.author.userId}" title=${this.post.author.displayName}>
-                    <span class="text-gray-700 font-bold">${username}</span>@<span class="font-medium">${domain}</span>
-                  </a>
-                </div>
-                <div>
-                  <a class="text-gray-500 hover:underline" href="${POST_URL(this.post)}" data-tooltip=${(new Date(this.post.value.createdAt)).toLocaleString()}>
-                    ${relativeDate(this.post.value.createdAt)}
-                  </a>
-                  ${this.post.value.community ? html`
-                    <span class="text-gray-500">
-                      in
-                      <a href="/${this.post.value.community.userId}" class="whitespace-nowrap font-semibold hover:underline">
-                        ${displayNames.render(this.post.value.community.userId)}
-                      </a>
-                    </span>
-                  ` : ''}
-                </div>
-              </div>
-              <div class="px-1 pt-1 text-sm">
-                ${this.renderRepliesCtrl()}
-              </div>
-            `}
-          </div>
+      <div class="px-4 py-3 min-w-0">
+        <div class="whitespace-pre-wrap break-words text-xl leading-tight font-medium text-gray-700 pb-1.5">${this.renderPostText()}</div>
+        <div class="text-gray-500 text-sm pb-2">
+          <a class="inline-block w-4 h-4 relative" href="/${this.post.author.userId}" title=${this.post.author.displayName}>
+            <img
+              class="inline-block absolute w-4 h-4 object-cover rounded-full"
+              src=${AVATAR_URL(this.post.author.userId)}
+              style="left: 0; top: 3px"
+            >
+          </a>
+          <a class="hover:underline" href="/${this.post.author.userId}" title=${this.post.author.displayName}>
+            <span class="text-gray-700 font-bold">${username}</span>@<span class="font-medium">${domain}</span>
+          </a>
+          <a class="text-gray-500 hover:underline" href="${POST_URL(this.post)}" data-tooltip=${(new Date(this.post.value.createdAt)).toLocaleString()}>
+            ${relativeDate(this.post.value.createdAt)}
+          </a>
+          ${this.post.value.community ? html`
+            <span class="text-gray-500">
+              in
+              <a href="/${this.post.value.community.userId}" class="whitespace-nowrap font-semibold hover:underline">
+                ${displayNames.render(this.post.value.community.userId)}
+              </a>
+            </span>
+          ` : ''}
         </div>
+        ${this.post.value.extendedText ? html`
+          <div class="whitespace-pre-wrap break-words leading-snug text-gray-600 pt-2 pb-3">${this.renderPostExtendedText()}</div>
+        ` : ''}
+        ${this.noctrls ? '' : html`<div class="text-sm text-gray-600 px-1">
+          ${this.renderRepliesCtrl()}
+        </div>`}
       </div>
     `
   }
 
   renderRepliesCtrl () {
-    let aCls = `inline-block`
+    let aCls = `inline-block mr-6 tooltip-right`
     if (this.canInteract) {
-      aCls += ` text-gray-500`
+      aCls += ` text-gray-500 cursor-pointer hover:bg-gray-100`
     } else {
       aCls += ` text-gray-400`
     }
     return html`
-      <a class=${aCls} @click=${this.onViewThread}>
+      <a class=${aCls} @click=${this.onViewThread} data-tooltip=${this.ctrlTooltip || 'Replies'}>
         <span class="far fa-comment"></span>
         ${this.replyCount}
       </a>
@@ -174,6 +157,10 @@ export class Post extends LitElement {
 
   renderPostText () {
     return unsafeHTML(linkify(makeSafe(this.post.value.text)))
+  }
+
+  renderPostExtendedText () {
+    return unsafeHTML(linkify(makeSafe(this.post.value.extendedText)))
   }
 
   renderMatchText () {
@@ -188,74 +175,12 @@ export class Post extends LitElement {
   // events
   // =
 
-  onClickReply (e) {
-    e.preventDefault()
-    this.isReplyOpen = true
-  }
-
-  onPublishReply (e) {
-    e.preventDefault()
-    e.stopPropagation()
-    this.isReplyOpen = false
-    emit(this, 'publish-reply')
-  }
-
   onCancelReply (e) {
     this.isReplyOpen = false
   }
-
-  onViewThread (e, record) {
-    if (!this.viewContentOnClick && e.button === 0 && !e.metaKey && !e.ctrlKey) {
-      e.preventDefault()
-      e.stopPropagation()
-      emit(this, 'view-thread', {detail: {subject: {dbUrl: this.post.url, authorId: this.post.author.userId}}})
-    }
-  }
-
-  onClickCard (e) {
-    for (let el of e.composedPath()) {
-      if (el.tagName === 'A' || el.tagName === 'CTZN-COMPOSER') return
-    }
-    e.preventDefault()
-    e.stopPropagation()
-  }
-
-  onMousedownCard (e) {
-    for (let el of e.composedPath()) {
-      if (el.tagName === 'A' || el.tagName === 'CTZN-COMPOSER') return
-    }
-    this.isMouseDown = true
-    this.isMouseDragging = false
-  }
-
-  onMousemoveCard (e) {
-    if (this.isMouseDown) {
-      this.isMouseDragging = true
-    }
-  }
-
-  onMouseupCard (e) {
-    if (!this.isMouseDown) return
-    if (!this.isMouseDragging) {
-      e.preventDefault()
-      e.stopPropagation()
-      emit(this, 'view-thread', {detail: {subject: {dbUrl: this.post.url, authorId: this.post.author.userId}}})
-    }
-    this.isMouseDown = false
-    this.isMouseDragging = false
-  }
-
-  onClickShowSites (e, results) {
-    e.preventDefault()
-    // TODO
-    // SitesListPopup.create('Subscribed Sites', results.map(r => ({
-    //   url: r.metadata.href,
-    //   title: r.metadata.title || 'Untitled'
-    // })))
-  }
 }
 
-customElements.define('ctzn-post', Post)
+customElements.define('ctzn-post-expanded', PostExpanded)
 
 const MINUTE = 1e3 * 60
 const HOUR = 1e3 * 60 * 60

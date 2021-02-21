@@ -34,7 +34,7 @@ export async function getPost (userId, key) {
 export async function getThread (authorId, subjectUrl) {
   const domain = getDomain(authorId)
   if (session.isActive(domain)) {
-    return session.api.posts.getThread(subjectUrl)
+    return session.api.comments.getThread(subjectUrl)
   }
   return httpGet(domain, `/ctzn/thread/${encodeURIComponent(subjectUrl)}`)
 }

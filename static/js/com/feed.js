@@ -117,7 +117,7 @@ export class Feed extends LitElement {
     this.activeQuery = undefined
     emit(this, 'load-state-updated', {detail: {isEmpty: this.results.length === 0}})
 
-    this.loadPostParents()
+    // this.loadPostParents()
   }
 
   async loadPostParents () {

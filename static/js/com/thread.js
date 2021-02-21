@@ -5,8 +5,9 @@ import { getPost, getThread } from '../lib/getters.js'
 import { emit } from '../lib/dom.js'
 import * as session from '../lib/session.js'
 import * as displayNames from '../lib/display-names.js'
-import './post.js'
-import './composer.js'
+import './post-expanded.js'
+import './comment.js'
+import './comment-composer.js'
 
 export class Thread extends LitElement {
   static get properties () {
@@ -83,7 +84,7 @@ export class Thread extends LitElement {
   scrollHighlightedPostIntoView () {
     try {
       this.querySelector('.highlight').scrollIntoView()
-    } catch (e) { console.log(e) }
+    } catch (e) { /* ignore */ }
   }
 
   // rendering
@@ -91,27 +92,20 @@ export class Thread extends LitElement {
 
   render () {
     return html`
-      <div
-        class="border mb-1 ${this.subject.dbUrl === this.post?.url ? 'highlight bg-indigo-50 border-indigo-300' : 'border-gray-200'} ${this.post?.error ? 'bg-gray-50' : ''}"
-      >
+      <div class="border mb-1 border-gray-200 ${this.post?.error ? 'bg-gray-50' : ''}">
         ${this.post ? html`
-          <ctzn-post
+          <ctzn-post-expanded
             .post=${this.post}
             hover-bg-color=${this.subject.dbUrl === this.post?.url ? 'indigo-100' : 'gray-50'}
             noborders
             view-content-on-click
-            @publish-reply=${this.onPublishReply}
-          ></ctzn-post>
-          ${this.subject.dbUrl === this.post?.url ? this.renderReplyBox() : ''}
+          ></ctzn-post-expanded>
         ` : html`
           <span class="spinner"></span>
         `}
       </div>
-      ${this.thread ? html`
-        <div class="pl-1 border-l border-gray-200">
-          ${this.renderReplies(this.thread)}
-        </div>
-      ` : ''}
+      ${this.post ? this.renderCommentBox() : ''}
+      ${this.thread ? this.renderReplies(this.thread) : ''}
     `
   }
 
@@ -133,20 +127,15 @@ export class Thread extends LitElement {
     }
     if (!replies?.length) return ''
     return html`
-      <div class="pl-1 border-l border-gray-200">
+      <div class="pl-3 border-l-2 border-gray-200">
         ${repeat(replies, r => r.url, reply => {
           const isSubject = this.subject.dbUrl === reply.url
           return html`
-          <div class="border mb-1 ${isSubject ? 'highlight bg-indigo-50 border-indigo-300' : 'border-gray-200'}">
-              <ctzn-post
-                .post=${reply}
-                hover-bg-color=${isSubject ? 'indigo-100' : 'gray-50'}
-                noborders
-                nocommunity
-                thread-view
+            <div class="mb-1 ${isSubject ? 'highlight bg-indigo-50' : ''}">
+              <ctzn-comment
+                .comment=${reply}
                 @publish-reply=${this.onPublishReply}
-              ></ctzn-post>
-              ${isSubject ? this.renderReplyBox() : ''}
+              ></ctzn-comment>
             </div>
             ${reply.replies?.length ? this.renderReplies(reply.replies) : ''}
           `
@@ -155,11 +144,11 @@ export class Thread extends LitElement {
     `
   }
 
-  renderReplyBox () {
+  renderCommentBox () {
     if (this.post?.value.community) {
       if (!session.isInCommunity(this.post.value.community.userId)) {
         return html`
-          <div class="bg-white border-t border-indigo-300 py-2 px-3">
+          <div class="bg-white border border-gray-200 py-2 px-3 my-2">
             <div class="italic text-gray-500 text-sm">
               Join <a href="/${this.post.value.community.userId}" class="hover:underline">${displayNames.render(this.post.value.community.userId)}</a> to reply.
             </div>
@@ -169,7 +158,7 @@ export class Thread extends LitElement {
     } else {
       if (!session.isFollowingMe(this.post.author.userId)) {
         return html`
-          <div class="bg-white border-t border-indigo-300 py-2 px-3">
+          <div class="bg-white border border-gray-200 py-2 px-3 my-2">
             <div class="italic text-gray-500 text-sm">
               Only people followed by <a href="/${this.post.author.userId}" class="hover:underline">${this.post.author.displayName}</a> can reply.
             </div>
@@ -178,19 +167,19 @@ export class Thread extends LitElement {
       }
     }
     return html`
-      <div class="bg-white border-t border-indigo-300 pb-2 pr-3">
+      <div class="bg-white border border-gray-200 py-3 px-3 my-2">
         ${this.isReplying ? html`
-          <ctzn-composer
+          <ctzn-comment-composer
             autofocus
-            .subject=${{dbUrl: this.post.url, authorId: this.post.author.userId, community: this.post.value.community}}
-            .parent=${this.subject}
-            placeholder="Write your reply"
+            .community=${this.post.value.community}
+            .subject=${{dbUrl: this.post.url, authorId: this.post.author.userId}}
+            placeholder="Write your comment"
             @publish=${this.onPublishReply}
             @cancel=${this.onCancelReply}
-          ></ctzn-composer>
+          ></ctzn-comment-composer>
         ` : html`
-          <div class="cursor-text pt-2 pl-3 italic text-gray-500" @click=${this.onStartReply}>
-            Write your reply
+          <div class="cursor-text italic text-gray-500" @click=${this.onStartReply}>
+            Write your comment
           </div>
         `}
       </div>
