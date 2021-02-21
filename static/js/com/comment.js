@@ -68,7 +68,6 @@ export class Comment extends LitElement {
       `
     }
 
-    const [username, domain] = this.comment.author.userId.split('@')
     return html`
       <div class="text-gray-600">
         ${this.context ? html`
@@ -83,7 +82,7 @@ export class Comment extends LitElement {
             </a>
             <div class="whitespace-nowrap">
               <a class="hover:underline" href="/${this.comment.author.userId}" title=${this.comment.author.displayName}>
-                <span class="text-gray-700 font-medium">${username}</span>@<span class="font-medium">${domain}</span>
+                <span class="text-gray-700 font-medium">${displayNames.render(this.comment.author.userId)}</span>
               </a>
             </div>
             <span class="mx-1">&middot;</span>

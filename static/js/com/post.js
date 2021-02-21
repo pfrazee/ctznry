@@ -106,7 +106,6 @@ export class Post extends LitElement {
       `
     }
 
-    const [username, domain] = this.post.author.userId.split('@')
     return html`
       <div
         class="relative text-gray-600 cursor-pointer hover:bg-${this.hoverBgColor}"
@@ -120,45 +119,41 @@ export class Post extends LitElement {
             ${this.context}
           </div>
         ` : ''}
-        <div class="pt-3">
-          <div class="px-2 pb-2 min-w-0">
-            <div class="whitespace-pre-wrap break-words text-lg leading-snug font-medium text-gray-700 pb-1 pl-1 pr-2.5">${this.renderPostText()}</div>
-            ${this.nometa ? '' : html`
-              <div class="flex pl-1 pr-2.5 text-gray-500 text-sm items-center">
-                <a class="block relative" href="/${this.post.author.userId}" title=${this.post.author.displayName}>
-                  <img class="block w-4 h-4 object-cover rounded-full mr-1" src=${AVATAR_URL(this.post.author.userId)}>
+        <div class="px-2.5 pt-3 pb-3 min-w-0">
+          <div class="whitespace-pre-wrap break-words font-medium leading-snug text-gray-800 pb-1.5 pl-1 pr-2.5">${this.renderPostText()}</div>
+          ${this.nometa ? '' : html`
+            <div class="flex pl-1 pr-2.5 text-gray-500 text-sm items-center">
+              ${this.renderRepliesCtrl()}
+              <a class="block relative" href="/${this.post.author.userId}" title=${this.post.author.displayName}>
+                <img class="block w-4 h-4 object-cover rounded-full mr-1" src=${AVATAR_URL(this.post.author.userId)}>
+              </a>
+              <div class="mr-1 whitespace-nowrap">
+                <a class="hover:underline" href="/${this.post.author.userId}" title=${this.post.author.displayName}>
+                  <span class="text-gray-500 font-medium">${displayNames.render(this.post.author.userId)}</span>
                 </a>
-                <div class="mr-1 whitespace-nowrap">
-                  <a class="hover:underline" href="/${this.post.author.userId}" title=${this.post.author.displayName}>
-                    <span class="text-gray-700 font-bold">${username}</span>@<span class="font-medium">${domain}</span>
-                  </a>
-                </div>
-                <div>
-                  <a class="text-gray-500 hover:underline" href="${POST_URL(this.post)}" data-tooltip=${(new Date(this.post.value.createdAt)).toLocaleString()}>
-                    ${relativeDate(this.post.value.createdAt)}
-                  </a>
-                  ${this.post.value.community ? html`
-                    <span class="text-gray-500">
-                      in
-                      <a href="/${this.post.value.community.userId}" class="whitespace-nowrap font-semibold hover:underline">
-                        ${displayNames.render(this.post.value.community.userId)}
-                      </a>
-                    </span>
-                  ` : ''}
-                </div>
               </div>
-              <div class="px-1 pt-1 text-sm">
-                ${this.renderRepliesCtrl()}
+              <div>
+                <a class="text-gray-500 hover:underline" href="${POST_URL(this.post)}" data-tooltip=${(new Date(this.post.value.createdAt)).toLocaleString()}>
+                  ${relativeDate(this.post.value.createdAt)}
+                </a>
+                ${this.post.value.community ? html`
+                  <span class="text-gray-500">
+                    in
+                    <a href="/${this.post.value.community.userId}" class="whitespace-nowrap font-medium hover:underline">
+                      ${displayNames.render(this.post.value.community.userId)}
+                    </a>
+                  </span>
+                ` : ''}
               </div>
-            `}
-          </div>
+            </div>
+          `}
         </div>
       </div>
     `
   }
 
   renderRepliesCtrl () {
-    let aCls = `inline-block`
+    let aCls = `inline-block ml-1 mr-3`
     if (this.canInteract) {
       aCls += ` text-gray-500`
     } else {

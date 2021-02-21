@@ -103,7 +103,6 @@ export class PostExpanded extends LitElement {
       `
     }
 
-    const [username, domain] = this.post.author.userId.split('@')
     return html`
       <div class="px-4 py-3 min-w-0">
         <div class="whitespace-pre-wrap break-words text-xl leading-tight font-medium text-gray-700 pb-1.5">${this.renderPostText()}</div>
@@ -116,7 +115,7 @@ export class PostExpanded extends LitElement {
             >
           </a>
           <a class="hover:underline" href="/${this.post.author.userId}" title=${this.post.author.displayName}>
-            <span class="text-gray-700 font-bold">${username}</span>@<span class="font-medium">${domain}</span>
+            <span class="text-gray-700 font-bold">${displayNames.render(this.post.author.userId)}</span>
           </a>
           <a class="text-gray-500 hover:underline" href="${POST_URL(this.post)}" data-tooltip=${(new Date(this.post.value.createdAt)).toLocaleString()}>
             ${relativeDate(this.post.value.createdAt)}
