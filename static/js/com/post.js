@@ -1,10 +1,13 @@
 import { LitElement, html } from '../../vendor/lit-element/lit-element.js'
 import { unsafeHTML } from '../../vendor/lit-element/lit-html/directives/unsafe-html.js'
-import { AVATAR_URL, POST_URL } from '../lib/const.js'
+import { AVATAR_URL, POST_URL, FULL_POST_URL } from '../lib/const.js'
 import * as session from '../lib/session.js'
 import { emit } from '../lib/dom.js'
 import { makeSafe, linkify } from '../lib/strings.js'
+import { writeToClipboard } from '../lib/clipboard.js'
 import * as displayNames from '../lib/display-names.js'
+import * as contextMenu from './context-menu.js'
+import * as toast from './toast.js'
 
 export class Post extends LitElement {
   static get properties () {
@@ -55,6 +58,13 @@ export class Post extends LitElement {
     return 0
   }
 
+  get isMyPost () {
+    if (!session.isActive() || !this.post?.author.userId) {
+      return false
+    }
+    return session.info?.userId === this.post?.author.userId
+  }
+
   get canInteract () {
     if (this.post?.value?.community?.userId) {
       return session.isInCommunity(this.post.value.community.userId)
@@ -93,7 +103,7 @@ export class Post extends LitElement {
               <span class="fas fa-fw fa-exclamation-circle"></span>
             </div>
           `}
-          <div class="${borderCls} px-4 py-2 min-w-0 bg-gray-50">
+          <div class="px-4 py-2 min-w-0 bg-gray-50">
             <div class="font-semibold text-gray-600">
               Failed to load post
             </div>
@@ -139,7 +149,7 @@ export class Post extends LitElement {
                   <span class="text-gray-500 font-medium">${displayNames.render(this.post.author.userId)}</span>
                 </a>
               </div>
-              <div>
+              <div class="mr-2">
                 <a class="text-gray-500 hover:underline" href="${POST_URL(this.post)}" data-tooltip=${(new Date(this.post.value.createdAt)).toLocaleString()}>
                   ${relativeDate(this.post.value.createdAt)}
                 </a>
@@ -151,6 +161,11 @@ export class Post extends LitElement {
                     </a>
                   </span>
                 ` : ''}
+              </div>
+              <div class="ml-1">
+                <a class="hover:bg-gray-200 px-1 rounded" @click=${this.onClickMenu}>
+                  <span class="fas fa-fw fa-ellipsis-h"></span>
+                </a>
               </div>
             </div>
           `}
@@ -249,6 +264,44 @@ export class Post extends LitElement {
     }
     this.isMouseDown = false
     this.isMouseDragging = false
+  }
+
+  onClickMenu (e) {
+    e.preventDefault()
+    e.stopPropagation()
+    const rect = e.currentTarget.getClientRects()[0]
+    let items = [
+      {
+        icon: 'fas fa-fw fa-link',
+        label: 'Copy link',
+        click: () => {
+          writeToClipboard(FULL_POST_URL(this.post))
+          toast.create('Copied to clipboard')
+        }
+      }
+    ]
+    if (this.isMyPost) {
+      items.push('-')
+      items.push({
+        icon: 'fas fa-fw fa-trash',
+        label: 'Delete post',
+        click: () => {
+          if (!confirm('Are you sure you want to delete this post?')) {
+            return
+          }
+          emit(this, 'delete-post', {detail: {post: this.post}})
+        }
+      })
+    }
+    contextMenu.create({
+      x: rect.right,
+      y: rect.bottom,
+      right: true,
+      roomy: true,
+      noBorders: true,
+      style: `padding: 4px 0; font-size: 13px`,
+      items
+    })
   }
 }
 

@@ -136,7 +136,7 @@ class CtznUser extends LitElement {
   }
 
   get isLoading () {
-    let queryViewEls = Array.from(this.shadowRoot.querySelectorAll('ctzn-record-feed'))
+    let queryViewEls = Array.from(this.shadowRoot.querySelectorAll('ctzn-feed'))
     return !!queryViewEls.find(el => el.isLoading)
   }
 
@@ -434,6 +434,7 @@ class CtznUser extends LitElement {
           @load-state-updated=${this.onFeedLoadStateUpdated}
           @view-thread=${this.onViewThread}
           @publish-reply=${this.onPublishReply}
+          @delete-post=${this.onDeletePost}
         ></ctzn-feed>
       </div>
     `
@@ -610,6 +611,17 @@ class CtznUser extends LitElement {
       this.load()
     } catch (e) {
       // ignore
+    }
+  }
+
+  async onDeletePost (e) {
+    try {
+      await session.api.posts.del(e.detail.post.key)
+      toast.create('Post deleted')
+      this.load()
+    } catch (e) {
+      console.log(e)
+      toast.create(e.toString(), 'error')
     }
   }
 }

@@ -20,6 +20,18 @@ export function POST_URL (post) {
   return '/' + joinPath(post.author.userId, 'ctzn.network/post', post.key)
 }
 
+export function FULL_POST_URL (post) {
+  return location.origin + '/' + joinPath(post.author.userId, 'ctzn.network/post', post.key)
+}
+
+export function COMMENT_URL (comment) {
+  return '/' + joinPath(comment.author.userId, 'ctzn.network/comment', comment.key)
+}
+
+export function FULL_COMMENT_URL (comment) {
+  return location.origin + '/' + joinPath(comment.author.userId, 'ctzn.network/comment', comment.key)
+}
+
 export const PERM_DESCRIPTIONS = {
   'ctzn.network/perm-community-ban': `Can remove, ban, and unban members from a community.`,
   'ctzn.network/perm-community-remove-post': `Can remove posts from the community's feed index.`,

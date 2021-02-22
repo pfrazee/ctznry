@@ -1,11 +1,14 @@
 import { LitElement, html } from '../../vendor/lit-element/lit-element.js'
 import { unsafeHTML } from '../../vendor/lit-element/lit-html/directives/unsafe-html.js'
 import { ifDefined } from '../../vendor/lit-element/lit-html/directives/if-defined.js'
-import { AVATAR_URL, POST_URL } from '../lib/const.js'
+import { AVATAR_URL, POST_URL, FULL_COMMENT_URL } from '../lib/const.js'
+import { writeToClipboard } from '../lib/clipboard.js'
 import * as session from '../lib/session.js'
 import { emit } from '../lib/dom.js'
 import { makeSafe, linkify } from '../lib/strings.js'
 import * as displayNames from '../lib/display-names.js'
+import * as contextMenu from './context-menu.js'
+import * as toast from './toast.js'
 import './comment-composer.js'
 
 export class Comment extends LitElement {
@@ -28,6 +31,13 @@ export class Comment extends LitElement {
     this.context = undefined
     this.searchTerms = undefined
     this.isReplyOpen = false
+  }
+
+  get isMyComment () {
+    if (!session.isActive() || !this.comment?.author.userId) {
+      return false
+    }
+    return session.info?.userId === this.comment?.author.userId
   }
 
   get canInteract () {
@@ -99,6 +109,12 @@ export class Comment extends LitElement {
             >
               <span class="fas fa-fw fa-reply"></span> Reply
             </a>
+            <a
+              class="cursor-pointer tooltip-right hover:bg-gray-100 px-2 py-1 text-xs text-gray-500 font-bold"
+              @click=${this.onClickMenu}
+            >
+              <span class="fas fa-fw fa-ellipsis-h"></span>
+            </a>
           </div>
           ${this.isReplyOpen ? html`
             <div class="border border-gray-300 rounded py-2 px-3 my-2 mx-1">
@@ -147,6 +163,43 @@ export class Comment extends LitElement {
       e.stopPropagation()
       emit(this, 'view-thread', {detail: {subject: {dbUrl: this.comment.url, authorId: this.comment.author.userId}}})
     }
+  }
+
+  onClickMenu (e) {
+    e.preventDefault()
+    e.stopPropagation()
+    const rect = e.currentTarget.getClientRects()[0]
+    let items = [
+      {
+        icon: 'fas fa-fw fa-link',
+        label: 'Copy link',
+        click: () => {
+          writeToClipboard(FULL_COMMENT_URL(this.comment))
+          toast.create('Copied to clipboard')
+        }
+      }
+    ]
+    if (this.isMyComment) {
+      items.push('-')
+      items.push({
+        icon: 'fas fa-fw fa-trash',
+        label: 'Delete comment',
+        click: () => {
+          if (!confirm('Are you sure you want to delete this comment?')) {
+            return
+          }
+          emit(this, 'delete-comment', {detail: {comment: this.comment}})
+        }
+      })
+    }
+    contextMenu.create({
+      x: rect.left,
+      y: rect.bottom,
+      roomy: true,
+      noBorders: true,
+      style: `padding: 4px 0; font-size: 13px`,
+      items
+    })
   }
 }
 

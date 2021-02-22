@@ -1,10 +1,12 @@
 import { LitElement, html } from '../../vendor/lit-element/lit-element.js'
 import { unsafeHTML } from '../../vendor/lit-element/lit-html/directives/unsafe-html.js'
-import { AVATAR_URL, POST_URL } from '../lib/const.js'
+import { AVATAR_URL, POST_URL, FULL_POST_URL } from '../lib/const.js'
 import * as session from '../lib/session.js'
 import { emit } from '../lib/dom.js'
 import { makeSafe, linkify } from '../lib/strings.js'
+import { writeToClipboard } from '../lib/clipboard.js'
 import * as displayNames from '../lib/display-names.js'
+import * as contextMenu from './context-menu.js'
 import * as toast from './toast.js'
 
 export class PostExpanded extends LitElement {
@@ -19,7 +21,6 @@ export class PostExpanded extends LitElement {
       nocommunity: {type: Boolean},
       noctrls: {type: Boolean},
       hoverBgColor: {type: String, attribute: 'hover-bg-color'},
-      isReplyOpen: {type: Boolean},
       viewContentOnClick: {type: Boolean, attribute: 'view-content-on-click'}
     }
   }
@@ -33,7 +34,6 @@ export class PostExpanded extends LitElement {
     this.post = undefined
     this.context = undefined
     this.searchTerms = undefined
-    this.isReplyOpen = false
     this.nometa = false
     this.nocommunity = false
     this.noctrls = false
@@ -48,6 +48,13 @@ export class PostExpanded extends LitElement {
       return this.post.replies.length
     }
     return 0
+  }
+
+  get isMyPost () {
+    if (!session.isActive() || !this.post?.author.userId) {
+      return false
+    }
+    return session.info?.userId === this.post?.author.userId
   }
 
   get canInteract () {
@@ -83,22 +90,16 @@ export class PostExpanded extends LitElement {
 
     if (this.post.error) {
       return html`
-        <div class="grid ${gridCls}">
-          ${this.noctrls ? '' : html`
-            <div class="text-xl pl-1 pt-2 text-gray-500">
-              <span class="fas fa-fw fa-exclamation-circle"></span>
-            </div>
-          `}
-          <div class="${borderCls} px-4 py-2 min-w-0 bg-gray-50">
-            <div class="font-semibold text-gray-600">
-              Failed to load post
-            </div>
-            ${this.post.message ? html`
-              <div class="text-gray-500 text-sm">
-                ${this.post.message}
-              </div>
-            ` : ''}
+        <div class="px-4 py-2 min-w-0 bg-gray-50">
+          <div class="font-semibold text-gray-600">
+            <span class="fas fa-fw fa-exclamation-circle"></span>
+            Failed to load post
           </div>
+          ${this.post.message ? html`
+            <div class="text-gray-500 text-sm">
+              ${this.post.message}
+            </div>
+          ` : ''}
         </div>
       `
     }
@@ -128,6 +129,9 @@ export class PostExpanded extends LitElement {
               </a>
             </span>
           ` : ''}
+          <a class="hover:bg-gray-200 px-1 ml-1 rounded" @click=${this.onClickMenu}>
+            <span class="fas fa-fw fa-ellipsis-h"></span>
+          </a>
         </div>
         ${this.post.value.extendedText ? html`
           <div class="whitespace-pre-wrap break-words leading-snug text-gray-600 pt-2 pb-3">${this.renderPostExtendedText()}</div>
@@ -174,8 +178,42 @@ export class PostExpanded extends LitElement {
   // events
   // =
 
-  onCancelReply (e) {
-    this.isReplyOpen = false
+  onClickMenu (e) {
+    e.preventDefault()
+    e.stopPropagation()
+    const rect = e.currentTarget.getClientRects()[0]
+    let items = [
+      {
+        icon: 'fas fa-fw fa-link',
+        label: 'Copy link',
+        click: () => {
+          writeToClipboard(FULL_POST_URL(this.post))
+          toast.create('Copied to clipboard')
+        }
+      }
+    ]
+    if (this.isMyPost) {
+      items.push('-')
+      items.push({
+        icon: 'fas fa-fw fa-trash',
+        label: 'Delete post',
+        click: () => {
+          if (!confirm('Are you sure you want to delete this post?')) {
+            return
+          }
+          emit(this, 'delete-post', {detail: {post: this.post}})
+        }
+      })
+    }
+    contextMenu.create({
+      x: rect.right,
+      y: rect.bottom,
+      right: true,
+      roomy: true,
+      noBorders: true,
+      style: `padding: 4px 0; font-size: 13px`,
+      items
+    })
   }
 }
 

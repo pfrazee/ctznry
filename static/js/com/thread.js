@@ -53,18 +53,21 @@ export class Thread extends LitElement {
     this.isLoading = true
     // this.reset() TODO causes a flash of the loading spinner, needed?
     console.log('loading', this.subject)
-    try {
-      if (this.subject.dbUrl.includes('ctzn.network/comment')) {
-        let comment = await getComment(this.subject.authorId, this.subject.dbUrl)
-        this.post = await getPost(comment.value.reply.root.authorId, comment.value.reply.root.dbUrl)
-        this.thread = await getThread(comment.value.reply.root.authorId, comment.value.reply.root.dbUrl)
+    const onError = e => ({
+      error: true,
+      message: e.toString()
+    })
+    if (this.subject.dbUrl.includes('ctzn.network/comment')) {
+      let comment = await getComment(this.subject.authorId, this.subject.dbUrl).catch(onError)
+      if (comment.error) {
+        this.post = comment
       } else {
-        this.post = await getPost(this.subject.authorId, this.subject.dbUrl)
-        this.thread = await getThread(this.subject.authorId, this.subject.dbUrl)
+        this.post = await getPost(comment.value.reply.root.authorId, comment.value.reply.root.dbUrl).catch(onError)
+        this.thread = await getThread(comment.value.reply.root.authorId, comment.value.reply.root.dbUrl).catch(onError)
       }
-    } catch (e) {
-      toast.create(e.message, 'error')
-      console.error(e)
+    } else {
+      this.post = await getPost(this.subject.authorId, this.subject.dbUrl).catch(onError)
+      this.thread = await getThread(this.subject.authorId, this.subject.dbUrl).catch(onError)
     }
     await this.updateComplete
     emit(this, 'load')
@@ -99,6 +102,7 @@ export class Thread extends LitElement {
             hover-bg-color=${this.subject.dbUrl === this.post?.url ? 'indigo-100' : 'gray-50'}
             noborders
             view-content-on-click
+            @delete-post=${this.onDeletePost}
           ></ctzn-post-expanded>
         ` : html`
           <span class="spinner"></span>
@@ -111,8 +115,11 @@ export class Thread extends LitElement {
 
   renderReplies (replies) {
     if (replies?.error) {
+      if (this.post?.error) {
+        return ''
+      }
       return html`
-        <div class="pl-1 py-2 border-l border-gray-200">
+        <div class="pl-3 py-2 border-l border-gray-200">
           <div class="font-semibold text-gray-500">
             <span class="fas fa-fw fa-exclamation-circle"></span>
             Failed to load thread
@@ -135,6 +142,7 @@ export class Thread extends LitElement {
               <ctzn-comment
                 .comment=${reply}
                 @publish-reply=${this.onPublishReply}
+                @delete-comment=${this.onDeleteComment}
               ></ctzn-comment>
             </div>
             ${reply.replies?.length ? this.renderReplies(reply.replies) : ''}
@@ -145,7 +153,10 @@ export class Thread extends LitElement {
   }
 
   renderCommentBox () {
-    if (this.post?.value.community) {
+    if (this.post?.error) {
+      return ''
+    }
+    if (this.post?.value?.community) {
       if (!session.isInCommunity(this.post.value.community.userId)) {
         return html`
           <div class="bg-white border border-gray-200 py-2 px-3 my-2">
@@ -156,7 +167,7 @@ export class Thread extends LitElement {
         `
       }
     } else {
-      if (!session.isFollowingMe(this.post.author.userId)) {
+      if (!session.isFollowingMe(this.post?.author?.userId)) {
         return html`
           <div class="bg-white border border-gray-200 py-2 px-3 my-2">
             <div class="italic text-gray-500 text-sm">
@@ -201,6 +212,28 @@ export class Thread extends LitElement {
 
   onCancelReply (e) {
     this.isReplying = false
+  }
+
+  async onDeletePost (e) {
+    try {
+      await session.api.posts.del(e.detail.post.key)
+      toast.create('Post deleted')
+      this.load()
+    } catch (e) {
+      console.log(e)
+      toast.create(e.toString(), 'error')
+    }
+  }
+
+  async onDeleteComment (e) {
+    try {
+      await session.api.comments.del(e.detail.comment.key)
+      toast.create('Comment deleted')
+      this.load()
+    } catch (e) {
+      console.log(e)
+      toast.create(e.toString(), 'error')
+    }
   }
 }
 

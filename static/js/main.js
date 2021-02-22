@@ -186,6 +186,7 @@ class CtznApp extends LitElement {
             @load-state-updated=${this.onFeedLoadStateUpdated}
             @view-thread=${this.onViewThread}
             @publish-reply=${this.onPublishReply}
+            @delete-post=${this.onDeletePost}
           ></ctzn-feed>
         </div>
         ${this.renderRightSidebar()}
@@ -260,6 +261,17 @@ class CtznApp extends LitElement {
     const res = await CreateCommunityPopup.create()
     console.log(res)
     window.location = `/${res.userId}`
+  }
+
+  async onDeletePost (e) {
+    try {
+      await session.api.posts.del(e.detail.post.key)
+      toast.create('Post deleted')
+      this.load()
+    } catch (e) {
+      console.log(e)
+      toast.create(e.toString(), 'error')
+    }
   }
 }
 
