@@ -116,18 +116,6 @@ export class Feed extends LitElement {
     this.results = results
     this.activeQuery = undefined
     emit(this, 'load-state-updated', {detail: {isEmpty: this.results.length === 0}})
-
-    // this.loadPostParents()
-  }
-
-  async loadPostParents () {
-    for (let post of this.results) {
-      if (post.parentPost) continue
-      if (!post.value.reply) continue
-      let parentInfo = post.value.reply.parent || post.value.reply.root
-      post.parentPost = await getPost(parentInfo.authorId, parentInfo.dbUrl)
-      this.requestUpdate()
-    }
   }
 
   // rendering
@@ -183,40 +171,17 @@ export class Feed extends LitElement {
   }
   
   renderNormalResult (post) {
-    const isReply = !!post.value.reply
     return html`
-      <div
-        class="post ${isReply ? 'reply' : ''} border border-gray-200 border-t-0"
-      >
-        ${post.parentPost ? html`
-          <ctzn-post
-            .post=${post.parentPost}
-            as-reply-parent
-          ></ctzn-post>
-        ` : ''}
+      <div class="post border border-gray-200 border-t-0">
         <ctzn-post
           .post=${post}
-          ?as-reply-child=${isReply}
         ></ctzn-post>
       </div>
     `
   }
 
   renderSearchResult (result) {
-    // var renderMode = this.forceRenderMode || ({
-    //   'comment': 'card',
-    //   'microblogpost': 'card',
-    //   'subscription': 'action',
-    // })[getRecordType(result)] || 'expanded-link'
-    // return html`
-    //   <ctzn-record
-    //     .record=${result}
-    //     class=${this.recordClass}
-    //     render-mode=${renderMode}
-    //     search-terms=${this.filter}
-    //     show-context
-    //   ></ctzn-record>
-    // `
+    // TODO
   }
 
   // events

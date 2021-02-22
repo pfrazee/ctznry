@@ -119,8 +119,14 @@ export class Post extends LitElement {
             ${this.context}
           </div>
         ` : ''}
-        <div class="px-2.5 pt-3 pb-3 min-w-0">
-          <div class="whitespace-pre-wrap break-words font-medium leading-snug text-gray-800 pb-1.5 pl-1 pr-2.5">${this.renderPostText()}</div>
+        <div class="px-2.5 pt-4 pb-4 min-w-0">
+          <div
+            class="whitespace-pre-wrap break-words text-gray-700 pb-1.5 pl-1 pr-2.5"
+            style="font-size: 16px; letter-spacing: 0.3px; line-height: 1.3;"
+          >${this.renderPostText()}${this.post.value.extendedText
+              ? html`<span class="bg-gray-200 ml-1 px-1 rounded text-gray-600 text-xs">more</span>`
+              : ''
+          }</div>
           ${this.nometa ? '' : html`
             <div class="flex pl-1 pr-2.5 text-gray-500 text-sm items-center">
               ${this.renderRepliesCtrl()}
