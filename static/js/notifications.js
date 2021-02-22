@@ -102,7 +102,6 @@ class CtznNotifications extends LitElement {
     return html`
       <main>
         <div>
-          ${this.isEmpty ? this.renderEmptyMessage() : ''}
           ${''/* TODO<div class="reload-page mx-4 mb-4 rounded cursor-pointer overflow-hidden leading-10 ${this.numNewItems > 0 ? 'visible' : ''}" @click=${e => this.load()}>
             ${this.numNewItems} new ${pluralize(this.numNewItems, 'update')}
           </div>*/}
@@ -116,6 +115,7 @@ class CtznNotifications extends LitElement {
             @view-thread=${this.onViewThread}
             @publish-reply=${this.onPublishReply}
           ></ctzn-notifications-feed>
+          ${this.isEmpty ? this.renderEmptyMessage() : ''}
         </div>
         ${this.renderRightSidebar()}
       </main>
@@ -124,7 +124,7 @@ class CtznNotifications extends LitElement {
 
   renderEmptyMessage () {
     return html`
-      <div class="bg-gray-100 text-gray-500 py-44 text-center my-5">
+      <div class="bg-gray-100 text-gray-500 py-44 text-center border border-gray-200">
         <div class="fas fa-bell text-6xl text-gray-300 mb-8"></div>
         <div>You have no notifications!</div>
       </div>
