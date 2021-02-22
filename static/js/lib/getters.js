@@ -31,6 +31,19 @@ export async function getPost (userId, key) {
   return httpGet(domain, `/ctzn/post/${username}/${encodeURIComponent(key)}`)
 }
 
+export async function getComment (userId, key) {
+  const domain = getDomain(userId)
+  if (session.isActive(domain)) {
+    if (key.startsWith('hyper://')) {
+      return session.api.comments.get(key)
+    }
+    return session.api.comments.get(userId, key)
+  }
+  const username = getUsername(userId)
+  key = toKey(key)
+  return httpGet(domain, `/ctzn/comment/${username}/${encodeURIComponent(key)}`)
+}
+
 export async function getThread (authorId, subjectUrl) {
   const domain = getDomain(authorId)
   if (session.isActive(domain)) {

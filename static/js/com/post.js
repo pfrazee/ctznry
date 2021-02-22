@@ -17,9 +17,9 @@ export class Post extends LitElement {
       nometa: {type: Boolean},
       nocommunity: {type: Boolean},
       noctrls: {type: Boolean},
+      noclick: {type: Boolean},
       hoverBgColor: {type: String, attribute: 'hover-bg-color'},
-      isReplyOpen: {type: Boolean},
-      viewContentOnClick: {type: Boolean, attribute: 'view-content-on-click'}
+      isReplyOpen: {type: Boolean}
     }
   }
 
@@ -36,6 +36,7 @@ export class Post extends LitElement {
     this.nometa = false
     this.nocommunity = false
     this.noctrls = false
+    this.noclick = false
     this.hoverBgColor = 'gray-50'
     this.viewContentOnClick = false
 
@@ -214,6 +215,7 @@ export class Post extends LitElement {
   }
 
   onClickCard (e) {
+    if (this.noclick) return
     for (let el of e.composedPath()) {
       if (el.tagName === 'A' || el.tagName === 'CTZN-COMPOSER') return
     }
@@ -222,6 +224,7 @@ export class Post extends LitElement {
   }
 
   onMousedownCard (e) {
+    if (this.noclick) return
     for (let el of e.composedPath()) {
       if (el.tagName === 'A' || el.tagName === 'CTZN-COMPOSER') return
     }
@@ -230,12 +233,14 @@ export class Post extends LitElement {
   }
 
   onMousemoveCard (e) {
+    if (this.noclick) return
     if (this.isMouseDown) {
       this.isMouseDragging = true
     }
   }
 
   onMouseupCard (e) {
+    if (this.noclick) return
     if (!this.isMouseDown) return
     if (!this.isMouseDragging) {
       e.preventDefault()
@@ -244,15 +249,6 @@ export class Post extends LitElement {
     }
     this.isMouseDown = false
     this.isMouseDragging = false
-  }
-
-  onClickShowSites (e, results) {
-    e.preventDefault()
-    // TODO
-    // SitesListPopup.create('Subscribed Sites', results.map(r => ({
-    //   url: r.metadata.href,
-    //   title: r.metadata.title || 'Untitled'
-    // })))
   }
 }
 

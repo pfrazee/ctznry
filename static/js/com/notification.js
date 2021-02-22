@@ -4,7 +4,7 @@ import * as session from '../lib/session.js'
 import { AVATAR_URL } from '../lib/const.js'
 import { emit } from '../lib/dom.js'
 import { extractSchemaId } from '../lib/strings.js'
-import { getPost } from '../lib/getters.js'
+import { getPost, getComment } from '../lib/getters.js'
 import './post.js'
 import './user-list.js'
 
@@ -38,23 +38,6 @@ export class Notification extends LitElement {
     if (!this.notification) return ''
   }
 
-  get myVote () {
-    if (this.notification?.votes.upvoterIds.includes(session.info?.userId)) {
-      return 1
-    }
-    if (this.notification?.votes.downvoterIds.includes(session.info?.userId)) {
-      return -1
-    }
-  }
-
-  get upvoteCount () {
-    return this.notification?.votes.upvoterIds.length
-  }
-
-  get downvoteCount () {
-    return this.notification?.votes.downvoterIds.length
-  }
-
   get replyCount () {
     if (typeof this.notification?.replyCount !== 'undefined') {
       return this.notification.replyCount
@@ -74,21 +57,12 @@ export class Notification extends LitElement {
 
     let subject
     let subjectSchemaId
-    let replyPostInfo
+    let replyCommentInfo
 
     var icon
     var action = ''
-    if (schemaId === 'ctzn.network/vote') {
-      subject = note.item.subject
-      if (note.item.vote === 1) {
-        action = 'upvoted'
-        icon = 'fas fa-arrow-up'
-      } else if (note.item.vote === -1) {
-        action = 'downvoted'
-        icon = 'fas fa-arrow-down'
-      }
-    } else if (schemaId === 'ctzn.network/post') {
-      replyPostInfo = {
+    if (schemaId === 'ctzn.network/comment') {
+      replyCommentInfo = {
         userId: note.author.userId,
         dbUrl: note.itemUrl
       }
@@ -98,20 +72,19 @@ export class Notification extends LitElement {
         subject = note.item.reply.root
       }
       action = 'replied to'
-      icon = 'far fa-comment'
+      icon = 'fas fa-reply'
     } else if (schemaId === 'ctzn.network/follow') {
       subject = note.item.subject
       action = 'followed'
-      icon = 'fas fa-rss'
+      icon = 'fas fa-user-plus'
+    } else {
+      return ''
     }
 
     subjectSchemaId = subject ? extractSchemaId(subject.dbUrl): undefined
     var target = ''
-    if (subjectSchemaId === 'ctzn.network/post') {
-      target = 'your post'
-      if (note.item.community) {
-        target += ' in ' + note.item.community.userId
-      }
+    if (['ctzn.network/post', 'ctzn.network/comment'].includes(subjectSchemaId)) {
+      target = `your ${subjectSchemaId === 'ctzn.network/post' ? 'post' : 'comment'}`
     } else if (!subjectSchemaId) {
       target = 'you'
     }
@@ -119,30 +92,23 @@ export class Notification extends LitElement {
     return html`
       <link rel="stylesheet" href="/css/fontawesome.css">
       <div class="cursor-pointer hover:bg-gray-50 ${this.isUnread ? 'unread' : ''}" @click=${this.onClickWrapper}>
-        ${schemaId === 'ctzn.network/post' ? html`
+        <div class="flex items-center text-sm ${schemaId === 'ctzn.network/follow' ? 'py-4 px-4' : 'pt-4 px-4 pb-2'}">
+          <span class="${icon} text-2xl mr-3 ml-1 text-gray-400"></span>
+          <a class="inline-flex items-center font-bold" href="/${note.author.userId}" title=${note.author.userId}>
+            <img class="w-6 h-6 rounded-full object-cover mr-2" src=${AVATAR_URL(note.author.userId)}>
+            <span class="truncate mr-2" style="max-width: 200px">${note.author.userId}</span>
+          </a>
+          ${action} ${target} &middot; ${relativeDate(note.createdAt)}
+        </div>
+        ${schemaId === 'ctzn.network/follow' ? html`
+          <div class="px-4 pb-2">
+            <ctzn-user-list .ids=${[note.author.userId]}></ctzn-user-list>
+          </div>
+        ` : schemaId === 'ctzn.network/comment' ? html`
           <div class="reply">
-            ${asyncReplace(this.renderReplyPost(replyPostInfo, html`<span class="fas fa-reply"></span> ${action} ${target}`))}
+            ${asyncReplace(this.renderReplyComment(replyCommentInfo))}
           </div>
-        ` : html`
-          <div class="flex items-center ${schemaId === 'ctzn.network/follow' ? 'py-4 px-4' : 'pt-4 px-4 pb-2'}">
-            <span class="${icon} text-2xl mr-4 ml-1 text-gray-300"></span>
-            <a class="inline-flex items-center font-bold" href="/${note.author.userId}" title=${note.author.userId}>
-              <img class="w-6 h-6 rounded-full object-cover mr-2" src=${AVATAR_URL(note.author.userId)}>
-              <span class="truncate mr-2" style="max-width: 200px">${note.author.userId}</span>
-            </a>
-            ${action} ${target} &middot; ${relativeDate(note.createdAt)}
-          </div>
-          ${['ctzn.network/post'].includes(subjectSchemaId) ? html`
-            <div class="subject">
-              ${asyncReplace(this.renderSubject(note.item.subject, subjectSchemaId))}
-            </div>
-          ` : ''}
-          ${schemaId === 'ctzn.network/follow' ? html`
-            <div class="mx-4 mb-2">
-              <ctzn-user-list .ids=${[note.author.userId]}></ctzn-user-list>
-            </div>
-          ` : ''}
-        `}
+        ` : ''}
       </div>
     `
   }
@@ -154,27 +120,33 @@ export class Notification extends LitElement {
     let record
     if (schemaId === 'ctzn.network/post') {
       record = await getPost(authorId, dbUrl)
+      yield html`
+        <ctzn-post
+          .post=${record}
+          nometa
+        ></ctzn-post>
+      `
+    } else if (schemaId === 'ctzn.network/comment') {
+      record = await getComment(authorId, dbUrl)
+      yield html`
+        <ctzn-post
+          .post=${record}
+          nometa
+          noclick
+        ></ctzn-post>
+      `
     }
-
-    yield html`
-      <ctzn-post
-        .post=${record}
-        nocommunity
-        nometa
-        noctrls
-      ></ctzn-post>
-    `
   }
 
-  async *renderReplyPost (postInfo, context) {
+  async *renderReplyComment (commentInfo) {
     yield html`Loading...`
 
-    let record = await getPost(postInfo.userId, postInfo.dbUrl)
+    let record = await getComment(commentInfo.userId, commentInfo.dbUrl)
     yield html`
       <ctzn-post
         .post=${record}
-        .context=${context}
-        noborders
+        nometa
+        noclick
       ></ctzn-post>
     `
   }
@@ -187,13 +159,11 @@ export class Notification extends LitElement {
 
     const schemaId = extractSchemaId(this.notification.itemUrl)
     if (schemaId === 'ctzn.network/post'){
-      const subject = await getPost(this.notification.itemUrl)
+      const subject = await getPost(this.notification.author.userId, this.notification.itemUrl)
       emit(this, 'view-thread', {detail: {subject: {dbUrl: subject.url, authorId: subject.author.userId}}})
-    } else if (schemaId === 'ctzn.network/vote') {
-      const subjectSchemaId = extractSchemaId(this.notification.item.subject.dbUrl)
-      const subject = subjectSchemaId === 'ctzn.network/post'
-        ? await getPost(this.notification.item.subject.authorId, this.notification.item.subject.dbUrl)
-        : undefined
+    } else if (schemaId === 'ctzn.network/comment') {
+      const subject = await getComment(this.notification.author.userId, this.notification.itemUrl)
+      // const subject = await getPost(comment.value.reply.root.authorId, comment.value.reply.root.dbUrl)
       emit(this, 'view-thread', {detail: {subject: {dbUrl: subject.url, authorId: subject.author.userId}}})
     } else if (schemaId === 'ctzn.network/follow') {
       window.location = `/${this.notification.author.userId}`

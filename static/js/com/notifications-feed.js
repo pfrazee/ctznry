@@ -1,6 +1,7 @@
 import { LitElement, html } from '../../vendor/lit-element/lit-element.js'
 import { repeat } from '../../vendor/lit-element/lit-html/directives/repeat.js'
 import { emit } from '../lib/dom.js'
+import { extractSchemaId } from '../lib/strings.js'
 import * as session from '../lib/session.js'
 import './notification.js'
 
@@ -132,9 +133,13 @@ export class NotificationsFeed extends LitElement {
   }
   
   renderNotification (notification) {
+    const schemaId = extractSchemaId(notification.itemUrl)
+    if (schemaId !== 'ctzn.network/comment' && schemaId !== 'ctzn.network/follow') {
+      return ''
+    }
     return html`
       <ctzn-notification
-        class="block border-t border-gray-200"
+        class="block border-b border-gray-200"
         .notification=${notification}
         ?is-unread=${Number(new Date(notification.createdAt)) > this.clearedAt}
       ></ctzn-notification>

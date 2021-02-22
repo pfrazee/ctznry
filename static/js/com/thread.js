@@ -1,7 +1,7 @@
 import { LitElement, html } from '../../vendor/lit-element/lit-element.js'
 import { repeat } from '../../vendor/lit-element/lit-html/directives/repeat.js'
 import * as toast from './toast.js'
-import { getPost, getThread } from '../lib/getters.js'
+import { getPost, getComment, getThread } from '../lib/getters.js'
 import { emit } from '../lib/dom.js'
 import * as session from '../lib/session.js'
 import * as displayNames from '../lib/display-names.js'
@@ -54,12 +54,12 @@ export class Thread extends LitElement {
     // this.reset() TODO causes a flash of the loading spinner, needed?
     console.log('loading', this.subject)
     try {
-      let post = await getPost(this.subject.authorId, this.subject.dbUrl)
-      if (post.value.reply) {
-        this.post = await getPost(post.value.reply.root.authorId, post.value.reply.root.dbUrl)
-        this.thread = await getThread(post.value.reply.root.authorId, post.value.reply.root.dbUrl)
+      if (this.subject.dbUrl.includes('ctzn.network/comment')) {
+        let comment = await getComment(this.subject.authorId, this.subject.dbUrl)
+        this.post = await getPost(comment.value.reply.root.authorId, comment.value.reply.root.dbUrl)
+        this.thread = await getThread(comment.value.reply.root.authorId, comment.value.reply.root.dbUrl)
       } else {
-        this.post = post
+        this.post = await getPost(this.subject.authorId, this.subject.dbUrl)
         this.thread = await getThread(this.subject.authorId, this.subject.dbUrl)
       }
     } catch (e) {
