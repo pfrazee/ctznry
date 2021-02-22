@@ -16,6 +16,7 @@ export class ComposerPopup extends BasePopup {
 
   constructor (opts) {
     super()
+    this.community = opts?.community
   }
 
   get shouldShowHead () {
@@ -48,6 +49,7 @@ export class ComposerPopup extends BasePopup {
     return html`
       <h2 class="text-3xl py-4">Create a post</h2>
       <ctzn-post-composer
+        .community=${this.community}
         nocancel
         @cancel=${this.onReject}
         @publish=${this.onPublishPost}

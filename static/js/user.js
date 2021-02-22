@@ -2,6 +2,7 @@ import { LitElement, html } from '../vendor/lit-element/lit-element.js'
 import { repeat } from '../vendor/lit-element/lit-html/directives/repeat.js'
 import { ViewThreadPopup } from './com/popups/view-thread.js'
 import { EditProfilePopup } from './com/popups/edit-profile.js'
+import { ComposerPopup } from './com/popups/composer.js'
 import { EditRolePopup } from './com/popups/edit-role.js'
 import { BanPopup } from './com/popups/ban.js'
 import { ManageBansPopup } from './com/popups/manage-bans.js'
@@ -312,7 +313,19 @@ class CtznUser extends LitElement {
 
   renderCommunityRightSidebar () {
     return html`
-      <div>
+      <div class="pt-2 sticky top-0">
+        <ctzn-button
+          primary
+          class="text-sm font-semibold w-full mb-1"
+          label="Create Post in ${this.userProfile?.value.displayName}"
+          ?disabled=${!this.amIAMember}
+          @click=${this.onClickCreatePost}
+        ></ctzn-button>
+        ${!this.amIAMember ? html`
+          <div class="p-1 text-gray-500 text-sm">
+            Join ${this.userProfile?.value.displayName} to participate and see the latest updates in your feed.
+          </div>
+        ` : ''}
       </div>
     `
   }
@@ -522,6 +535,21 @@ class CtznUser extends LitElement {
   onPublishReply (e) {
     toast.create('Reply published', '', 10e3)
     this.load()
+  }
+
+  async onClickCreatePost (e) {
+    e.preventDefault()
+    e.stopPropagation()
+    try {
+      await ComposerPopup.create({
+        community: {userId: this.userId, dbUrl: this.userProfile?.dbUrl}
+      })
+      toast.create('Post published', '', 10e3)
+      this.querySelector('ctzn-feed').load()
+    } catch (e) {
+      // ignore
+      console.log(e)
+    }
   }
 
   async onCreateRole (e) {
