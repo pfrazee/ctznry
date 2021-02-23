@@ -1,12 +1,24 @@
 import { LitElement, html } from '../vendor/lit-element/lit-element.js'
+import { repeat } from '../vendor/lit-element/lit-html/directives/repeat.js'
 import * as session from './lib/session.js'
+import { HTTP_ENDPOINT } from './lib/const.js'
 import './com/header.js'
 import './com/button.js'
+
+const CANVAS_SIZE = 200
+const SERVERS = ['ctzn.one']
+const SERVER_DESCRIPTIONS = {
+  'ctzn.one': 'The first CTZN server. Welcome, trailblazers!'
+}
 
 class CtznSignup extends LitElement {
   static get properties () {
     return {
-      isSigningUp: {type: Boolean},
+      currentStage: {type: Number},
+      values: {type: Object},
+      isServersExpanded: {type: Boolean},
+      isCustomServer: {type: Boolean},
+      isProcessing: {type: Boolean},
       currentError: {type: String}
     }
   }
@@ -17,17 +29,21 @@ class CtznSignup extends LitElement {
 
   constructor () {
     super()
-    this.isSigningUp = false
+    this.isProcessing = false
     this.currentError = undefined
+    this.currentStage = 1
+    this.values = {
+      domain: SERVERS[0]
+    }
+    this.isServersExpanded = false
+    this.isCustomServer = false
     this.load()
   }
 
   async load () {
+    document.body.classList.add('no-pad')
+    document.body.classList.add('sm:bg-gray-50')
     await session.setup()
-  }
-
-  firstUpdated () {
-    this.querySelector('input#domain').focus()
   }
 
   // rendering
@@ -35,37 +51,64 @@ class CtznSignup extends LitElement {
 
   render () {
     return html`
-      <ctzn-header></ctzn-header>
-      <div class="mx-auto my-12 max-w-md border border-gray-200 p-8 bg-gray-50">
-        <form @submit=${this.onSubmit}>
-          <h2 class="mb-6 text-xl">Sign up</h2>
+      <div class="mx-auto my-6 sm:my-12 max-w-lg px-8 sm:py-8 bg-white sm:rounded-2xl sm:border border-gray-300">
+        ${this.currentStage === 1 ? this.renderServerForm() : ''}
+        ${this.currentStage === 2 ? this.renderAccountForm() : ''}
+        ${this.currentStage === 3 ? this.renderProfileForm() : ''}
+      </div>
+    `
+  }
+
+  renderServerForm () {
+    return html`
+        <form @submit=${this.onNext}>
+          <h2 class="mb-6 text-2xl">Sign up</h2>
           <div class="mb-6">
-            <label class="block w-full box-border mb-1" for="domain">Server</label>
-            <input class="block w-full box-border mb-1 p-4 border border-gray-300" id="domain" name="domain" required placeholder="E.g. home.com">
-          </div>
-          <div class="mb-6">
-            <label class="block w-full box-border mb-1" for="username">Username</label>
-            <input class="block w-full box-border mb-1 p-4 border border-gray-300" id="username" name="username" required placeholder="E.g. bob">
-          </div>
-          <div class="mb-6">
-            <label class="block w-full box-border mb-1" for="displayName">Display Name</label>
-            <input class="block w-full box-border mb-1 p-4 border border-gray-300" id="displayName" name="displayName" required placeholder="E.g. Bob Roberts">
-          </div>
-          <div class="mb-6">
-            <label class="block w-full box-border mb-1" for="description">Bio line</label>
-            <textarea class="block w-full box-border mb-1 p-4 border border-gray-300" id="description" name="description" placeholder="E.g. A new CTZN user! (optional)"></textarea>
-          </div>
-          <div class="mb-6">
-            <label class="block w-full box-border mb-1" for="avatar">Avatar</label>
-            <input type="file" accept="image/*" id="avatar" name="avatar">
-          </div>
-          <div class="mb-6">
-            <label class="block w-full box-border mb-1" for="email">Your email</label>
-            <input class="block w-full box-border mb-1 p-4 border border-gray-300" id="email" name="email" required placeholder="E.g. bob@mail.com">
-          </div>
-          <div class="mb-6">
-            <label class="block w-full box-border mb-1" for="password">Password</label>
-            <input class="block w-full box-border mb-1 p-4 border border-gray-300" id="password" type="password" name="password" required>
+            <label class="block w-full box-border mb-1 font-medium">Select your server</label>
+            <div class="pb-2 text-gray-500 text-sm">
+              Your server will determine your UserID and where your data is stored.
+              E.g. alice@${this.values.domain || 'server.com'}.
+            </div>
+            ${this.isServersExpanded ? html`
+              <div class="border border-gray-400 rounded w-full overflow-hidden" @click=${e => this.isServersExpanded = !this.isServersExpanded}>
+                ${repeat(SERVERS, server => html`
+                  <button class="w-full border-b border-gray-300 hover:bg-gray-50" @click=${e => this.onSelectServer(server)}>
+                    <span class="flex items-center justify-between pb-4 pt-4 px-4 w-full">
+                      <span>${server}</span>
+                    </span>
+                  </button>
+                `)}
+                <button class="w-full hover:bg-gray-50" @click=${e => this.onSelectServer('custom')}>
+                  <span class="flex items-center justify-between pb-4 pt-4 px-4 w-full">
+                    <span>Custom server</span>
+                  </span>
+                </button>
+              </div>
+            ` : html`
+              <button class="block border border-gray-300 rounded w-full overflow-hidden hover:border-gray-400" @click=${e => this.isServersExpanded = !this.isServersExpanded}>
+                <span class="flex items-center justify-between pb-4 pt-4 px-4 w-full">
+                  <span>${this.isCustomServer ? 'Custom server' : this.values.domain}</span> <span class="fas fa-fw fa-caret-down"></span>
+                </span>
+                ${!this.isCustomServer ? html`
+                  <span class="bg-gray-50 border-gray-200 border-t flex text-left items-center px-4 py-4 text-gray-600 text-sm tracking-tight">
+                    <span><span class="fas fa-info-circle fa-fw text-gray-500"></span> ${SERVER_DESCRIPTIONS[this.values.domain]}</span>
+                  </span>
+                ` : html`
+                  <span class="bg-gray-50 border-gray-200 border-t flex text-left items-center px-4 py-4 text-gray-600 text-sm tracking-tight">
+                    <span><span class="fas fa-info-circle fa-fw text-gray-500"></span> Enter the URL of a custom server (advanced).</span>
+                  </span>
+                `}
+              </button>
+              ${this.isCustomServer ? html`
+                <input
+                  class="block w-full box-border my-1 p-4 border border-gray-300 rounded"
+                  name="domain"
+                  required
+                  placeholder="E.g. home.com"
+                  @keyup=${this.onKeyupCustomServer}
+                >
+              ` : ''}
+            `}
           </div>
           ${this.currentError ? html`
             <div class="bg-red-100 p-6 text-red-600">${this.currentError}</div>
@@ -75,53 +118,230 @@ class CtznSignup extends LitElement {
             <ctzn-button
               primary
               type="submit"
-              ?disabled=${this.isSigningUp}
-              ?spinner=${this.isSigningUp}
-              label="Sign up"
+              ?disabled=${this.isProcessing}
+              ?spinner=${this.isProcessing}
+              label="Next"
             ></ctzn-button>
           </div>
         </form>
       </div>
-      <div class="text-center text-xs mt-4 mb-14">FYI This is a crummy temporary UI for Testnet Saturday</div>
+    `
+  }
+
+  renderAccountForm () {
+    return html`
+      <form @submit=${this.onNext}>
+        <h2 class="mb-2 text-2xl">Sign up</h2>
+        <div class="mb-4 text-gray-500 text-sm">
+          Create your account on ${this.values.domain}
+        </div>
+        <div class="mb-6">
+          <label class="block w-full box-border mb-1" for="username">Username</label>
+          <input
+            class="block w-full box-border mb-1 p-4 border border-gray-300 rounded"
+            id="username"
+            name="username"
+            required
+            placeholder="E.g. bob"
+            @keyup=${e => this.onKeyupValue(e, 'username')}
+          >
+          ${this.values.username ? html`
+            <div class="text-gray-500 text-sm px-2">
+              Your UserID will be ${this.values.username}@${this.values.domain}
+            </div>
+          ` : ''}
+        </div>
+        <div class="mb-6">
+          <label class="block w-full box-border mb-1" for="email">Your email</label>
+          <input
+            class="block w-full box-border mb-1 p-4 border border-gray-300 rounded"
+            id="email"
+            name="email"
+            required
+            placeholder="E.g. bob@mail.com"
+            @keyup=${e => this.onKeyupValue(e, 'email')}
+          >
+        </div>
+        <div class="mb-6">
+          <label class="block w-full box-border mb-1" for="password">Password</label>
+          <input
+            class="block w-full box-border mb-1 p-4 border border-gray-300 rounded"
+            id="password"
+            type="password"
+            name="password"
+            required
+            @keyup=${e => this.onKeyupValue(e, 'password')}
+          >
+        </div>
+        ${this.currentError ? html`
+          <div class="bg-red-100 p-6 text-red-600">${this.currentError}</div>
+        ` : ''}
+        <div class="flex justify-between items-center border-t border-gray-300 mt-10 pt-6">
+          <ctzn-button
+            ?disabled=${this.isProcessing}
+            ?spinner=${this.isProcessing}
+            label="Back"
+            @click=${this.onBack}
+          ></ctzn-button>
+          <ctzn-button
+            primary
+            type="submit"
+            ?disabled=${this.isProcessing}
+            ?spinner=${this.isProcessing}
+            label="Next"
+          ></ctzn-button>
+        </div>
+      </form>
+    `
+  }
+
+  renderProfileForm () {
+    return html`
+      <form @submit=${this.onSubmit}>
+        <h2 class="mb-2 text-2xl">Sign up</h2>
+        <div class="mb-4 text-gray-500 text-sm">
+          Set up your profile information.
+        </div>
+        <img
+          class="block mx-auto my-4 w-48 h48 rounded-full cursor-pointer hover:opacity-50"
+          src=${this.values.avatar || '/img/default-user-thumb.jpg'}
+          @click=${this.onClickAvatar}
+        >
+        <div class="text-center mb-4">
+          <ctzn-button tabindex="1" @click=${this.onClickAvatar} label="Change Avatar"></ctzn-button>
+          <input class="hidden" type="file" accept=".jpg,.jpeg,.png" @change=${this.onChooseAvatarFile}>
+        </div>
+        <div class="mb-6">
+          <label class="block w-full box-border mb-1" for="displayName">Display Name</label>
+          <input
+            class="block w-full box-border mb-1 p-4 border border-gray-300 rounded"
+            id="displayName"
+            name="displayName"
+            required
+            placeholder="E.g. Bob Roberts"
+            @keyup=${e => this.onKeyupValue(e, 'displayName')}
+          >
+        </div>
+        <div class="mb-6">
+          <label class="block w-full box-border mb-1" for="description">Bio line</label>
+          <textarea
+            class="block w-full box-border mb-1 p-4 border border-gray-300 rounded"
+            id="description"
+            name="description"
+            placeholder="Optional"
+            @keyup=${e => this.onKeyupValue(e, 'description')}
+          ></textarea>
+        </div>
+        ${this.currentError ? html`
+          <div class="bg-red-100 p-6 text-red-600">${this.currentError}</div>
+        ` : ''}
+        <div class="flex justify-between items-center border-t border-gray-300 mt-10 pt-6">
+          <ctzn-button
+            ?disabled=${this.isProcessing}
+            ?spinner=${this.isProcessing}
+            label="Back"
+            @click=${this.onBack}
+          ></ctzn-button>
+          <ctzn-button
+            primary
+            type="submit"
+            ?disabled=${this.isProcessing}
+            ?spinner=${this.isProcessing}
+            label="Sign up"
+          ></ctzn-button>
+        </div>
+      </form>
     `
   }
 
   // events
   // =
 
+  async onBack (e) {
+    e.preventDefault()
+    this.currentStage--
+  }
+
+  async onNext (e) {
+    e.preventDefault()
+    this.currentError = undefined
+
+    if (this.currentStage === 1) {
+      // server
+      this.isProcessing = true
+      try {
+        const domain = await checkCtznServer(this.values.domain)
+        this.values.domain = domain
+        this.isProcessing = false
+      } catch (e) {
+        this.currentError = 'Failed to connect to server'
+        this.isProcessing = false
+        return
+      }
+    }
+
+    this.currentStage++
+  }
+
+  onSelectServer (server) {
+    if (server === 'custom') {
+      this.isCustomServer = true
+    } else {
+      this.isCustomServer = false
+      this.values = Object.assign({}, this.values, {domain: server})
+    }
+  }
+
+  onKeyupCustomServer (e) {
+    this.values = Object.assign({}, this.values, {domain: e.currentTarget.value})
+  }
+
+  onKeyupValue (e, key) {
+    this.values = Object.assign({}, this.values, {[key]: e.currentTarget.value})
+  }
+
+  async onClickAvatar (e) {
+    e.preventDefault()
+    this.querySelector('input[type="file"]').click()
+  }
+
+  onChooseAvatarFile (e) {
+    var file = e.currentTarget.files[0]
+    if (!file) return
+    var fr = new FileReader()
+    fr.onload = () => {
+      this.values = Object.assign({}, this.values, {avatar: fr.result})
+    }
+    fr.readAsDataURL(file)
+  }
+
   async onSubmit (e) {
     e.preventDefault()
-    this.isSigningUp = true
+    this.isProcessing = true
     this.currentError = undefined
-    let info = {
-      domain: e.target.domain.value,
-      username: e.target.username.value,
-      displayName: e.target.displayName.value,
-      description: e.target.description.value,
-      email: e.target.email.value,
-      password: e.target.password.value,
-      avatarBase64: undefined
-    }
-
-    const avatarFile = e.target.avatar.files[0]
-    if (avatarFile) {
-      info.avatarBase64 = await new Promise((resolve) => {
-        let fr = new FileReader()
-        fr.onload = () => resolve(fr.result.split(',').pop())
-        fr.readAsDataURL(avatarFile)
-      })
-    }
 
     try {
-      await session.doSignup(info)
+      await session.doSignup(this.values)
       window.location = '/'
     } catch (e) {
       console.log(e)
       this.currentError = e.data || e.message
     }
-    this.isSigningUp = false
+    this.isProcessing = false
   }
 
 }
 
 customElements.define('ctzn-signup', CtznSignup)
+
+async function checkCtznServer (domain) {
+  try {
+    let urlp = new URL(domain)
+    domain = urlp.hostname
+  } catch (e) {
+    // ignore
+  }
+  const res = await (await fetch(`${HTTP_ENDPOINT(domain)}/ctzn/server-info`))
+  if (!res.ok) throw new Error(res.statusText)
+  return domain
+}

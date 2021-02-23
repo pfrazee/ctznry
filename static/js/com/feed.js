@@ -1,7 +1,7 @@
 import { LitElement, html } from '../../vendor/lit-element/lit-element.js'
 import { repeat } from '../../vendor/lit-element/lit-html/directives/repeat.js'
 import * as session from '../lib/session.js'
-import { listUserFeed, getPost } from '../lib/getters.js'
+import { listUserFeed } from '../lib/getters.js'
 import { emit } from '../lib/dom.js'
 import './post.js'
 

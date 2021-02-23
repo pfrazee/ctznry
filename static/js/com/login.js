@@ -38,7 +38,7 @@ class CtznLogin extends LitElement {
         <form @submit=${this.onSubmit}>
           <h2 class="mb-6 text-xl font-semibold">Login</h2>
           <div class="mb-6">
-            <label class="block w-full box-border mb-1" for="userid">Your address</label>
+            <label class="block w-full box-border mb-1" for="userid">Your UserID</label>
             <input class="block w-full box-border mb-1 p-4 border border-gray-300 rounded" id="userid" name="userid" required placeholder="E.g. bob@home.com">
           </div>
           <div class="mb-6">
@@ -46,7 +46,7 @@ class CtznLogin extends LitElement {
             <input class="block w-full box-border mb-1 p-4 border border-gray-300 rounded" id="password" type="password" name="password" required>
           </div>
           ${this.currentError ? html`
-            <div class="bg-red-100 p-6 text-red-600">${this.currentError}</div>
+            <div class="bg-red-100 p-6 mb-4 text-red-600">${this.currentError}</div>
           ` : ''}
           <div class="flex justify-between items-center">
             <a href="/forgot-password">Forgot Password</a>
@@ -79,7 +79,11 @@ class CtznLogin extends LitElement {
       password: e.target.password.value
     }
     if (!creds.userId.includes('@')) {
-      this.currentError = 'Invalid address: should look like an email (eg bob@home.com).'
+      this.currentError = html`
+        <div class="mb-2 font-medium">Invalid UserID</div>
+        <div class="mb-2 text-sm">Don't forget your server! Your UserID should look like an email.</div>
+        <div class="text-sm">(Was it ${creds.userId}@ctzn.one?)</div>
+      `
     } else {
       try {
         await session.doLogin(creds)
