@@ -106,9 +106,8 @@ export class PostExpanded extends LitElement {
 
     return html`
       <div class="px-4 py-3 min-w-0">
-        <div class="whitespace-pre-wrap break-words text-xl leading-tight font-medium text-gray-700 pb-1.5">${this.renderPostText()}</div>
         <div class="text-gray-500 text-sm pb-2">
-          <a class="inline-block w-4 h-4 relative" href="/${this.post.author.userId}" title=${this.post.author.displayName}>
+          <a class="inline-block w-4 h-4 relative mr-1" href="/${this.post.author.userId}" title=${this.post.author.displayName}>
             <img
               class="inline-block absolute w-4 h-4 object-cover rounded-full"
               src=${AVATAR_URL(this.post.author.userId)}
@@ -122,7 +121,7 @@ export class PostExpanded extends LitElement {
             ${relativeDate(this.post.value.createdAt)}
           </a>
           ${this.post.value.community ? html`
-            <span class="text-gray-500">
+            <span class="text-gray-600">
               in
               <a href="/${this.post.value.community.userId}" class="whitespace-nowrap font-semibold hover:underline">
                 ${displayNames.render(this.post.value.community.userId)}
@@ -133,6 +132,7 @@ export class PostExpanded extends LitElement {
             <span class="fas fa-fw fa-ellipsis-h"></span>
           </a>
         </div>
+        <div class="whitespace-pre-wrap break-words text-lg leading-tight font-medium text-gray-700 pb-1.5">${this.renderPostText()}</div>
         ${this.post.value.extendedText ? html`
           <div class="whitespace-pre-wrap break-words leading-snug text-gray-600 pt-2 pb-3">${this.renderPostExtendedText()}</div>
         ` : ''}

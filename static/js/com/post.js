@@ -130,39 +130,41 @@ export class Post extends LitElement {
             ${this.context}
           </div>
         ` : ''}
-        <div class="px-2.5 pt-4 pb-4 min-w-0">
+        <div class="px-2 py-3 min-w-0">
+          ${this.nometa ? '' : html`
+            <div class="flex pl-1 pr-2.5 text-gray-600 text-sm items-center">
+              <a class="block relative" href="/${this.post.author.userId}" title=${this.post.author.displayName}>
+                <img class="block w-4 h-4 object-cover rounded-full mr-2" src=${AVATAR_URL(this.post.author.userId)}>
+              </a>
+              <div class="mr-1 whitespace-nowrap">
+                <a class="hover:underline" href="/${this.post.author.userId}" title=${this.post.author.displayName}>
+                  <span class="text-gray-800 font-semibold">${displayNames.render(this.post.author.userId)}</span>
+                </a>
+              </div>
+              <div class="mr-2">
+                <a class="hover:underline" href="${POST_URL(this.post)}" data-tooltip=${(new Date(this.post.value.createdAt)).toLocaleString()}>
+                  ${relativeDate(this.post.value.createdAt)}
+                </a>
+                ${this.post.value.community ? html`
+                  in
+                  <a href="/${this.post.value.community.userId}" class="whitespace-nowrap font-semibold text-gray-700 hover:underline">
+                    ${displayNames.render(this.post.value.community.userId)}
+                  </a>
+                ` : ''}
+              </div>
+            </div>
+          `}
           <div
-            class="whitespace-pre-wrap break-words text-gray-700 pb-1.5 pl-1 pr-2.5"
-            style="font-size: 16px; letter-spacing: 0.3px; line-height: 1.3;"
+            class="whitespace-pre-wrap break-words text-gray-900 pt-1 pb-1.5 pl-7 pr-2.5"
+            style="font-size: 15px; letter-spacing: 0.1px; line-height: 1.3;"
           >${this.renderPostText()}${this.post.value.extendedText
               ? html`<span class="bg-gray-200 ml-1 px-1 rounded text-gray-600 text-xs">more</span>`
               : ''
           }</div>
           ${this.nometa ? '' : html`
-            <div class="flex pl-1 pr-2.5 text-gray-500 text-sm items-center">
+            <div class="flex pl-6 text-gray-500 text-sm items-center">
               ${this.renderRepliesCtrl()}
-              <a class="block relative" href="/${this.post.author.userId}" title=${this.post.author.displayName}>
-                <img class="block w-4 h-4 object-cover rounded-full mr-1" src=${AVATAR_URL(this.post.author.userId)}>
-              </a>
-              <div class="mr-1 whitespace-nowrap">
-                <a class="hover:underline" href="/${this.post.author.userId}" title=${this.post.author.displayName}>
-                  <span class="text-gray-500 font-medium">${displayNames.render(this.post.author.userId)}</span>
-                </a>
-              </div>
-              <div class="mr-2">
-                <a class="text-gray-500 hover:underline" href="${POST_URL(this.post)}" data-tooltip=${(new Date(this.post.value.createdAt)).toLocaleString()}>
-                  ${relativeDate(this.post.value.createdAt)}
-                </a>
-                ${this.post.value.community ? html`
-                  <span class="text-gray-500">
-                    in
-                    <a href="/${this.post.value.community.userId}" class="whitespace-nowrap font-medium hover:underline">
-                      ${displayNames.render(this.post.value.community.userId)}
-                    </a>
-                  </span>
-                ` : ''}
-              </div>
-              <div class="ml-1">
+              <div>
                 <a class="hover:bg-gray-200 px-1 rounded" @click=${this.onClickMenu}>
                   <span class="fas fa-fw fa-ellipsis-h"></span>
                 </a>
@@ -175,7 +177,7 @@ export class Post extends LitElement {
   }
 
   renderRepliesCtrl () {
-    let aCls = `inline-block ml-1 mr-3`
+    let aCls = `inline-block ml-1 mr-6`
     if (this.canInteract) {
       aCls += ` text-gray-500`
     } else {
@@ -294,9 +296,8 @@ export class Post extends LitElement {
       })
     }
     contextMenu.create({
-      x: rect.right,
+      x: rect.left,
       y: rect.bottom,
-      right: true,
       roomy: true,
       noBorders: true,
       style: `padding: 4px 0; font-size: 13px`,
