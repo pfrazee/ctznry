@@ -103,6 +103,7 @@ export class Thread extends LitElement {
             noborders
             view-content-on-click
             @delete-post=${this.onDeletePost}
+            @moderator-remove-post=${this.onModeratorRemovePost}
           ></ctzn-post-expanded>
         ` : html`
           <span class="spinner"></span>
@@ -143,6 +144,7 @@ export class Thread extends LitElement {
                 .comment=${reply}
                 @publish-reply=${this.onPublishReply}
                 @delete-comment=${this.onDeleteComment}
+                @moderator-remove-comment=${this.onModeratorRemoveComment}
               ></ctzn-comment>
             </div>
             ${reply.replies?.length ? this.renderReplies(reply.replies) : ''}
@@ -229,6 +231,32 @@ export class Thread extends LitElement {
     try {
       await session.api.comments.del(e.detail.comment.key)
       toast.create('Comment deleted')
+      this.load()
+    } catch (e) {
+      console.log(e)
+      toast.create(e.toString(), 'error')
+    }
+  }
+
+  async onModeratorRemovePost (e) {
+    try {
+      const post = e.detail.post
+      await session.api.communities.removePost(post.value.community.userId, post.url)
+      this.load()
+    } catch (e) {
+      console.log(e)
+      toast.create(e.toString(), 'error')
+    }
+  }
+
+  async onModeratorRemoveComment (e) {
+    try {
+      const comment = e.detail.comment
+      await session.api.communities.removeComment(
+        comment.value.community.userId,
+        comment.value.reply.root.dbUrl,
+        comment.url
+      )
       this.load()
     } catch (e) {
       console.log(e)

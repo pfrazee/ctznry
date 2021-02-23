@@ -133,10 +133,14 @@ class CtznUser extends LitElement {
       this.roles = roles
       console.log({userProfile: this.userProfile, members, roles})
     }
+
+    if (this.querySelector('ctzn-feed')) {
+      this.querySelector('ctzn-feed').load()
+    }
   }
 
   get isLoading () {
-    let queryViewEls = Array.from(this.shadowRoot.querySelectorAll('ctzn-feed'))
+    let queryViewEls = Array.from(this.querySelectorAll('ctzn-feed'))
     return !!queryViewEls.find(el => el.isLoading)
   }
 
@@ -435,6 +439,7 @@ class CtznUser extends LitElement {
           @view-thread=${this.onViewThread}
           @publish-reply=${this.onPublishReply}
           @delete-post=${this.onDeletePost}
+          @moderator-remove-post=${this.onModeratorRemovePost}
         ></ctzn-feed>
       </div>
     `
@@ -618,6 +623,17 @@ class CtznUser extends LitElement {
     try {
       await session.api.posts.del(e.detail.post.key)
       toast.create('Post deleted')
+      this.load()
+    } catch (e) {
+      console.log(e)
+      toast.create(e.toString(), 'error')
+    }
+  }
+
+  async onModeratorRemovePost (e) {
+    try {
+      const post = e.detail.post
+      await session.api.communities.removePost(post.value.community.userId, post.url)
       this.load()
     } catch (e) {
       console.log(e)

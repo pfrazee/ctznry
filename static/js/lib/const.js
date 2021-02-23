@@ -34,7 +34,8 @@ export function FULL_COMMENT_URL (comment) {
 
 export const PERM_DESCRIPTIONS = {
   'ctzn.network/perm-community-ban': `Can remove, ban, and unban members from a community.`,
-  'ctzn.network/perm-community-remove-post': `Can remove posts from the community's feed index.`,
+  'ctzn.network/perm-community-remove-post': `Can remove posts from the community.`,
+  'ctzn.network/perm-community-remove-comment': `Can remove comments from the community.`,
   'ctzn.network/perm-community-edit-profile': `Can edit the profile of the community.`,
   'ctzn.network/perm-community-manage-roles': `Can create, edit, and delete roles.`,
   'ctzn.network/perm-community-assign-roles': `Can assign roles to community members.`

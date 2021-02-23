@@ -40,6 +40,10 @@ export class PostExpanded extends LitElement {
     this.hoverBgColor = 'gray-50'
   }
 
+  get communityUserId () {
+    return this.post?.value?.community?.userId
+  }
+
   get replyCount () {
     if (typeof this.post?.replyCount !== 'undefined') {
       return this.post.replyCount
@@ -58,16 +62,16 @@ export class PostExpanded extends LitElement {
   }
 
   get canInteract () {
-    if (this.post?.value?.community?.userId) {
-      return session.isInCommunity(this.post.value.community.userId)
+    if (this.communityUserId) {
+      return session.isInCommunity(this.communityUserId)
     }
     return session.isFollowingMe(this.post.author.userId)
   }
 
   get ctrlTooltip () {
     if (this.canInteract) return undefined
-    if (this.post?.value?.community?.userId) {
-      return `Only members of ${displayNames.render(this.post.value.community.userId)} can interact with this post`
+    if (this.communityUserId) {
+      return `Only members of ${displayNames.render(this.communityUserId)} can interact with this post`
     }
     return `Only people followed by ${this.post.author.displayName} can interact with this post`
   }
@@ -123,8 +127,8 @@ export class PostExpanded extends LitElement {
           ${this.post.value.community ? html`
             <span class="text-gray-600">
               in
-              <a href="/${this.post.value.community.userId}" class="whitespace-nowrap font-semibold hover:underline">
-                ${displayNames.render(this.post.value.community.userId)}
+              <a href="/${this.communityUserId}" class="whitespace-nowrap font-semibold hover:underline">
+                ${displayNames.render(this.communityUserId)}
               </a>
             </span>
           ` : ''}
@@ -205,6 +209,26 @@ export class PostExpanded extends LitElement {
         }
       })
     }
+    if (this.communityUserId && session.isInCommunity(this.communityUserId)) {
+      items.push(
+        session.api.communities.getUserPermission(
+          this.communityUserId,
+          session.info.userId,
+          'ctzn.network/perm-community-remove-post'
+        ).then(perm => {
+          if (perm) {
+            return html`
+              <div class="dropdown-item" @click=${() => this.onClickModeratorRemove()}>
+                <i class="fas fa-times fa-fw"></i>
+                Remove post (moderator)
+              </div>
+            `
+          } else {
+            return ''
+          }
+        })
+      )
+    }
     contextMenu.create({
       x: rect.right,
       y: rect.bottom,
@@ -214,6 +238,13 @@ export class PostExpanded extends LitElement {
       style: `padding: 4px 0; font-size: 13px`,
       items
     })
+  }
+
+  onClickModeratorRemove () {
+    if (!confirm('Are you sure you want to remove this post?')) {
+      return
+    }
+    emit(this, 'moderator-remove-post', {detail: {post: this.post}})
   }
 }
 

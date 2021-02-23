@@ -187,6 +187,7 @@ class CtznApp extends LitElement {
             @view-thread=${this.onViewThread}
             @publish-reply=${this.onPublishReply}
             @delete-post=${this.onDeletePost}
+            @moderator-remove-post=${this.onModeratorRemovePost}
           ></ctzn-feed>
         </div>
         ${this.renderRightSidebar()}
@@ -267,6 +268,17 @@ class CtznApp extends LitElement {
     try {
       await session.api.posts.del(e.detail.post.key)
       toast.create('Post deleted')
+      this.load()
+    } catch (e) {
+      console.log(e)
+      toast.create(e.toString(), 'error')
+    }
+  }
+
+  async onModeratorRemovePost (e) {
+    try {
+      const post = e.detail.post
+      await session.api.communities.removePost(post.value.community.userId, post.url)
       this.load()
     } catch (e) {
       console.log(e)

@@ -33,6 +33,10 @@ export class Comment extends LitElement {
     this.isReplyOpen = false
   }
 
+  get communityUserId () {
+    return this.comment?.value?.community?.userId
+  }
+
   get isMyComment () {
     if (!session.isActive() || !this.comment?.author.userId) {
       return false
@@ -41,16 +45,16 @@ export class Comment extends LitElement {
   }
 
   get canInteract () {
-    if (this.comment?.value?.community?.userId) {
-      return session.isInCommunity(this.comment.value.community.userId)
+    if (this.communityUserId) {
+      return session.isInCommunity(this.communityUserId)
     }
     return session.isFollowingMe(this.comment.author.userId)
   }
 
   get ctrlTooltip () {
     if (this.canInteract) return undefined
-    if (this.comment?.value?.community?.userId) {
-      return `Only members of ${displayNames.render(this.comment.value.community.userId)} can interact with this comment`
+    if (this.communityUserId) {
+      return `Only members of ${displayNames.render(this.communityUserId)} can interact with this comment`
     }
     return `Only people followed by ${this.comment.author.displayName} can interact with this comment`
   }
@@ -192,6 +196,26 @@ export class Comment extends LitElement {
         }
       })
     }
+    if (this.communityUserId && session.isInCommunity(this.communityUserId)) {
+      items.push(
+        session.api.communities.getUserPermission(
+          this.communityUserId,
+          session.info.userId,
+          'ctzn.network/perm-community-remove-comment'
+        ).then(perm => {
+          if (perm) {
+            return html`
+              <div class="dropdown-item" @click=${() => this.onClickModeratorRemove()}>
+                <i class="fas fa-times fa-fw"></i>
+                Remove comment (moderator)
+              </div>
+            `
+          } else {
+            return ''
+          }
+        })
+      )
+    }
     contextMenu.create({
       x: rect.left,
       y: rect.bottom,
@@ -200,6 +224,13 @@ export class Comment extends LitElement {
       style: `padding: 4px 0; font-size: 13px`,
       items
     })
+  }
+
+  onClickModeratorRemove () {
+    if (!confirm('Are you sure you want to remove this comment?')) {
+      return
+    }
+    emit(this, 'moderator-remove-comment', {detail: {comment: this.comment}})
   }
 }
 

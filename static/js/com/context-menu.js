@@ -1,7 +1,8 @@
-import {LitElement, html, css} from '../../vendor/lit-element/lit-element.js'
-import {classMap} from '../../vendor/lit-element/lit-html/directives/class-map.js'
-import {ifDefined} from '../../vendor/lit-element/lit-html/directives/if-defined.js'
-import {findParent} from '../lib/dom.js'
+import { LitElement, html, css } from '../../vendor/lit-element/lit-element.js'
+import { classMap } from '../../vendor/lit-element/lit-html/directives/class-map.js'
+import { ifDefined } from '../../vendor/lit-element/lit-html/directives/if-defined.js'
+import { asyncReplace } from '../../vendor/lit-element/lit-html/directives/async-replace.js'
+import { findParent } from '../lib/dom.js'
 import dropdownCSS from '../../css/com/dropdown.css.js'
 
 // globals
@@ -158,6 +159,9 @@ export class BeakerContextMenu extends LitElement {
           : html`
             <div class="${cls}" style="${ifDefined(this.customStyle)}">
               ${this.items.map(item => {
+                if (item instanceof Promise) {
+                  return html`${asyncReplace(renderPromiseItem(item))}`
+                }
                 if (item === '-') {
                   return html`<hr />`
                 }
@@ -197,6 +201,12 @@ export class BeakerContextMenu extends LitElement {
         }
       </div>`
   }
+}
+
+async function* renderPromiseItem (item) {
+  yield html``
+  let value = await item
+  yield value
 }
 
 BeakerContextMenu.styles = css`
