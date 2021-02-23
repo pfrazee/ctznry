@@ -80,7 +80,7 @@ export class Header extends LitElement {
                 <img class="inline-block w-9 h-9 object-cover rounded-full" src=${AVATAR_URL(info.userId)}>
               </a>
             ` : html`
-              <a href="/login" class="px-4 py-2 text-lg text-blue-600" style="line-height: 1.8">Log in</a>
+              <a href="/" class="px-4 py-2 text-lg text-blue-600" style="line-height: 1.8">Log in</a>
             `
           }
         </div>
@@ -121,7 +121,7 @@ export class Header extends LitElement {
       `
     } else {
       return html`
-        <a class=${this.getMenuNavClass()} href="/login"><span class="fas fa-fw fa-sign-in-alt mr-1.5"></span> Log in</a>
+        <a class=${this.getMenuNavClass()} href="/"><span class="fas fa-fw fa-sign-in-alt mr-1.5"></span> Log in</a>
         <a class=${this.getMenuNavClass()} href="/signup"><span class="fas fa-fw fa-user-plus mr-1.5"></span> <strong>Sign up</strong></a>
       `
     }

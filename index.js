@@ -20,10 +20,6 @@ export async function start ({port, configDir, domain}) {
   app.use('/vendor', express.static('static/vendor'))
   app.use('/webfonts', express.static('static/webfonts'))
 
-  app.get('/login', (req, res) => {
-    res.render('login')
-  })
-
   app.get('/signup', (req, res) => {
     res.render('signup')
   })
