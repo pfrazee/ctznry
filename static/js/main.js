@@ -9,6 +9,7 @@ import * as session from './lib/session.js'
 import { listMemberships } from './lib/getters.js'
 import './com/header.js'
 import './com/button.js'
+import './com/login.js'
 import './com/feed.js'
 import './com/img-fallbacks.js'
 
@@ -48,6 +49,8 @@ class CtznApp extends LitElement {
     await session.setup()
     this.isLoading = false
     if (!session.isActive()) {
+      document.body.classList.add('no-pad')
+      document.body.classList.add('bg-gray-50')
       return this.requestUpdate()
     }
     this.memberships = await listMemberships(session.info.userId)
@@ -85,7 +88,6 @@ class CtznApp extends LitElement {
 
   render () {
     return html`
-      <ctzn-header></ctzn-header>
       ${this.renderCurrentView()}
     `
   }
@@ -157,13 +159,31 @@ class CtznApp extends LitElement {
 
   renderNoSession () {
     return html`
-      <div class="max-w-4xl mx-auto">
-        <div class="text-center py-20 text-gray-600 text-lg">
-          <h1 class="font-semibold mb-4 text-4xl">Welcome to the <strong>CTZN</strong> network</h1>
-          <div class="mb-4">A decentralized social network.</div>
+      <div class="hidden lg:block" style="margin-top: 10vh">
+        <div class="flex my-2 max-w-4xl mx-auto">
+          <div class="flex-1 py-20 text-gray-800 text-lg">
+            <h1 class="font-semibold mb-1 text-6xl tracking-widest">CTZN</h1>
+            <div class="mb-6 text-gray-500 text-2xl tracking-tight">(Pronounced "Citizen")</div>
+            <div class="mb-6 text-2xl">
+              Build your community in a decentralized<br>social network.
+            </div>
+          </div>
+          <div class="w-96">
+            <ctzn-login class="block border border-gray-300 overflow-hidden rounded-2xl shadow-xl"></ctzn-login>
+          </div>
+        </div>
+      </div>
+      <div class="block lg:hidden">
+        <div class="max-w-lg mx-auto bg-white sm:border sm:border-gray-300 sm:my-8 sm:rounded-2xl sm:shadow-xl">
+          <div class="text-center pt-20 pb-14 text-gray-800 text-lg border-b border-gray-300">
+            <h1 class="font-semibold mb-1 text-6xl tracking-widest">CTZN</h1>
+            <div class="mb-6 text-gray-500 text-2xl tracking-tight">(Pronounced "Citizen")</div>
+            <div class="mb-6 text-xl px-4">
+              Build your community in a decentralized social network.
+            </div>
+          </div>
           <div>
-            <ctzn-button class="py-1" label="Log in" href="/login"></ctzn-button>
-            <ctzn-button class="py-1" primary label="Sign up" href="/signup"></ctzn-button>
+            <ctzn-login></ctzn-login>
           </div>
         </div>
       </div>
@@ -172,6 +192,7 @@ class CtznApp extends LitElement {
 
   renderWithSession () {
     return html`
+      <ctzn-header></ctzn-header>
       <main>
         <div>
           <div class="border border-t-0 border-gray-200 text-xl font-semibold px-4 py-2 sticky top-0 z-10 bg-white">

@@ -74,12 +74,13 @@ export class Header extends LitElement {
             C T Z N
           </a>
           <span class="flex-grow"></span>
-          ${session.hasOneSaved() ? html`
+          ${session.hasOneSaved()
+            ? html`
               <a href="/${info.userId}" title=${info.userId} class="p-1.5 px-5">
                 <img class="inline-block w-9 h-9 object-cover rounded-full" src=${AVATAR_URL(info.userId)}>
               </a>
             ` : html`
-              <a href="/login"><span class="fas fa-fw fa-sign-in-alt mr-1.5"></span> Log in</a>
+              <a href="/login" class="px-4 py-2 text-lg text-blue-600" style="line-height: 1.8">Log in</a>
             `
           }
         </div>

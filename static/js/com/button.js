@@ -28,14 +28,22 @@ export class Button extends LitElement {
       if (this.disabled) {
         colors = 'bg-blue-400 text-blue-50'
       }
+    } else if (this.hasAttribute('color')) {
+      const color = this.getAttribute('color')
+      colors = `bg-${color}-600 text-white hover:bg-${color}-700`
+      if (this.disabled) {
+        colors = `bg-${color}-400 text-${color}-50`
+      }
     } else if (this.disabled) {
       colors = 'bg-gray-100 text-gray-50'
     }
     let paddings = ''
     if (!/p(x|l|r)-/.test(parentClass)) paddings += 'px-4 '
     if (!/p(y|t|b)-/.test(parentClass)) paddings += 'py-2'
-    let borders = `border border-${this.hasAttribute('primary') ? 'blue-800' : 'gray-300'}`
+    let borders = `border border-gray-300`
     if (/border/.test(parentClass)) borders = ''
+    else if (this.hasAttribute('primary')) borders = 'border border-blue-800'
+    else if (this.hasAttribute('color')) borders = `border border-${this.getAttribute('color')}-800`
     return `rounded ${colors} ${paddings} ${borders} shadow-sm ${parentClass}`
   }
 

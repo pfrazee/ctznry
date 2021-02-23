@@ -60,12 +60,12 @@ export async function doLogin ({userId, password}) {
 
 export async function doLogout () {
   if (info && api) {
-    await api.accounts.logout()
-    localStorage.removeItem('session-info')
-    info = undefined
-    api = undefined
-    emitter.dispatchEvent(new Event('change'))
+    await api.accounts.logout().catch(e => undefined) // ignore failures, we'll just abandon the session
   }
+  localStorage.removeItem('session-info')
+  info = undefined
+  api = undefined
+  emitter.dispatchEvent(new Event('change'))
 }
 
 export async function doSignup ({domain, username, displayName, description, avatarBase64, email, password}) {
