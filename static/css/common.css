@@ -8,7 +8,6 @@ body.no-pad {
 
 header .menu {
   position: fixed;
-  z-index: 41;
   top: 10px;
   left: calc(50vw - 550px);
   height: calc(100vh - 10px);
@@ -41,7 +40,7 @@ header .mobile-bot {
 
 nav {
   position: fixed;
-  z-index: 41;
+  z-index: 29;
   top: 10px;
   right: calc(50vw - 550px);
   height: calc(100vh - 10px);
@@ -73,6 +72,7 @@ main {
     padding-right: 20px;
     transform: translateX(-100%);
     transition: transform 0.5s;
+    z-index: 41;
   }
   
   header .menu.open {
