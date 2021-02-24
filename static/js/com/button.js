@@ -4,6 +4,7 @@ export class Button extends LitElement {
   static get properties () {
     return {
       label: {type: String},
+      icon: {type: String},
       href: {type: String},
       btnClass: {type: String, attribute: 'btn-class'},
       disabled: {type: Boolean},
@@ -55,6 +56,10 @@ export class Button extends LitElement {
     return html`<span class="spinner ${colors}"></span>`
   }
 
+  renderLabel () {
+    return html`${this.icon ? html`<span class=${this.icon}></span> ` : ''}${this.label}`
+  }
+
   render () {
     if (this.href) {
       return html`
@@ -67,7 +72,7 @@ export class Button extends LitElement {
         tabindex=${this.getAttribute('tabindex')}
         class=${this.getClass()}
         ?disabled=${this.disabled}
-      >${this.spinner ? this.renderSpinner() : this.label}</button>
+      >${this.spinner ? this.renderSpinner() : this.renderLabel()}</button>
     `
   }
 }

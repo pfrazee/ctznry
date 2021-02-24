@@ -14,6 +14,7 @@ export class BasePopup extends LitElement {
       }
     }
     document.addEventListener('keyup', onGlobalKeyUp)
+    window.closePopup = () => this.onReject()
 
     // cleanup function called on cancel
     this.cleanup = () => {
@@ -49,6 +50,7 @@ export class BasePopup extends LitElement {
     parentEl.appendChild(popupEl)
 
     const cleanup = () => {
+      window.closePopup = undefined
       popupEl.cleanup()
       popupEl.remove()
     }
@@ -82,17 +84,21 @@ export class BasePopup extends LitElement {
   render () {
     return html`
       <div
-        class="popup-wrapper fixed left-0 top-0 w-full h-full z-50 overflow-y-auto"
-        style="background: rgba(0,0,0,0.45)"
+        class="popup-wrapper fixed left-0 top-0 w-full h-full z-30 overflow-y-auto py-12 sm:py-0"
         @click=${this.onClickWrapper}
       >
-        <div class="popup-inner bg-white shadow border border-gray-400 rounded overflow-hidden" style="margin: 80px auto; max-width: ${this.maxWidth}">
+        <div class="popup-inner bg-white sm:shadow sm:border border-gray-400 rounded overflow-hidden mx-auto sm:my-10" style="max-width: ${this.maxWidth}">
           ${this.shouldShowHead ? html`
             <div class="flex justify-between box-border relative bg-gray-100 py-2 px-3 w-full border-b border-gray-400 rounded-t">
               <span class="font-semibold">${this.renderTitle()}</span>
-              <span title="Close" @click=${this.onReject} class="close-btn cursor-pointer">&times;</span>
+              <span title="Close" @click=${this.onReject} class="close-btn cursor-pointer"><span class="fas fa-times"></span></span>
             </div>
-          ` : ''}
+          ` : html`
+            <div class="flex justify-between box-border relative pt-4 px-5 w-full sm:hidden">
+              <span title="Close" @click=${this.onReject}><span class="fas fa-arrow-left fa-fw text-xl"></span></span>
+              <span class="font-semibold">${this.renderTitle()}</span>
+            </div>
+          `}
           <div class="p-4">
             ${this.renderBody()}
           </div>

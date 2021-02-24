@@ -54,6 +54,7 @@ export class Notification extends LitElement {
   render () {
     const note = this.notification
     const schemaId = extractSchemaId(note.itemUrl)
+    console.log('hit', schemaId)
 
     let subject
     let subjectSchemaId
@@ -92,20 +93,24 @@ export class Notification extends LitElement {
     return html`
       <link rel="stylesheet" href="/css/fontawesome.css">
       <div class="cursor-pointer hover:bg-gray-50 ${this.isUnread ? 'unread' : ''}" @click=${this.onClickWrapper}>
-        <div class="flex items-center text-sm ${schemaId === 'ctzn.network/follow' ? 'py-4 px-4' : 'pt-4 px-4 pb-2'}">
-          <span class="${icon} text-2xl mr-3 ml-1 text-gray-400"></span>
-          <a class="inline-flex items-center font-bold" href="/${note.author.userId}" title=${note.author.userId}>
-            <img class="w-6 h-6 rounded-full object-cover mr-2" src=${AVATAR_URL(note.author.userId)}>
-            <span class="truncate mr-2" style="max-width: 200px">${note.author.userId}</span>
+        <div class="flex items-center text-sm pt-4 px-4 pb-2">
+          <span class="${icon} text-2xl mr-4 ml-1 text-gray-400"></span>
+          <a href="/${note.author.userId}" title=${note.author.userId}>
+            <img class="w-8 h-8 rounded-full object-cover mr-2" src=${AVATAR_URL(note.author.userId)}>
+          </a>
+        </div>
+        <div class="pl-16 pr-4 pb-2">
+          <a class="font-bold" href="/${note.author.userId}" title=${note.author.userId}>
+           ${note.author.userId}
           </a>
           ${action} ${target} &middot; ${relativeDate(note.createdAt)}
         </div>
         ${schemaId === 'ctzn.network/follow' ? html`
-          <div class="px-4 pb-2">
-            <ctzn-user-list .ids=${[note.author.userId]}></ctzn-user-list>
+          <div class="pl-16 pr-4 pb-4">
+            <ctzn-user-list class="block max-w-xs" cols="1" .ids=${[note.author.userId]}></ctzn-user-list>
           </div>
         ` : schemaId === 'ctzn.network/comment' ? html`
-          <div class="reply">
+          <div class="reply pl-16 pb-4 pr-6">
             ${asyncReplace(this.renderReplyComment(replyCommentInfo))}
           </div>
         ` : ''}

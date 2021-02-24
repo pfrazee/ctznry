@@ -56,12 +56,10 @@ export class SimpleUserList extends LitElement {
             <a class="ml-1 mr-3" href="/${userId}" title=${userId}>
               <img class="block rounded-full w-10 h-10 object-cover shadow-sm" src=${AVATAR_URL(userId)}>
             </a>
-            <div class="flex-1">
-              <div class="">
-                <a class="hover:underline" href="/${userId}" title=${userId}>
-                  <span class="font-bold">${username}</span><span class="text-gray-500">@${domain}</span>
-                </a>
-              </div>
+            <div class="flex-1 min-w-0 truncate">
+              <a class="hover:underline" href="/${userId}" title=${userId}>
+                <span class="font-bold">${username}</span><span class="text-gray-500">@${domain}</span>
+              </a>
             </div>
             <div>
               ${this.renderControls(userId)}

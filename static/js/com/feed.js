@@ -1,5 +1,6 @@
 import { LitElement, html } from '../../vendor/lit-element/lit-element.js'
 import { repeat } from '../../vendor/lit-element/lit-html/directives/repeat.js'
+import { AVATAR_URL } from '../lib/const.js'
 import * as session from '../lib/session.js'
 import { listUserFeed } from '../lib/getters.js'
 import { emit } from '../lib/dom.js'
@@ -125,7 +126,7 @@ export class Feed extends LitElement {
     if (!this.results) {
       return html`
         ${this.title ? html`<h2  class="results-header"><span>${this.title}</span></h2>` : ''}
-        <div class="bg-gray-100 text-gray-500 py-44 text-center my-5">
+        <div class="bg-gray-50 text-gray-500 py-44 text-center my-5">
           <span class="spinner"></span>
         </div>
       `
@@ -172,8 +173,12 @@ export class Feed extends LitElement {
   
   renderNormalResult (post) {
     return html`
-      <div class="post border border-gray-200 border-t-0">
+      <div class="grid grid-post my-2 px-1 border-t border-b border-gray-200 bg-white sm:my-3 sm:px-0 sm:border-0 sm:bg-transparent">
+        <a class="block pl-2 pt-2 sm:p-0" href="/${post.author.userId}" title=${post.author.displayName}>
+          <img class="block object-cover rounded-full mt-1 w-8 h-8 sm:w-11 sm:h-11" src=${AVATAR_URL(post.author.userId)}>
+        </a>
         <ctzn-post
+          class="block sm:border border-gray-200 rounded-md bg-white min-w-0"
           .post=${post}
         ></ctzn-post>
       </div>

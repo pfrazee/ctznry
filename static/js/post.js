@@ -55,11 +55,9 @@ class CtznPostPage extends LitElement {
 
   renderRightSidebar () {
     return html`
-      <div>
-        <section class="sticky top-0 py-2">
-          <ctzn-user-list cols="1" .ids=${[this.authorProfile.userId]}></ctzn-user-list>
-        </section>
-      </div>
+      <nav>
+        <ctzn-user-list cols="1" .ids=${[this.authorProfile.userId]}></ctzn-user-list>
+      </nav>
     `
   }
 

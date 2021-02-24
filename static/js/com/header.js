@@ -1,6 +1,10 @@
 import {LitElement, html} from '../../vendor/lit-element/lit-element.js'
 import * as session from '../lib/session.js'
 import { AVATAR_URL } from '../lib/const.js'
+import { emit } from '../lib/dom.js'
+import { ComposerPopup } from './popups/composer.js'
+import { CreateCommunityPopup } from './popups/create-community.js'
+import * as toast from './toast.js'
 import './button.js'
 
 const CHECK_NOTIFICATIONS_INTERVAL = 5e3
@@ -36,20 +40,20 @@ export class Header extends LitElement {
   }
 
   getMenuNavClass (str) {
-    const additions = str === location.pathname ? 'text-blue-700' : ''
+    const additions = str === location.pathname ? 'text-blue-600' : ''
     return `pl-3 pr-4 py-3 font-semibold rounded hover:bg-gray-100 ${additions}`
   }
 
   getMobileNavClass (str) {
-    const additions = str === location.pathname ? 'text-blue-700' : ''
-    return `px-6 py-2 text-2xl font-semibold rounded hover:bg-gray-100 ${additions}`
+    const additions = str === location.pathname ? 'text-blue-600' : ''
+    return `px-6 py-2 text-2xl font-semibold rounded ${additions}`
   }
 
   render () {
     let info = session.getSavedInfo()
     return html`
       <header>
-        <div class="menu ${this.isMenuOpen ? 'open' : 'closed'} flex flex-col leading-none text-lg bg-white">
+        <div class="menu ${this.isMenuOpen ? 'open' : 'closed'} flex flex-col leading-none text-lg bg-gray-50">
           <span class="font-bold px-3 py-2 text-3xl text-gray-800">
             C T Z N
           </span>
@@ -58,10 +62,35 @@ export class Header extends LitElement {
             Home
           </a>
           ${session.hasOneSaved() ? html`
-            <a href="/notifications" class=${this.getMenuNavClass('/notifications')}>
+            <a href="/notifications" class="relative ${this.getMenuNavClass('/notifications')}">
+              ${this.unreadNotificationsCount > 0 ? html`
+                <span class="absolute bg-blue-500 font-medium leading-none px-1.5 py-0.5 rounded-2xl text-white text-xs" style="top: 5px; left: 22px">${this.unreadNotificationsCount}</span>
+              ` : ''}
               <span class="far mr-1.5 fa-fw navicon fa-bell"></span>
-              Notifications ${this.unreadNotificationsCount > 0 ? `(${this.unreadNotificationsCount})` : ''}
+              Notifications
             </a>
+            <a
+              class="relative ${this.getMenuNavClass()} mt-1"
+              href="/${info.userId}"
+              title=${info.userId}
+            >
+              <img class="absolute inline-block w-7 h-7 object-cover rounded-full" src=${AVATAR_URL(info.userId)} style="left: 10px; top: 6px">
+              <span class="inline-block" style="width: 29px"></span>
+              Profile
+            </a>
+            <div class="mt-6 px-1">
+              <ctzn-button
+                primary
+                btn-class="text-sm font-semibold w-full mb-2 rounded-3xl"
+                label="Create Post"
+                @click=${this.onClickCreatePost}
+              ></ctzn-button>
+              <ctzn-button
+                btn-class="text-gray-600 text-sm font-semibold w-full rounded-3xl"
+                label="Create Community"
+                @click=${this.onClickCreateCommunity}
+              ></ctzn-button>
+            </div>
           ` : ''}
           ${this.renderSessionCtrls()}
         </div>
@@ -103,21 +132,13 @@ export class Header extends LitElement {
 
   renderSessionCtrls () {
     if (session.hasOneSaved()) {
-      let info = session.getSavedInfo()
       return html`
-        <a
-          class="relative ${this.getMenuNavClass()} mt-1"
-          href="/${info.userId}"
-          title=${info.userId}
-        >
-          <img class="absolute inline-block w-7 h-7 object-cover rounded-full" src=${AVATAR_URL(info.userId)} style="left: 10px; top: 6px">
-          <span class="inline-block" style="width: 29px"></span>
-          Profile
-        </a>
         <span class="flex-grow"></span>
-        <a class=${this.getMenuNavClass()} href="#" @click=${this.onLogOut}>
-          <span class="fas fa-fw fa-sign-out-alt mr-1.5"></span> Log out
-        </a>
+        <div class="pb-6">
+          <a class=${this.getMenuNavClass()} href="#" @click=${this.onLogOut}>
+            <span class="fas fa-fw fa-sign-out-alt mr-1.5"></span> Log out
+          </a>
+        </div>
       `
     } else {
       return html`
@@ -148,7 +169,29 @@ export class Header extends LitElement {
     if (window.location.pathname === '/') {
       e.preventDefault()
       window.scrollTo(0, 0)
+      window.closePopup?.()
     }
+  }
+
+  async onClickCreatePost (e) {
+    e.preventDefault()
+    e.stopPropagation()
+    try {
+      await ComposerPopup.create()
+      toast.create('Post published', '', 10e3)
+      emit(this, 'post-created')
+    } catch (e) {
+      // ignore
+      console.log(e)
+    }
+  }
+
+  async onClickCreateCommunity (e) {
+    e.preventDefault()
+    e.stopPropagation()
+    const res = await CreateCommunityPopup.create()
+    console.log(res)
+    window.location = `/${res.userId}`
   }
 }
 

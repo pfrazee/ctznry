@@ -1,6 +1,6 @@
 import { LitElement, html } from '../../vendor/lit-element/lit-element.js'
 import { unsafeHTML } from '../../vendor/lit-element/lit-html/directives/unsafe-html.js'
-import { AVATAR_URL, POST_URL, FULL_POST_URL } from '../lib/const.js'
+import { POST_URL, FULL_POST_URL } from '../lib/const.js'
 import * as session from '../lib/session.js'
 import { emit } from '../lib/dom.js'
 import { makeSafe, linkify } from '../lib/strings.js'
@@ -134,18 +134,15 @@ export class Post extends LitElement {
             ${this.context}
           </div>
         ` : ''}
-        <div class="px-2 py-3 min-w-0">
+        <div class="${this.nometa ? '' : 'px-2 py-3'} min-w-0">
           ${this.nometa ? '' : html`
-            <div class="flex pl-1 pr-2.5 text-gray-600 text-sm items-center">
-              <a class="block relative" href="/${this.post.author.userId}" title=${this.post.author.displayName}>
-                <img class="block w-4 h-4 object-cover rounded-full mr-2" src=${AVATAR_URL(this.post.author.userId)}>
-              </a>
-              <div class="mr-1 whitespace-nowrap">
+            <div class="pl-1 pr-2.5 text-gray-600 truncate">
+              <span class="sm:mr-1 whitespace-nowrap">
                 <a class="hover:underline" href="/${this.post.author.userId}" title=${this.post.author.displayName}>
                   <span class="text-gray-800 font-semibold">${displayNames.render(this.post.author.userId)}</span>
                 </a>
-              </div>
-              <div class="mr-2">
+              </span>
+              <span class="mr-2 text-sm">
                 <a class="hover:underline" href="${POST_URL(this.post)}" data-tooltip=${(new Date(this.post.value.createdAt)).toLocaleString()}>
                   ${relativeDate(this.post.value.createdAt)}
                 </a>
@@ -155,18 +152,18 @@ export class Post extends LitElement {
                     ${displayNames.render(this.communityUserId)}
                   </a>
                 ` : ''}
-              </div>
+              </span>
             </div>
           `}
           <div
-            class="whitespace-pre-wrap break-words text-gray-900 pt-1 pb-1.5 pl-7 pr-2.5"
-            style="font-size: 15px; letter-spacing: 0.1px; line-height: 1.3;"
+            class="whitespace-pre-wrap break-words text-gray-900 ${this.nometa ? '' : 'pt-1 pb-2 pl-1 pr-2.5'}"
+            style="font-size: 16px; letter-spacing: 0.1px; line-height: 1.3;"
           >${this.renderPostText()}${this.post.value.extendedText
               ? html`<span class="bg-gray-200 ml-1 px-1 rounded text-gray-600 text-xs">more</span>`
               : ''
           }</div>
           ${this.nometa ? '' : html`
-            <div class="flex pl-6 text-gray-500 text-sm items-center">
+            <div class="flex pl-1 text-gray-500 text-sm items-center">
               ${this.renderRepliesCtrl()}
               <div>
                 <a class="hover:bg-gray-200 px-1 rounded" @click=${this.onClickMenu}>

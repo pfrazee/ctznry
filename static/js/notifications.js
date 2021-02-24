@@ -101,11 +101,11 @@ class CtznNotifications extends LitElement {
     }
     return html`
       <main>
-        <div>
+        <div class="bg-white">
           ${''/* TODO<div class="reload-page mx-4 mb-4 rounded cursor-pointer overflow-hidden leading-10 ${this.numNewItems > 0 ? 'visible' : ''}" @click=${e => this.load()}>
             ${this.numNewItems} new ${pluralize(this.numNewItems, 'update')}
           </div>*/}
-          <div class="border border-gray-200 border-t-0 border-b-0 text-xl font-semibold px-4 py-2 sticky top-0 z-10 bg-white">
+          <div class="border border-gray-300 border-t-0 border-b-0 text-xl font-semibold px-4 py-2 sticky top-0 z-10 bg-white">
             Notifications
           </div>
           <ctzn-notifications-feed

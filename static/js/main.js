@@ -1,12 +1,10 @@
 import { LitElement, html } from '../vendor/lit-element/lit-element.js'
 import { repeat } from '../vendor/lit-element/lit-html/directives/repeat.js'
 import { ViewThreadPopup } from './com/popups/view-thread.js'
-import { ComposerPopup } from './com/popups/composer.js'
-import { CreateCommunityPopup } from './com/popups/create-community.js'
 import * as toast from './com/toast.js'
-import { AVATAR_URL } from './lib/const.js'
 import * as session from './lib/session.js'
 import { listMemberships } from './lib/getters.js'
+import * as displayNames from './lib/display-names.js'
 import './com/header.js'
 import './com/button.js'
 import './com/login.js'
@@ -94,46 +92,31 @@ class CtznApp extends LitElement {
 
   renderRightSidebar () {
     return html`
-      <div>
-        <div class="sticky top-0 py-4">
-          ${''/*todo <section class="mb-4">
-            <span class="fas fa-search"></span>
-            ${!!this.searchQuery ? html`
-              <a class="clear-search" @click=${this.onClickClearSearch}><span class="fas fa-times"></span></a>
-            ` : ''}
-            <input @keyup=${this.onKeyupSearch} placeholder="Search" value=${this.searchQuery}>
-          </section>*/}
-          <section class="mb-4">
-            <ctzn-button
-              primary
-              class="text-sm font-semibold w-full mb-1"
-              label="Create Post"
-              @click=${this.onClickCreatePost}
-            ></ctzn-button>
-            <ctzn-button
-              class="text-gray-600 text-sm font-semibold w-full"
-              label="Create Community"
-              @click=${this.onClickCreateCommunity}
-            ></ctzn-button>
-          </section>
-          <section class="mb-4">
-            <h3 class="mb-1 font-bold text-gray-600">My Communities</h3>
-            ${this.memberships?.length ? html`
-              <div class="mt-2">
-                ${repeat(this.memberships, membership => html`
-                  <a href="/${membership.value.community.userId}" data-tooltip=${membership.value.community.userId}>
-                    <img class="inline-block rounded-full w-10 h-10 object-cover" src="${AVATAR_URL(membership.value.community.userId)}">
-                  </a>
-                `)}
-              </div>
-            ` : html`
-              <div class="px-3 py-2 bg-gray-100 text-gray-500 text-xs">
-                Join a community to get connected to more people!
-              </div>
-            `}
-          </section>
-        </div>
-      </div>
+      <nav>
+        ${''/*todo <section class="mb-4">
+          <span class="fas fa-search"></span>
+          ${!!this.searchQuery ? html`
+            <a class="clear-search" @click=${this.onClickClearSearch}><span class="fas fa-times"></span></a>
+          ` : ''}
+          <input @keyup=${this.onKeyupSearch} placeholder="Search" value=${this.searchQuery}>
+        </section>*/}
+        <section class="pt-1 mb-4">
+          <h3 class="font-medium mb-1">My Communities</h3>
+          ${this.memberships?.length ? html`
+            <div class="mt-2">
+              ${repeat(this.memberships, membership => html`
+                <div>
+                  <a class="inline-block bg-gray-100 rounded py-1 px-2 mb-1 text-sm hover:bg-gray-200" href="/${membership.value.community.userId}">${displayNames.render(membership.value.community.userId)}</a>
+                </div>
+              `)}
+            </div>
+          ` : html`
+            <div class="px-3 py-2 bg-gray-100 text-gray-500 text-xs">
+              Join a community to get connected to more people!
+            </div>
+          `}
+        </section>
+      </nav>
     `
   }
 
@@ -192,12 +175,12 @@ class CtznApp extends LitElement {
 
   renderWithSession () {
     return html`
-      <ctzn-header></ctzn-header>
+      <ctzn-header @post-created=${e => this.load()}></ctzn-header>
       <main>
         <div>
-          <div class="border border-t-0 border-gray-200 text-xl font-semibold px-4 py-2 sticky top-0 z-10 bg-white">
+          ${''/*<div class="border border-t-0 border-gray-200 text-xl font-semibold px-4 py-2 sticky top-0 z-10 bg-white">
             Latest Posts
-          </div>
+  </div>*/}
           ${this.isEmpty ? this.renderEmptyMessage() : ''}
           ${''/*TODO<div class="reload-page mx-4 mb-4 rounded cursor-pointer overflow-hidden leading-10 ${this.numNewItems > 0 ? 'expanded' : ''}" @click=${e => this.load()}>
             ${this.numNewItems} new ${pluralize(this.numNewItems, 'update')}
@@ -262,27 +245,6 @@ class CtznApp extends LitElement {
   onPublishReply (e) {
     toast.create('Reply published', '', 10e3)
     this.load()
-  }
-
-  async onClickCreatePost (e) {
-    e.preventDefault()
-    e.stopPropagation()
-    try {
-      await ComposerPopup.create()
-      toast.create('Post published', '', 10e3)
-      this.load()
-    } catch (e) {
-      // ignore
-      console.log(e)
-    }
-  }
-
-  async onClickCreateCommunity (e) {
-    e.preventDefault()
-    e.stopPropagation()
-    const res = await CreateCommunityPopup.create()
-    console.log(res)
-    window.location = `/${res.userId}`
   }
 
   async onDeletePost (e) {

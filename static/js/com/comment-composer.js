@@ -2,8 +2,6 @@
 import { LitElement, html } from '../../vendor/lit-element/lit-element.js'
 import * as toast from './toast.js'
 import * as session from '../lib/session.js'
-import * as contextMenu from './context-menu.js'
-import * as displayNames from '../lib/display-names.js'
 
 class CommentComposer extends LitElement {
   static get properties () {

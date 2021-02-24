@@ -53,8 +53,8 @@ export class MembersList extends LitElement {
             <a class="ml-1 mr-3" href="/${userId}" title=${userId}>
               <img class="block rounded-full w-10 h-10 object-cover shadow-sm" src=${AVATAR_URL(userId)}>
             </a>
-            <div class="flex-1">
-              <div class="">
+            <div class="flex-1 min-w-0">
+              <div class="truncate">
                 <a class="hover:underline" href="/${userId}" title=${userId}>
                   <span class="font-bold">${username}</span><span class="text-gray-500">@${domain}</span>
                 </a>

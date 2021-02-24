@@ -100,10 +100,8 @@ export function linkify (str = '') {
 
 export function extractSchemaId (str = '') {
   try {
-    const urlp = new URL(str)
-    const pathParts = urlp.pathname.split('/')
-    if (pathParts.length === 2) return undefined
-    return pathParts.slice(3, 5).join('/')
+    const pathParts = str.split(DRIVE_KEY_REGEX)[1]?.split('/').filter(Boolean)
+    return pathParts.slice(0, 2).join('/')
   } catch (e) {
     return undefined
   }
