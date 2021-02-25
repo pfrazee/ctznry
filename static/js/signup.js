@@ -1,11 +1,11 @@
 import { LitElement, html } from '../vendor/lit-element/lit-element.js'
 import { repeat } from '../vendor/lit-element/lit-html/directives/repeat.js'
+import { asyncReplace } from '../vendor/lit-element/lit-html/directives/async-replace.js'
 import * as session from './lib/session.js'
 import { HTTP_ENDPOINT } from './lib/const.js'
 import './com/header.js'
 import './com/button.js'
 
-const CANVAS_SIZE = 200
 const SERVERS = ['ctzn.one']
 const SERVER_DESCRIPTIONS = {
   'ctzn.one': 'The first CTZN server. Welcome, trailblazers!'
@@ -53,78 +53,118 @@ class CtznSignup extends LitElement {
     return html`
       <div class="mx-auto my-6 sm:my-12 max-w-lg px-8 sm:py-8 bg-white sm:rounded-2xl sm:border border-gray-300">
         ${this.currentStage === 1 ? this.renderServerForm() : ''}
-        ${this.currentStage === 2 ? this.renderAccountForm() : ''}
-        ${this.currentStage === 3 ? this.renderProfileForm() : ''}
+        ${this.currentStage === 2 ? this.renderLegalDocsForm() : ''}
+        ${this.currentStage === 3 ? this.renderAccountForm() : ''}
+        ${this.currentStage === 4 ? this.renderProfileForm() : ''}
       </div>
     `
   }
 
   renderServerForm () {
     return html`
-        <form @submit=${this.onNext}>
-          <h2 class="mb-6 text-2xl">Sign up</h2>
-          <div class="mb-6">
-            <label class="block w-full box-border mb-1 font-medium">Select your server</label>
-            <div class="pb-2 text-gray-500 text-sm">
-              Your server will determine your UserID and where your data is stored.
-              E.g. alice@${this.values.domain || 'server.com'}.
-            </div>
-            ${this.isServersExpanded ? html`
-              <div class="border border-gray-400 rounded w-full overflow-hidden" @click=${e => this.isServersExpanded = !this.isServersExpanded}>
-                ${repeat(SERVERS, server => html`
-                  <button class="w-full border-b border-gray-300 hover:bg-gray-50" @click=${e => this.onSelectServer(server)}>
-                    <span class="flex items-center justify-between pb-4 pt-4 px-4 w-full">
-                      <span>${server}</span>
-                    </span>
-                  </button>
-                `)}
-                <button class="w-full hover:bg-gray-50" @click=${e => this.onSelectServer('custom')}>
+      <form @submit=${this.onNext}>
+        <h2 class="mb-6 text-2xl">Sign up</h2>
+        <div class="mb-6">
+          <label class="block w-full box-border mb-1 font-medium">Select your server</label>
+          <div class="pb-2 text-gray-500 text-sm">
+            Your server will determine your UserID and where your data is stored.
+            E.g. alice@${this.values.domain || 'server.com'}.
+          </div>
+          ${this.isServersExpanded ? html`
+            <div class="border border-gray-400 rounded w-full overflow-hidden" @click=${e => this.isServersExpanded = !this.isServersExpanded}>
+              ${repeat(SERVERS, server => html`
+                <button class="w-full border-b border-gray-300 hover:bg-gray-50" @click=${e => this.onSelectServer(server)}>
                   <span class="flex items-center justify-between pb-4 pt-4 px-4 w-full">
-                    <span>Custom server</span>
+                    <span>${server}</span>
                   </span>
                 </button>
-              </div>
-            ` : html`
-              <button class="block border border-gray-300 rounded w-full overflow-hidden hover:border-gray-400" @click=${e => this.isServersExpanded = !this.isServersExpanded}>
+              `)}
+              <button class="w-full hover:bg-gray-50" @click=${e => this.onSelectServer('custom')}>
                 <span class="flex items-center justify-between pb-4 pt-4 px-4 w-full">
-                  <span>${this.isCustomServer ? 'Custom server' : this.values.domain}</span> <span class="fas fa-fw fa-caret-down"></span>
+                  <span>Custom server</span>
                 </span>
-                ${!this.isCustomServer ? html`
-                  <span class="bg-gray-50 border-gray-200 border-t flex text-left items-center px-4 py-4 text-gray-600 text-sm tracking-tight">
-                    <span><span class="fas fa-info-circle fa-fw text-gray-500"></span> ${SERVER_DESCRIPTIONS[this.values.domain]}</span>
-                  </span>
-                ` : html`
-                  <span class="bg-gray-50 border-gray-200 border-t flex text-left items-center px-4 py-4 text-gray-600 text-sm tracking-tight">
-                    <span><span class="fas fa-info-circle fa-fw text-gray-500"></span> Enter the URL of a custom server (advanced).</span>
-                  </span>
-                `}
               </button>
-              ${this.isCustomServer ? html`
-                <input
-                  class="block w-full box-border my-1 p-4 border border-gray-300 rounded"
-                  name="domain"
-                  required
-                  placeholder="E.g. home.com"
-                  @keyup=${this.onKeyupCustomServer}
-                >
-              ` : ''}
-            `}
-          </div>
-          ${this.currentError ? html`
-            <div class="bg-red-100 p-6 text-red-600">${this.currentError}</div>
-          ` : ''}
-          <div class="flex justify-between items-center border-t border-gray-300 mt-10 pt-6">
-            <a href="/">Log in to an existing account</a>
-            <ctzn-button
-              primary
-              type="submit"
-              ?disabled=${this.isProcessing}
-              ?spinner=${this.isProcessing}
-              label="Next"
-            ></ctzn-button>
-          </div>
-        </form>
-      </div>
+            </div>
+          ` : html`
+            <button class="block border border-gray-300 rounded w-full overflow-hidden hover:border-gray-400" @click=${e => this.isServersExpanded = !this.isServersExpanded}>
+              <span class="flex items-center justify-between pb-4 pt-4 px-4 w-full">
+                <span>${this.isCustomServer ? 'Custom server' : this.values.domain}</span> <span class="fas fa-fw fa-caret-down"></span>
+              </span>
+              ${!this.isCustomServer ? html`
+                <span class="bg-gray-50 border-gray-200 border-t flex text-left items-center px-4 py-4 text-gray-600 text-sm tracking-tight">
+                  <span><span class="fas fa-info-circle fa-fw text-gray-500"></span> ${SERVER_DESCRIPTIONS[this.values.domain]}</span>
+                </span>
+              ` : html`
+                <span class="bg-gray-50 border-gray-200 border-t flex text-left items-center px-4 py-4 text-gray-600 text-sm tracking-tight">
+                  <span><span class="fas fa-info-circle fa-fw text-gray-500"></span> Enter the URL of a custom server (advanced).</span>
+                </span>
+              `}
+            </button>
+            ${this.isCustomServer ? html`
+              <input
+                class="block w-full box-border my-1 p-4 border border-gray-300 rounded"
+                name="domain"
+                required
+                placeholder="E.g. home.com"
+                @keyup=${this.onKeyupCustomServer}
+              >
+            ` : ''}
+          `}
+        </div>
+        ${this.currentError ? html`
+          <div class="bg-red-100 p-6 text-red-600">${this.currentError}</div>
+        ` : ''}
+        <div class="flex justify-between items-center border-t border-gray-300 mt-10 pt-6">
+          <a href="/">Log in to an existing account</a>
+          <ctzn-button
+            primary
+            type="submit"
+            ?disabled=${this.isProcessing}
+            ?spinner=${this.isProcessing}
+            label="Next"
+          ></ctzn-button>
+        </div>
+      </form>
+    `
+  }
+
+  renderLegalDocsForm () {
+    return html`
+      <form @submit=${this.onNext}>
+        <h2 class="mb-2 text-2xl">Sign up</h2>
+        <div class="mb-4 text-gray-500 text-sm">
+          Please review these terms from ${this.values.domain}.
+        </div>
+        <div class="mb-6">
+          <div class="block w-full box-border mb-1">Terms of Service</div>
+          <div class="block border border-gray-300 box-border max-h-40 mb-1 overflow-y-auto p-4 rounded text-gray-700 w-full whitespace-pre-wrap">${asyncReplace(loadTermsOfService(this.values.domain))}</div>
+        </div>
+        <div class="mb-6">
+          <div class="block w-full box-border mb-1">Privacy Policy</div>
+          <div class="block border border-gray-300 box-border max-h-40 mb-1 overflow-y-auto p-4 rounded text-gray-700 w-full whitespace-pre-wrap">${asyncReplace(loadPrivacyPolicy(this.values.domain))}</div>
+        </div>
+        <div class="mb-6">
+          <label class="bg-gray-50 flex items-center mb-1 py-2 rounded w-full">
+            <input type="checkbox" class="mx-3" required>
+            <span>I have read and agreed to these terms.</span>
+          </label>
+        </div>
+        <div class="flex justify-between items-center border-t border-gray-300 pt-6">
+          <ctzn-button
+            ?disabled=${this.isProcessing}
+            ?spinner=${this.isProcessing}
+            label="Back"
+            @click=${this.onBack}
+          ></ctzn-button>
+          <ctzn-button
+            primary
+            type="submit"
+            ?disabled=${this.isProcessing}
+            ?spinner=${this.isProcessing}
+            label="Next"
+          ></ctzn-button>
+        </div>
+      </form>
     `
   }
 
@@ -344,4 +384,38 @@ async function checkCtznServer (domain) {
   const res = await (await fetch(`${HTTP_ENDPOINT(domain)}/ctzn/server-info`))
   if (!res.ok) throw new Error(res.statusText)
   return domain
+}
+
+async function* loadTermsOfService (domain) {
+  yield html`Loading...`
+
+  try {
+    let urlp = new URL(domain)
+    domain = urlp.hostname
+  } catch (e) {
+    // ignore
+  }
+  const res = await (await fetch(`${HTTP_ENDPOINT(domain)}/ctzn/server-terms-of-service`)).text()
+  if (res) {
+    yield res
+  } else {
+    yield 'This server has no terms of service.'
+  }
+}
+
+async function* loadPrivacyPolicy (domain) {
+  yield html`Loading...`
+
+  try {
+    let urlp = new URL(domain)
+    domain = urlp.hostname
+  } catch (e) {
+    // ignore
+  }
+  const res = await (await fetch(`${HTTP_ENDPOINT(domain)}/ctzn/server-privacy-policy`)).text()
+  if (res) {
+    yield res
+  } else {
+    yield 'This server has no privacy policy.'
+  }
 }
