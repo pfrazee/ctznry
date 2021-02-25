@@ -115,7 +115,7 @@ class CtznApp extends LitElement {
       <div class="hidden lg:block" style="margin-top: 10vh">
         <div class="flex my-2 max-w-4xl mx-auto">
           <div class="flex-1 py-20 text-gray-800 text-lg">
-            <h1 class="font-semibold mb-1 text-6xl tracking-widest">CTZN</h1>
+            <h1 class="font-semibold mb-1 text-6xl tracking-widest">CTZN<span class="font-bold text-3xl text-gray-500 tracking-normal" data-tooltip="Alpha Version">α</span></h1>
             <div class="mb-6 text-gray-500 text-2xl tracking-tight">(Pronounced "Citizen")</div>
             <div class="mb-8 text-2xl">
               Build your community in a decentralized<br>social network.
@@ -135,7 +135,7 @@ class CtznApp extends LitElement {
       <div class="block lg:hidden">
         <div class="max-w-lg mx-auto bg-white sm:border sm:border-gray-300 sm:my-8 sm:rounded-2xl sm:shadow-xl">
           <div class="text-center pt-20 pb-14 text-gray-800 text-lg border-b border-gray-300">
-            <h1 class="font-semibold mb-1 text-6xl tracking-widest">CTZN</h1>
+            <h1 class="font-semibold mb-1 text-6xl tracking-widest">CTZN<span class="font-bold text-3xl text-gray-500 tracking-normal">α</span></h1>
             <div class="mb-6 text-gray-500 text-2xl tracking-tight">(Pronounced "Citizen")</div>
             <div class="mb-6 text-xl px-4">
               Build your community in a decentralized social network.
