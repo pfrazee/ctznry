@@ -117,8 +117,14 @@ class CtznApp extends LitElement {
           <div class="flex-1 py-20 text-gray-800 text-lg">
             <h1 class="font-semibold mb-1 text-6xl tracking-widest">CTZN</h1>
             <div class="mb-6 text-gray-500 text-2xl tracking-tight">(Pronounced "Citizen")</div>
-            <div class="mb-6 text-2xl">
+            <div class="mb-8 text-2xl">
               Build your community in a decentralized<br>social network.
+            </div>
+            <div class="mb-6 text-blue-600 hover:underline">
+              <a href="https://github.com/pfrazee/ctzn" title="Learn more about CTZN" target="_blank">
+                <span class="fas fa-external-link-alt fa-fw"></span>
+                Learn more about CTZN
+              </a>
             </div>
           </div>
           <div class="w-96">
@@ -133,6 +139,11 @@ class CtznApp extends LitElement {
             <div class="mb-6 text-gray-500 text-2xl tracking-tight">(Pronounced "Citizen")</div>
             <div class="mb-6 text-xl px-4">
               Build your community in a decentralized social network.
+            </div>
+            <div class="mb-6 text-blue-600 hover:underline">
+              <a href="https://github.com/pfrazee/ctzn" title="Learn more about CTZN" target="_blank">
+                Learn more about CTZN
+              </a>
             </div>
           </div>
           <div>
