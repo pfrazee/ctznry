@@ -34,8 +34,7 @@ class CtznApp extends LitElement {
     return {
       searchQuery: {type: String},
       isEmpty: {type: Boolean},
-      memberships: {type: Array},
-      numNewItems: {type: Number}
+      memberships: {type: Array}
     }
   }
 
@@ -48,21 +47,17 @@ class CtznApp extends LitElement {
     this.isLoading = true
     this.searchQuery = ''
     this.isEmpty = false
-    this.numNewItems = 0
-    this.loadTime = Date.now()
     this.memberships = undefined
     this.suggestedCommunities = undefined
 
     this.load()
-
-    setInterval(this.checkNewItems.bind(this), 5e3)
 
     window.addEventListener('popstate', (event) => {
       this.configFromQP()
     })
   }
 
-  async load ({clearCurrent} = {clearCurrent: false}) {
+  async load () {
     await session.setup()
     this.isLoading = false
     if (!session.isActive()) {
@@ -76,9 +71,7 @@ class CtznApp extends LitElement {
     }
 
     if (this.querySelector('ctzn-feed')) {
-      this.loadTime = Date.now()
-      this.numNewItems = 0
-      this.querySelector('ctzn-feed').load({clearCurrent})
+      this.querySelector('ctzn-feed').load()
     }
     
     if ((new URL(window.location)).searchParams.has('composer')) {
@@ -86,21 +79,6 @@ class CtznApp extends LitElement {
       document.querySelector('ctzn-composer').focus()
       window.history.replaceState({}, null, '/')
     }
-  }
-
-  async checkNewItems () {
-    // TODO check for new items
-    // var query = PATH_QUERIES[location.pathname.slice(1) || 'all']
-    // if (!query) return
-    // var {count} = await beaker.index.gql(`
-    //   query NewItems ($paths: [String!]!, $loadTime: Long!) {
-    //     count: recordCount(
-    //       paths: $paths
-    //       after: {key: "crtime", value: $loadTime}
-    //     )
-    //   }
-    // `, {paths: query, loadTime: this.loadTime})
-    // this.numNewItems = count
   }
 
   // rendering
@@ -170,13 +148,7 @@ class CtznApp extends LitElement {
       <ctzn-header @post-created=${e => this.load()}></ctzn-header>
       <main>
         <div>
-          ${''/*<div class="border border-t-0 border-gray-200 text-xl font-semibold px-4 py-2 sticky top-0 z-10 bg-white">
-            Latest Posts
-  </div>*/}
           ${this.isEmpty ? this.renderEmptyMessage() : ''}
-          ${''/*TODO<div class="reload-page mx-4 mb-4 rounded cursor-pointer overflow-hidden leading-10 ${this.numNewItems > 0 ? 'expanded' : ''}" @click=${e => this.load()}>
-            ${this.numNewItems} new ${pluralize(this.numNewItems, 'update')}
-          </div>*/}
           <ctzn-feed
             limit="50"
             @load-state-updated=${this.onFeedLoadStateUpdated}

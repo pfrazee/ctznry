@@ -6,6 +6,8 @@ import { listUserFeed } from '../lib/getters.js'
 import { emit } from '../lib/dom.js'
 import './post.js'
 
+const CHECK_NEW_ITEMS_INTERVAL = 15e3
+
 export class Feed extends LitElement {
   static get properties () {
     return {
@@ -22,7 +24,8 @@ export class Feed extends LitElement {
       filter: {type: String},
       results: {type: Array},
       emptyMessage: {type: String, attribute: 'empty-message'},
-      noMerge: {type: Boolean, attribute: 'no-merge'}
+      noMerge: {type: Boolean, attribute: 'no-merge'},
+      hasNewItems: {type: Boolean}
     }
   }
 
@@ -44,9 +47,11 @@ export class Feed extends LitElement {
     this.results = undefined
     this.emptyMessage = undefined
     this.noMerge = false
+    this.hasNewItems = false
 
     // ui state
     this.loadMoreObserver = undefined
+    setInterval(() => this.checkNewItems(), CHECK_NEW_ITEMS_INTERVAL)
 
     // query state
     this.activeQuery = undefined
@@ -122,6 +127,19 @@ export class Feed extends LitElement {
     emit(this, 'load-state-updated', {detail: {isEmpty: this.results.length === 0}})
   }
 
+  async checkNewItems () {
+    if (!this.results) {
+      return
+    }
+    let results
+    if (this.source) {
+      results = await listUserFeed(this.source, {limit: 1, reverse: true})
+    } else {
+      results = await session.api.posts.listHomeFeed({limit: 1, reverse: true})
+    }
+    this.hasNewItems = (results[0] && results[0].key !== this.results[0].key)
+  }
+
   // rendering
   // =
 
@@ -138,6 +156,7 @@ export class Feed extends LitElement {
       if (!this.emptyMessage) return html``
       return html`
         ${this.title ? html`<h2  class="results-header"><span>${this.title}</span></h2>` : ''}
+        ${this.renderHasNewItems()}
         <div class="bg-gray-100 text-gray-500 py-44 text-center my-5">
           <div>${this.emptyMessage}</div>
         </div>
@@ -145,8 +164,23 @@ export class Feed extends LitElement {
     }
     return html`
       ${this.title ? html`<h2  class="results-header"><span>${this.title}</span></h2>` : ''}
+      ${this.renderHasNewItems()}
       ${this.renderResults()}
       ${this.results?.length ? html`<div class="bottom-of-feed mb-10"></div>` : ''}
+    `
+  }
+
+  renderHasNewItems () {
+    if (!this.hasNewItems) {
+      return ''
+    }
+    return html`
+      <div
+        class="new-items-indicator bg-blue-50 border border-blue-500 cursor-pointer fixed font-semibold hover:bg-blue-100 inline-block px-4 py-2 rounded-3xl shadow-md text-blue-800 text-sm z-30"
+        @click=${this.onClickViewNewPosts}
+      >
+        New Posts <span class="fas fa-fw fa-angle-up"></span>
+      </div>
     `
   }
 
@@ -195,6 +229,12 @@ export class Feed extends LitElement {
 
   // events
   // =
+
+  onClickViewNewPosts (e) {
+    this.hasNewItems = false
+    this.load()
+    window.scrollTo(0, 0)
+  }
 }
 
 customElements.define('ctzn-feed', Feed)

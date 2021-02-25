@@ -262,3 +262,15 @@ main {
     background: #fff;
   }
 }
+
+.new-items-indicator {
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+@media (max-width: 640px) {
+  .new-items-indicator {
+    top: 60px;
+  }
+}
