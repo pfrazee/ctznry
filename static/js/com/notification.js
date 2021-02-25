@@ -54,7 +54,6 @@ export class Notification extends LitElement {
   render () {
     const note = this.notification
     const schemaId = extractSchemaId(note.itemUrl)
-    console.log('hit', schemaId)
 
     let subject
     let subjectSchemaId

@@ -32,6 +32,9 @@ export class NotificationsFeed extends LitElement {
     this.limit = undefined
     this.results = undefined
 
+    // ui state
+    this.loadMoreObserver = undefined
+
     // query state
     this.activeQuery = undefined
   }
@@ -42,7 +45,6 @@ export class NotificationsFeed extends LitElement {
 
   async load ({clearCurrent} = {clearCurrent: false}) {
     if (!session.isActive()) {
-      console.log('not active yet')
       session.onChange(() => this.load({clearCurrent}), {once: true})
       return
     }
@@ -56,13 +58,24 @@ export class NotificationsFeed extends LitElement {
         this.load()
       }
     }
+
+    const botOfFeedEl = this.querySelector('.bottom-of-feed')
+    if (!this.loadMoreObserver && botOfFeedEl) {
+      this.loadMoreObserver = new IntersectionObserver((entries) => {
+        if (entries[0]?.isIntersecting) {
+          this.queueQuery({more: true})
+        }
+      }, {threshold: 1.0})
+      this.loadMoreObserver.observe(botOfFeedEl)
+    }
   }
 
-  queueQuery () {
+  queueQuery ({more} = {more: false}) {
     if (!this.activeQuery) {
-      this.activeQuery = this.query()
+      this.activeQuery = this.query({more})
       this.requestUpdate()
     } else {
+      if (more) return
       this.activeQuery = this.activeQuery.catch(e => undefined).then(r => {
         this.activeQuery = undefined
         this.queueQuery()
@@ -70,11 +83,12 @@ export class NotificationsFeed extends LitElement {
     }
   }
 
-  async query () {
+  async query ({more} = {more: false}) {
     emit(this, 'load-state-updated')
-    var results = []
+    let results = more ? this.results : []
+
     // because we collapse results, we need to run the query until the limit is fulfilled
-    let before = undefined
+    let before = more ? results[results?.length - 1]?.createdAt : undefined
     do {
       let subresults = await session.api.notifications.list({before})
       if (subresults.length === 0) break
@@ -82,6 +96,7 @@ export class NotificationsFeed extends LitElement {
       before = subresults[subresults.length - 1].createdAt
       results = results.concat(subresults)
     } while (results.length < this.limit)
+    
     console.log(results)
     this.results = results
     this.activeQuery = undefined
@@ -108,6 +123,7 @@ export class NotificationsFeed extends LitElement {
       ${this.title ? html`<h2  class="results-header"><span>${this.title}</span></h2>` : ''}
       <div class="border border-gray-300 border-b-0">
         ${this.renderResults()}
+        ${this.results?.length ? html`<div class="bottom-of-feed mb-10"></div>` : ''}
       </div>
     `
   }

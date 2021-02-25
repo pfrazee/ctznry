@@ -38,12 +38,15 @@ export class Feed extends LitElement {
     this.recordClass = ''
     this.title = undefined
     this.sort = 'ctime'
-    this.limit = undefined
+    this.limit = 15
     this.filter = undefined
     this.notifications = undefined
     this.results = undefined
     this.emptyMessage = undefined
     this.noMerge = false
+
+    // ui state
+    this.loadMoreObserver = undefined
 
     // query state
     this.activeQuery = undefined
@@ -77,42 +80,42 @@ export class Feed extends LitElement {
     } else if (changedProperties.has('source') && !isArrayEq(this.source, changedProperties.get('source'))) {
       this.queueQuery()
     }
+
+    const botOfFeedEl = this.querySelector('.bottom-of-feed')
+    if (!this.loadMoreObserver && botOfFeedEl) {
+      this.loadMoreObserver = new IntersectionObserver((entries) => {
+        if (entries[0]?.isIntersecting) {
+          this.queueQuery({more: true})
+        }
+      }, {threshold: 1.0})
+      this.loadMoreObserver.observe(botOfFeedEl)
+    }
   }
 
-  queueQuery () {
+  queueQuery ({more} = {more: false}) {
     if (!this.activeQuery) {
-      this.activeQuery = this.query()
+      this.activeQuery = this.query({more})
       this.requestUpdate()
     } else {
+      if (more) return
       if (this.abortController) this.abortController.abort()
       this.activeQuery = this.activeQuery.catch(e => undefined).then(r => {
         this.activeQuery = undefined
-        this.queueQuery()
+        this.queueQuery({more})
       })
     }
   }
 
-  async query () {
+  async query ({more} = {more: false}) {
     emit(this, 'load-state-updated')
     this.abortController = new AbortController()
-    var results = []
-    // because we collapse results, we need to run the query until the limit is fulfilled
-    let lt = undefined
-    do {
-      let subresults
-      if (this.source) {
-        subresults = await listUserFeed(this.source, {limit: this.limit, reverse: true, lt})
-      } else {
-        subresults = await session.api.posts.listHomeFeed({limit: this.limit, reverse: true, lt})
-      }
-      if (subresults.length === 0) break
-      
-      lt = subresults[subresults.length - 1].key
-      if (!this.noMerge) {
-        subresults = subresults.reduce(reduceMultipleActions, [])
-      }
-      results = results.concat(subresults)
-    } while (results.length < this.limit)
+    let results = more ? this.results : []
+    let lt = more ? results[results?.length - 1]?.key : undefined
+    if (this.source) {
+      results = results.concat(await listUserFeed(this.source, {limit: this.limit, reverse: true, lt}))
+    } else {
+      results = results.concat(await session.api.posts.listHomeFeed({limit: this.limit, reverse: true, lt}))
+    }
     console.log(results)
     this.results = results
     this.activeQuery = undefined
@@ -143,6 +146,7 @@ export class Feed extends LitElement {
     return html`
       ${this.title ? html`<h2  class="results-header"><span>${this.title}</span></h2>` : ''}
       ${this.renderResults()}
+      ${this.results?.length ? html`<div class="bottom-of-feed mb-10"></div>` : ''}
     `
   }
 
