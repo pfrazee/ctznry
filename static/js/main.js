@@ -112,7 +112,11 @@ class CtznApp extends LitElement {
 
   renderNoSession () {
     return html`
-      <div class="hidden lg:block" style="margin-top: 10vh">
+      <div class="bg-gray-700 border-gray-200 fixed py-2 text-center text-gray-100 w-full" style="top: 0; left: 0">
+        <span class="font-bold text-gray-50">Alpha Release</span>.
+        This is a preview build of CTZN.
+      </div>
+      <div class="hidden lg:block" style="margin-top: 15vh">
         <div class="flex my-2 max-w-4xl mx-auto">
           <div class="flex-1 py-20 text-gray-800 text-lg">
             <h1 class="font-semibold mb-1 text-6xl tracking-widest">CTZN<span class="font-bold text-3xl text-gray-500 tracking-normal" data-tooltip="Alpha Version">α</span></h1>

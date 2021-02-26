@@ -51,12 +51,48 @@ class CtznSignup extends LitElement {
 
   render () {
     return html`
-      <div class="mx-auto my-6 sm:my-12 max-w-lg px-8 sm:py-8 bg-white sm:rounded-2xl sm:border border-gray-300">
-        ${this.currentStage === 1 ? this.renderServerForm() : ''}
-        ${this.currentStage === 2 ? this.renderLegalDocsForm() : ''}
-        ${this.currentStage === 3 ? this.renderAccountForm() : ''}
-        ${this.currentStage === 4 ? this.renderProfileForm() : ''}
+      <div class="bg-gray-700 border-gray-200 py-2 text-center text-gray-100 w-full">
+        <span class="font-bold text-gray-50">Alpha Release</span>.
+        This is a preview build of CTZN.
       </div>
+      <div class="mx-auto my-6 sm:my-12 max-w-lg px-8 sm:py-8 bg-white sm:rounded-2xl sm:border border-gray-300">
+        ${this.currentStage === 1 ? this.renderAlphaForm() : ''}
+        ${this.currentStage === 2 ? this.renderServerForm() : ''}
+        ${this.currentStage === 3 ? this.renderLegalDocsForm() : ''}
+        ${this.currentStage === 4 ? this.renderAccountForm() : ''}
+        ${this.currentStage === 5 ? this.renderProfileForm() : ''}
+      </div>
+    `
+  }
+
+  renderAlphaForm () {
+    return html`
+      <form @submit=${this.onNext}>
+        <h2 class="mb-2 text-2xl font-semibold">Alpha Preview</h2>
+        <div class="mb-4 text-gray-700">
+          CTZN is still in development and many features are not yet complete.
+          We've launched this alpha so you can help us shape this software!
+        </div>
+        <div class="mb-4 text-gray-700">
+          Basic features like posting, following, and communities have been implemented,
+          but they're just part our goal to create user-programmable social communities.
+        </div>
+        <div class="bg-gray-100 mb-4 px-4 py-4 rounded text-gray-700 text-sm">
+          CTZN's development is live-streamed every day, so
+          <a class="text-blue-600 hover:underline" href="https://www.youtube.com/channel/UCSkcL4my2wgDRFvjQOJzrlg">join us there</a>
+          to share your thoughts and see what's going on!
+        </div>
+        <div class="flex justify-between items-center border-t border-gray-300 pt-6">
+          <a href="/">Log in to an existing account</a>
+          <ctzn-button
+            primary
+            type="submit"
+            ?disabled=${this.isProcessing}
+            ?spinner=${this.isProcessing}
+            label="Got it, let's do this!"
+          ></ctzn-button>
+        </div>
+      </form>
     `
   }
 
@@ -306,7 +342,7 @@ class CtznSignup extends LitElement {
     e.preventDefault()
     this.currentError = undefined
 
-    if (this.currentStage === 1) {
+    if (this.currentStage === 2) {
       // server
       this.isProcessing = true
       try {

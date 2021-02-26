@@ -54,9 +54,10 @@ export class Header extends LitElement {
     return html`
       <header>
         <div class="menu ${this.isMenuOpen ? 'open' : 'closed'} flex flex-col leading-none text-lg bg-gray-50">
-          <span class="font-bold px-3 py-2 text-3xl text-gray-800">
-            C T Z N
-          </span>
+          <div class="px-3 py-2">
+            <div class="font-bold text-3xl text-gray-800">CTZN</div>
+            <div class="font-bold pl-0.5 text-gray-500 tracking-tight">alpha</div>
+          </div>
           <a href="/" class=${this.getMenuNavClass('/')}>
             <span class="fas mr-1.5 fa-fw navicon fa-home"></span>
             Home
@@ -100,7 +101,7 @@ export class Header extends LitElement {
           </a>
           <span class="flex-grow"></span>
           <a class="font-bold px-3 py-2 text-2xl text-gray-800" href="/" @click=${this.onClickTopNavCTZN}>
-            C T Z N
+            C T Z N <span class="text-gray-500 tracking-tight">alpha</span>
           </a>
           <span class="flex-grow"></span>
           ${session.hasOneSaved()
