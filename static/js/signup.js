@@ -333,6 +333,14 @@ class CtznSignup extends LitElement {
   // events
   // =
 
+  captureValues () {
+    const formEl = this.querySelector('form')
+    for (let el of formEl.elements) {
+      if (!el.name) continue
+      this.values[el.name] = el.value
+    }
+  }
+
   async onBack (e) {
     e.preventDefault()
     this.currentStage--
@@ -356,6 +364,7 @@ class CtznSignup extends LitElement {
       }
     }
 
+    this.captureValues()
     this.currentStage++
   }
 
@@ -395,6 +404,7 @@ class CtznSignup extends LitElement {
     e.preventDefault()
     this.isProcessing = true
     this.currentError = undefined
+    this.captureValues()
 
     try {
       await session.doSignup(this.values)
