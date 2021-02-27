@@ -16,19 +16,63 @@ const SUGGESTED_COMMUNITIES = [
     userId: 'alphatesters@ctzn.one',
     displayName: 'CTZN Alpha Testers',
     description: 'Find other CTZN alpha users and talk about what\'s going on with the network.'
-  }
-]/*
-  {
-    userId: 'foo@foo.com',
-    displayName: 'Test data',
-    description: 'These suggestions are not real.'
   },
   {
-    userId: 'foo@foo.com',
-    displayName: 'Test data',
-    description: 'We\'ll choose real suggestions during Alpha Launch Saturday!'
+    userId: 'welcome@ctzn.one',
+    displayName: 'Welcome to CTZN',
+    description: 'A place for new users to ask questions!'
+  },
+  {
+    userId: 'ktzns@ctzn.one',
+    displayName: 'KTZNs',
+    description: 'A community for cat lovers.'
+  },
+  {
+    userId: 'quotes@ctzn.one',
+    displayName: 'Quotes',
+    description: 'Share the wisdom, or lack thereof.'
+  },
+  {
+    userId: 'gameboard@ctzn.one',
+    displayName: 'Boardgames',
+    description: 'A place to share what you\'ve been playing.'
+  },
+  {
+    userId: 'P2P@ctzn.one',
+    displayName: 'P2P',
+    description: 'A place to chat about P2P, Federated, and Decentralised Systems!'
+  },
+  {
+    userId: 'mlai@ctzn.one',
+    displayName: 'Machine Learning & artificial intelligence',
+    description: 'A space for ML & AI discussions.'
+  },
+  {
+    userId: 'rustaceans@ctzn.one',
+    displayName: 'Rustaceans',
+    description: 'Rustaceans are people who use Rust, contribute to Rust, or are interested in the development of Rust.'
+  },
+  {
+    userId: 'python@ctzn.one',
+    displayName: 'Python',
+    description: 'Python programming language'
+  },
+  {
+    userId: 'GeminiEnthusiasts@ctzn.one',
+    displayName: 'Gemini Protocol Enthusiasts',
+    description: 'Community for people who love the Gemeni protocol.'
+  },
+  {
+    userId: 'sports@ctzn.one',
+    displayName: 'Sports',
+    description: 'A place all around sports.'
+  },
+  {
+    userId: 'Hamradio@ctzn.one',
+    displayName: 'Hamradio',
+    description: 'Hamradio Community'
   }
-]*/
+]
 
 class CtznApp extends LitElement {
   static get properties () {
@@ -69,6 +113,7 @@ class CtznApp extends LitElement {
     this.memberships = await listMemberships(session.info.userId)
     if (!this.suggestedCommunities) {
       this.suggestedCommunities = SUGGESTED_COMMUNITIES.filter(c => !this.memberships?.find(m => c.userId === m.value.community.userId))
+      this.suggestedCommunities = this.suggestedCommunities.slice(0, 5).sort(() => Math.random() - 0.5)
     }
 
     if (this.querySelector('ctzn-feed')) {
