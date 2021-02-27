@@ -11,8 +11,8 @@ import './com/login.js'
 import './com/feed.js'
 import './com/img-fallbacks.js'
 
-const SUGGESTED_COMMUNITIES = [
-  {
+const SUGGESTED_COMMUNITIES = []
+/*  {
     userId: 'foo@foo.com',
     displayName: 'Cool community',
     description: 'The coolest community in CTZN.'
@@ -27,7 +27,7 @@ const SUGGESTED_COMMUNITIES = [
     displayName: 'Test data',
     description: 'We\'ll choose real suggestions during Alpha Launch Saturday!'
   }
-]
+]*/
 
 class CtznApp extends LitElement {
   static get properties () {
