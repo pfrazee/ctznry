@@ -1,8 +1,13 @@
 module.exports = {
-  purge: [
-    './static/**/*.html',
-    './static/**/*.js'
-  ],
+  purge: {
+    content: [
+      './static/**/*.html',
+      './static/**/*.js'
+    ],
+    options: {
+      safelist: ['bg-pink-600', 'hover:bg-pink-700', 'border-pink-800']
+    }
+  },
   darkMode: 'media',
   theme: {
     extend: {
