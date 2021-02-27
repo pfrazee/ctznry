@@ -11,12 +11,13 @@ import './com/login.js'
 import './com/feed.js'
 import './com/img-fallbacks.js'
 
-const SUGGESTED_COMMUNITIES = []
-/*  {
-    userId: 'foo@foo.com',
-    displayName: 'Cool community',
-    description: 'The coolest community in CTZN.'
-  },
+const SUGGESTED_COMMUNITIES = [
+  {
+    userId: 'alphatesters@ctzn.one',
+    displayName: 'CTZN Alpha Testers',
+    description: 'Find other CTZN alpha users and talk about what\'s going on with the network.'
+  }
+]/*
   {
     userId: 'foo@foo.com',
     displayName: 'Test data',
