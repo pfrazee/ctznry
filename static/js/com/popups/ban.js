@@ -81,7 +81,7 @@ export class BanPopup extends BasePopup {
           <span class="flex-1"></span>
           <ctzn-button
             btn-class="mr-1"
-            type="submit"
+            btn-type="submit"
             tabindex="2"
             ?disabled=${this.isProcessing}
             ?spinner=${this.isProcessing}
@@ -90,7 +90,7 @@ export class BanPopup extends BasePopup {
           ></ctzn-button>
           <ctzn-button
             primary
-            type="submit"
+            btn-type="submit"
             tabindex="1"
             ?disabled=${this.isProcessing}
             ?spinner=${this.isProcessing}

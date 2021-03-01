@@ -52,7 +52,7 @@ class CtznLogin extends LitElement {
             <a href="/forgot-password">Forgot Password</a>
             <ctzn-button
               primary
-              type="submit"
+              btn-type="submit"
               ?disabled=${this.isLoggingIn}
               ?spinner=${this.isLoggingIn}
               label="Login"

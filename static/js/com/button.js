@@ -68,7 +68,7 @@ export class Button extends LitElement {
     }
     return html`
       <button
-        type=${this.getAttribute('type') || 'button'}
+        type=${this.getAttribute('btn-type') || 'button'}
         tabindex=${this.getAttribute('tabindex')}
         class=${this.getClass()}
         ?disabled=${this.disabled}

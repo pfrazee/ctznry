@@ -113,7 +113,7 @@ class PostComposer extends LitElement {
           <ctzn-button @click=${this.onCancel} tabindex="2" label="Cancel"></ctzn-button>
           <ctzn-button
             primary
-            type="submit"
+            btn-type="submit"
             ?disabled=${!this.canPost}
             tabindex="1"
             label="Create Post"

@@ -86,7 +86,7 @@ class CtznSignup extends LitElement {
           <a href="/">Log in to an existing account</a>
           <ctzn-button
             primary
-            type="submit"
+            btn-type="submit"
             ?disabled=${this.isProcessing}
             ?spinner=${this.isProcessing}
             label="Got it, let's do this!"
@@ -154,7 +154,7 @@ class CtznSignup extends LitElement {
           <a href="/">Log in to an existing account</a>
           <ctzn-button
             primary
-            type="submit"
+            btn-type="submit"
             ?disabled=${this.isProcessing}
             ?spinner=${this.isProcessing}
             label="Next"
@@ -194,7 +194,7 @@ class CtznSignup extends LitElement {
           ></ctzn-button>
           <ctzn-button
             primary
-            type="submit"
+            btn-type="submit"
             ?disabled=${this.isProcessing}
             ?spinner=${this.isProcessing}
             label="Next"
@@ -261,7 +261,7 @@ class CtznSignup extends LitElement {
           ></ctzn-button>
           <ctzn-button
             primary
-            type="submit"
+            btn-type="submit"
             ?disabled=${this.isProcessing}
             ?spinner=${this.isProcessing}
             label="Next"
@@ -320,7 +320,7 @@ class CtznSignup extends LitElement {
           ></ctzn-button>
           <ctzn-button
             primary
-            type="submit"
+            btn-type="submit"
             ?disabled=${this.isProcessing}
             ?spinner=${this.isProcessing}
             label="Sign up"

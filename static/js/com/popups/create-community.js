@@ -103,7 +103,7 @@ export class CreateCommunityPopup extends BasePopup {
           <ctzn-button @click=${this.onReject} tabindex="2" label="Cancel"></ctzn-button>
           <ctzn-button
             primary
-            type="submit"
+            btn-type="submit"
             tabindex="1"
             ?disabled=${this.isCreating || !this.username || !this.displayName}
             ?spinner=${this.isCreating}
