@@ -107,7 +107,7 @@ class CtznUser extends LitElement {
     }
     for (let roleId of memberRecord.value.roles) {
       let roleRecord = this.roles.find(r => r.value.roleId === roleId)
-      if (roleRecord && roleRecord.value.permissions?.includes(p => p.permId === permId)) {
+      if (roleRecord && !!roleRecord.value.permissions?.find(p => p.permId === permId)) {
         return true
       }
     }
