@@ -8,10 +8,9 @@ export async function start ({port, configDir, domain}) {
   configDir = configDir || path.join(os.homedir(), '.ctznry')
 
   app = express()
-  app.set('view engine', 'ejs')
 
   app.get('/', (req, res) => {
-    res.render('index')
+    res.sendFile('./static/index.html', {root: process.cwd()})
   })
 
   app.use('/img', express.static('static/img'))
@@ -21,31 +20,31 @@ export async function start ({port, configDir, domain}) {
   app.use('/webfonts', express.static('static/webfonts'))
 
   app.get('/signup', (req, res) => {
-    res.render('signup')
+    res.sendFile('static/signup.html', {root: process.cwd()})
   })
 
   app.get('/forgot-password', (req, res) => {
-    res.render('forgot-password')
+    res.sendFile('static/forgot-password.html', {root: process.cwd()})
   })
 
   app.get('/notifications', (req, res) => {
-    res.render('notifications')
+    res.sendFile('static/notifications.html', {root: process.cwd()})
   })
 
   app.get('/profile', (req, res) => {
-    res.render('user')
+    res.sendFile('static/user.html', {root: process.cwd()})
   })
 
   app.get('/search', (req, res) => {
-    res.render('search')
+    res.sendFile('static/search.html', {root: process.cwd()})
   })
 
   app.get('/:username([^\/]{3,})/ctzn.network/post/:key', (req, res) => {
-    res.render('post')
+    res.sendFile('static/post.html', {root: process.cwd()})
   })
 
   app.get('/:username([^\/]{3,})', (req, res) => {
-    res.render('user')
+    res.sendFile('static/user.html', {root: process.cwd()})
   })
 
   app.use((req, res) => {
