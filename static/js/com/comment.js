@@ -121,7 +121,7 @@ export class Comment extends LitElement {
             </a>
           </div>
           ${this.isReplyOpen ? html`
-            <div class="border border-gray-300 rounded py-2 px-3 my-2 mx-1">
+            <div class="border border-gray-300 rounded py-2 px-3 my-2 mx-1 bg-white">
               <ctzn-comment-composer
                 autofocus
                 .community=${this.comment.value.community}
