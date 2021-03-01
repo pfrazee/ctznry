@@ -43,6 +43,10 @@ export async function start ({port, configDir, domain}) {
     res.sendFile('static/post.html', {root: process.cwd()})
   })
 
+  app.get('/:username([^\/]{3,})/ctzn.network/comment/:key', (req, res) => {
+    res.sendFile('static/comment.html', {root: process.cwd()})
+  })
+
   app.get('/:username([^\/]{3,})', (req, res) => {
     res.sendFile('static/user.html', {root: process.cwd()})
   })

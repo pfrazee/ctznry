@@ -34,12 +34,12 @@ class CtznPostPage extends LitElement {
     await session.setup()
 
     let pathname = window.location.pathname
-    let [userId, _, _2, key] = pathname.split('/').filter(Boolean)
+    let [userId, schemaDomain, schemaName, key] = pathname.split('/').filter(Boolean)
 
     this.authorProfile = await getProfile(userId)
     this.subject = {
       authorId: userId,
-      dbUrl: joinPath(this.authorProfile.dbUrl, 'ctzn.network/post', key)
+      dbUrl: joinPath(this.authorProfile.dbUrl, schemaDomain, schemaName, key)
     }
   }
 

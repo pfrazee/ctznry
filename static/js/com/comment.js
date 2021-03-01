@@ -1,7 +1,7 @@
 import { LitElement, html } from '../../vendor/lit-element/lit-element.js'
 import { unsafeHTML } from '../../vendor/lit-element/lit-html/directives/unsafe-html.js'
 import { ifDefined } from '../../vendor/lit-element/lit-html/directives/if-defined.js'
-import { AVATAR_URL, POST_URL, FULL_COMMENT_URL } from '../lib/const.js'
+import { AVATAR_URL, COMMENT_URL, FULL_COMMENT_URL } from '../lib/const.js'
 import { writeToClipboard } from '../lib/clipboard.js'
 import * as session from '../lib/session.js'
 import { emit } from '../lib/dom.js'
@@ -100,7 +100,7 @@ export class Comment extends LitElement {
               </a>
             </div>
             <span class="mx-1">&middot;</span>
-            <a class="text-gray-500 hover:underline" href="${POST_URL(this.comment)}" data-tooltip=${(new Date(this.comment.value.createdAt)).toLocaleString()}>
+            <a class="text-gray-500 hover:underline" href="${COMMENT_URL(this.comment)}" data-tooltip=${(new Date(this.comment.value.createdAt)).toLocaleString()}>
               ${relativeDate(this.comment.value.createdAt)}
             </a>
           </div>
