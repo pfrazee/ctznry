@@ -95,11 +95,11 @@ export class BasePopup extends LitElement {
             </div>
           ` : html`
             <div class="flex justify-between box-border relative pt-4 px-5 w-full sm:hidden">
-              <span title="Close" @click=${this.onReject}><span class="fas fa-arrow-left fa-fw text-xl"></span></span>
+              <span title="Close" @click=${this.onReject}><span class="fas fa-arrow-left fa-fw text-3xl"></span></span>
               <span class="font-semibold">${this.renderTitle()}</span>
             </div>
           `}
-          <div class="p-4">
+          <div class="px-4 pt-4 lg:pb-4 pb-24">
             ${this.renderBody()}
           </div>
         </div>
