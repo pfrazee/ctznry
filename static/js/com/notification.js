@@ -6,8 +6,6 @@ import { emit } from '../lib/dom.js'
 import { extractSchemaId } from '../lib/strings.js'
 import { getPost, getComment } from '../lib/getters.js'
 import './post.js'
-import './user-list.js'
-
 
 export class Notification extends LitElement {
   static get properties () {
@@ -104,15 +102,13 @@ export class Notification extends LitElement {
           </a>
           ${action} ${target} &middot; ${relativeDate(note.createdAt)}
         </div>
-        ${schemaId === 'ctzn.network/follow' ? html`
-          <div class="pl-16 pr-4 pb-4">
-            <ctzn-user-list class="block max-w-xs" cols="1" .ids=${[note.author.userId]}></ctzn-user-list>
-          </div>
-        ` : schemaId === 'ctzn.network/comment' ? html`
+        ${schemaId === 'ctzn.network/comment' ? html`
           <div class="reply pl-16 pb-4 pr-6">
             ${asyncReplace(this.renderReplyComment(replyCommentInfo))}
           </div>
-        ` : ''}
+        ` : html`
+          <div class="pb-2"></div>
+        `}
       </div>
     `
   }
