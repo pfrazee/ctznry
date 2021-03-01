@@ -96,10 +96,6 @@ class CtznApp extends LitElement {
     this.suggestedCommunities = undefined
 
     this.load()
-
-    window.addEventListener('popstate', (event) => {
-      this.configFromQP()
-    })
   }
 
   async load () {
