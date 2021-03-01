@@ -195,11 +195,17 @@ class CtznUser extends LitElement {
           </div>
           <div class="flex items-center py-4 px-4 border border-gray-200 border-t-0 border-b-0 bg-white">
             <a class="hidden sm:block" href="/${this.userId}" title=${this.userProfile?.value.displayName} @click=${setView('feed')}>
-              <img class="block mx-auto ml-2 mr-6 w-32 h-32 object-cover rounded-full shadow-md" src=${AVATAR_URL(this.userId)}>
+              <img class="block mx-auto ml-2 mr-6 w-16 h-16 object-cover rounded-full shadow-md" src=${AVATAR_URL(this.userId)}>
             </a>
             <div class="flex-1">
               <h2 class="text-3xl font-semibold">
-                <a href="/${this.userId}" title=${this.userProfile?.value.displayName} @click=${setView('feed')}>
+                <a
+                  class="inline-block"
+                  href="/${this.userId}"
+                  title=${this.userProfile?.value.displayName}
+                  @click=${setView('feed')}
+                  style="max-width: 320px"
+                >
                   ${this.userProfile?.value.displayName}
                 </a>
               </h2>
@@ -210,11 +216,11 @@ class CtznUser extends LitElement {
                   ${this.userId}
                 </a>
               </h2>
-              ${this.userProfile?.value.description ? html`
-                <div class="mt-4">${this.userProfile?.value.description}</div>
-              ` : ''}
             </div>
           </div>
+          ${this.userProfile?.value.description ? html`
+            <div class="pb-3 px-7 border border-gray-200 border-t-0 border-b-0 bg-white">${this.userProfile?.value.description}</div>
+          ` : ''}
           <div class="flex border border-gray-200 border-t-0 bg-white text-gray-400 sticky top-0 z-10">
             <a class="${navCls('feed')}" @click=${setView('feed')}>Feed</a>
             ${this.isCitizen ? html`
