@@ -13,6 +13,7 @@ export class Header extends LitElement {
   static get properties () {
     return {
       isMenuOpen: {type: Boolean},
+      isMenuTransitionEnabled: {type: Boolean},
       unreadNotificationsCount: {type: Number}
     }
   }
@@ -49,6 +50,11 @@ export class Header extends LitElement {
 
   updated () {
     this.checkNotifications()
+    if (!this.isMenuTransitionEnabled) {
+      setTimeout(() => {
+        this.isMenuTransitionEnabled = true
+      }, 500)
+    }
   }
 
   async checkNotifications () {
@@ -71,7 +77,7 @@ export class Header extends LitElement {
     let info = session.getSavedInfo()
     return html`
       <header>
-        <div class="menu ${this.isMenuOpen ? 'open' : 'closed'} flex flex-col leading-none text-lg bg-gray-50 pt-12 lg:pt-0">
+        <div class="menu ${this.isMenuOpen ? 'open' : 'closed'} ${this.isMenuTransitionEnabled ? 'transition-enabled' : ''} flex flex-col leading-none text-lg bg-gray-50 pt-12 lg:pt-0">
           <div class="px-3 py-2 hidden lg:block">
             <div class="font-bold text-3xl text-gray-800">CTZN</div>
             <div class="font-bold pl-0.5 text-gray-500 tracking-tight">alpha</div>
