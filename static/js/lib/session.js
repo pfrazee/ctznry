@@ -68,7 +68,7 @@ export async function doLogout () {
   emitter.dispatchEvent(new Event('change'))
 }
 
-export async function doSignup ({domain, username, displayName, description, avatarBase64, email, password}) {
+export async function doSignup ({domain, username, displayName, description, avatar, email, password}) {
   const newApi = await connectApi(domain)
   const newSessionInfo = await newApi.accounts.register({
     username,
@@ -83,7 +83,8 @@ export async function doSignup ({domain, username, displayName, description, ava
     newSessionInfo.username = username
     newSessionInfo.domain = domain
 
-    if (avatarBase64) {
+    if (avatar) {
+      const avatarBase64 = avatar.split(',').pop()
       await newApi.profiles.putAvatar(avatarBase64).catch(e => console.log(e))
     }
 
