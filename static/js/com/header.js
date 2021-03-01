@@ -187,6 +187,7 @@ export class Header extends LitElement {
   async onClickCreatePost (e) {
     e.preventDefault()
     e.stopPropagation()
+    this.isMenuOpen = false
     try {
       await ComposerPopup.create()
       toast.create('Post published', '', 10e3)
@@ -200,6 +201,7 @@ export class Header extends LitElement {
   async onClickCreateCommunity (e) {
     e.preventDefault()
     e.stopPropagation()
+    this.isMenuOpen = false
     const res = await CreateCommunityPopup.create()
     console.log(res)
     window.location = `/${res.userId}`
