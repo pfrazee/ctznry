@@ -95,6 +95,11 @@ export class NotificationsFeed extends LitElement {
       
       before = subresults[subresults.length - 1].blendedCreatedAt
       results = results.concat(subresults)
+
+      // apply dedup, results may sometimes have duplicates
+      results = results.filter((entry, index) => {
+        return results.findIndex(entry2 => entry2.itemUrl === entry.itemUrl) === index
+      })
     } while (results.length < this.limit)
     
     console.log(results)
