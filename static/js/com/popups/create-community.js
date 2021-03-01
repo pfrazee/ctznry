@@ -179,6 +179,7 @@ export class CreateCommunityPopup extends BasePopup {
     } finally {
       this.isCreating = false
     }
+    await session.loadSecondaryState()
     this.dispatchEvent(new CustomEvent('resolve', {detail: res}))
   }
 }

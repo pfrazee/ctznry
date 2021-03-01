@@ -564,6 +564,7 @@ class CtznUser extends LitElement {
     try {
       this.isJoiningOrLeaving = true
       await session.api.communities.join(this.userId)
+      await session.loadSecondaryState()
       this.members = await listMembers(this.userId)
     } catch (e) {
       console.log(e)
@@ -576,6 +577,7 @@ class CtznUser extends LitElement {
     try {
       this.isJoiningOrLeaving = true
       await session.api.communities.leave(this.userId)
+      await session.loadSecondaryState()
       this.members = await listMembers(this.userId)
     } catch (e) {
       console.log(e)

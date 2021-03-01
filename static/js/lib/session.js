@@ -21,15 +21,7 @@ export async function setup () {
       localStorage.setItem('session-info', JSON.stringify(info))
       api = newApi
       emitter.dispatchEvent(new Event('change'))
-
-      {
-        let [memberships, followers] = await Promise.all([
-          api.communities.listMemberships(info.userId),
-          api.follows.listFollowers(info.userId)
-        ])
-        myCommunities = memberships.map(m => m.value.community)
-        myFollowers = getUniqFollowers(followers)
-      }
+      await loadSecondaryState()
     }
   } catch (e) {
     console.error('Failed to resume API session')
@@ -38,6 +30,15 @@ export async function setup () {
 
   // DEBUG
   window.api = api
+}
+
+export async function loadSecondaryState () {
+  let [memberships, followers] = await Promise.all([
+    api.communities.listMemberships(info.userId).catch(e => []),
+    api.follows.listFollowers(info.userId).catch(e => [])
+  ])
+  myCommunities = memberships.map(m => m.value.community)
+  myFollowers = getUniqFollowers(followers)
 }
 
 export async function doLogin ({userId, password}) {

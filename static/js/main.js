@@ -359,6 +359,7 @@ class CtznApp extends LitElement {
     this.requestUpdate()
     try {
       await session.api.communities.join(community.userId)
+      await session.loadSecondaryState()
       toast.create('Community joined')
     } catch (e) {
       console.log(e)
