@@ -1,4 +1,3 @@
-import urlRegexSafe from './url-regex-safe.js'
 export const DRIVE_KEY_REGEX = /[0-9a-f]{64}/i
 
 export function urlToKey (str) {
@@ -94,8 +93,32 @@ export function makeSafe (str = '') {
   return str.replace(/["'&<>]/g, (match) => MAKE_SAFE_MAP[match] || '')
 }
 
+const URL_RE = /(http|https|hyper):\/\/([a-z0-9\-._~:/\?#\[\]@!$&'\(\)*+,;=%]+)/gi
+const PUNCTUATION_RE = /[^a-z0-9]$/i
+const OPEN_PARENS_RE = /\(/g
+const CLOSE_PARENS_RE = /\)/g
+const OPEN_SQBRACKETS_RE = /\[/g
+const CLOSE_SQBRACKETS_RE = /\]/g
 export function linkify (str = '') {
-  return str.replace(urlRegexSafe(), match => `<a class="text-blue-600 hover:underline" href="${match}" target="_blank">${match}</a>`)
+  return str.replace(URL_RE, match => {
+    // remove trailing punctuation
+    let trailingChars = ''
+    while (match.length && PUNCTUATION_RE.test(match)) {
+      let char = match.charAt(match.length - 1)
+      if (char === ')' || char === ']') {
+        // closing brackets require us to balance
+        let openCount = match.match((char === ')' ? OPEN_PARENS_RE : OPEN_SQBRACKETS_RE))?.length || 0
+        let closeCount = match.match((char === ')' ? CLOSE_PARENS_RE : CLOSE_SQBRACKETS_RE))?.length || 0
+        if (closeCount <= openCount) {
+          // this char seems to close an opening bracket in the URL so consider it a part of the URL
+          break
+        }
+      }
+      match = match.slice(0, match.length - 1)
+      trailingChars += char
+    }
+    return `<a class="text-blue-600 hover:underline" href="${match}" target="_blank">${match}</a>${trailingChars}`
+  })
 }
 
 export function extractSchemaId (str = '') {
