@@ -122,20 +122,26 @@ export class CreateCommunityPopup extends BasePopup {
   // =
 
   onKeyupUsername (e) {
-    this.username = e.currentTarget.value.trim().replace(/[^A-z0-9]/gi, '').slice(0, 64)
-    e.currentTarget.value = this.username
+    this.username = e.currentTarget.value.trim().replace(/[^A-z0-9-]/gi, '').slice(0, 64)
+    if (e.currentTarget.value !== this.username) {
+      e.currentTarget.value = this.username
+    }
     this.requestUpdate()
   }
 
   onKeyupDisplayName (e) {
     this.displayName = e.currentTarget.value.slice(0, 64)
-    e.currentTarget.value = this.displayName
+    if (e.currentTarget.value !== this.displayName) {
+      e.currentTarget.value = this.displayName
+    }
     this.requestUpdate()
   }
 
   onKeyupDescription (e) {
     this.description = e.currentTarget.value.slice(0, 256)
-    e.currentTarget.value = this.description
+    if (e.currentTarget.value !== this.description) {
+      e.currentTarget.value = this.description
+    }
     this.requestUpdate()
   }
 
