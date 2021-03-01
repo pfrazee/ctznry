@@ -27,6 +27,24 @@ export class Header extends LitElement {
     this.unreadNotificationsCount = 0
     setInterval(this.checkNotifications.bind(this), CHECK_NOTIFICATIONS_INTERVAL)
     session.onChange(() => this.requestUpdate())
+
+    // detect swipes to the right and open the menu
+    let touchstartX = 0
+    let touchstartY = 0
+    document.body.addEventListener('touchstart', event => {
+      touchstartX = event.changedTouches[0].screenX
+      touchstartY = event.changedTouches[0].screenY
+    }, false)
+    document.body.addEventListener('touchend', event => {
+      let touchendX = event.changedTouches[0].screenX
+      let touchendY = event.changedTouches[0].screenY
+      let diffX = touchendX - touchstartX
+      let diffY = touchendY - touchstartY
+      let diffXNormalized = diffX / Math.abs(diffY)
+      if (diffX > 100 && diffXNormalized > 1.5) {
+        this.isMenuOpen = true
+      }
+    }, false);
   }
 
   updated () {
