@@ -88,12 +88,12 @@ export class NotificationsFeed extends LitElement {
     let results = more ? this.results : []
 
     // because we collapse results, we need to run the query until the limit is fulfilled
-    let before = more ? results[results?.length - 1]?.createdAt : undefined
+    let before = more ? results[results?.length - 1]?.blendedCreatedAt : undefined
     do {
       let subresults = await session.api.notifications.list({before})
       if (subresults.length === 0) break
       
-      before = subresults[subresults.length - 1].createdAt
+      before = subresults[subresults.length - 1].blendedCreatedAt
       results = results.concat(subresults)
     } while (results.length < this.limit)
     
@@ -148,16 +148,17 @@ export class NotificationsFeed extends LitElement {
     `
   }
   
-  renderNotification (notification) {
-    const schemaId = extractSchemaId(notification.itemUrl)
+  renderNotification (note) {
+    const schemaId = extractSchemaId(note.itemUrl)
     if (schemaId !== 'ctzn.network/comment' && schemaId !== 'ctzn.network/follow') {
       return ''
     }
+    let blendedCreatedAt = Number(new Date(note.blendedCreatedAt))
     return html`
       <ctzn-notification
         class="block border-b border-gray-300"
-        .notification=${notification}
-        ?is-unread=${Number(new Date(notification.createdAt)) > this.clearedAt}
+        .notification=${note}
+        ?is-unread=${blendedCreatedAt > this.clearedAt}
       ></ctzn-notification>
     `
   }

@@ -87,7 +87,6 @@ export class Notification extends LitElement {
       target = 'you'
     }
     
-    let blendedCreatedAt = Math.min(new Date(note.createdAt), new Date(note.item?.createdAt || note.createdAt))
     return html`
       <link rel="stylesheet" href="/css/fontawesome.css">
       <div class="cursor-pointer hover:bg-gray-50 ${this.isUnread ? 'unread' : ''}" @click=${this.onClickWrapper}>
@@ -101,7 +100,7 @@ export class Notification extends LitElement {
           <a class="font-bold" href="/${note.author.userId}" title=${note.author.userId}>
            ${note.author.userId}
           </a>
-          ${action} ${target} &middot; ${relativeDate(blendedCreatedAt)}
+          ${action} ${target} &middot; ${relativeDate(note.blendedCreatedAt)}
         </div>
         ${schemaId === 'ctzn.network/comment' ? html`
           <div class="reply pl-16 pb-4 pr-6">
