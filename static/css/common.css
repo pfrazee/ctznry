@@ -11,7 +11,7 @@ header .menu {
   top: 10px;
   left: calc(50vw - 550px);
   height: calc(100vh - 10px);
-  width: 170px;
+  width: 172px;
 }
 
 header .menu.open {

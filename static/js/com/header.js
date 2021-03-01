@@ -80,6 +80,10 @@ export class Header extends LitElement {
             <span class="fas mr-1.5 fa-fw navicon fa-home"></span>
             Home
           </a>
+          <a href="/communities" class=${this.getMenuNavClass('/communities')}>
+            <span class="fas mr-1.5 fa-fw navicon fa-users"></span>
+            Communities
+          </a>
           ${session.hasOneSaved() ? html`
             <a href="/notifications" class="relative ${this.getMenuNavClass('/notifications')}">
               ${this.unreadNotificationsCount > 0 ? html`
@@ -142,7 +146,9 @@ export class Header extends LitElement {
               ${this.unreadNotificationsCount > 0 ? `(${this.unreadNotificationsCount})` : ''}
             </a>
           ` : html`<span class="flex-1"></span>`}
-          <span class="flex-1"></span>
+          <a href="/communities" class="flex-1 text-center ${this.getMobileNavClass('/communities')}">
+            <span class="fas fa-fw navicon fa-users"></span>
+          </a>
           <span class="flex-1"></span>
         </div>
       </header>

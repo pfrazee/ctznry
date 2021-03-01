@@ -33,5 +33,12 @@ export default [
       file: 'static/js/notifications.build.js',
       format: 'iife'
     }
+  },
+  {
+    input: 'static/js/communities.js',
+    output: {
+      file: 'static/js/communities.build.js',
+      format: 'iife'
+    }
   }
 ]

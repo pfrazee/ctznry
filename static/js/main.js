@@ -109,7 +109,7 @@ class CtznApp extends LitElement {
     this.memberships = await listMemberships(session.info.userId)
     if (!this.suggestedCommunities) {
       this.suggestedCommunities = SUGGESTED_COMMUNITIES.filter(c => !this.memberships?.find(m => c.userId === m.value.community.userId))
-      this.suggestedCommunities = this.suggestedCommunities.slice(0, 5).sort(() => Math.random() - 0.5)
+      this.suggestedCommunities = this.suggestedCommunities.sort(() => Math.random() - 0.5).slice(0, 5)
     }
 
     if (this.querySelector('ctzn-feed')) {

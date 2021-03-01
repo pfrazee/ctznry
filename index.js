@@ -31,6 +31,10 @@ export async function start ({port, configDir, domain}) {
     res.sendFile('static/notifications.html', {root: process.cwd()})
   })
 
+  app.get('/communities', (req, res) => {
+    res.sendFile('static/communities.html', {root: process.cwd()})
+  })
+
   app.get('/profile', (req, res) => {
     res.sendFile('static/user.html', {root: process.cwd()})
   })
