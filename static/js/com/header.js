@@ -53,8 +53,8 @@ export class Header extends LitElement {
     let info = session.getSavedInfo()
     return html`
       <header>
-        <div class="menu ${this.isMenuOpen ? 'open' : 'closed'} flex flex-col leading-none text-lg bg-gray-50">
-          <div class="px-3 py-2">
+        <div class="menu ${this.isMenuOpen ? 'open' : 'closed'} flex flex-col leading-none text-lg bg-gray-50 pt-12 lg:pt-0">
+          <div class="px-3 py-2 hidden lg:block">
             <div class="font-bold text-3xl text-gray-800">CTZN</div>
             <div class="font-bold pl-0.5 text-gray-500 tracking-tight">alpha</div>
           </div>
@@ -128,6 +128,12 @@ export class Header extends LitElement {
           <span class="flex-1"></span>
         </div>
       </header>
+      ${this.isMenuOpen ? html`
+        <div
+          class="fixed top-0 left-0 w-full h-full z-40" style="background: rgba(0, 0, 0, 0.5)"
+          @click=${this.onClickMenuOverlay}
+        ></div>
+      ` : ''}
     `
   }
 
@@ -154,6 +160,10 @@ export class Header extends LitElement {
 
   onToggleMenu (e) {
     this.isMenuOpen = !this.isMenuOpen
+  }
+
+  onClickMenuOverlay (e) {
+    this.isMenuOpen = false
   }
 
   async onClickNewPost (e) {
