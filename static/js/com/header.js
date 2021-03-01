@@ -80,18 +80,20 @@ export class Header extends LitElement {
             <span class="fas mr-1.5 fa-fw navicon fa-home"></span>
             Home
           </a>
-          <a href="/communities" class=${this.getMenuNavClass('/communities')}>
-            <span class="fas mr-1.5 fa-fw navicon fa-users"></span>
-            Communities
-          </a>
           ${session.hasOneSaved() ? html`
             <a href="/notifications" class="relative ${this.getMenuNavClass('/notifications')}">
               ${this.unreadNotificationsCount > 0 ? html`
                 <span class="absolute bg-blue-500 font-medium leading-none px-1.5 py-0.5 rounded-2xl text-white text-xs" style="top: 5px; left: 22px">${this.unreadNotificationsCount}</span>
               ` : ''}
-              <span class="far mr-1.5 fa-fw navicon fa-bell"></span>
+              <span class="fas mr-1.5 fa-fw navicon fa-bell"></span>
               Notifications
             </a>
+          ` : ''}
+          <a href="/communities" class=${this.getMenuNavClass('/communities')}>
+            <span class="fas mr-1.5 fa-fw navicon fa-users"></span>
+            Communities
+          </a>
+          ${session.hasOneSaved() ? html`
             <a
               class="relative ${this.getMenuNavClass()} mt-1"
               href="/${info.userId}"
@@ -142,7 +144,7 @@ export class Header extends LitElement {
           </a>
           ${session.hasOneSaved() ? html`
             <a href="/notifications" class="flex-1 text-center ${this.getMobileNavClass('/notifications')}">
-              <span class="far fa-fw navicon fa-bell"></span>
+              <span class="fas fa-fw navicon fa-bell"></span>
               ${this.unreadNotificationsCount > 0 ? `(${this.unreadNotificationsCount})` : ''}
             </a>
           ` : html`<span class="flex-1"></span>`}
