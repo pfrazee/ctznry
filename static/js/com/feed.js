@@ -211,7 +211,7 @@ export class Feed extends LitElement {
   
   renderNormalResult (post) {
     return html`
-      <div class="grid grid-post px-1 border-b border-gray-300 bg-white sm:my-3 sm:px-0 sm:border-0 sm:bg-transparent">
+      <div class="grid grid-post px-1 py-0.5 border-b border-gray-200 bg-white sm:my-3 sm:p-0 sm:border-0 sm:bg-transparent">
         <a class="block pl-2 pt-2 sm:p-0" href="/${post.author.userId}" title=${post.author.displayName}>
           <img class="block object-cover rounded-full mt-1 w-8 h-8 sm:w-11 sm:h-11" src=${AVATAR_URL(post.author.userId)}>
         </a>
