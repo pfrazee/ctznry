@@ -6,6 +6,7 @@ import { HTTP_ENDPOINT } from './lib/const.js'
 import './com/header.js'
 import './com/button.js'
 
+const CANVAS_SIZE = 200
 const SERVERS = ['ctzn.one']
 const SERVER_DESCRIPTIONS = {
   'ctzn.one': 'The first CTZN server. Welcome, trailblazers!'
@@ -18,6 +19,7 @@ class CtznSignup extends LitElement {
       values: {type: Object},
       isServersExpanded: {type: Boolean},
       isCustomServer: {type: Boolean},
+      isAvatarSet: {type: Boolean},
       isProcessing: {type: Boolean},
       currentError: {type: String}
     }
@@ -37,6 +39,7 @@ class CtznSignup extends LitElement {
     }
     this.isServersExpanded = false
     this.isCustomServer = false
+    this.isAvatarSet = false
     this.load()
   }
 
@@ -44,6 +47,29 @@ class CtznSignup extends LitElement {
     document.body.classList.add('no-pad')
     document.body.classList.add('sm:bg-gray-50')
     await session.setup()
+  }
+
+  loadImg (url) {
+    let zoom = 1
+    const img = document.createElement('img')
+    img.src = url
+    img.onload = async () => {
+      var smallest = (img.width < img.height) ? img.width : img.height
+      zoom = CANVAS_SIZE / smallest
+
+      await this.requestUpdate()
+      var canvas = document.getElementById('avatar-canvas')
+      if (canvas) {
+        var ctx = canvas.getContext('2d')
+        ctx.globalCompositeOperation = 'source-over'
+        ctx.fillStyle = '#fff'
+        ctx.fillRect(0, 0, CANVAS_SIZE, CANVAS_SIZE)
+        ctx.save()
+        ctx.scale(zoom, zoom)
+        ctx.drawImage(img, 0, 0, img.width, img.height)
+        ctx.restore()
+      }
+    }
   }
 
   // rendering
@@ -278,11 +304,21 @@ class CtznSignup extends LitElement {
         <div class="mb-4 text-gray-500 text-sm">
           Set up your profile information.
         </div>
-        <img
-          class="block mx-auto my-4 w-48 h48 rounded-full cursor-pointer hover:opacity-50"
-          src=${this.values.avatar || '/img/default-user-thumb.jpg'}
-          @click=${this.onClickAvatar}
-        >
+        ${this.isAvatarSet ? html`
+          <canvas
+            class="block mx-auto my-4 w-48 h48 rounded-full cursor-pointer hover:opacity-50"
+            id="avatar-canvas"
+            width=${CANVAS_SIZE}
+            height=${CANVAS_SIZE}
+            @click=${this.onClickAvatar}
+          ></canvas>
+        ` : html`
+          <img
+            class="block mx-auto my-4 w-48 h48 rounded-full cursor-pointer hover:opacity-50"
+            src="/img/default-user-thumb.jpg"
+            @click=${this.onClickAvatar}
+          >
+        `}
         <div class="text-center mb-4">
           <ctzn-button tabindex="1" @click=${this.onClickAvatar} label="Change Avatar"></ctzn-button>
           <input class="hidden" type="file" accept=".jpg,.jpeg,.png" @change=${this.onChooseAvatarFile}>
@@ -395,7 +431,8 @@ class CtznSignup extends LitElement {
     if (!file) return
     var fr = new FileReader()
     fr.onload = () => {
-      this.values = Object.assign({}, this.values, {avatar: fr.result})
+      this.isAvatarSet = true
+      this.loadImg(fr.result)
     }
     fr.readAsDataURL(file)
   }
@@ -405,6 +442,10 @@ class CtznSignup extends LitElement {
     this.isProcessing = true
     this.currentError = undefined
     this.captureValues()
+
+    if (this.isAvatarSet) {
+      this.values.avatar = document.getElementById('avatar-canvas').toDataURL()
+    }
 
     try {
       await session.doSignup(this.values)
