@@ -11,8 +11,7 @@ class CtznNotifications extends LitElement {
   static get properties () {
     return {
       searchQuery: {type: String},
-      isEmpty: {type: Boolean},
-      numNewItems: {type: Number}
+      isEmpty: {type: Boolean}
     }
   }
 
@@ -24,12 +23,8 @@ class CtznNotifications extends LitElement {
     super()
     this.notificationsClearedAt = undefined
     this.isEmpty = false
-    this.numNewItems = 0
-    this.loadTime = Date.now()
 
     this.load()
-
-    setInterval(this.checkNewItems.bind(this), 5e3)
   }
 
   async load ({clearCurrent} = {clearCurrent: false}) {
@@ -39,28 +34,8 @@ class CtznNotifications extends LitElement {
       return this.requestUpdate()
     }
     this.notificationsClearedAt = Number(new Date(await session.api.notifications.getNotificationsClearedAt()))
-    if (this.querySelector('ctzn-notifications-feed')) {
-      this.loadTime = Date.now()
-      this.numNewItems = 0
-      this.querySelector('ctzn-notifications-feed').load({clearCurrent})
-    }
     await session.api.notifications.updateNotificationsClearedAt()
     return this.requestUpdate()
-  }
-
-  async checkNewItems () {
-    // TODO check for new items
-    // var query = PATH_QUERIES[location.pathname.slice(1) || 'all']
-    // if (!query) return
-    // var {count} = await beaker.index.gql(`
-    //   query NewItems ($paths: [String!]!, $loadTime: Long!) {
-    //     count: recordCount(
-    //       paths: $paths
-    //       after: {key: "crtime", value: $loadTime}
-    //     )
-    //   }
-    // `, {paths: query, loadTime: this.loadTime})
-    // this.numNewItems = count
   }
 
   get isLoading () {
@@ -73,25 +48,8 @@ class CtznNotifications extends LitElement {
 
   render () {
     return html`
-      <ctzn-header></ctzn-header>
+      <ctzn-header @unread-notifications-changed=${this.onUnreadNotificationsChanged}></ctzn-header>
       ${this.renderCurrentView()}
-    `
-  }
-
-  renderRightSidebar () {
-    return '' // todo
-    return html`
-      <div class="sidebar">
-        <div class="sticky">
-          <div class="search-ctrl">
-            <span class="fas fa-search"></span>
-            ${!!this.searchQuery ? html`
-              <a class="clear-search" @click=${this.onClickClearSearch}><span class="fas fa-times"></span></a>
-            ` : ''}
-            <input @keyup=${this.onKeyupSearch} placeholder="Search" value=${this.searchQuery}>
-          </div>
-        </div>
-      </div>
     `
   }
 
@@ -102,9 +60,6 @@ class CtznNotifications extends LitElement {
     return html`
       <main>
         <div class="bg-white">
-          ${''/* TODO<div class="reload-page mx-4 mb-4 rounded cursor-pointer overflow-hidden leading-10 ${this.numNewItems > 0 ? 'visible' : ''}" @click=${e => this.load()}>
-            ${this.numNewItems} new ${pluralize(this.numNewItems, 'update')}
-          </div>*/}
           <div class="border border-gray-300 border-t-0 border-b-0 text-xl font-semibold px-4 py-2 sticky top-0 z-10 bg-white">
             Notifications
           </div>
@@ -117,7 +72,6 @@ class CtznNotifications extends LitElement {
           ></ctzn-notifications-feed>
           ${this.isEmpty ? this.renderEmptyMessage() : ''}
         </div>
-        ${this.renderRightSidebar()}
       </main>
     `
   }
@@ -160,6 +114,10 @@ class CtznNotifications extends LitElement {
   onPublishReply (e) {
     toast.create('Reply published', '', 10e3)
     this.load()
+  }
+
+  onUnreadNotificationsChanged (e) {
+    document.title = `(${e.detail.count}) Notifications | CTZN`
   }
 }
 

@@ -1,10 +1,9 @@
 import { LitElement, html } from '../vendor/lit-element/lit-element.js'
 import { ViewThreadPopup } from './com/popups/view-thread.js'
 import * as toast from './com/toast.js'
-import { AVATAR_URL } from './lib/const.js'
 import * as session from './lib/session.js'
 import { getProfile } from './lib/getters.js'
-import { joinPath } from './lib/strings.js'
+import { joinPath, ucfirst } from './lib/strings.js'
 import './com/header.js'
 import './com/button.js'
 import './com/thread.js'
@@ -41,6 +40,7 @@ class CtznPostPage extends LitElement {
       authorId: userId,
       dbUrl: joinPath(this.authorProfile.dbUrl, schemaDomain, schemaName, key)
     }
+    document.title = `${ucfirst(schemaName)} by ${this.authorProfile?.value.displayName || userId} | CTZN`
   }
 
   // rendering

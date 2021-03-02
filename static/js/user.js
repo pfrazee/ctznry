@@ -51,6 +51,7 @@ class CtznUser extends LitElement {
     this.isJoiningOrLeaving = false
 
     this.userId = (new URL(location)).pathname.split('/')[1]
+    document.title = `Loading... | CTZN`
     if (location.hash === '#followers') {
       this.currentView = 'followers'
     }
@@ -118,8 +119,10 @@ class CtznUser extends LitElement {
     await session.setup()
     this.userProfile = await getProfile(this.userId).catch(e => ({error: true, message: e.toString()}))
     if (this.userProfile.error) {
+      document.title = `Not Found | CTZN`
       return this.requestUpdate()
     }
+    document.title = `${this.userProfile?.value.displayName || this.userId} | CTZN`
     if (this.isCitizen) {
       const [followers, following, memberships] = await Promise.all([
         listFollowers(this.userId),

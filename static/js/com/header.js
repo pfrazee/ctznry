@@ -47,14 +47,18 @@ export class Header extends LitElement {
     }, false);
   }
 
-  updated () {
+  firstUpdated () {
     this.checkNotifications()
   }
 
   async checkNotifications () {
     if (!session.isActive()) return
     const clearedAt = (await session.api.notifications.getNotificationsClearedAt()) || undefined
+    let oldCount = this.unreadNotificationsCount
     this.unreadNotificationsCount = await session.api.notifications.count({after: clearedAt})
+    if (oldCount !== this.unreadNotificationsCount) {
+      emit(this, 'unread-notifications-changed', {detail: {count: this.unreadNotificationsCount}})
+    }
   }
 
   getMenuNavClass (str) {
