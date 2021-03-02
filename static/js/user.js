@@ -159,9 +159,9 @@ class CtznUser extends LitElement {
   setView (str) {
     this.currentView = str
     if (str === 'feed') {
-      history.pushState('', document.title, location.pathname + location.search)
+      window.history.pushState('', document.title, location.pathname + location.search)
     } else {
-      history.pushState('', document.title, location.pathname + location.search + `#${str}`)
+      window.history.pushState('', document.title, location.pathname + location.search + `#${str}`)
     }
   }
 

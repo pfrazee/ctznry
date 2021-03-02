@@ -1,5 +1,6 @@
 import { LitElement, html } from '../../vendor/lit-element/lit-element.js'
 import { repeat } from '../../vendor/lit-element/lit-html/directives/repeat.js'
+import PullToRefresh from '../../vendor/pulltorefreshjs/index.js'
 import { AVATAR_URL } from '../lib/const.js'
 import * as session from '../lib/session.js'
 import { listUserFeed } from '../lib/getters.js'
@@ -52,6 +53,12 @@ export class Feed extends LitElement {
     // ui state
     this.loadMoreObserver = undefined
     setInterval(() => this.checkNewItems(), CHECK_NEW_ITEMS_INTERVAL)
+    this.ptr = PullToRefresh.init({
+      mainElement: 'body',
+      onRefresh: () => {
+        return this.load()
+      }
+    })
 
     // query state
     this.activeQuery = undefined
@@ -67,7 +74,12 @@ export class Feed extends LitElement {
       session.onChange(() => this.load({clearCurrent}), {once: true})
     }
     if (clearCurrent) this.results = undefined
-    this.queueQuery()
+    return this.queueQuery()
+  }
+
+  disconnectedCallback (...args) {
+    super.disconnectedCallback(...args)
+    PullToRefresh.destroyAll()
   }
 
   updated (changedProperties) {
@@ -109,6 +121,7 @@ export class Feed extends LitElement {
         this.queueQuery({more})
       })
     }
+    return this.activeQuery
   }
 
   async query ({more} = {more: false}) {

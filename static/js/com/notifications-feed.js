@@ -1,5 +1,6 @@
 import { LitElement, html } from '../../vendor/lit-element/lit-element.js'
 import { repeat } from '../../vendor/lit-element/lit-html/directives/repeat.js'
+import PullToRefresh from '../../vendor/pulltorefreshjs/index.js'
 import { emit } from '../lib/dom.js'
 import { extractSchemaId } from '../lib/strings.js'
 import * as session from '../lib/session.js'
@@ -34,6 +35,12 @@ export class NotificationsFeed extends LitElement {
 
     // ui state
     this.loadMoreObserver = undefined
+    this.ptr = PullToRefresh.init({
+      mainElement: 'body',
+      onRefresh: () => {
+        return this.load()
+      }
+    })
 
     // query state
     this.activeQuery = undefined
@@ -49,7 +56,12 @@ export class NotificationsFeed extends LitElement {
       return
     }
     if (clearCurrent) this.results = undefined
-    this.queueQuery()
+    return this.queueQuery()
+  }
+
+  disconnectedCallback (...args) {
+    super.disconnectedCallback(...args)
+    PullToRefresh.destroyAll()
   }
 
   updated () {
@@ -81,6 +93,7 @@ export class NotificationsFeed extends LitElement {
         this.queueQuery()
       })
     }
+    return this.activeQuery
   }
 
   async query ({more} = {more: false}) {
