@@ -71,7 +71,7 @@ export class PostExpanded extends LitElement {
   get ctrlTooltip () {
     if (this.canInteract) return undefined
     if (this.communityUserId) {
-      return `Only members of ${displayNames.render(this.communityUserId)} can interact with this post`
+      return `Only members of ${this.communityUserId} can interact with this post`
     }
     return `Only people followed by ${this.post.author.displayName} can interact with this post`
   }

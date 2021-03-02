@@ -54,7 +54,7 @@ export class Comment extends LitElement {
   get ctrlTooltip () {
     if (this.canInteract) return undefined
     if (this.communityUserId) {
-      return `Only members of ${displayNames.render(this.communityUserId)} can interact with this comment`
+      return `Only members of ${this.communityUserId} can interact with this comment`
     }
     return `Only people followed by ${this.comment.author.displayName} can interact with this comment`
   }
