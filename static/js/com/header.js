@@ -143,9 +143,11 @@ export class Header extends LitElement {
             <span class="fas fa-fw navicon fa-home"></span>
           </a>
           ${session.hasOneSaved() ? html`
-            <a href="/notifications" class="flex-1 text-center ${this.getMobileNavClass('/notifications')}">
+            <a href="/notifications" class="relative flex-1 text-center ${this.getMobileNavClass('/notifications')}">
+              ${this.unreadNotificationsCount > 0 ? html`
+                <span class="absolute bg-blue-500 font-medium leading-none px-1.5 py-0.5 rounded-2xl text-white text-xs" style="top: 8px; right: calc(50% - 24px);">${this.unreadNotificationsCount}</span>
+              ` : ''}
               <span class="fas fa-fw navicon fa-bell"></span>
-              ${this.unreadNotificationsCount > 0 ? `(${this.unreadNotificationsCount})` : ''}
             </a>
           ` : html`<span class="flex-1"></span>`}
           <a href="/communities" class="flex-1 text-center ${this.getMobileNavClass('/communities')}">
