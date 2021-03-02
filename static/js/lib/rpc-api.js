@@ -3,11 +3,26 @@ import * as rpcWebsockets from '../../vendor/rpc-websockets/bundle.js'
 const SESSION_ERROR_CODE = -32001
 
 export async function create (endpoint = 'ws://localhost:3000/', recoverSessionFn) {
-  const ws = new rpcWebsockets.Client(endpoint, {reconnect: false})
-  await new Promise((resolve, reject) => {
-    ws.on('open', resolve)
-    ws.on('error', e => reject(new Error('Connection failed')))
-  })
+  let ws
+  
+  let attemptConnectPromise = undefined
+  function attemptConnect () {
+    if (attemptConnectPromise) return attemptConnectPromise
+    const newWebSocket = new rpcWebsockets.Client(endpoint, {reconnect: false})
+    attemptConnectPromise = new Promise((resolve, reject) => {
+      newWebSocket.on('open', () => {
+        attemptConnectPromise = undefined
+        resolve(newWebSocket)
+      })
+      newWebSocket.on('error', e => {
+        attemptConnectPromise = undefined
+        reject(new Error('Connection failed'))
+      })
+    })
+    return attemptConnectPromise
+  }
+  ws = await attemptConnect()
+
   const api = new Proxy({}, {
     get (target, prop) {
       // generate rpc calls as needed
@@ -20,8 +35,13 @@ export async function create (endpoint = 'ws://localhost:3000/', recoverSessionF
                   // send call
                   return await ws.call(`${prop}.${prop2}`, params)
                 } catch (e) {
-                  if (e.code === SESSION_ERROR_CODE && recoverSessionFn) {
+                  const isSocketDead =  e?.toString()?.includes('socket not ready')
+                  if ((e.code === SESSION_ERROR_CODE || isSocketDead) && recoverSessionFn) {
                     // session is missing, try to recover it
+                    if (isSocketDead) {
+                      // entire connection died, recreate it
+                      ws = await attemptConnect()
+                    }
                     if (await recoverSessionFn()) {
                       // success, send the call again
                       try {

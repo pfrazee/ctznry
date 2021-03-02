@@ -147,6 +147,7 @@ async function connectApi (domain) {
         } else {
           resolve(false)
         }
+        _sessionRecoverPromise = undefined
       })
       return _sessionRecoverPromise
     }
