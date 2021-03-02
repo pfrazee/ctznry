@@ -263,36 +263,38 @@ class CtznApp extends LitElement {
             </div>
           `}
         </section>
-        <section class="pt-1 mb-4">
-          <h3 class="font-bold mb-2 text-gray-500 text-xs">Suggested Communities</h3>
-          ${repeat(this.suggestedCommunities, community => community.userId, community => {
-            const hasJoined = this.memberships?.find(m => community.userId === m.value.community.userId)
-            return html`
-              <div class="text-sm mb-3">
-                <div>
-                  <a class="text-sm hover:pointer hover:underline" href="/${community.userId}" title=${community.displayName}>
-                  ${community.displayName}
-                  </a>
+        ${this.suggestedCommunities?.length ? html`
+          <section class="pt-1 mb-4">
+            <h3 class="font-bold mb-2 text-gray-500 text-xs">Suggested Communities</h3>
+            ${repeat(this.suggestedCommunities, community => community.userId, community => {
+              const hasJoined = this.memberships?.find(m => community.userId === m.value.community.userId)
+              return html`
+                <div class="text-sm mb-3">
+                  <div>
+                    <a class="text-sm hover:pointer hover:underline" href="/${community.userId}" title=${community.displayName}>
+                    ${community.displayName}
+                    </a>
+                  </div>
+                  <div class="text-gray-600 mb-1">${community.description}</div>
+                  <div>
+                    ${hasJoined ? html`
+                      <button
+                        class="border border-blue-400 px-4 py-0.5 rounded-2xl text-blue-600 text-sm cursor-default"
+                        disabled
+                      >Joined!</button>
+                    ` : html`
+                      <button
+                        class="border border-blue-400 hover:bg-gray-100 hover:pointer px-4 py-0.5 rounded-2xl text-blue-600 text-sm"
+                        @click=${e => this.onClickJoinSuggestedCommunity(e, community)}
+                        ?disabled=${hasJoined}
+                      >${community.isJoining ? html`<span class="spinner"></span>` : 'Join'}</button>
+                    `}
+                  </div>
                 </div>
-                <div class="text-gray-600 mb-1">${community.description}</div>
-                <div>
-                  ${hasJoined ? html`
-                    <button
-                      class="border border-blue-400 px-4 py-0.5 rounded-2xl text-blue-600 text-sm cursor-default"
-                      disabled
-                    >Joined!</button>
-                  ` : html`
-                    <button
-                      class="border border-blue-400 hover:bg-gray-100 hover:pointer px-4 py-0.5 rounded-2xl text-blue-600 text-sm"
-                      @click=${e => this.onClickJoinSuggestedCommunity(e, community)}
-                      ?disabled=${hasJoined}
-                    >${community.isJoining ? html`<span class="spinner"></span>` : 'Join'}</button>
-                  `}
-                </div>
-              </div>
-            `
-          })}
-        </section>
+              `
+            })}
+          </section>
+        ` : ''}
       </nav>
     `
   }

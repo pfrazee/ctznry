@@ -163,39 +163,41 @@ class CtznCommunities extends LitElement {
               `}
             </div>
           ` : ''}
-          <div class="border border-gray-200 text-xl font-semibold px-4 py-2 sticky top-0 z-10 bg-white">
-            Suggested Communities
-          </div>
-          ${repeat(this.suggestedCommunities, community => community.userId, community => {
-            const hasJoined = this.memberships?.find(m => community.userId === m.value.community.userId)
-            return html`
-              <div class="flex bg-white border border-gray-200 border-t-0 px-4 py-3">
-                <img class="block rounded-full w-10 h-10 mr-4" src=${AVATAR_URL(community.userId)}>
-                <div class="flex-1 min-w-0">
-                  <div>
-                    <a class="font-medium hover:pointer hover:underline" href="/${community.userId}" title=${community.displayName}>
-                      ${community.displayName}
-                    </a>
+          ${this.suggestedCommunities?.length ? html`
+            <div class="border border-gray-200 text-xl font-semibold px-4 py-2 sticky top-0 z-10 bg-white">
+              Suggested Communities
+            </div>
+            ${repeat(this.suggestedCommunities, community => community.userId, community => {
+              const hasJoined = this.memberships?.find(m => community.userId === m.value.community.userId)
+              return html`
+                <div class="flex bg-white border border-gray-200 border-t-0 px-4 py-3">
+                  <img class="block rounded-full w-10 h-10 mr-4" src=${AVATAR_URL(community.userId)}>
+                  <div class="flex-1 min-w-0">
+                    <div>
+                      <a class="font-medium hover:pointer hover:underline" href="/${community.userId}" title=${community.displayName}>
+                        ${community.displayName}
+                      </a>
+                    </div>
+                    <div class="text-gray-600 mb-1">${community.description}</div>
+                    ${session.isActive() ? html`<div>
+                      ${hasJoined ? html`
+                        <button
+                          class="border border-blue-400 px-6 py-1 rounded-2xl text-blue-600 text-sm cursor-default"
+                          disabled
+                        >Joined!</button>
+                      ` : html`
+                        <button
+                          class="border border-blue-400 hover:bg-gray-100 hover:pointer px-6 py-1 rounded-2xl text-blue-600 text-sm"
+                          @click=${e => this.onClickJoinSuggestedCommunity(e, community)}
+                          ?disabled=${hasJoined}
+                        >${community.isJoining ? html`<span class="spinner"></span>` : 'Join'}</button>
+                      `}
+                    </div>` : ''}
                   </div>
-                  <div class="text-gray-600 mb-1">${community.description}</div>
-                  ${session.isActive() ? html`<div>
-                    ${hasJoined ? html`
-                      <button
-                        class="border border-blue-400 px-6 py-1 rounded-2xl text-blue-600 text-sm cursor-default"
-                        disabled
-                      >Joined!</button>
-                    ` : html`
-                      <button
-                        class="border border-blue-400 hover:bg-gray-100 hover:pointer px-6 py-1 rounded-2xl text-blue-600 text-sm"
-                        @click=${e => this.onClickJoinSuggestedCommunity(e, community)}
-                        ?disabled=${hasJoined}
-                      >${community.isJoining ? html`<span class="spinner"></span>` : 'Join'}</button>
-                    `}
-                  </div>` : ''}
                 </div>
-              </div>
-            `
-          })}
+              `
+            })}
+          ` : ''}
         </div>
       </main>
     `
