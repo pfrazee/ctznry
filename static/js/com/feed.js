@@ -137,6 +137,7 @@ export class Feed extends LitElement {
     console.log(results)
     this.results = results
     this.activeQuery = undefined
+    this.hasNewItems = false
     emit(this, 'load-state-updated', {detail: {isEmpty: this.results.length === 0}})
   }
 
