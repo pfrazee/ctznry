@@ -46,6 +46,7 @@ class CommentComposer extends LitElement {
       <form @submit=${this.onSubmit}>
         <div class="mb-2">
           <textarea
+            id="text"
             class="w-full box-border resize-none outline-none h-32 text-base"
             placeholder=${this.placeholder}
             @keyup=${this.onTextareaKeyup}
@@ -101,14 +102,8 @@ class CommentComposer extends LitElement {
       if (this.parent && this.parent.dbUrl !== root.dbUrl) {
         reply.parent = this.parent
       }
-      console.log({
-        text: this.draftText,
-        reply,
-        community: this.community
-      })
-      // return
       res = await session.api.comments.create({
-        text: this.draftText,
+        text: this.querySelector('#text').value,
         reply,
         community: this.community
       })
