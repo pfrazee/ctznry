@@ -10,6 +10,13 @@ export class ViewThreadPopup extends BasePopup {
   constructor (opts) {
     super()
     this.subject = opts.subject
+
+    try {
+      const path = opts.subject.dbUrl.split('/').slice(3).join('/')
+      this.addToHistory(`/${opts.subject.authorId}/${path}`)
+    } catch (e) {
+      console.log('Failed to add popup to history', e)
+    }
   }
 
   static get properties () {

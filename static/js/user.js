@@ -13,6 +13,7 @@ import * as session from './lib/session.js'
 import { getProfile, listFollowers, listFollows, listMembers, listMemberships, listRoles } from './lib/getters.js'
 import * as displayNames from './lib/display-names.js'
 import { pluralize } from './lib/strings.js'
+import * as history from './lib/history.js'
 import './com/header.js'
 import './com/button.js'
 import './com/feed.js'
@@ -40,6 +41,7 @@ class CtznUser extends LitElement {
 
   constructor () {
     super()
+    history.setup()
     this.userProfile = undefined
     this.currentView = 'feed'
     this.followers = undefined

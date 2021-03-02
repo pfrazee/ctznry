@@ -5,6 +5,7 @@ import * as toast from './com/toast.js'
 import * as session from './lib/session.js'
 import { listMemberships } from './lib/getters.js'
 import * as displayNames from './lib/display-names.js'
+import * as history from './lib/history.js'
 import './com/header.js'
 import './com/button.js'
 import './com/login.js'
@@ -89,6 +90,7 @@ class CtznApp extends LitElement {
 
   constructor () {
     super()
+    history.setup()
     this.isLoading = true
     this.searchQuery = ''
     this.isEmpty = false

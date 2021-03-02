@@ -5,6 +5,7 @@ import * as session from './lib/session.js'
 import { AVATAR_URL } from './lib/const.js'
 import { getProfile, listMemberships } from './lib/getters.js'
 import * as displayNames from './lib/display-names.js'
+import * as history from './lib/history.js'
 import './com/header.js'
 import './com/button.js'
 import './com/login.js'
@@ -89,6 +90,7 @@ class CtznCommunities extends LitElement {
 
   constructor () {
     super()
+    history.setup()
     this.isLoading = true
     this.isEmpty = false
     this.memberships = undefined

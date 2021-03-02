@@ -2,7 +2,7 @@ import { LitElement, html } from '../vendor/lit-element/lit-element.js'
 import { ViewThreadPopup } from './com/popups/view-thread.js'
 import * as toast from './com/toast.js'
 import * as session from './lib/session.js'
-import { pluralize } from './lib/strings.js'
+import * as history from './lib/history.js'
 import './com/header.js'
 import './com/notifications-feed.js'
 import './com/img-fallbacks.js'
@@ -21,6 +21,7 @@ class CtznNotifications extends LitElement {
 
   constructor () {
     super()
+    history.setup()
     this.notificationsClearedAt = undefined
     this.isEmpty = false
 

@@ -4,6 +4,7 @@ import * as toast from './com/toast.js'
 import * as session from './lib/session.js'
 import { getProfile } from './lib/getters.js'
 import { joinPath, ucfirst } from './lib/strings.js'
+import * as history from './lib/history.js'
 import './com/header.js'
 import './com/button.js'
 import './com/thread.js'
@@ -23,6 +24,7 @@ class CtznPostPage extends LitElement {
 
   constructor () {
     super()
+    history.setup()
     this.authorProfile = undefined
     this.subject = undefined
 

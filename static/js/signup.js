@@ -3,6 +3,7 @@ import { repeat } from '../vendor/lit-element/lit-html/directives/repeat.js'
 import { asyncReplace } from '../vendor/lit-element/lit-html/directives/async-replace.js'
 import * as session from './lib/session.js'
 import { HTTP_ENDPOINT } from './lib/const.js'
+import * as history from './lib/history.js'
 import './com/header.js'
 import './com/button.js'
 
@@ -31,6 +32,7 @@ class CtznSignup extends LitElement {
 
   constructor () {
     super()
+    history.setup()
     this.isProcessing = false
     this.currentError = undefined
     this.currentStage = 1

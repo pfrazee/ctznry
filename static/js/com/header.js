@@ -41,7 +41,6 @@ export class Header extends LitElement {
       let diffX = touchendX - touchstartX
       let diffY = touchendY - touchstartY
       let diffXNormalized = diffX / Math.abs(diffY + 1)
-      console.log(diffXNormalized)
       if (diffX > 100 && diffXNormalized > 10) {
         this.isMenuOpen = true
       }
