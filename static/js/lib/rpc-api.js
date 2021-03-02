@@ -3,8 +3,11 @@ import * as rpcWebsockets from '../../vendor/rpc-websockets/bundle.js'
 const SESSION_ERROR_CODE = -32001
 
 export async function create (endpoint = 'ws://localhost:3000/', recoverSessionFn) {
-  const ws = new rpcWebsockets.Client(endpoint)
-  await new Promise(resolve => ws.on('open', resolve))
+  const ws = new rpcWebsockets.Client(endpoint, {reconnect: false})
+  await new Promise((resolve, reject) => {
+    ws.on('open', resolve)
+    ws.on('error', e => reject(new Error('Connection failed')))
+  })
   const api = new Proxy({}, {
     get (target, prop) {
       // generate rpc calls as needed

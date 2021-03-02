@@ -1,5 +1,6 @@
 import { DEBUG_ENDPOINTS } from './const.js'
 import { create as createRpcApi } from './rpc-api.js'
+import * as toast from '../com/toast.js'
 
 let emitter = new EventTarget()
 export let info = undefined
@@ -8,8 +9,9 @@ export let myFollowers = undefined
 export let api = undefined
 
 export async function setup () {
+  let oldSessionInfo
   try {
-    const oldSessionInfo = JSON.parse(localStorage.getItem('session-info'))
+    oldSessionInfo = JSON.parse(localStorage.getItem('session-info'))
     if (!oldSessionInfo) return
 
     const newApi = await connectApi(oldSessionInfo.domain)
@@ -26,6 +28,9 @@ export async function setup () {
       throw new Error('Session not found')
     }
   } catch (e) {
+    if (e.toString().includes('Connection failed')) {
+      toast.create(`Failed to connect to your server at ${oldSessionInfo.domain}`, 'error')
+    }
     console.error('Failed to resume API session')
     console.error(e)
   }

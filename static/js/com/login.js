@@ -18,11 +18,6 @@ class CtznLogin extends LitElement {
     super()
     this.isLoggingIn = false
     this.currentError = undefined
-    this.load()
-  }
-
-  async load () {
-    await session.setup()
   }
 
   firstUpdated () {
