@@ -1,6 +1,8 @@
 import * as rpcWebsockets from '../../vendor/rpc-websockets/bundle.js'
 
-export async function create (endpoint = 'ws://localhost:3000/') {
+const SESSION_ERROR_CODE = -32001
+
+export async function create (endpoint = 'ws://localhost:3000/', recoverSessionFn) {
   const ws = new rpcWebsockets.Client(endpoint)
   await new Promise(resolve => ws.on('open', resolve))
   const api = new Proxy({}, {
@@ -12,9 +14,22 @@ export async function create (endpoint = 'ws://localhost:3000/') {
             if (!(prop2 in target)) {
               target[prop2] = async (...params) => {
                 try {
+                  // send call
                   return await ws.call(`${prop}.${prop2}`, params)
                 } catch (e) {
-                  throw new Error(e.data || e.message)
+                  if (e.code === SESSION_ERROR_CODE && recoverSessionFn) {
+                    // session is missing, try to recover it
+                    if (await recoverSessionFn()) {
+                      // success, send the call again
+                      try {
+                        return await ws.call(`${prop}.${prop2}`, params)
+                      } catch (e) {
+                        throw new Error(e.data || e.message)
+                      }
+                    }
+                  } else {
+                    throw new Error(e.data || e.message)
+                  }
                 }
               }
             }

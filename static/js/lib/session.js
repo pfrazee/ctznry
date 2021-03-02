@@ -22,6 +22,8 @@ export async function setup () {
       api = newApi
       emitter.dispatchEvent(new Event('change'))
       await loadSecondaryState()
+    } else {
+      throw new Error('Session not found')
     }
   } catch (e) {
     console.error('Failed to resume API session')
@@ -123,9 +125,27 @@ export function onChange (cb, opts) {
   emitter.addEventListener('change', cb, opts)
 }
 
+let _sessionRecoverPromise = undefined
 async function connectApi (domain) {
   const wsEndpoint = (domain in DEBUG_ENDPOINTS) ? `ws://${DEBUG_ENDPOINTS[domain]}/` : `wss://${domain}/`
-  return createRpcApi(wsEndpoint)
+  return createRpcApi(wsEndpoint, async () => {
+    if (_sessionRecoverPromise) return _sessionRecoverPromise
+    if (api && hasOneSaved()) {
+      // we still have a saved session, try to resume again
+      _sessionRecoverPromise = new Promise(async (resolve) => {
+        const newSessionInfo = await api.accounts.resumeSession(info.sessionId).catch(e => undefined)
+        if (newSessionInfo) {
+          Object.assign(info, newSessionInfo)
+          console.debug('Recovered session', info)
+          localStorage.setItem('session-info', JSON.stringify(info))
+          resolve(true)
+        } else {
+          resolve(false)
+        }
+      })
+      return _sessionRecoverPromise
+    }
+  })
 }
 
 function getUniqFollowers (followers) {
