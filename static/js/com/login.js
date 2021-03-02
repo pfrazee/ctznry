@@ -59,7 +59,7 @@ class CtznLogin extends LitElement {
             ></ctzn-button>
           </div>
           <div class="relative text-center border-t border-gray-300 pt-8 mt-6">
-            <span class="absolute bg-gray-50 px-3 text-gray-500" style="top: -14px; left: 50%; transform: translateX(-50%);">or</span>
+            <span class="absolute bg-white px-3 text-gray-500" style="top: -14px; left: 50%; transform: translateX(-50%);">or</span>
             <ctzn-button btn-class="py-2 px-8 font-semibold rounded-full" color="pink" label="Sign up" href="/signup"></ctzn-button>
           </div>
         </form>
