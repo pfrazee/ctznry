@@ -14,7 +14,8 @@ class CtznPostPage extends LitElement {
   static get properties () {
     return {
       authorProfile: {type: Object},
-      subject: {type: Object}
+      subject: {type: Object},
+      loadError: {type: Object}
     }
   }
 
@@ -27,6 +28,7 @@ class CtznPostPage extends LitElement {
     history.setup()
     this.authorProfile = undefined
     this.subject = undefined
+    this.loadError = undefined
 
     this.load()
   }
@@ -37,10 +39,14 @@ class CtznPostPage extends LitElement {
     let pathname = window.location.pathname
     let [userId, schemaDomain, schemaName, key] = pathname.split('/').filter(Boolean)
 
-    this.authorProfile = await getProfile(userId)
-    this.subject = {
-      authorId: userId,
-      dbUrl: joinPath(this.authorProfile.dbUrl, schemaDomain, schemaName, key)
+    try {
+      this.authorProfile = await getProfile(userId)
+      this.subject = {
+        authorId: userId,
+        dbUrl: joinPath(this.authorProfile.dbUrl, schemaDomain, schemaName, key)
+      }
+    } catch (e) {
+      this.loadError = e
     }
     document.title = `${ucfirst(schemaName)} by ${this.authorProfile?.value.displayName || userId} | CTZN`
   }
@@ -64,10 +70,23 @@ class CtznPostPage extends LitElement {
   }
 
   renderCurrentView () {
+    if (this.loadError) {
+      return this.renderError()
+    }
     if (!this.authorProfile) {
       return this.renderLoading()
     }
     return this.renderThread()
+  }
+
+  renderError () {
+    return html`
+      <div class="text-gray-500 py-44 text-center my-5">
+        <div class="fas fa-exclamation-triangle text-6xl text-gray-300 mb-8"></div>
+        <div>There was an error while trying to load this content.</div>
+        <pre class="py-2">${this.loadError.toString()}</pre>
+      </div>
+    `
   }
 
   renderLoading () {
@@ -100,7 +119,7 @@ class CtznPostPage extends LitElement {
   renderNotFound () {
     return html`
       <div class="bg-gray-100 text-gray-500 py-44 text-center my-5">
-        <div class="fas fa-stream text-6xl text-gray-300 mb-8"></div>
+        <div class="fas fa-exclamation-triangle text-6xl text-gray-300 mb-8"></div>
         <div>404 Not Found</div>
       </div>
     `
