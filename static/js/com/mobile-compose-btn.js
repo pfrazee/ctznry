@@ -22,8 +22,8 @@ export class MobileComposeBtn extends LitElement {
   render () {
     return html`
       <div
-        class="fixed z-30 flex items-center justify-center bg-blue-500 text-white w-12 h-12 rounded-full shadow-lg lg:hidden"
-        style="right: 10px; bottom: calc(70px + env(safe-area-inset-bottom))"
+        class="fixed z-30 flex items-center justify-center bg-blue-500 text-white w-16 h-16 rounded-full shadow-lg lg:hidden"
+        style="right: 10px; bottom: 100px"
         @click=${this.onClickCreatePost}
       ><span class="fas fa-feather-alt"></span></div>
     `
