@@ -128,7 +128,7 @@ export class NotificationsFeed extends LitElement {
     if (!this.results) {
       return html`
         ${this.title ? html`<h2  class="results-header"><span>${this.title}</span></h2>` : ''}
-        <div class="border border-gray-200">
+        <div class="border border-gray-200 px-6 py-5 text-gray-500">
           <span class="spinner"></span>
         </div>
       `
