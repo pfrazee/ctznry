@@ -43,6 +43,7 @@ class PostComposer extends LitElement {
   get canPost () {
     return !this.isProcessing && (
       (this.draftText.length > 0 && this.draftText.length <= CHAR_LIMIT)
+      || this.media.filter(Boolean).length > 0
     )
   }
 
