@@ -43,3 +43,10 @@ export async function resizeImage (dataUrl, maxWidth, quality = 0.9) {
 
   return canvas.toDataURL('image/jpeg', quality)
 }
+
+
+export async function shrinkImage (dataUrl, factor = 0.9, mimeType = 'image/jpeg') {
+  let canvas = await renderCanvas(dataUrl)
+  canvas = scaleCanvas(canvas, factor)
+  return canvas.toDataURL(mimeType)
+}

@@ -164,7 +164,7 @@ export class PostExpanded extends LitElement {
       </a>
     `
     return html`
-      <div class="mt-1">
+      <div class="mt-1 mb-3">
         ${repeat(media, item => img(item))}
       </div>
     `

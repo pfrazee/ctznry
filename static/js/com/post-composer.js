@@ -41,7 +41,9 @@ class PostComposer extends LitElement {
   }
 
   get canPost () {
-    return !this.isProcessing && this.draftText.length > 0 && this.draftText.length <= CHAR_LIMIT
+    return !this.isProcessing && (
+      (this.draftText.length > 0 && this.draftText.length <= CHAR_LIMIT)
+    )
   }
 
   get communityName () {
@@ -209,7 +211,6 @@ class PostComposer extends LitElement {
     Array.from(e.currentTarget.files).forEach(file => {
       var fr = new FileReader()
       fr.onload = () => {
-        // this.loadImg(fr.result)
         this.media = this.media.concat({
           caption: '',
           blobs: {
@@ -318,7 +319,19 @@ class PostComposer extends LitElement {
         }
         if (!item.blobs.original?.blobName) {
           let originalData = parseDataUrl(item.blobs.original.dataUrl)
-          let res = await session.api.blobs.create(originalData.base64buf)
+          let originalMimeType = originalData.mimeType
+          let res
+          let lastError
+          for (let i = 1; i < 6; i++) {
+            try {
+              res = await session.api.blobs.create(originalData.base64buf)
+            } catch (e) {
+              lastError = e
+              let dataUrl = await images.shrinkImage(item.blobs.original.dataUrl, (10 - i) / 10, originalMimeType)
+              originalData = parseDataUrl(dataUrl)
+            }
+          }
+          if (!res) throw lastError
           item.blobs.original = {
             blobName: res.name,
             mimeType: originalData.mimeType
