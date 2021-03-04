@@ -157,10 +157,13 @@ export class PostExpanded extends LitElement {
     const img = (item) => html`
       <a href=${BLOB_URL(this.post.author.userId, (item.blobs.original || item.blobs.thumb).blobName)} target="_blank">
         <img
-          class="box-border object-cover rounded w-full h-full mb-1"
+          class="box-border object-cover w-full h-full ${item.caption ? 'rounded-t' : 'mb-1 rounded'}"
           src=${BLOB_URL(this.post.author.userId, (item.blobs.thumb || item.blobs.original).blobName)}
           alt=${item.caption || 'Image'}
         >
+        ${item.caption ? html`
+          <div class="bg-gray-100 px-3 py-1 rounded-b mb-1">${item.caption}</div>
+        ` : ''}
       </a>
     `
     return html`
