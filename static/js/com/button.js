@@ -36,7 +36,7 @@ export class Button extends LitElement {
         colors = `bg-${color}-400 text-${color}-50`
       }
     } else if (this.disabled) {
-      colors = 'bg-gray-100 text-gray-50'
+      colors = 'bg-gray-100 text-gray-500'
     }
     let paddings = ''
     if (!/p(x|l|r)-/.test(parentClass)) paddings += 'px-4 '

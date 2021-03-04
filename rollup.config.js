@@ -40,5 +40,19 @@ export default [
       file: 'static/js/communities.build.js',
       format: 'iife'
     }
+  },
+  {
+    input: 'static/js/account.js',
+    output: {
+      file: 'static/js/account.build.js',
+      format: 'iife'
+    }
+  },
+  {
+    input: 'static/js/forgot-password.js',
+    output: {
+      file: 'static/js/forgot-password.build.js',
+      format: 'iife'
+    }
   }
 ]

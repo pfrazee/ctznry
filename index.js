@@ -35,6 +35,10 @@ export async function start ({port, configDir, domain}) {
     res.sendFile('static/communities.html', {root: process.cwd()})
   })
 
+  app.get('/account', (req, res) => {
+    res.sendFile('static/account.html', {root: process.cwd()})
+  })
+
   app.get('/profile', (req, res) => {
     res.sendFile('static/user.html', {root: process.cwd()})
   })

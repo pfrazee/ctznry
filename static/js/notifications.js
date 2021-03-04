@@ -118,7 +118,7 @@ class CtznNotifications extends LitElement {
   }
 
   onUnreadNotificationsChanged (e) {
-    document.title = `(${e.detail.count}) Notifications | CTZN`
+    document.title = e.detail.count ? `(${e.detail.count}) Notifications | CTZN` : `Notifications | CTZN`
   }
 }
 

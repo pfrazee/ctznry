@@ -173,7 +173,8 @@ export class Header extends LitElement {
     if (session.hasOneSaved()) {
       return html`
         <span class="hidden lg:block lg:flex-grow"></span>
-        <div class="pb-6 pt-6 lg:pt-0">
+        <div class="pb-6 pt-6 lg:pt-0 flex flex-col">
+          <a class=${this.getMenuNavClass('/account')} href="/account"><span class="fas fa-fw fa-cog mr-1.5"></span> Account</a>
           <a class=${this.getMenuNavClass()} href="#" @click=${this.onLogOut}>
             <span class="fas fa-fw fa-sign-out-alt mr-1.5"></span> Log out
           </a>

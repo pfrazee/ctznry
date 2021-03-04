@@ -7,10 +7,6 @@ import { getProfile, listMemberships } from './lib/getters.js'
 import * as displayNames from './lib/display-names.js'
 import * as history from './lib/history.js'
 import './com/header.js'
-import './com/button.js'
-import './com/login.js'
-import './com/feed.js'
-import './com/img-fallbacks.js'
 
 const SUGGESTED_COMMUNITIES = [
   {
@@ -134,7 +130,7 @@ class CtznCommunities extends LitElement {
       return this.renderLoading()
     }
     return html`
-      <ctzn-header @post-created=${e => this.load()}></ctzn-header>
+      <ctzn-header></ctzn-header>
       <main>
         <div class="pb-16">
           ${session.isActive() ? html`

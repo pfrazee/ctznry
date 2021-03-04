@@ -104,6 +104,24 @@ export async function doSignup ({domain, username, displayName, description, ava
   return newSessionInfo
 }
 
+export async function doRequestPasswordChangeCode (userId) {
+  const [username, domain] = userId.split('@')
+  if (!username || !domain) {
+    throw new Error('Invalid UserID: it should look like bob@ctzn.one')
+  }
+  const newApi = await connectApi(domain)
+  await newApi.accounts.requestChangePasswordCode(username)
+}
+
+export async function doChangePasswordUsingCode (userId, passwordChangeCode, newPassword) {
+  const [username, domain] = userId.split('@')
+  if (!username || !domain) {
+    throw new Error('Invalid UserID: it should look like bob@ctzn.one')
+  }
+  const newApi = await connectApi(domain)
+  await newApi.accounts.changePasswordUsingCode(username, passwordChangeCode, newPassword)
+}
+
 export function hasOneSaved () {
   return !!localStorage.getItem('session-info')
 }

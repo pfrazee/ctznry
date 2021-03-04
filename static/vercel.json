@@ -6,6 +6,7 @@
     { "src": "/forgot-password", "dest": "/forgot-password.html" },
     { "src": "/notifications", "dest": "/notifications.html" },
     { "src": "/communities", "dest": "/communities.html" },
+    { "src": "/account", "dest": "/account.html" },
     { "src": "/search", "dest": "/search.html" },
     { "src": "/signup", "dest": "/signup.html" }
   ]
