@@ -32,6 +32,11 @@ export function FULL_COMMENT_URL (comment) {
   return location.origin + '/' + joinPath(comment.author.userId, 'ctzn.network/comment', comment.key)
 }
 
+export function BLOB_URL (userId, blobName) {
+  const {domain, username} = parseUserId(userId)
+  return joinPath(HTTP_ENDPOINT(domain), 'ctzn/blobs', userId, blobName)
+}
+
 export const PERM_DESCRIPTIONS = {
   'ctzn.network/perm-community-ban': `Can remove, ban, and unban members from a community.`,
   'ctzn.network/perm-community-remove-post': `Can remove posts from the community.`,

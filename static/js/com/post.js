@@ -1,6 +1,6 @@
 import { LitElement, html } from '../../vendor/lit-element/lit-element.js'
 import { unsafeHTML } from '../../vendor/lit-element/lit-html/directives/unsafe-html.js'
-import { POST_URL, FULL_POST_URL } from '../lib/const.js'
+import { POST_URL, FULL_POST_URL, BLOB_URL } from '../lib/const.js'
 import * as session from '../lib/session.js'
 import { emit } from '../lib/dom.js'
 import { makeSafe, linkify } from '../lib/strings.js'
@@ -163,6 +163,7 @@ export class Post extends LitElement {
               : ''
           }</div>
           ${this.nometa ? '' : html`
+            ${this.renderMedia()}
             <div class="flex pl-1 text-gray-500 text-sm items-center">
               ${this.renderRepliesCtrl()}
               <div>
@@ -173,6 +174,50 @@ export class Post extends LitElement {
             </div>
           `}
         </div>
+      </div>
+    `
+  }
+
+  renderMedia () {
+    if (!this.post.value.media?.length) {
+      return ''
+    }
+    const media = this.post.value.media
+    const img = (item, maxHeight) => html`
+      <img
+        class="box-border object-cover rounded w-full h-full"
+        style="max-height: ${maxHeight}px"
+        src="${BLOB_URL(this.post.author.userId, (item.blobs.thumb || item.blobs.original).blobName)}"
+        alt=${item.caption || 'Image'}
+      >
+    `
+    const moreImages = media.length - 4
+    return html`
+      <div class="flex mt-1">
+        ${media.length >= 4 ? html`
+          <div class="flex-1 flex flex-col pr-0.5">
+            <div class="flex-1 pb-0.5">${img(media[0], 210)}</div>
+            <div class="flex-1 pt-0.5">${img(media[2], 210)}</div>
+          </div>
+          <div class="flex-1 flex flex-col pl-0.5">
+            <div class="flex-1 pb-0.5">${img(media[1], 210)}</div>
+            <div class="flex-1 pt-0.5">${img(media[3], 210)}</div>
+          </div>
+        ` : media.length === 3 ? html`
+          <div class="flex-1 pr-0.5">${img(media[0], 420)}</div>
+          <div class="flex-1 flex flex-col pl-0.5">
+            <div class="flex-1 pb-0.5">${img(media[1], 205)}</div>
+            <div class="flex-1 pt-0.5">${img(media[2], 205)}</div>
+          </div>
+        ` : media.length === 2 ? html`
+          <div class="flex-1 pr-0.5">${img(media[0], 210)}</div>
+          <div class="flex-1 pl-0.5">${img(media[1], 210)}</div>
+        ` : html`
+          <div class="flex-1">${img(media[0], 420)}</div>
+        `}
+      </div>
+      <div class="mb-3">
+        ${moreImages > 0 ? html`<div class="bg-gray-100 font-bold mt-1 px-2 py-0.5 rounded text-sm">+${moreImages} more...</div>` : ''}
       </div>
     `
   }

@@ -71,7 +71,7 @@ export class EditProfilePopup extends BasePopup {
           ${this.avatarUrl ? html`
             <img class="block mx-auto my-4 w-48 h48 rounded-full cursor-pointer hover:opacity-50" src=${this.avatarUrl} @click=${this.onClickAvatar}>
           ` : html`
-            <canvas class="block mx-auto my-4 w-48 h48 rounded-full cursor-pointer hover:opacity-50" id="avatar-canvas" width=${CANVAS_SIZE} height=${CANVAS_SIZE} @click=${this.onClickAvatar}></canvas>
+            <canvas class="block mx-auto my-4 w-48 h-48 rounded-full cursor-pointer hover:opacity-50" id="avatar-canvas" width=${CANVAS_SIZE} height=${CANVAS_SIZE} @click=${this.onClickAvatar}></canvas>
           `}
           <div class="text-center mb-4">
             <ctzn-button tabindex="1" @click=${this.onClickAvatar} label="Change Avatar"></ctzn-button>

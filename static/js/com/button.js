@@ -29,6 +29,11 @@ export class Button extends LitElement {
       if (this.disabled) {
         colors = 'bg-blue-400 text-blue-50'
       }
+    } else if (this.hasAttribute('transparent')) {
+      colors = 'hover:bg-gray-100'
+      if (this.disabled) {
+        colors = 'bg-gray-100'
+      }
     } else if (this.hasAttribute('color')) {
       const color = this.getAttribute('color')
       colors = `bg-${color}-600 text-white hover:bg-${color}-700`
@@ -38,14 +43,18 @@ export class Button extends LitElement {
     } else if (this.disabled) {
       colors = 'bg-gray-100 text-gray-500'
     }
+    
     let paddings = ''
     if (!/p(x|l|r)-/.test(parentClass)) paddings += 'px-4 '
     if (!/p(y|t|b)-/.test(parentClass)) paddings += 'py-2'
+
+    let shadow = 'shadow-sm'
     let borders = `border border-gray-300`
     if (/border/.test(parentClass)) borders = ''
     else if (this.hasAttribute('primary')) borders = 'border border-blue-800'
+    else if (this.hasAttribute('transparent')) { borders = ''; shadow = '' }
     else if (this.hasAttribute('color')) borders = `border border-${this.getAttribute('color')}-800`
-    return `rounded ${colors} ${paddings} ${borders} shadow-sm ${parentClass}`
+    return `rounded ${colors} ${paddings} ${borders} ${shadow} ${parentClass}`
   }
 
   renderSpinner () {

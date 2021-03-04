@@ -1,6 +1,7 @@
 import { LitElement, html } from '../../vendor/lit-element/lit-element.js'
 import { unsafeHTML } from '../../vendor/lit-element/lit-html/directives/unsafe-html.js'
-import { AVATAR_URL, POST_URL, FULL_POST_URL } from '../lib/const.js'
+import { repeat } from '../../vendor/lit-element/lit-html/directives/repeat.js'
+import { AVATAR_URL, POST_URL, FULL_POST_URL, BLOB_URL } from '../lib/const.js'
 import * as session from '../lib/session.js'
 import { emit } from '../lib/dom.js'
 import { makeSafe, linkify } from '../lib/strings.js'
@@ -140,9 +141,31 @@ export class PostExpanded extends LitElement {
         ${this.post.value.extendedText ? html`
           <div class="whitespace-pre-wrap break-words leading-snug text-gray-600 pt-2 pb-3">${this.renderPostExtendedText()}</div>
         ` : ''}
+        ${this.renderMedia()}
         ${this.noctrls ? '' : html`<div class="text-sm text-gray-600 px-1">
           ${this.renderRepliesCtrl()}
         </div>`}
+      </div>
+    `
+  }
+
+  renderMedia () {
+    if (!this.post.value.media?.length) {
+      return ''
+    }
+    const media = this.post.value.media
+    const img = (item) => html`
+      <a href=${BLOB_URL(this.post.author.userId, (item.blobs.original || item.blobs.thumb).blobName)} target="_blank">
+        <img
+          class="box-border object-cover rounded w-full h-full mb-1"
+          src=${BLOB_URL(this.post.author.userId, (item.blobs.thumb || item.blobs.original).blobName)}
+          alt=${item.caption || 'Image'}
+        >
+      </a>
+    `
+    return html`
+      <div class="mt-1">
+        ${repeat(media, item => img(item))}
       </div>
     `
   }

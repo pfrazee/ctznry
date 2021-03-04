@@ -1,26 +1,38 @@
 /* globals beaker monaco */
 import { LitElement, html } from '../../vendor/lit-element/lit-element.js'
+import { repeat } from '../../vendor/lit-element/lit-html/directives/repeat.js'
 import * as toast from './toast.js'
 import * as session from '../lib/session.js'
+import * as images from '../lib/images.js'
 import * as contextMenu from './context-menu.js'
 import * as displayNames from '../lib/display-names.js'
+import './button.js'
 
 const CHAR_LIMIT = 256
+const THUMB_WIDTH = 640
 
 class PostComposer extends LitElement {
   static get properties () {
     return {
+      isProcessing: {type: Boolean},
+      uploadProgress: {type: Number},
+      uploadTotal: {type: Number},
       isExtendedOpen: {type: Boolean},
       draftText: {type: String, attribute: 'draft-text'},
+      media: {type: Array},
       community: {type: Object},
     }
   }
 
   constructor () {
     super()
+    this.isProcessing = false
+    this.uploadProgress = 0
+    this.uploadTotal = 0
     this.isExtendedOpen = false
     this.placeholder = 'What\'s new?'
     this.draftText = ''
+    this.media = []
     this.community = undefined
   }
 
@@ -29,7 +41,7 @@ class PostComposer extends LitElement {
   }
 
   get canPost () {
-    return this.draftText.length > 0 && this.draftText.length <= CHAR_LIMIT
+    return !this.isProcessing && this.draftText.length > 0 && this.draftText.length <= CHAR_LIMIT
   }
 
   get communityName () {
@@ -109,16 +121,71 @@ class PostComposer extends LitElement {
           ></textarea>
         </section>
 
-        <div class="flex justify-between border-t border-gray-200 mt-4 pt-4">
-          <ctzn-button @click=${this.onCancel} tabindex="2" label="Cancel"></ctzn-button>
+        ${this.media.length ? html`
+          ${repeat(this.media, (item, index) => item ? html`
+            <div class="flex my-3 overflow-hidden rounded bg-gray-50">
+              <div class="flex-1 bg-black">
+                <img
+                  src=${item.blobs.original.dataUrl}
+                  class="block mx-auto"
+                >
+              </div>
+              <div class="flex-1 p-4">
+                <label class="block box-border mb-1 w-full" for="media-caption-${index}">Caption</label>
+                <input
+                  class="block border border-gray-300 box-border mb-1 px-3 py-2 rounded w-full"
+                  id="media-caption-${index}"
+                  placeholder="Optional"
+                >
+                <div class="text-sm px-0.5">
+                  <a class="text-blue-600 cursor-pointer hover:underline" @click=${e => this.onClickRemoveMedia(e, index)}>Remove</a>
+                </div>
+              </div>
+            </div>
+          ` : '')}
+        ` : ''}
+
+        <input
+          id="image-file-input"
+          class="hidden"
+          type="file"
+          accept=".jpg,.jpeg,.png"
+          multiple
+          @change=${this.onChooseImageFile}
+        >
+
+        <div class="flex border-t border-gray-200 mt-4 pt-4">
+          <ctzn-button
+            transparent
+            label="Cancel"
+            @click=${this.onCancel}
+          ></ctzn-button>
+          <div class="flex-1"></div>
+          <ctzn-button
+            transparent
+            btn-class="mr-2"
+            label="Add Image"
+            icon="far fa-image"
+            @click=${this.onClickAddImage}
+          ></ctzn-button>
           <ctzn-button
             primary
             btn-type="submit"
             ?disabled=${!this.canPost}
+            ?spinner=${this.isProcessing}
             tabindex="1"
             label="Create Post"
           ></ctzn-button>
         </div>
+
+        ${this.isProcessing && this.uploadTotal > 0 ? html`
+          <div class="bg-gray-100 mt-3 rounded overflow-hidden">
+            <div
+              class="bg-blue-500"
+              style="height: 2px; width: ${10 + (this.uploadProgress / this.uploadTotal * 90)|0}%; transition: width 0.1s"
+            ></div>
+          </div>
+        ` : ''}
       </form>
     `
   }
@@ -132,6 +199,31 @@ class PostComposer extends LitElement {
 
   onToggleExtendedText (e) {
     this.isExtendedOpen = !this.isExtendedOpen
+  }
+
+  onClickAddImage (e) {
+    this.querySelector('#image-file-input').click()
+  }
+
+  onChooseImageFile (e) {
+    Array.from(e.currentTarget.files).forEach(file => {
+      var fr = new FileReader()
+      fr.onload = () => {
+        // this.loadImg(fr.result)
+        this.media = this.media.concat({
+          caption: '',
+          blobs: {
+            original: {dataUrl: fr.result}
+          }
+        })
+      }
+      fr.readAsDataURL(file)
+    })
+  }
+
+  onClickRemoveMedia (e, index) {
+    this.media[index] = undefined
+    this.requestUpdate()
   }
 
   onCancel (e) {
@@ -204,17 +296,59 @@ class PostComposer extends LitElement {
       return
     }
 
+    this.isProcessing = true
+    this.uploadProgress = 0
+    this.uploadTotal = this.media.filter(Boolean).length
+
+    // upload media
+    for (let i = 0; i < this.media.length; i++) {
+      try {
+        let item = this.media[i]
+        if (!item) continue // happens if the item was removed
+
+        item.caption = document.getElementById(`media-caption-${i}`).value || undefined
+        if (!item.blobs.thumb?.blobName && item.blobs.original?.dataUrl) {
+          let thumbDataUrl = await images.resizeImage(item.blobs.original.dataUrl, THUMB_WIDTH)
+          let thumbData = parseDataUrl(thumbDataUrl)
+          let res = await session.api.blobs.create(thumbData.base64buf)
+          item.blobs.thumb = {
+            blobName: res.name,
+            mimeType: thumbData.mimeType
+          }
+        }
+        if (!item.blobs.original?.blobName) {
+          let originalData = parseDataUrl(item.blobs.original.dataUrl)
+          let res = await session.api.blobs.create(originalData.base64buf)
+          item.blobs.original = {
+            blobName: res.name,
+            mimeType: originalData.mimeType
+          }
+        }
+
+        this.uploadProgress++
+      } catch (e) {
+        this.isProcessing = false
+        toast.create(e.message, 'error')
+        console.log(e)
+        return
+      }
+    }
+
     let res
     try {
+      let media = this.media.filter(Boolean)
       let text = this.querySelector('#text').value
       let extendedText = this.querySelector('#extendedText').value
       res = await session.api.posts.create({
         text,
+        media: media?.length ? media : undefined,
         extendedText,
         community: this.community
       })
     } catch (e) {
+      this.isProcessing = false
       toast.create(e.message, 'error')
+      console.log(e)
       return
     }
     
@@ -224,3 +358,9 @@ class PostComposer extends LitElement {
 }
 
 customElements.define('ctzn-post-composer', PostComposer)
+
+function parseDataUrl (url) {
+  const [prelude, base64buf] = url.split(',')
+  const mimeType = /data:([^\/]+\/[^;]+)/.exec(prelude)[1]
+  return {mimeType, base64buf}
+}
