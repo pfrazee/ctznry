@@ -69,8 +69,8 @@ export class Header extends LitElement {
   }
 
   getMobileNavClass (str) {
-    const additions = str === location.pathname ? 'text-blue-600' : ''
-    return `px-6 py-2 text-2xl font-semibold rounded ${additions}`
+    const additions = str === location.pathname ? 'text-blue-600' : 'text-gray-500'
+    return `px-6 py-2 text-xl font-semibold ${additions}`
   }
 
   render () {
@@ -126,7 +126,7 @@ export class Header extends LitElement {
           ${this.renderSessionCtrls()}
         </div>
         <div class="mobile-top box-border flex bg-white border-b border-gray-300">
-          <a class=${this.getMobileNavClass()} @click=${this.onToggleMenu}>
+          <a class="font-semibold px-4 py-3 text-gray-500" @click=${this.onToggleMenu}>
             <span class="fas fa-fw fa-bars"></span>
           </a>
           <span class="flex-grow"></span>
@@ -159,7 +159,9 @@ export class Header extends LitElement {
           <a href="/communities" class="flex-1 text-center ${this.getMobileNavClass('/communities')}">
             <span class="fas fa-fw navicon fa-users"></span>
           </a>
-          <span class="flex-1"></span>
+          <span class="flex-1 px-6 py-2">
+            <span class="fas fa-fw navicon fa-users" style="visibility: hidden"></span>
+          </span>
         </div>
       </header>
       ${this.isMenuOpen ? html`
