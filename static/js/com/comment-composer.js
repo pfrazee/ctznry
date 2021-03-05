@@ -50,6 +50,7 @@ class CommentComposer extends LitElement {
             class="w-full box-border resize-none outline-none h-32 text-base"
             placeholder=${this.placeholder}
             @keyup=${this.onTextareaKeyup}
+            @keydown=${this.onTextareaKeydown}
           ></textarea>
         </div>
 
@@ -77,6 +78,12 @@ class CommentComposer extends LitElement {
     this.draftText = e.currentTarget.value
   }
 
+  onTextareaKeydown (e) {
+    if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
+      this.onSubmit()
+    }
+  }
+
   onCancel (e) {
     e.preventDefault()
     e.stopPropagation()
@@ -85,8 +92,8 @@ class CommentComposer extends LitElement {
   }
 
   async onSubmit (e) {
-    e.preventDefault()
-    e.stopPropagation()
+    e?.preventDefault()
+    e?.stopPropagation()
 
     if (!this.canPost) {
       return

@@ -105,6 +105,7 @@ class PostComposer extends LitElement {
             class="py-2 px-3 w-full h-20 box-border resize-y text-lg border border-gray-300 rounded"
             placeholder="What's new?"
             @keyup=${this.onTextareaKeyup}
+            @keydown=${this.onTextareaKeydown}
           ></textarea>
           <div>
             <span class="px-2 ${this.charLimitClass}">
@@ -199,6 +200,12 @@ class PostComposer extends LitElement {
 
   onTextareaKeyup (e) {
     this.draftText = e.currentTarget.value
+  }
+
+  onTextareaKeydown (e) {
+    if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
+      this.onSubmit()
+    }
   }
 
   onToggleExtendedText (e) {
