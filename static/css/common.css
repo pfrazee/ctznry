@@ -26,6 +26,11 @@ header .mobile-top {
   left: 0;
   width: 100vw;
   height: 50px;
+  transition: top 0.1s;
+}
+
+header .mobile-top.hidden {
+  top: -50px;
 }
 
 header .mobile-bot {

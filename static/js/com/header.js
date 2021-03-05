@@ -8,6 +8,7 @@ import * as toast from './toast.js'
 import './button.js'
 
 const CHECK_NOTIFICATIONS_INTERVAL = 10e3
+const HEADER_HEIGHT = 50
 
 export class Header extends LitElement {
   static get properties () {
@@ -29,6 +30,21 @@ export class Header extends LitElement {
     this.community = undefined
     setInterval(this.checkNotifications.bind(this), CHECK_NOTIFICATIONS_INTERVAL)
     session.onChange(() => this.requestUpdate())
+
+    // hide the header menu on scrolls (in mobile)
+    let lastScrollY = window.pageYOffset || 0
+    setInterval(() => {
+      const scrollY = window.pageYOffset
+      if (Math.abs(lastScrollY - scrollY) <= 5) {
+        return
+      }
+      if (scrollY > HEADER_HEIGHT && scrollY > lastScrollY) {
+        this.querySelector('.mobile-top').classList.add('hidden')
+      } else {
+        this.querySelector('.mobile-top').classList.remove('hidden')
+      }
+      lastScrollY = scrollY
+    }, 250)
 
     // detect swipes to the right and open the menu
     let touchstartX = 0
