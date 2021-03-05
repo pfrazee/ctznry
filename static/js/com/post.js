@@ -183,37 +183,38 @@ export class Post extends LitElement {
       return ''
     }
     const media = this.post.value.media
-    const img = (item, maxHeight) => html`
-      <img
-        class="box-border object-cover rounded w-full h-full"
-        style="max-height: ${maxHeight}px"
-        src="${BLOB_URL(this.post.author.userId, (item.blobs.thumb || item.blobs.original).blobName)}"
-        alt=${item.caption || 'Image'}
-      >
+    const img = (item, size) => html`
+      <div class="bg-gray-100 rounded img-sizing-${size} img-placeholder">
+        <img
+          class="box-border object-cover rounded w-full img-sizing-${size}"
+          src="${BLOB_URL(this.post.author.userId, (item.blobs.thumb || item.blobs.original).blobName)}"
+          alt=${item.caption || 'Image'}
+        >
+      </div>
     `
     const moreImages = media.length - 4
     return html`
       <div class="flex mt-1">
         ${media.length >= 4 ? html`
           <div class="flex-1 flex flex-col pr-0.5">
-            <div class="flex-1 pb-0.5">${img(media[0], 210)}</div>
-            <div class="flex-1 pt-0.5">${img(media[2], 210)}</div>
+            <div class="flex-1 pb-0.5">${img(media[0], 'small')}</div>
+            <div class="flex-1 pt-0.5">${img(media[2], 'small')}</div>
           </div>
           <div class="flex-1 flex flex-col pl-0.5">
-            <div class="flex-1 pb-0.5">${img(media[1], 210)}</div>
-            <div class="flex-1 pt-0.5">${img(media[3], 210)}</div>
+            <div class="flex-1 pb-0.5">${img(media[1], 'small')}</div>
+            <div class="flex-1 pt-0.5">${img(media[3], 'small')}</div>
           </div>
         ` : media.length === 3 ? html`
-          <div class="flex-1 pr-0.5">${img(media[0], 420)}</div>
+          <div class="flex-1 pr-0.5">${img(media[0], 'big')}</div>
           <div class="flex-1 flex flex-col pl-0.5">
-            <div class="flex-1 pb-0.5">${img(media[1], 205)}</div>
-            <div class="flex-1 pt-0.5">${img(media[2], 205)}</div>
+            <div class="flex-1 pb-0.5">${img(media[1], 'smaller')}</div>
+            <div class="flex-1 pt-0.5">${img(media[2], 'smaller')}</div>
           </div>
         ` : media.length === 2 ? html`
-          <div class="flex-1 pr-0.5">${img(media[0], 210)}</div>
-          <div class="flex-1 pl-0.5">${img(media[1], 210)}</div>
+          <div class="flex-1 pr-0.5">${img(media[0], 'small')}</div>
+          <div class="flex-1 pl-0.5">${img(media[1], 'small')}</div>
         ` : html`
-          <div class="flex-1">${img(media[0], 420)}</div>
+          <div class="flex-1">${img(media[0], 'big')}</div>
         `}
       </div>
       <div class="mb-3">

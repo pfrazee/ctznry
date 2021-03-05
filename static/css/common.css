@@ -278,3 +278,44 @@ main {
     top: 60px;
   }
 }
+
+.img-placeholder {
+  background-image: url(/img/img-placeholder.png);
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+@media (max-width: 640px) {
+  .img-placeholder {
+    background-size: 70%;
+  }
+}
+
+.img-sizing-big {
+  height: 300px;
+  object-fit: cover;
+}
+
+.img-sizing-small {
+  height: 150px;
+  object-fit: cover;
+}
+
+.img-sizing-smaller {
+  height: 145px;
+  object-fit: cover;
+}
+
+@media (max-width: 640px) {
+  .img-sizing-big {
+    height: 150px;
+  }
+  
+  .img-sizing-small {
+    height: 75px;
+  }
+
+  .img-sizing-smaller {
+    height: 73px;
+  }
+}
