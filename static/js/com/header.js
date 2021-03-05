@@ -7,7 +7,7 @@ import { CreateCommunityPopup } from './popups/create-community.js'
 import * as toast from './toast.js'
 import './button.js'
 
-const CHECK_NOTIFICATIONS_INTERVAL = 5e3
+const CHECK_NOTIFICATIONS_INTERVAL = 10e3
 
 export class Header extends LitElement {
   static get properties () {

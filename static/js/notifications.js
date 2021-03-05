@@ -28,7 +28,7 @@ class CtznNotifications extends LitElement {
     this.load()
   }
 
-  async load ({clearCurrent} = {clearCurrent: false}) {
+  async load () {
     await session.setup()
     if (!session.isActive()) {
       window.location = '/'
