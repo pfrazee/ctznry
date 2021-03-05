@@ -3,6 +3,7 @@ import { LitElement, html } from '../../vendor/lit-element/lit-element.js'
 import { repeat } from '../../vendor/lit-element/lit-html/directives/repeat.js'
 import * as toast from './toast.js'
 import * as session from '../lib/session.js'
+import { AVATAR_URL } from '../lib/const.js'
 import * as images from '../lib/images.js'
 import * as contextMenu from './context-menu.js'
 import * as displayNames from '../lib/display-names.js'
@@ -48,7 +49,7 @@ class PostComposer extends LitElement {
   }
 
   get communityName () {
-    return this.community?.userId || 'Self'
+    return this.community?.userId ? displayNames.render(this.community.userId) : 'Self'
   }
 
   get communityIcon () {
@@ -238,55 +239,52 @@ class PostComposer extends LitElement {
   onClickSelectCommunity (e) {
     e.preventDefault()
     e.stopPropagation()
+    const _this = this
     const rect = e.currentTarget.getClientRects()[0]
+    const communities = session.myCommunities.slice()
+    communities.sort((a, b) => a.userId.toLowerCase().localeCompare(b.userId.toLowerCase()))
     contextMenu.create({
       x: rect.left,
       y: rect.bottom,
-      roomy: true,
-      items: [
-        {
-          icon: 'fas fa-fw fa-user',
-          label: 'Self',
-          click: async () => {
-            this.community = undefined
-          }
-        }
-      ].concat(session.myCommunities.map(community => ({
-        icon: 'fas fa-fw fa-users',
-        label: community.userId,
-        click: async () => {
-          this.community = community
-        }
-      })))
-    })
-  }
-
-  onClickPostTo (e) {
-    e.preventDefault()
-    e.stopPropagation()
-    const rect = e.currentTarget.getClientRects()[0]
-    contextMenu.create({
-      x: rect.right,
-      y: rect.bottom,
-      right: true,
-      roomy: true,
-      items: [
-        {
-          icon: 'fas fa-fw fa-user',
-          label: 'Self',
-          click: async () => {
-            this.community = undefined
-            this.onSubmit()
-          }
-        }
-      ].concat(session.myCommunities.map(community => ({
-        icon: 'fas fa-fw fa-users',
-        label: displayNames.render(community.userId),
-        click: async () => {
-          this.community = community
-          this.onSubmit()
-        }
-      })))
+      render () {
+        return html`
+          <div class="dropdown-items left no-border" style="padding: 4px 0; max-height: 50vh; overflow-y: scroll">
+            <div class="section-header small light">
+              My Profile
+            </div>
+            <div class="dropdown-item" @click=${e => {_this.community = undefined}}>
+              <div class="img-wrapper">
+                <img class="rounded" src=${AVATAR_URL(session.info.userId)}>
+                <div>
+                  <div class="label truncate">
+                    ${displayNames.render(session.info.userId)}
+                  </div>
+                  <div class="description truncate">${session.info.userId}</div>
+                </div>
+              </div>
+            </div>
+            ${session.myCommunities.length ? html`
+              <hr>
+              <div class="section-header small light">
+                My Communities
+              </div>
+              ${repeat(communities, community => html`
+                <div class="dropdown-item"  @click=${e => {_this.community = community}}>
+                  <div class="img-wrapper">
+                    <img class="rounded" src=${AVATAR_URL(community.userId)}>
+                    <div>
+                      <div class="label truncate">
+                        ${displayNames.render(community.userId)}
+                      </div>
+                      <div class="description truncate">${community.userId}</div>
+                    </div>
+                  </div>
+                </div>
+              `)}
+            ` : ''}
+          </div>
+        `
+      }
     })
   }
 
