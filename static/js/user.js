@@ -139,7 +139,7 @@ class CtznUser extends LitElement {
       console.log({userProfile: this.userProfile, followers, following, memberships})
     } else if (this.isCommunity) {
       const [members, roles] = await Promise.all([
-        listMembers(this.userId),
+        listAllMembers(this.userId),
         listRoles(this.userId).catch(e => [])
       ])
       this.members = members
@@ -758,4 +758,16 @@ customElements.define('ctzn-user', CtznUser)
 
 function getUniqFollowers (followers) {
   return new Set(followers.community.concat(followers.myCommunity || []).concat(followers.myFollowed || []))
+}
+
+async function listAllMembers (userId) {
+  let members = []
+  let gt = undefined
+  for (let i = 0; i < 1000; i++) {
+    let m = await listMembers(userId, {gt, limit: 100})
+    members = m.length ? members.concat(m) : members
+    if (m.length < 100) break
+    gt = m[m.length - 1].key
+  }
+  return members
 }

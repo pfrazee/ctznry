@@ -78,12 +78,12 @@ export async function listFollows (userId) {
   return httpGet(domain, `/ctzn/follows/${encodeURIComponent(userId)}`)
 }
 
-export async function listMembers (userId) {
+export async function listMembers (userId, opts) {
   const domain = getDomain(userId)
   if (session.isActive(domain)) {
-    return session.api.communities.listMembers(userId)
+    return session.api.communities.listMembers(userId, opts)
   }
-  return httpGet(domain, `/ctzn/members/${encodeURIComponent(userId)}`)
+  return httpGet(domain, `/ctzn/members/${encodeURIComponent(userId)}`, opts)
 }
 
 export async function listMemberships (userId) {
