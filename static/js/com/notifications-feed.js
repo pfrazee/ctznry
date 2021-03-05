@@ -101,12 +101,12 @@ export class NotificationsFeed extends LitElement {
     let results = more ? this.results : []
 
     // because we collapse results, we need to run the query until the limit is fulfilled
-    let before = more ? results[results?.length - 1]?.blendedCreatedAt : undefined
+    let lt = more ? results[results?.length - 1]?.key : undefined
     do {
-      let subresults = await session.api.notifications.list({before})
+      let subresults = await session.api.notifications.list({lt})
       if (subresults.length === 0) break
       
-      before = subresults[subresults.length - 1].blendedCreatedAt
+      lt = subresults[subresults.length - 1].key
       results = results.concat(subresults)
 
       // apply dedup, results may sometimes have duplicates

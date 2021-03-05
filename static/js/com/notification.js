@@ -53,6 +53,11 @@ export class Notification extends LitElement {
     const note = this.notification
     const schemaId = extractSchemaId(note.itemUrl)
 
+    if (!note.item) {
+      console.warn('Malformed notification, skipping render', note)
+      return ''
+    }
+
     let subject
     let subjectSchemaId
     let replyCommentInfo
