@@ -188,7 +188,10 @@ class CtznUser extends LitElement {
     `.replace('\n', '')
     
     return html`
-      <ctzn-header @post-created=${e => this.load()}></ctzn-header>
+      <ctzn-header
+        @post-created=${e => this.load()}
+        .community=${this.isCommunity && this.amIAMember ? ({userId: this.userId, dbUrl: this.userProfile?.dbUrl}) : undefined}
+      ></ctzn-header>
       <main>
         <div class="relative">
           <div class="absolute" style="top: 8px; right: 10px">

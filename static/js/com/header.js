@@ -13,7 +13,8 @@ export class Header extends LitElement {
   static get properties () {
     return {
       isMenuOpen: {type: Boolean},
-      unreadNotificationsCount: {type: Number}
+      unreadNotificationsCount: {type: Number},
+      community: {type: Object}
     }
   }
 
@@ -25,6 +26,7 @@ export class Header extends LitElement {
     super()
     this.isMenuOpen = false
     this.unreadNotificationsCount = 0
+    this.community = undefined
     setInterval(this.checkNotifications.bind(this), CHECK_NOTIFICATIONS_INTERVAL)
     session.onChange(() => this.requestUpdate())
 
@@ -222,7 +224,9 @@ export class Header extends LitElement {
     e.stopPropagation()
     this.isMenuOpen = false
     try {
-      await ComposerPopup.create()
+      await ComposerPopup.create({
+        community: this.community
+      })
       toast.create('Post published', '', 10e3)
       emit(this, 'post-created')
     } catch (e) {
