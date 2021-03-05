@@ -251,12 +251,6 @@ main {
   grid-template-columns: 56px 1fr;
 }
 
-@media (max-width: 640px) {
-  .grid-post {
-    grid-template-columns: 46px 1fr;
-  }
-}
-
 .popup-wrapper {
   background: rgba(0, 0, 0, 0.45);
 }
