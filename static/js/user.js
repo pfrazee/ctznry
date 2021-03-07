@@ -20,6 +20,7 @@ import './com/feed.js'
 import './com/mobile-compose-btn.js'
 import './com/simple-user-list.js'
 import './com/members-list.js'
+import './com/register-service-worker.js'
 
 class CtznUser extends LitElement {
   static get properties () {
@@ -186,7 +187,7 @@ class CtznUser extends LitElement {
       ${mobileOnly ? 'block sm:hidden' : ''}
       ${id === this.currentView ? 'border-b-2 border-blue-600 text-blue-600' : ''}
     `.replace('\n', '')
-    
+
     return html`
       <ctzn-header
         @post-created=${e => this.load()}
@@ -384,7 +385,7 @@ class CtznUser extends LitElement {
         <div class="border border-gray-200 border-t-0 border-b-0 bg-white">
           <ctzn-simple-user-list .ids=${this.following?.map(f => f.value.subject.userId)} empty-message="${this.userProfile.value.displayName} is not following anybody."></ctzn-simple-user-list>
         </div>
-      `      
+      `
     } else if (this.currentView === 'communities') {
       return html`
         <div class="border border-t-0 border-gray-200 px-4 py-2 bg-white">
@@ -415,7 +416,7 @@ class CtznUser extends LitElement {
           </div>
         `}
         </div>
-      `      
+      `
     }  else if (this.currentView === 'members') {
       return html`
         <div class="border border-gray-200 border-t-0 border-b-0 bg-white">
@@ -425,7 +426,7 @@ class CtznUser extends LitElement {
             @ban=${this.onBan}
           ></ctzn-members-list>
         </div>
-      `      
+      `
     } else if (this.currentView === 'about') {
       const renderRole = (roleId, permissions) => {
         let members = this.getMembersWithRole(roleId)
@@ -492,7 +493,7 @@ class CtznUser extends LitElement {
             <ctzn-button btn-class="text-sm px-4 py-1 ml-1 rounded-3xl" label="Manage Banned Users" @click=${this.onClickManageBans}></ctzn-button>
           </div>
         ` : ''}
-      `      
+      `
     }
     return html`
       <div>

@@ -6,6 +6,7 @@ import * as history from './lib/history.js'
 import './com/header.js'
 import './com/notifications-feed.js'
 import './com/img-fallbacks.js'
+import './com/register-service-worker.js'
 
 class CtznNotifications extends LitElement {
   static get properties () {

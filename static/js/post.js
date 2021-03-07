@@ -9,6 +9,7 @@ import './com/header.js'
 import './com/button.js'
 import './com/thread.js'
 import './com/user-list.js'
+import './com/register-service-worker.js'
 
 class CtznPostPage extends LitElement {
   static get properties () {
