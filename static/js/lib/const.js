@@ -45,3 +45,15 @@ export const PERM_DESCRIPTIONS = {
   'ctzn.network/perm-community-manage-roles': `Can create, edit, and delete roles.`,
   'ctzn.network/perm-community-assign-roles': `Can assign roles to community members.`
 }
+
+export const SUGGESTED_REACTIONS = [
+  'like',
+  'haha',
+  'woah',
+  'cool',
+  'oh no!',
+  'aww',
+  'yes',
+  'no',
+  'ok!'
+]

@@ -1,7 +1,7 @@
 import { LitElement, html } from '../../vendor/lit-element/lit-element.js'
 import { unsafeHTML } from '../../vendor/lit-element/lit-html/directives/unsafe-html.js'
 import { repeat } from '../../vendor/lit-element/lit-html/directives/repeat.js'
-import { AVATAR_URL, POST_URL, FULL_POST_URL, BLOB_URL } from '../lib/const.js'
+import { AVATAR_URL, POST_URL, FULL_POST_URL, BLOB_URL, SUGGESTED_REACTIONS } from '../lib/const.js'
 import * as session from '../lib/session.js'
 import { emit } from '../lib/dom.js'
 import { makeSafe, linkify } from '../lib/strings.js'
@@ -22,7 +22,8 @@ export class PostExpanded extends LitElement {
       nocommunity: {type: Boolean},
       noctrls: {type: Boolean},
       hoverBgColor: {type: String, attribute: 'hover-bg-color'},
-      viewContentOnClick: {type: Boolean, attribute: 'view-content-on-click'}
+      viewContentOnClick: {type: Boolean, attribute: 'view-content-on-click'},
+      isReactionsOpen: {type: Boolean}
     }
   }
 
@@ -39,6 +40,7 @@ export class PostExpanded extends LitElement {
     this.nocommunity = false
     this.noctrls = false
     this.hoverBgColor = 'gray-50'
+    this.isReactionsOpen = false
   }
 
   get communityUserId () {
@@ -77,8 +79,21 @@ export class PostExpanded extends LitElement {
     return `Only people followed by ${this.post.author.displayName} can interact with this post`
   }
 
+  haveIReacted (reaction) {
+    if (!session.isActive()) return
+    return this.post.reactions?.[reaction]?.includes(session.info.userId)
+  }
+
+  getMyReactions () {
+    if (!session.isActive()) return []
+    if (!this.post.reactions) return []
+    return Object.keys(this.post.reactions).filter(reaction => {
+      return this.post.reactions[reaction].includes(session.info.userId)
+    })
+  }
+
   async reloadSignals () {
-    this.post.votes = await session.api.votes.getVotesForSubject(this.post.url)
+    this.post.reactions = (await session.api.reactions.getReactionsForSubject(this.post.url))?.reactions
     this.requestUpdate()
   }
 
@@ -89,9 +104,6 @@ export class PostExpanded extends LitElement {
     if (!this.post) {
       return html``
     }
-
-    let gridCls = 'grid grid-cols-post'
-    if (this.noctrls) gridCls = ''
 
     if (this.post.error) {
       return html`
@@ -142,9 +154,14 @@ export class PostExpanded extends LitElement {
           <div class="whitespace-pre-wrap break-words leading-snug text-gray-600 pt-2 pb-3">${this.renderPostExtendedText()}</div>
         ` : ''}
         ${this.renderMedia()}
-        ${this.noctrls ? '' : html`<div class="text-sm text-gray-600 px-1">
-          ${this.renderRepliesCtrl()}
-        </div>`}
+        ${this.renderReactions()}
+        ${this.noctrls ? '' : html`
+          <div class="text-sm text-gray-600 px-1">
+            ${this.renderRepliesCtrl()}
+            ${this.renderReactionsBtn()}
+          </div>
+          ${this.renderReactionsCtrl()}
+        `}
       </div>
     `
   }
@@ -188,6 +205,73 @@ export class PostExpanded extends LitElement {
     `
   }
 
+  renderReactionsBtn () {
+    let aCls = `inline-block ml-1 mr-6 rounded`
+    if (this.canInteract) {
+      aCls += ` text-gray-500 hover:bg-gray-200`
+    } else {
+      aCls += ` text-gray-400`
+    }
+    return html`
+      <a class=${aCls} @click=${e => {this.isReactionsOpen = !this.isReactionsOpen}}>
+        <span class="fas fa-fw fa-${this.isReactionsOpen ? 'minus' : 'plus'}"></span>
+      </a>
+    `
+  }
+
+  renderReactionsCtrl () {
+    if (!this.isReactionsOpen) {
+      return ''
+    }
+    let reactions = Array.from(new Set(SUGGESTED_REACTIONS.concat(this.getMyReactions())))
+    return html`
+      <div>
+        <div class="font-semibold pt-2 px-1 text-gray-500 text-xs">
+          Add a reaction
+        </div>
+        <div class="overflow-x-auto px-1 sm:whitespace-normal whitespace-nowrap">
+          ${repeat(reactions, reaction => {
+            const colors = this.haveIReacted(reaction) ? 'bg-green-500 sm:hover:bg-green-400 text-white' : 'bg-gray-100 sm:hover:bg-gray-200'
+            return html`
+              <a
+                class="inline-block rounded text-sm px-2 py-0.5 mt-1 mr-1 ${colors} cursor-pointer"
+                @click=${e => this.onClickReaction(e, reaction)}
+              >
+                ${reaction}
+              </a>
+            `
+          })}
+          <a
+            class="inline-block text-sm px-2 py-0.5 mt-1 text-gray-500 rounded cursor-pointer sm:hover:bg-gray-100"
+            @click=${this.onClickCustomReaction}
+          >
+            Custom
+          </a>
+        </div>
+      </div>
+    `
+  }
+
+  renderReactions () {
+    if (!this.post.reactions || !Object.keys(this.post.reactions).length) {
+      return ''
+    }
+    return html`
+      <div class="pb-2 text-gray-500 text-sm">
+        <span class="far fa-fw fa-hand-point-up"></span>
+        ${repeat(Object.entries(this.post.reactions), ([reaction, userIds]) => html`
+          <span
+            class="inline-block mr-1 cursor-default hover:underline"
+            data-tooltip="${userIds.join(', ')}"
+          >
+            ${reaction}
+            (${userIds.length})
+          </span>
+        `)}
+      </div>
+    `
+  }
+
   renderPostText () {
     return unsafeHTML(linkify(makeSafe(this.post.value.text)))
   }
@@ -207,6 +291,40 @@ export class PostExpanded extends LitElement {
 
   // events
   // =
+
+  async onClickReaction (e, reaction) {
+    e.preventDefault()
+    e.stopPropagation()
+
+    if (this.haveIReacted(reaction)) {
+      await session.api.reactions.del(this.post.url, reaction)
+    } else {
+      await session.api.reactions.put({
+        subject: {dbUrl: this.post.url, authorId: this.post.author.userId},
+        reaction
+      })
+    }
+    this.isReactionsOpen = false
+    this.reloadSignals()
+  }
+
+  async onClickCustomReaction (e) {
+    e.preventDefault()
+    e.stopPropagation()
+
+    const reaction = prompt('Type your reaction')
+    if (!reaction) return
+
+    if (this.haveIReacted(reaction)) {
+      return
+    }
+    await session.api.reactions.put({
+      subject: {dbUrl: this.post.url, authorId: this.post.author.userId},
+      reaction
+    })
+    this.isReactionsOpen = false
+    this.reloadSignals()
+  }
 
   onClickMenu (e) {
     e.preventDefault()

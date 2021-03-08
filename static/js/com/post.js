@@ -1,6 +1,7 @@
 import { LitElement, html } from '../../vendor/lit-element/lit-element.js'
 import { unsafeHTML } from '../../vendor/lit-element/lit-html/directives/unsafe-html.js'
-import { POST_URL, FULL_POST_URL, BLOB_URL } from '../lib/const.js'
+import { repeat } from '../../vendor/lit-element/lit-html/directives/repeat.js'
+import { POST_URL, FULL_POST_URL, BLOB_URL, SUGGESTED_REACTIONS } from '../lib/const.js'
 import * as session from '../lib/session.js'
 import { emit } from '../lib/dom.js'
 import { makeSafe, linkify } from '../lib/strings.js'
@@ -22,7 +23,8 @@ export class Post extends LitElement {
       noctrls: {type: Boolean},
       noclick: {type: Boolean},
       hoverBgColor: {type: String, attribute: 'hover-bg-color'},
-      isReplyOpen: {type: Boolean}
+      isReplyOpen: {type: Boolean},
+      isReactionsOpen: {type: Boolean}
     }
   }
 
@@ -42,6 +44,7 @@ export class Post extends LitElement {
     this.noclick = false
     this.hoverBgColor = 'gray-50'
     this.viewContentOnClick = false
+    this.isReactionsOpen = false
 
     // helper state
     this.isMouseDown = false
@@ -84,7 +87,21 @@ export class Post extends LitElement {
     return `Only people followed by ${this.post.author.displayName} can interact with this post`
   }
 
+  haveIReacted (reaction) {
+    if (!session.isActive()) return
+    return this.post.reactions?.[reaction]?.includes(session.info.userId)
+  }
+
+  getMyReactions () {
+    if (!session.isActive()) return []
+    if (!this.post.reactions) return []
+    return Object.keys(this.post.reactions).filter(reaction => {
+      return this.post.reactions[reaction].includes(session.info.userId)
+    })
+  }
+
   async reloadSignals () {
+    this.post.reactions = (await session.api.reactions.getReactionsForSubject(this.post.url))?.reactions
     this.requestUpdate()
   }
 
@@ -123,7 +140,7 @@ export class Post extends LitElement {
 
     return html`
       <div
-        class="relative text-gray-600 cursor-pointer hover:bg-${this.hoverBgColor}"
+        class="relative text-gray-600 cursor-pointer"
         @click=${this.onClickCard}
         @mousedown=${this.onMousedownCard}
         @mouseup=${this.onMouseupCard}
@@ -164,14 +181,17 @@ export class Post extends LitElement {
           }</div>
           ${this.nometa ? '' : html`
             ${this.renderMedia()}
+            ${this.renderReactions()}
             <div class="flex pl-1 text-gray-500 text-sm items-center">
               ${this.renderRepliesCtrl()}
+              ${this.renderReactionsBtn()}
               <div>
                 <a class="hover:bg-gray-200 px-1 rounded" @click=${this.onClickMenu}>
                   <span class="fas fa-fw fa-ellipsis-h"></span>
                 </a>
               </div>
             </div>
+            ${this.renderReactionsCtrl()}
           `}
         </div>
       </div>
@@ -235,6 +255,70 @@ export class Post extends LitElement {
         <span class="far fa-comment"></span>
         ${this.replyCount}
       </a>
+    `
+  }
+
+  renderReactionsBtn () {
+    let aCls = `inline-block ml-1 mr-6 rounded`
+    if (this.canInteract) {
+      aCls += ` text-gray-500 hover:bg-gray-200`
+    } else {
+      aCls += ` text-gray-400`
+    }
+    return html`
+      <a class=${aCls} @click=${e => {this.isReactionsOpen = !this.isReactionsOpen}}>
+        <span class="fas fa-fw fa-${this.isReactionsOpen ? 'minus' : 'plus'}"></span>
+      </a>
+    `
+  }
+
+  renderReactionsCtrl () {
+    if (!this.isReactionsOpen) {
+      return ''
+    }
+    let reactions = Array.from(new Set(SUGGESTED_REACTIONS.concat(this.getMyReactions())))
+    return html`
+      <div>
+        <div class="font-semibold pt-2 px-1 text-gray-500 text-xs">
+          Add a reaction
+        </div>
+        <div class="overflow-x-auto px-1 sm:whitespace-normal whitespace-nowrap">
+          ${repeat(reactions, reaction => {
+            const colors = this.haveIReacted(reaction) ? 'bg-green-500 sm:hover:bg-green-400 text-white' : 'bg-gray-100 sm:hover:bg-gray-200'
+            return html`
+              <a
+                class="inline-block rounded text-sm px-2 py-0.5 mt-1 mr-1 cursor-pointer ${colors}"
+                @click=${e => this.onClickReaction(e, reaction)}
+              >
+                ${reaction}
+              </a>
+            `
+          })}
+          <a
+            class="inline-block text-sm px-2 py-0.5 mt-1 text-gray-500 rounded cursor-pointer sm:hover:bg-gray-100"
+            @click=${this.onClickCustomReaction}
+          >
+            Custom
+          </a>
+        </div>
+      </div>
+    `
+  }
+
+  renderReactions () {
+    if (!this.post.reactions || !Object.keys(this.post.reactions).length) {
+      return ''
+    }
+    return html`
+      <div class="pb-2 px-1 text-gray-500 text-sm truncate">
+        <span class="far fa-fw fa-hand-point-up"></span>
+        ${repeat(Object.entries(this.post.reactions), ([reaction, userIds]) => html`
+          <span class="inline-block mr-1">
+            ${reaction}
+            (${userIds.length})
+          </span>
+        `)}
+      </div>
     `
   }
 
@@ -313,6 +397,40 @@ export class Post extends LitElement {
     }
     this.isMouseDown = false
     this.isMouseDragging = false
+  }
+
+  async onClickReaction (e, reaction) {
+    e.preventDefault()
+    e.stopPropagation()
+
+    if (this.haveIReacted(reaction)) {
+      await session.api.reactions.del(this.post.url, reaction)
+    } else {
+      await session.api.reactions.put({
+        subject: {dbUrl: this.post.url, authorId: this.post.author.userId},
+        reaction
+      })
+    }
+    this.isReactionsOpen = false
+    this.reloadSignals()
+  }
+
+  async onClickCustomReaction (e) {
+    e.preventDefault()
+    e.stopPropagation()
+
+    const reaction = prompt('Type your reaction')
+    if (!reaction) return
+
+    if (this.haveIReacted(reaction)) {
+      return
+    }
+    await session.api.reactions.put({
+      subject: {dbUrl: this.post.url, authorId: this.post.author.userId},
+      reaction
+    })
+    this.isReactionsOpen = false
+    this.reloadSignals()
   }
 
   onClickMenu (e) {

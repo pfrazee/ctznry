@@ -1,7 +1,8 @@
 import { LitElement, html } from '../../vendor/lit-element/lit-element.js'
 import { unsafeHTML } from '../../vendor/lit-element/lit-html/directives/unsafe-html.js'
 import { ifDefined } from '../../vendor/lit-element/lit-html/directives/if-defined.js'
-import { AVATAR_URL, COMMENT_URL, FULL_COMMENT_URL } from '../lib/const.js'
+import { repeat } from '../../vendor/lit-element/lit-html/directives/repeat.js'
+import { AVATAR_URL, COMMENT_URL, FULL_COMMENT_URL, SUGGESTED_REACTIONS } from '../lib/const.js'
 import { writeToClipboard } from '../lib/clipboard.js'
 import * as session from '../lib/session.js'
 import { emit } from '../lib/dom.js'
@@ -17,7 +18,8 @@ export class Comment extends LitElement {
       comment: {type: Object},
       context: {type: String},
       searchTerms: {type: String, attribute: 'search-terms'},
-      isReplyOpen: {type: Boolean}
+      isReplyOpen: {type: Boolean},
+      isReactionsOpen: {type: Boolean}
     }
   }
 
@@ -31,6 +33,7 @@ export class Comment extends LitElement {
     this.context = undefined
     this.searchTerms = undefined
     this.isReplyOpen = false
+    this.isReactionsOpen = false
   }
 
   get communityUserId () {
@@ -57,6 +60,24 @@ export class Comment extends LitElement {
       return `Only members of ${this.communityUserId} can interact with this comment`
     }
     return `Only people followed by ${this.comment.author.displayName} can interact with this comment`
+  }
+
+  haveIReacted (reaction) {
+    if (!session.isActive()) return
+    return this.comment.reactions?.[reaction]?.includes(session.info.userId)
+  }
+
+  getMyReactions () {
+    if (!session.isActive()) return []
+    if (!this.comment.reactions) return []
+    return Object.keys(this.comment.reactions).filter(reaction => {
+      return this.comment.reactions[reaction].includes(session.info.userId)
+    })
+  }
+
+  async reloadSignals () {
+    this.comment.reactions = (await session.api.reactions.getReactionsForSubject(this.comment.url))?.reactions
+    this.requestUpdate()
   }
 
   // rendering
@@ -105,6 +126,7 @@ export class Comment extends LitElement {
             </a>
           </div>
           <div class="whitespace-pre-wrap break-words text-base leading-snug text-gray-700 pt-2 pb-1.5 pl-5 pr-2.5">${this.renderCommentText()}</div>
+          ${this.renderReactions()}
           <div class="pl-4">
             <a
               class="cursor-pointer tooltip-right hover:bg-gray-100 px-2 py-1 text-xs text-gray-500 font-bold"
@@ -115,11 +137,19 @@ export class Comment extends LitElement {
             </a>
             <a
               class="cursor-pointer tooltip-right hover:bg-gray-100 px-2 py-1 text-xs text-gray-500 font-bold"
+              data-tooltip=${ifDefined(this.ctrlTooltip)}
+              @click=${e => {this.isReactionsOpen = !this.isReactionsOpen}}
+            >
+              <span class="fas fa-fw fa-${this.isReactionsOpen ? 'minus' : 'plus'}"></span>
+            </a>
+            <a
+              class="cursor-pointer tooltip-right hover:bg-gray-100 px-2 py-1 text-xs text-gray-500 font-bold"
               @click=${this.onClickMenu}
             >
               <span class="fas fa-fw fa-ellipsis-h"></span>
             </a>
           </div>
+          ${this.renderReactionsCtrl()}
           ${this.isReplyOpen ? html`
             <div class="border border-gray-300 rounded py-2 px-3 my-2 mx-1 bg-white">
               <ctzn-comment-composer
@@ -140,6 +170,56 @@ export class Comment extends LitElement {
 
   renderCommentText () {
     return unsafeHTML(linkify(makeSafe(this.comment.value.text)))
+  }
+
+  renderReactionsCtrl () {
+    if (!this.isReactionsOpen) {
+      return ''
+    }
+    let reactions = Array.from(new Set(SUGGESTED_REACTIONS.concat(this.getMyReactions())))
+    return html`
+      <div class="pl-5">
+        <div class="overflow-x-auto px-1 sm:whitespace-normal whitespace-nowrap">
+          ${repeat(reactions, reaction => {
+            const colors = this.haveIReacted(reaction) ? 'bg-green-500 sm:hover:bg-green-400 text-white' : 'bg-gray-100 sm:hover:bg-gray-200'
+            return html`
+              <a
+                class="inline-block rounded text-sm px-2 py-0.5 mt-1 mr-1 ${colors} cursor-pointer"
+                @click=${e => this.onClickReaction(e, reaction)}
+              >
+                ${reaction}
+              </a>
+            `
+          })}
+          <a
+            class="inline-block text-sm px-2 py-0.5 mt-1 text-gray-500 rounded cursor-pointer sm:hover:bg-gray-100"
+            @click=${this.onClickCustomReaction}
+          >
+            Custom
+          </a>
+        </div>
+      </div>
+    `
+  }
+
+  renderReactions () {
+    if (!this.comment.reactions || !Object.keys(this.comment.reactions).length) {
+      return ''
+    }
+    return html`
+      <div class="pb-1 pl-4 text-gray-500 text-sm">
+        <span class="far fa-fw fa-hand-point-up"></span>
+        ${repeat(Object.entries(this.comment.reactions), ([reaction, userIds]) => html`
+          <span
+            class="inline-block mr-1 cursor-default hover:underline"
+            data-tooltip="${userIds.join(', ')}"
+          >
+            ${reaction}
+            (${userIds.length})
+          </span>
+        `)}
+      </div>
+    `
   }
 
   // events
@@ -167,6 +247,40 @@ export class Comment extends LitElement {
       e.stopPropagation()
       emit(this, 'view-thread', {detail: {subject: {dbUrl: this.comment.url, authorId: this.comment.author.userId}}})
     }
+  }
+
+  async onClickReaction (e, reaction) {
+    e.preventDefault()
+    e.stopPropagation()
+
+    if (this.haveIReacted(reaction)) {
+      await session.api.reactions.del(this.comment.url, reaction)
+    } else {
+      await session.api.reactions.put({
+        subject: {dbUrl: this.comment.url, authorId: this.comment.author.userId},
+        reaction
+      })
+    }
+    this.isReactionsOpen = false
+    this.reloadSignals()
+  }
+
+  async onClickCustomReaction (e) {
+    e.preventDefault()
+    e.stopPropagation()
+
+    const reaction = prompt('Type your reaction')
+    if (!reaction) return
+
+    if (this.haveIReacted(reaction)) {
+      return
+    }
+    await session.api.reactions.put({
+      subject: {dbUrl: this.comment.url, authorId: this.comment.author.userId},
+      reaction
+    })
+    this.isReactionsOpen = false
+    this.reloadSignals()
   }
 
   onClickMenu (e) {
