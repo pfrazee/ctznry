@@ -1,9 +1,11 @@
 import { LitElement, html } from '../../vendor/lit-element/lit-element.js'
+import { unsafeHTML } from '../../vendor/lit-element/lit-html/directives/unsafe-html.js'
 import { asyncReplace } from '../../vendor/lit-element/lit-html/directives/async-replace.js'
 import * as session from '../lib/session.js'
 import { AVATAR_URL } from '../lib/const.js'
 import { emit } from '../lib/dom.js'
-import { extractSchemaId } from '../lib/strings.js'
+import { extractSchemaId, makeSafe } from '../lib/strings.js'
+import { emojify } from '../lib/emojify.js'
 import { getPost, getComment } from '../lib/getters.js'
 import * as displayNames from '../lib/display-names.js'
 import './post.js'
@@ -83,7 +85,7 @@ export class Notification extends LitElement {
       icon = 'fas fa-user-plus'
     } else if (schemaId === 'ctzn.network/reaction') {
       subject = note.item.subject
-      action = `reacted "${note.item.reaction}" to`
+      action = html`reacted "${unsafeHTML(emojify(makeSafe(note.item.reaction)))}" to`
       icon = 'far fa-hand-point-up'
     } else {
       return ''
