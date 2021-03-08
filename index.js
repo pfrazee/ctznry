@@ -15,6 +15,10 @@ export async function start ({port, configDir, domain}) {
 
   app.use('/img', express.static('static/img'))
   app.use('/css', express.static('static/css'))
+  app.get('/js/:filename([^\.]+).build.js', (req, res) => {
+    // for the dev server, just serve the non-built assets
+    res.sendFile(`static/js/${req.params.filename}.js`, {root: process.cwd()})
+  })
   app.use('/js', express.static('static/js'))
   app.use('/vendor', express.static('static/vendor'))
   app.use('/webfonts', express.static('static/webfonts'))
