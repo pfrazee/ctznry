@@ -263,7 +263,7 @@ export class PostExpanded extends LitElement {
       <div class="pt-1 text-gray-500 text-sm">
         ${repeat(reactionEntries, ([reaction, userIds]) => html`
           <span
-            class="inline-block mr-1 mt-1 bg-gray-100 px-1.5 py-0.5 rounded cursor-default hover:underline"
+            class="inline-block mt-1 bg-gray-100 px-1.5 py-0.5 rounded cursor-default hover:underline"
             data-tooltip="${userIds.join(', ')}"
           >
             ${unsafeHTML(emojify(makeSafe(reaction)))}
@@ -314,8 +314,9 @@ export class PostExpanded extends LitElement {
     e.preventDefault()
     e.stopPropagation()
 
-    const reaction = prompt('Type your reaction')
+    let reaction = prompt('Type your reaction')
     if (!reaction) return
+    reaction = reaction.toLowerCase()
 
     if (this.haveIReacted(reaction)) {
       return

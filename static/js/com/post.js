@@ -421,8 +421,9 @@ export class Post extends LitElement {
     e.preventDefault()
     e.stopPropagation()
 
-    const reaction = prompt('Type your reaction')
+    let reaction = prompt('Type your reaction')
     if (!reaction) return
+    reaction = reaction.toLowerCase()
 
     if (this.haveIReacted(reaction)) {
       return
