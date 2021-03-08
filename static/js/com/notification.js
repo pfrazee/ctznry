@@ -5,6 +5,7 @@ import { AVATAR_URL } from '../lib/const.js'
 import { emit } from '../lib/dom.js'
 import { extractSchemaId } from '../lib/strings.js'
 import { getPost, getComment } from '../lib/getters.js'
+import * as displayNames from '../lib/display-names.js'
 import './post.js'
 
 export class Notification extends LitElement {
@@ -80,6 +81,10 @@ export class Notification extends LitElement {
       subject = note.item.subject
       action = 'followed'
       icon = 'fas fa-user-plus'
+    } else if (schemaId === 'ctzn.network/reaction') {
+      subject = note.item.subject
+      action = `reacted "${note.item.reaction}" to`
+      icon = 'far fa-hand-point-up'
     } else {
       return ''
     }
@@ -103,7 +108,7 @@ export class Notification extends LitElement {
         </div>
         <div class="pl-16 pr-4 pb-2">
           <a class="font-bold" href="/${note.author.userId}" title=${note.author.userId}>
-           ${note.author.userId}
+           ${displayNames.render(note.author.userId)}
           </a>
           ${action} ${target} &middot; ${relativeDate(note.blendedCreatedAt)}
         </div>
@@ -162,7 +167,7 @@ export class Notification extends LitElement {
   async onClickWrapper (e) {
     e.preventDefault()
 
-    const schemaId = extractSchemaId(this.notification.itemUrl)
+    let schemaId = extractSchemaId(this.notification.itemUrl)
     if (schemaId === 'ctzn.network/post'){
       const subject = await getPost(this.notification.author.userId, this.notification.itemUrl)
       emit(this, 'view-thread', {detail: {subject: {dbUrl: subject.url, authorId: subject.author.userId}}})
@@ -172,6 +177,17 @@ export class Notification extends LitElement {
       emit(this, 'view-thread', {detail: {subject: {dbUrl: subject.url, authorId: subject.author.userId}}})
     } else if (schemaId === 'ctzn.network/follow') {
       window.location = `/${this.notification.author.userId}`
+    } else if (schemaId === 'ctzn.network/reaction') {
+      let subject
+      const subjectSchemaId = extractSchemaId(this.notification.item.subject.dbUrl)
+      if (subjectSchemaId === 'ctzn.network/post') {
+        subject = await getPost(this.notification.item.subject.authorId, this.notification.item.subject.dbUrl)
+      } else if (subjectSchemaId === 'ctzn.network/comment') {
+        subject = await getComment(this.notification.item.subject.authorId, this.notification.item.subject.dbUrl)
+      }
+      if (subject) {
+        emit(this, 'view-thread', {detail: {subject: {dbUrl: subject.url, authorId: subject.author.userId}}})
+      }
     }
   }
 }
