@@ -5,6 +5,7 @@ import { POST_URL, FULL_POST_URL, BLOB_URL, SUGGESTED_REACTIONS } from '../lib/c
 import * as session from '../lib/session.js'
 import { emit } from '../lib/dom.js'
 import { makeSafe, linkify } from '../lib/strings.js'
+import { emojify } from '../lib/emojify.js'
 import { writeToClipboard } from '../lib/clipboard.js'
 import * as displayNames from '../lib/display-names.js'
 import * as contextMenu from './context-menu.js'
@@ -314,7 +315,7 @@ export class Post extends LitElement {
         <span class="far fa-fw fa-hand-point-up"></span>
         ${repeat(Object.entries(this.post.reactions), ([reaction, userIds]) => html`
           <span class="inline-block mr-1">
-            ${reaction}
+            ${unsafeHTML(emojify(makeSafe(reaction)))}
             (${userIds.length})
           </span>
         `)}
@@ -323,7 +324,7 @@ export class Post extends LitElement {
   }
 
   renderPostText () {
-    return unsafeHTML(linkify(makeSafe(this.post.value.text)))
+    return html`${unsafeHTML(linkify(emojify(makeSafe(this.post.value.text))))}`
   }
 
   renderMatchText () {

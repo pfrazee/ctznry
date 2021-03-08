@@ -5,6 +5,7 @@ import { AVATAR_URL, POST_URL, FULL_POST_URL, BLOB_URL, SUGGESTED_REACTIONS } fr
 import * as session from '../lib/session.js'
 import { emit } from '../lib/dom.js'
 import { makeSafe, linkify } from '../lib/strings.js'
+import { emojify } from '../lib/emojify.js'
 import { writeToClipboard } from '../lib/clipboard.js'
 import * as displayNames from '../lib/display-names.js'
 import * as contextMenu from './context-menu.js'
@@ -264,7 +265,7 @@ export class PostExpanded extends LitElement {
             class="inline-block mr-1 cursor-default hover:underline"
             data-tooltip="${userIds.join(', ')}"
           >
-            ${reaction}
+            ${unsafeHTML(emojify(makeSafe(reaction)))}
             (${userIds.length})
           </span>
         `)}
@@ -273,11 +274,11 @@ export class PostExpanded extends LitElement {
   }
 
   renderPostText () {
-    return unsafeHTML(linkify(makeSafe(this.post.value.text)))
+    return unsafeHTML(emojify(linkify(makeSafe(this.post.value.text))))
   }
 
   renderPostExtendedText () {
-    return unsafeHTML(linkify(makeSafe(this.post.value.extendedText)))
+    return unsafeHTML(emojify(linkify(makeSafe(this.post.value.extendedText))))
   }
 
   renderMatchText () {

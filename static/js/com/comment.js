@@ -7,6 +7,7 @@ import { writeToClipboard } from '../lib/clipboard.js'
 import * as session from '../lib/session.js'
 import { emit } from '../lib/dom.js'
 import { makeSafe, linkify } from '../lib/strings.js'
+import { emojify } from '../lib/emojify.js'
 import * as displayNames from '../lib/display-names.js'
 import * as contextMenu from './context-menu.js'
 import * as toast from './toast.js'
@@ -169,7 +170,7 @@ export class Comment extends LitElement {
   }
 
   renderCommentText () {
-    return unsafeHTML(linkify(makeSafe(this.comment.value.text)))
+    return unsafeHTML(emojify(linkify(makeSafe(this.comment.value.text))))
   }
 
   renderReactionsCtrl () {
@@ -214,7 +215,7 @@ export class Comment extends LitElement {
             class="inline-block mr-1 cursor-default hover:underline"
             data-tooltip="${userIds.join(', ')}"
           >
-            ${reaction}
+            ${unsafeHTML(emojify(makeSafe(reaction)))}
             (${userIds.length})
           </span>
         `)}
