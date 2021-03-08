@@ -118,6 +118,10 @@ export class Notification extends LitElement {
           <div class="reply pl-16 pb-4 pr-6">
             ${asyncReplace(this.renderReplyComment(replyCommentInfo))}
           </div>
+        ` : schemaId === 'ctzn.network/reaction' ? html`
+          <div class="reply pl-16 pb-4 pr-6">
+            ${asyncReplace(this.renderSubject())}
+          </div>
         ` : html`
           <div class="pb-2"></div>
         `}
@@ -126,9 +130,11 @@ export class Notification extends LitElement {
   }
 
 
-  async *renderSubject ({dbUrl, authorId}, schemaId) {
+  async *renderSubject () {
     yield html`Loading...`
 
+    const {authorId, dbUrl} = this.notification.item.subject
+    const schemaId = extractSchemaId(dbUrl)
     let record
     if (schemaId === 'ctzn.network/post') {
       record = await getPost(authorId, dbUrl)
@@ -136,6 +142,8 @@ export class Notification extends LitElement {
         <ctzn-post
           .post=${record}
           nometa
+          noclick
+          light
         ></ctzn-post>
       `
     } else if (schemaId === 'ctzn.network/comment') {
@@ -145,6 +153,7 @@ export class Notification extends LitElement {
           .post=${record}
           nometa
           noclick
+          light
         ></ctzn-post>
       `
     }

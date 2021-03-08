@@ -23,6 +23,7 @@ export class Post extends LitElement {
       nocommunity: {type: Boolean},
       noctrls: {type: Boolean},
       noclick: {type: Boolean},
+      light: {type: Boolean},
       hoverBgColor: {type: String, attribute: 'hover-bg-color'},
       isReplyOpen: {type: Boolean},
       isReactionsOpen: {type: Boolean}
@@ -43,6 +44,7 @@ export class Post extends LitElement {
     this.nocommunity = false
     this.noctrls = false
     this.noclick = false
+    this.light = false
     this.hoverBgColor = 'gray-50'
     this.viewContentOnClick = false
     this.isReactionsOpen = false
@@ -174,7 +176,7 @@ export class Post extends LitElement {
             </div>
           `}
           <div
-            class="whitespace-pre-wrap break-words text-gray-900 ${this.nometa ? '' : 'pt-1 pb-2 pl-1 pr-2.5'}"
+            class="whitespace-pre-wrap break-words text-gray-${this.light ? '500' : '900'} ${this.nometa ? '' : 'pt-1 pb-2 pl-1 pr-2.5'}"
             style="font-size: 16px; letter-spacing: 0.1px; line-height: 1.3;"
           >${this.renderPostText()}${this.post.value.extendedText
               ? html`<span class="bg-gray-200 ml-1 px-1 rounded text-gray-600 text-xs">more</span>`
