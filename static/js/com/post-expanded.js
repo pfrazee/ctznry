@@ -155,12 +155,12 @@ export class PostExpanded extends LitElement {
           <div class="whitespace-pre-wrap break-words leading-snug text-gray-600 pt-2 pb-3">${this.renderPostExtendedText()}</div>
         ` : ''}
         ${this.renderMedia()}
-        ${this.renderReactions()}
         ${this.noctrls ? '' : html`
           <div class="text-sm text-gray-600 px-1">
             ${this.renderRepliesCtrl()}
             ${this.renderReactionsBtn()}
           </div>
+          ${this.renderReactions()}
           ${this.renderReactionsCtrl()}
         `}
       </div>
@@ -257,16 +257,17 @@ export class PostExpanded extends LitElement {
     if (!this.post.reactions || !Object.keys(this.post.reactions).length) {
       return ''
     }
+    const reactionEntries = Object.entries(this.post.reactions)
+    reactionEntries.sort((a, b) => b[1].length - a[1].length)
     return html`
-      <div class="pb-2 text-gray-500 text-sm">
-        <span class="far fa-fw fa-hand-point-up"></span>
-        ${repeat(Object.entries(this.post.reactions), ([reaction, userIds]) => html`
+      <div class="pt-1 text-gray-500 text-sm">
+        ${repeat(reactionEntries, ([reaction, userIds]) => html`
           <span
-            class="inline-block mr-1 cursor-default hover:underline"
+            class="inline-block mr-1 mt-1 bg-gray-100 px-1.5 py-0.5 rounded cursor-default hover:underline"
             data-tooltip="${userIds.join(', ')}"
           >
             ${unsafeHTML(emojify(makeSafe(reaction)))}
-            (${userIds.length})
+            <sup class="font-semibold">${userIds.length}</sup>
           </span>
         `)}
       </div>

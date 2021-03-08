@@ -207,12 +207,13 @@ export class Comment extends LitElement {
     if (!this.comment.reactions || !Object.keys(this.comment.reactions).length) {
       return ''
     }
+    const reactionEntries = Object.entries(this.comment.reactions)
+    reactionEntries.sort((a, b) => b[1].length - a[1].length)
     return html`
-      <div class="pb-1 pl-4 text-gray-500 text-sm">
-        <span class="far fa-fw fa-hand-point-up"></span>
-        ${repeat(Object.entries(this.comment.reactions), ([reaction, userIds]) => html`
+      <div class="pb-1 pl-5 text-gray-500 text-sm">
+        ${repeat(reactionEntries, ([reaction, userIds]) => html`
           <span
-            class="inline-block mr-1 cursor-default hover:underline"
+            class="inline-block mr-1 mt-1 bg-gray-100 px-1.5 py-0.5 rounded cursor-default hover:underline"
             data-tooltip="${userIds.join(', ')}"
           >
             ${unsafeHTML(emojify(makeSafe(reaction)))}

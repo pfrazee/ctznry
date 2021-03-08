@@ -182,7 +182,6 @@ export class Post extends LitElement {
           }</div>
           ${this.nometa ? '' : html`
             ${this.renderMedia()}
-            ${this.renderReactions()}
             <div class="flex pl-1 text-gray-500 text-sm items-center">
               ${this.renderRepliesCtrl()}
               ${this.renderReactionsBtn()}
@@ -192,6 +191,7 @@ export class Post extends LitElement {
                 </a>
               </div>
             </div>
+            ${this.renderReactions()}
             ${this.renderReactionsCtrl()}
           `}
         </div>
@@ -310,13 +310,14 @@ export class Post extends LitElement {
     if (!this.post.reactions || !Object.keys(this.post.reactions).length) {
       return ''
     }
+    const reactionEntries = Object.entries(this.post.reactions)
+    reactionEntries.sort((a, b) => b[1].length - a[1].length)
     return html`
-      <div class="pb-2 px-1 text-gray-500 text-sm truncate">
-        <span class="far fa-fw fa-hand-point-up"></span>
-        ${repeat(Object.entries(this.post.reactions), ([reaction, userIds]) => html`
-          <span class="inline-block mr-1">
+      <div class="mt-1.5 mx-1 text-gray-500 text-sm truncate">
+        ${repeat(reactionEntries, ([reaction, userIds]) => html`
+          <span class="inline-block mr-1.5 bg-gray-100 px-1.5 py-0.5 rounded">
             ${unsafeHTML(emojify(makeSafe(reaction)))}
-            (${userIds.length})
+            <sup class="font-semibold">${userIds.length}</sup>
           </span>
         `)}
       </div>
