@@ -229,7 +229,7 @@ class CtznUser extends LitElement {
             </div>
           </div>
           ${this.userProfile?.value.description ? html`
-            <div class="pb-3 px-7 border border-gray-200 border-t-0 border-b-0 bg-white">${this.userProfile?.value.description}</div>
+            <div class="pb-3 px-7 border border-gray-200 border-t-0 border-b-0 bg-white whitespace-pre-wrap">${this.userProfile?.value.description}</div>
           ` : ''}
           <div class="flex border border-gray-200 border-t-0 bg-white text-gray-400 sticky top-0 z-10">
             <a class="${navCls('feed')}" @click=${setView('feed')}>Feed</a>
