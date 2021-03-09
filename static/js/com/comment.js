@@ -177,11 +177,10 @@ export class Comment extends LitElement {
     if (!this.isReactionsOpen) {
       return ''
     }
-    let reactions = Array.from(new Set(SUGGESTED_REACTIONS.concat(this.getMyReactions())))
     return html`
       <div class="pl-5">
         <div class="overflow-x-auto px-1 sm:whitespace-normal whitespace-nowrap">
-          ${repeat(reactions, reaction => {
+          ${repeat(SUGGESTED_REACTIONS, reaction => {
             const colors = this.haveIReacted(reaction) ? 'bg-green-500 sm:hover:bg-green-400 text-white' : 'bg-gray-100 sm:hover:bg-gray-200'
             return html`
               <a
@@ -207,19 +206,20 @@ export class Comment extends LitElement {
     if (!this.comment.reactions || !Object.keys(this.comment.reactions).length) {
       return ''
     }
-    const reactionEntries = Object.entries(this.comment.reactions)
-    reactionEntries.sort((a, b) => b[1].length - a[1].length)
     return html`
       <div class="pb-1 pl-5 text-gray-500 text-sm">
-        ${repeat(reactionEntries, ([reaction, userIds]) => html`
-          <span
-            class="inline-block mt-1 bg-gray-100 px-1.5 py-0.5 rounded cursor-default hover:underline"
-            data-tooltip="${userIds.join(', ')}"
-          >
-            ${unsafeHTML(emojify(makeSafe(reaction)))}
-            (${userIds.length})
-          </span>
-        `)}
+        ${repeat(Object.entries(this.comment.reactions), ([reaction, userIds]) => {
+          const colors = this.haveIReacted(reaction) ? 'bg-blue-50 sm:hover:bg-blue-100 text-blue-600' : 'bg-gray-100 sm:hover:bg-gray-200'
+          return html`
+            <a
+              class="inline-block mr-1.5 px-1.5 py-0.5 rounded cursor-pointer ${colors}"
+              @click=${e => this.onClickReaction(e, reaction)}
+            >
+              ${unsafeHTML(emojify(makeSafe(reaction)))}
+              <sup class="font-medium">${userIds.length}</sup>
+            </a>
+          `
+        })}
       </div>
     `
   }
@@ -256,8 +256,12 @@ export class Comment extends LitElement {
     e.stopPropagation()
 
     if (this.haveIReacted(reaction)) {
+      this.comment.reactions[reaction] = this.comment.reactions[reaction].filter(userId => userId !== session.info.userId)
+      this.requestUpdate()
       await session.api.reactions.del(this.comment.url, reaction)
     } else {
+      this.comment.reactions[reaction] = (this.comment.reactions[reaction] || []).concat([session.info.userId])
+      this.requestUpdate()
       await session.api.reactions.put({
         subject: {dbUrl: this.comment.url, authorId: this.comment.author.userId},
         reaction
@@ -271,9 +275,14 @@ export class Comment extends LitElement {
     e.preventDefault()
     e.stopPropagation()
 
-    let reaction = prompt('Type your reaction')
-    if (!reaction) return
-    reaction = reaction.toLowerCase()
+    let reaction
+    do {
+      reaction = prompt('Type your reaction')
+      if (!reaction) return
+      reaction = reaction.toLowerCase()
+      if (reaction.length < 16) break
+      alert('Sorry, reactions can be no longer than 16 characters.')
+    } while (true)
 
     if (this.haveIReacted(reaction)) {
       return
@@ -282,6 +291,8 @@ export class Comment extends LitElement {
       subject: {dbUrl: this.comment.url, authorId: this.comment.author.userId},
       reaction
     })
+    this.comment.reactions[reaction] = (this.comment.reactions[reaction] || []).concat([session.info.userId])
+    this.requestUpdate()
     this.isReactionsOpen = false
     this.reloadSignals()
   }

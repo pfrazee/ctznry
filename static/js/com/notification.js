@@ -85,7 +85,7 @@ export class Notification extends LitElement {
       icon = 'fas fa-user-plus'
     } else if (schemaId === 'ctzn.network/reaction') {
       subject = note.item.subject
-      action = html`reacted "${unsafeHTML(emojify(makeSafe(note.item.reaction)))}" to`
+      action = html`reacted <span class="inline-block px-1.5 py-0.5 rounded bg-blue-50 text-blue-600 text-sm">${unsafeHTML(emojify(makeSafe(note.item.reaction)))}</span> to`
       icon = 'far fa-hand-point-up'
     } else {
       return ''

@@ -19,7 +19,7 @@ export async function setup () {
     const newSessionInfo = await newApi.accounts.resumeSession(oldSessionInfo.sessionId)
     if (newSessionInfo) {
       info = Object.assign(oldSessionInfo, newSessionInfo)
-      console.debug('Resumed session', info)
+      console.debug('Resumed session')
       localStorage.setItem('session-info', JSON.stringify(info))
       api = newApi
       emitter.dispatchEvent(new Event('change'))
@@ -159,7 +159,7 @@ async function connectApi (domain) {
         const newSessionInfo = await api.accounts.resumeSession(info.sessionId).catch(e => undefined)
         if (newSessionInfo) {
           Object.assign(info, newSessionInfo)
-          console.debug('Recovered session', info)
+          console.debug('Recovered session')
           localStorage.setItem('session-info', JSON.stringify(info))
           resolve(true)
         } else {
