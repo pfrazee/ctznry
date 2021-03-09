@@ -94,7 +94,7 @@ export class Feed extends LitElement {
       // NOTE ^ to correctly track this, the query arrays must be reused
       this.results = undefined // clear results while loading
       this.queueQuery()
-    } else if (changedProperties.has('source') && !isArrayEq(this.source, changedProperties.get('source'))) {
+    } else if (changedProperties.has('source') && this.source !== changedProperties.get('source')) {
       this.queueQuery()
     }
 
@@ -114,7 +114,7 @@ export class Feed extends LitElement {
       this.activeQuery = this.query({more})
       this.requestUpdate()
     } else {
-      if (more) return
+      if (more) return this.activeQuery
       if (this.abortController) this.abortController.abort()
       this.activeQuery = this.activeQuery.catch(e => undefined).then(r => {
         this.activeQuery = undefined
@@ -127,7 +127,7 @@ export class Feed extends LitElement {
   async query ({more} = {more: false}) {
     emit(this, 'load-state-updated')
     this.abortController = new AbortController()
-    let results = more ? this.results : []
+    let results = more ? (this.results || []) : []
     let lt = more ? results[results?.length - 1]?.key : undefined
     if (this.source) {
       results = results.concat(await listUserFeed(this.source, {limit: this.limit, reverse: true, lt}))
@@ -152,6 +152,22 @@ export class Feed extends LitElement {
       results = await session.api.posts.listHomeFeed({limit: 1, reverse: true})
     }
     this.hasNewItems = (results[0] && results[0].key !== this.results[0].key)
+  }
+
+  async pageLoadScrollTo (y) {
+    window.scrollTo(0, y)
+    while (true) {
+      if (Math.abs(window.scrollY - y) < 100) {
+        return
+      }
+
+      let numResults = this.results?.length || 0
+      await this.queueQuery({more: true})
+      window.scrollTo(0, y)
+      if (numResults === this.results?.length || 0) {
+        return
+      }
+    }
   }
 
   // rendering

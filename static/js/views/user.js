@@ -1,30 +1,28 @@
-import { LitElement, html } from '../vendor/lit-element/lit-element.js'
-import { repeat } from '../vendor/lit-element/lit-html/directives/repeat.js'
-import { ViewThreadPopup } from './com/popups/view-thread.js'
-import { EditProfilePopup } from './com/popups/edit-profile.js'
-import { ComposerPopup } from './com/popups/composer.js'
-import { EditRolePopup } from './com/popups/edit-role.js'
-import { BanPopup } from './com/popups/ban.js'
-import { ManageBansPopup } from './com/popups/manage-bans.js'
-import * as contextMenu from './com/context-menu.js'
-import * as toast from './com/toast.js'
-import { AVATAR_URL, PERM_DESCRIPTIONS } from './lib/const.js'
-import * as session from './lib/session.js'
-import { getProfile, listFollowers, listFollows, listMembers, listMemberships, listRoles } from './lib/getters.js'
-import * as displayNames from './lib/display-names.js'
-import { pluralize } from './lib/strings.js'
-import * as history from './lib/history.js'
-import './com/header.js'
-import './com/button.js'
-import './com/feed.js'
-import './com/mobile-compose-btn.js'
-import './com/simple-user-list.js'
-import './com/members-list.js'
-import './com/register-service-worker.js'
+import { LitElement, html } from '../../vendor/lit-element/lit-element.js'
+import { repeat } from '../../vendor/lit-element/lit-html/directives/repeat.js'
+import { EditProfilePopup } from '../com/popups/edit-profile.js'
+import { ComposerPopup } from '../com/popups/composer.js'
+import { EditRolePopup } from '../com/popups/edit-role.js'
+import { BanPopup } from '../com/popups/ban.js'
+import { ManageBansPopup } from '../com/popups/manage-bans.js'
+import * as contextMenu from '../com/context-menu.js'
+import * as toast from '../com/toast.js'
+import { AVATAR_URL, PERM_DESCRIPTIONS } from '../lib/const.js'
+import * as session from '../lib/session.js'
+import { getProfile, listFollowers, listFollows, listMembers, listMemberships, listRoles } from '../lib/getters.js'
+import * as displayNames from '../lib/display-names.js'
+import { pluralize } from '../lib/strings.js'
+import '../com/header.js'
+import '../com/button.js'
+import '../com/feed.js'
+import '../com/mobile-compose-btn.js'
+import '../com/simple-user-list.js'
+import '../com/members-list.js'
 
 class CtznUser extends LitElement {
   static get properties () {
     return {
+      currentPath: {type: String, attribute: 'current-path'},
       userProfile: {type: Object},
       currentView: {type: String},
       followers: {type: Array},
@@ -43,7 +41,6 @@ class CtznUser extends LitElement {
 
   constructor () {
     super()
-    history.setup()
     this.userProfile = undefined
     this.currentView = 'feed'
     this.followers = undefined
@@ -54,25 +51,21 @@ class CtznUser extends LitElement {
     this.isEmpty = false
     this.isJoiningOrLeaving = false
 
-    this.userId = (new URL(location)).pathname.split('/')[1]
+    const pathParts = (new URL(location)).pathname.split('/')
+    this.userId = pathParts[1]
+    this.currentView = pathParts[2] || 'feed'
     document.title = `Loading... | CTZN`
-    if (location.hash === '#followers') {
-      this.currentView = 'followers'
-    }
-    if (location.hash === '#following') {
-      this.currentView = 'following'
-    }
-    if (location.hash === '#communities') {
-      this.currentView = 'communities'
-    }
-    if (location.hash === '#members') {
-      this.currentView = 'members'
-    }
-    window.addEventListener('popstate', e => {
-      this.currentView = location.hash.slice(1) || 'feed'
-    })
 
     this.load()
+  }
+
+  updated (changedProperties) {
+    if (changedProperties.get('currentPath')) {
+      const pathParts = (new URL(location)).pathname.split('/')
+      this.userId = pathParts[1]
+      this.currentView = pathParts[2] || 'feed'
+      this.load()
+    }
   }
 
   get isCitizen () {
@@ -120,7 +113,6 @@ class CtznUser extends LitElement {
   }
 
   async load () {
-    await session.setup()
     this.userProfile = await getProfile(this.userId).catch(e => ({error: true, message: e.toString()}))
     if (this.userProfile.error) {
       document.title = `Not Found | CTZN`
@@ -158,12 +150,13 @@ class CtznUser extends LitElement {
     return !!queryViewEls.find(el => el.isLoading)
   }
 
-  setView (str) {
-    this.currentView = str
-    if (str === 'feed') {
-      window.history.pushState('', document.title, location.pathname + location.search)
+  async pageLoadScrollTo (y) {
+    await this.requestUpdate()
+    const feed = this.querySelector('ctzn-feed')
+    if (feed) {
+      feed.pageLoadScrollTo(y)
     } else {
-      window.history.pushState('', document.title, location.pathname + location.search + `#${str}`)
+      window.scrollTo(0, y)
     }
   }
 
@@ -172,10 +165,6 @@ class CtznUser extends LitElement {
 
   render () {
     const nMembers = this.members?.length || 0
-    const setView = (str) => e => {
-      e.preventDefault()
-      this.setView(str)
-    }
 
     if (this.userProfile?.error) {
       return this.renderError()
@@ -199,12 +188,12 @@ class CtznUser extends LitElement {
             ${this.renderProfileControls()}
           </div>
           <div class="bg-white pt-4 pl-2 sm:hidden">
-            <a href="/${this.userId}" title=${this.userProfile?.value.displayName} @click=${setView('feed')}>
+            <a href="/${this.userId}" title=${this.userProfile?.value.displayName}>
               <img class="block h-14 ml-2 mr-6 mx-auto object-cover rounded-full shadow-md w-14" src=${AVATAR_URL(this.userId)}>
             </a>
           </div>
           <div class="flex items-center py-4 px-4 border border-gray-200 border-t-0 border-b-0 bg-white">
-            <a class="hidden sm:block" href="/${this.userId}" title=${this.userProfile?.value.displayName} @click=${setView('feed')}>
+            <a class="hidden sm:block" href="/${this.userId}" title=${this.userProfile?.value.displayName}>
               <img class="block mx-auto ml-2 mr-6 w-16 h-16 object-cover rounded-full shadow-md" src=${AVATAR_URL(this.userId)}>
             </a>
             <div class="flex-1">
@@ -213,14 +202,13 @@ class CtznUser extends LitElement {
                   class="inline-block"
                   href="/${this.userId}"
                   title=${this.userProfile?.value.displayName}
-                  @click=${setView('feed')}
                   style="max-width: 320px"
                 >
                   ${this.userProfile?.value.displayName}
                 </a>
               </h2>
               <h2 class="text-gray-500 font-semibold">
-                <a href="/${this.userId}" title="${this.userId}" @click=${setView('feed')}>
+                <a href="/${this.userId}" title="${this.userId}">
                   ${this.isCitizen ? html`<span class="fas fa-fw fa-user"></span>` : ''}
                   ${this.isCommunity ? html`<span class="fas fa-fw fa-users"></span>` : ''}
                   ${this.userId}
@@ -232,15 +220,15 @@ class CtznUser extends LitElement {
             <div class="pb-3 px-7 border border-gray-200 border-t-0 border-b-0 bg-white">${this.userProfile?.value.description}</div>
           ` : ''}
           <div class="flex border border-gray-200 border-t-0 bg-white text-gray-400 sticky top-0 z-10">
-            <a class="${navCls('feed')}" @click=${setView('feed')}>Feed</a>
+            <a class="${navCls('feed')}" href="/${this.userId}">Feed</a>
             ${this.isCitizen ? html`
-              <a class="${navCls('followers')}" @click=${setView('followers')}>Followers</a>
-              <a class="${navCls('following', true)}" @click=${setView('following')}>Following</a>
-              <a class="${navCls('communities', true)}" @click=${setView('communities')}>Communities</a>
+              <a class="${navCls('followers')}" href="/${this.userId}/followers">Followers</a>
+              <a class="${navCls('following', true)}" href="/${this.userId}/following">Following</a>
+              <a class="${navCls('communities', true)}" href="/${this.userId}/communities">Communities</a>
               <a class="${navCls('menu', false, true)}" @click=${this.onClickNavMore}>More <span class="fas fa-caret-down fa-fw"></span></a>
             ` : this.isCommunity ? html`
-              <a class="${navCls('members')}" @click=${setView('members')}>${nMembers} ${pluralize(nMembers, 'Member')}</a>
-              <a class="${navCls('about')}" @click=${setView('about')}>About</a>
+              <a class="${navCls('members')}" href="/${this.userId}/members">${nMembers} ${pluralize(nMembers, 'Member')}</a>
+              <a class="${navCls('about')}" href="/${this.userId}/about">About</a>
             ` : ''}
           </div>
           ${this.renderCurrentView()}
@@ -502,7 +490,6 @@ class CtznUser extends LitElement {
           .source=${this.userId}
           limit="50"
           @load-state-updated=${this.onFeedLoadStateUpdated}
-          @view-thread=${this.onViewThread}
           @publish-reply=${this.onPublishReply}
           @delete-post=${this.onDeletePost}
           @moderator-remove-post=${this.onModeratorRemovePost}
@@ -598,12 +585,6 @@ class CtznUser extends LitElement {
       toast.create(e.toString(), 'error')
     }
     this.isJoiningOrLeaving = false
-  }
-
-  onViewThread (e) {
-    ViewThreadPopup.create({
-      subject: e.detail.subject
-    })
   }
 
   onPublishReply (e) {
@@ -738,11 +719,18 @@ class CtznUser extends LitElement {
   onClickNavMore (e) {
     e.preventDefault()
     e.stopPropagation()
+
+    const setView = (view) => {
+      const pathname = `/${this.userId}/${view}`
+      window.history.pushState({}, null, pathname)
+      this.currentView = view
+    }
+
     let items = []
     if (this.isCitizen) {
       items = [
-        {label: 'Following', click: () => this.setView('following')},
-        {label: 'Communities', click: () => this.setView('communities')}
+        {label: 'Following', click: () => setView('following')},
+        {label: 'Communities', click: () => setView('communities')}
       ]
     }
     let rect = e.currentTarget.getClientRects()[0]
@@ -758,7 +746,7 @@ class CtznUser extends LitElement {
   }
 }
 
-customElements.define('ctzn-user', CtznUser)
+customElements.define('ctzn-user-view', CtznUser)
 
 function getUniqFollowers (followers) {
   return new Set(followers.community.concat(followers.myCommunity || []).concat(followers.myFollowed || []))

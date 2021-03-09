@@ -1,12 +1,10 @@
-import { LitElement, html } from '../vendor/lit-element/lit-element.js'
-import { repeat } from '../vendor/lit-element/lit-html/directives/repeat.js'
-import { asyncReplace } from '../vendor/lit-element/lit-html/directives/async-replace.js'
-import * as session from './lib/session.js'
-import { HTTP_ENDPOINT } from './lib/const.js'
-import * as history from './lib/history.js'
-import './com/header.js'
-import './com/button.js'
-import './com/register-service-worker.js'
+import { LitElement, html } from '../../vendor/lit-element/lit-element.js'
+import { repeat } from '../../vendor/lit-element/lit-html/directives/repeat.js'
+import { asyncReplace } from '../../vendor/lit-element/lit-html/directives/async-replace.js'
+import * as session from '../lib/session.js'
+import { HTTP_ENDPOINT } from '../lib/const.js'
+import '../com/header.js'
+import '../com/button.js'
 
 const CANVAS_SIZE = 200
 const SERVERS = ['ctzn.one']
@@ -33,7 +31,6 @@ class CtznSignup extends LitElement {
 
   constructor () {
     super()
-    history.setup()
     this.isProcessing = false
     this.currentError = undefined
     this.currentStage = 1
@@ -47,9 +44,9 @@ class CtznSignup extends LitElement {
   }
 
   async load () {
+    document.title = `Sign up | CTZN`
     document.body.classList.add('no-pad')
     document.body.classList.add('sm:bg-gray-50')
-    await session.setup()
   }
 
   loadImg (url) {
@@ -462,7 +459,7 @@ class CtznSignup extends LitElement {
 
 }
 
-customElements.define('ctzn-signup', CtznSignup)
+customElements.define('ctzn-signup-view', CtznSignup)
 
 async function checkCtznServer (domain) {
   try {

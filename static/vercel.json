@@ -1,13 +1,14 @@
 {
   "routes": [
-    { "src": "/([^/]+@[^/]+)/ctzn.network/post/([^/]+)", "dest": "/post.html" },
-    { "src": "/([^/]+@[^/]+)/ctzn.network/comment/([^/]+)", "dest": "/comment.html" },
-    { "src": "/([^/]+@[^/]+)", "dest": "/user.html" },
-    { "src": "/forgot-password", "dest": "/forgot-password.html" },
-    { "src": "/notifications", "dest": "/notifications.html" },
-    { "src": "/communities", "dest": "/communities.html" },
-    { "src": "/account", "dest": "/account.html" },
-    { "src": "/search", "dest": "/search.html" },
-    { "src": "/signup", "dest": "/signup.html" }
+    { "src": "/([^/]+@[^/]+)/ctzn.network/post/([^/]+)", "dest": "/index.html" },
+    { "src": "/([^/]+@[^/]+)/ctzn.network/comment/([^/]+)", "dest": "/index.html" },
+    { "src": "/([^/]+@[^/]+)/(.+)", "dest": "/index.html" },
+    { "src": "/([^/]+@[^/]+)", "dest": "/index.html" },
+    { "src": "/forgot-password", "dest": "/index.html" },
+    { "src": "/notifications", "dest": "/index.html" },
+    { "src": "/communities", "dest": "/index.html" },
+    { "src": "/account", "dest": "/index.html" },
+    { "src": "/search", "dest": "/index.html" },
+    { "src": "/signup", "dest": "/index.html" }
   ]
 }

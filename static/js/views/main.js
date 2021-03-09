@@ -1,18 +1,15 @@
-import { LitElement, html } from '../vendor/lit-element/lit-element.js'
-import { repeat } from '../vendor/lit-element/lit-html/directives/repeat.js'
-import { ViewThreadPopup } from './com/popups/view-thread.js'
-import * as toast from './com/toast.js'
-import * as session from './lib/session.js'
-import { listMemberships } from './lib/getters.js'
-import * as displayNames from './lib/display-names.js'
-import * as history from './lib/history.js'
-import './com/header.js'
-import './com/button.js'
-import './com/login.js'
-import './com/feed.js'
-import './com/mobile-compose-btn.js'
-import './com/img-fallbacks.js'
-import './com/register-service-worker.js'
+import { LitElement, html } from '../../vendor/lit-element/lit-element.js'
+import { repeat } from '../../vendor/lit-element/lit-html/directives/repeat.js'
+import * as toast from '../com/toast.js'
+import * as session from '../lib/session.js'
+import { listMemberships } from '../lib/getters.js'
+import * as displayNames from '../lib/display-names.js'
+import '../com/header.js'
+import '../com/button.js'
+import '../com/login.js'
+import '../com/feed.js'
+import '../com/mobile-compose-btn.js'
+import '../com/img-fallbacks.js'
 
 const SUGGESTED_COMMUNITIES = [
   {
@@ -77,7 +74,7 @@ const SUGGESTED_COMMUNITIES = [
   }
 ]
 
-class CtznApp extends LitElement {
+class CtznMainView extends LitElement {
   static get properties () {
     return {
       searchQuery: {type: String},
@@ -92,8 +89,6 @@ class CtznApp extends LitElement {
 
   constructor () {
     super()
-    history.setup()
-    this.isLoading = true
     this.searchQuery = ''
     this.isEmpty = false
     this.memberships = undefined
@@ -103,8 +98,7 @@ class CtznApp extends LitElement {
   }
 
   async load () {
-    await session.setup()
-    this.isLoading = false
+    document.title = `CTZN`
     if (!session.isActive()) {
       document.body.classList.add('no-pad')
       document.body.classList.add('bg-gray-50')
@@ -127,6 +121,12 @@ class CtznApp extends LitElement {
     }
   }
 
+  async pageLoadScrollTo (y) {
+    await this.requestUpdate()
+    const feed = this.querySelector('ctzn-feed')
+    feed.pageLoadScrollTo(y)
+  }
+
   // rendering
   // =
 
@@ -137,23 +137,10 @@ class CtznApp extends LitElement {
   }
 
   renderCurrentView () {
-    if (this.isLoading) {
-      return this.renderLoading()
-    }
     if (!session.isActive()) {
       return this.renderNoSession()
     }
     return this.renderWithSession()
-  }
-
-  renderLoading () {
-    return html`
-      <div class="max-w-4xl mx-auto">
-        <div class="py-32 text-center text-gray-400">
-          <span class="spinner h-7 w-7"></span>
-        </div>
-      </div>
-    `
   }
 
   renderNoSession () {
@@ -214,7 +201,6 @@ class CtznApp extends LitElement {
           <ctzn-feed
             limit="50"
             @load-state-updated=${this.onFeedLoadStateUpdated}
-            @view-thread=${this.onViewThread}
             @publish-reply=${this.onPublishReply}
             @delete-post=${this.onDeletePost}
             @moderator-remove-post=${this.onModeratorRemovePost}
@@ -324,12 +310,6 @@ class CtznApp extends LitElement {
     window.location = '/'
   }
 
-  onViewThread (e) {
-    ViewThreadPopup.create({
-      subject: e.detail.subject
-    })
-  }
-
   onPublishReply (e) {
     toast.create('Reply published', '', 10e3)
     this.load()
@@ -374,4 +354,4 @@ class CtznApp extends LitElement {
   }
 }
 
-customElements.define('ctzn-app', CtznApp)
+customElements.define('ctzn-main-view', CtznMainView)

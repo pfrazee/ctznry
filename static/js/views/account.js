@@ -1,15 +1,12 @@
-import { LitElement, html } from '../vendor/lit-element/lit-element.js'
-import * as session from './lib/session.js'
-import * as history from './lib/history.js'
-import * as toast from './com/toast.js'
-import './com/header.js'
-import './com/button.js'
-import './com/register-service-worker.js'
+import { LitElement, html } from '../../vendor/lit-element/lit-element.js'
+import * as session from '../lib/session.js'
+import * as toast from '../com/toast.js'
+import '../com/header.js'
+import '../com/button.js'
 
 class CtznAccount extends LitElement {
   static get properties () {
     return {
-      isLoading: {type: Boolean},
       isChangingPassword: {type: Boolean},
       isProcessing: {type: Boolean},
       userHasPasswordChangeCode: {type: Boolean}
@@ -22,18 +19,10 @@ class CtznAccount extends LitElement {
 
   constructor () {
     super()
-    history.setup()
-    this.isLoading = true
+    document.title = `Account | CTZN`
     this.isChangingPassword = false
     this.isProcessing = false
     this.userHasPasswordChangeCode = false
-
-    this.load()
-  }
-
-  async load () {
-    await session.setup()
-    this.isLoading = false
   }
 
   // rendering
@@ -46,9 +35,6 @@ class CtznAccount extends LitElement {
   }
 
   renderCurrentView () {
-    if (this.isLoading) {
-      return this.renderLoading()
-    }
     if (!session.isActive()) {
       return html`
         <ctzn-header></ctzn-header>
@@ -126,16 +112,6 @@ class CtznAccount extends LitElement {
     `
   }
 
-  renderLoading () {
-    return html`
-      <div class="max-w-4xl mx-auto">
-        <div class="py-32 text-center text-gray-400">
-          <span class="spinner h-7 w-7"></span>
-        </div>
-      </div>
-    `
-  }
-
   // events
   // =
 
@@ -175,4 +151,4 @@ class CtznAccount extends LitElement {
   }
 }
 
-customElements.define('ctzn-account', CtznAccount)
+customElements.define('ctzn-account-view', CtznAccount)

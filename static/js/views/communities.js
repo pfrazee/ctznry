@@ -1,13 +1,11 @@
-import { LitElement, html } from '../vendor/lit-element/lit-element.js'
-import { repeat } from '../vendor/lit-element/lit-html/directives/repeat.js'
-import * as toast from './com/toast.js'
-import * as session from './lib/session.js'
-import { AVATAR_URL } from './lib/const.js'
-import { getProfile, listMemberships } from './lib/getters.js'
-import * as displayNames from './lib/display-names.js'
-import * as history from './lib/history.js'
-import './com/header.js'
-import './com/register-service-worker.js'
+import { LitElement, html } from '../../vendor/lit-element/lit-element.js'
+import { repeat } from '../../vendor/lit-element/lit-html/directives/repeat.js'
+import * as toast from '../com/toast.js'
+import * as session from '../lib/session.js'
+import { AVATAR_URL } from '../lib/const.js'
+import { getProfile, listMemberships } from '../lib/getters.js'
+import * as displayNames from '../lib/display-names.js'
+import '../com/header.js'
 
 const SUGGESTED_COMMUNITIES = [
   {
@@ -87,8 +85,6 @@ class CtznCommunities extends LitElement {
 
   constructor () {
     super()
-    history.setup()
-    this.isLoading = true
     this.isEmpty = false
     this.memberships = undefined
     this.suggestedCommunities = undefined
@@ -97,8 +93,7 @@ class CtznCommunities extends LitElement {
   }
 
   async load () {
-    await session.setup()
-    this.isLoading = false
+    document.title = `Communities | CTZN`
     if (session.isActive()) {
       this.memberships = await listMemberships(session.info.userId)
       this.memberships.sort((a, b) => a.value.community.userId.localeCompare(b.value.community.userId))
@@ -127,9 +122,6 @@ class CtznCommunities extends LitElement {
   }
 
   renderCurrentView () {
-    if (this.isLoading) {
-      return this.renderLoading()
-    }
     return html`
       <ctzn-header></ctzn-header>
       <main>
@@ -202,16 +194,6 @@ class CtznCommunities extends LitElement {
     `
   }
 
-  renderLoading () {
-    return html`
-      <div class="max-w-4xl mx-auto">
-        <div class="py-32 text-center text-gray-400">
-          <span class="spinner h-7 w-7"></span>
-        </div>
-      </div>
-    `
-  }
-
   // events
   // =
 
@@ -232,4 +214,4 @@ class CtznCommunities extends LitElement {
   }
 }
 
-customElements.define('ctzn-communities', CtznCommunities)
+customElements.define('ctzn-communities-view', CtznCommunities)

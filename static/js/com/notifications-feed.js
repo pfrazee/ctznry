@@ -87,7 +87,7 @@ export class NotificationsFeed extends LitElement {
       this.activeQuery = this.query({more})
       this.requestUpdate()
     } else {
-      if (more) return
+      if (more) return this.activeQuery
       this.activeQuery = this.activeQuery.catch(e => undefined).then(r => {
         this.activeQuery = undefined
         this.queueQuery()
@@ -98,7 +98,7 @@ export class NotificationsFeed extends LitElement {
 
   async query ({more} = {more: false}) {
     emit(this, 'load-state-updated')
-    let results = more ? this.results : []
+    let results = more ? (this.results || []) : []
 
     // because we collapse results, we need to run the query until the limit is fulfilled
     let lt = more ? results[results?.length - 1]?.key : undefined
@@ -137,6 +137,22 @@ export class NotificationsFeed extends LitElement {
     }
   }
 
+  async pageLoadScrollTo (y) {
+    window.scrollTo(0, y)
+    while (true) {
+      if (Math.abs(window.scrollY - y) < 100) {
+        return
+      }
+
+      let numResults = this.results?.length || 0
+      await this.queueQuery({more: true})
+      window.scrollTo(0, y)
+      if (numResults === this.results?.length || 0) {
+        return
+      }
+    }
+  }
+
   // rendering
   // =
 
@@ -155,7 +171,7 @@ export class NotificationsFeed extends LitElement {
     return html`
       <link rel="stylesheet" href="/css/fontawesome.css">
       ${this.title ? html`<h2  class="results-header"><span>${this.title}</span></h2>` : ''}
-      <div class="border border-gray-300 border-b-0">
+      <div class="border border-gray-300 border-t-0">
         ${this.renderResults()}
         ${this.results?.length ? html`<div class="bottom-of-feed mb-10"></div>` : ''}
       </div>

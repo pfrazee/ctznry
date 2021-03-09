@@ -1,12 +1,9 @@
-import { LitElement, html } from '../vendor/lit-element/lit-element.js'
-import { ViewThreadPopup } from './com/popups/view-thread.js'
-import * as toast from './com/toast.js'
-import * as session from './lib/session.js'
-import * as history from './lib/history.js'
-import './com/header.js'
-import './com/notifications-feed.js'
-import './com/img-fallbacks.js'
-import './com/register-service-worker.js'
+import { LitElement, html } from '../../vendor/lit-element/lit-element.js'
+import * as toast from '../com/toast.js'
+import * as session from '../lib/session.js'
+import '../com/header.js'
+import '../com/notifications-feed.js'
+import '../com/img-fallbacks.js'
 
 class CtznNotifications extends LitElement {
   static get properties () {
@@ -22,7 +19,6 @@ class CtznNotifications extends LitElement {
 
   constructor () {
     super()
-    history.setup()
     this.notificationsClearedAt = undefined
     this.isEmpty = false
 
@@ -30,7 +26,7 @@ class CtznNotifications extends LitElement {
   }
 
   async load () {
-    await session.setup()
+    document.title = `Notifications | CTZN`
     if (!session.isActive()) {
       window.location = '/'
       return this.requestUpdate()
@@ -43,6 +39,12 @@ class CtznNotifications extends LitElement {
   get isLoading () {
     let queryViewEls = Array.from(this.querySelectorAll('ctzn-notifications-feed'))
     return !!queryViewEls.find(el => el.isLoading)
+  }
+
+  async pageLoadScrollTo (y) {
+    await this.requestUpdate()
+    const feed = this.querySelector('ctzn-notifications-feed')
+    feed.pageLoadScrollTo(y)
   }
 
   // rendering
@@ -62,14 +64,13 @@ class CtznNotifications extends LitElement {
     return html`
       <main>
         <div class="bg-white">
-          <div class="border border-gray-300 border-t-0 border-b-0 text-xl font-semibold px-4 py-2 sticky top-0 z-10 bg-white">
+          <div class="border border-gray-300 border-t-0 text-xl font-semibold px-4 py-2 sticky top-0 z-10 bg-white">
             Notifications
           </div>
           <ctzn-notifications-feed
             cleared-at=${this.notificationsClearedAt}
             limit="50"
             @load-state-updated=${this.onFeedLoadStateUpdated}
-            @view-thread=${this.onViewThread}
             @publish-reply=${this.onPublishReply}
           ></ctzn-notifications-feed>
           ${this.isEmpty ? this.renderEmptyMessage() : ''}
@@ -107,12 +108,6 @@ class CtznNotifications extends LitElement {
     window.location = '/'
   }
 
-  onViewThread (e) {
-    ViewThreadPopup.create({
-      subject: e.detail.subject
-    })
-  }
-
   onPublishReply (e) {
     toast.create('Reply published', '', 10e3)
     this.load()
@@ -124,4 +119,4 @@ class CtznNotifications extends LitElement {
   }
 }
 
-customElements.define('ctzn-notifications', CtznNotifications)
+customElements.define('ctzn-notifications-view', CtznNotifications)

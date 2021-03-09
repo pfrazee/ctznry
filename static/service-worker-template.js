@@ -1,6 +1,7 @@
 const CACHE_NAME = 'ctznry-$CACHE_NAME'
 const CACHE_LIST = [
   '/',
+  '/index.html',
   '/account',
   '/communities',
   '/forgot-password',
@@ -15,14 +16,7 @@ const CACHE_LIST = [
   '/img/favicon.png',
   '/img/img-placeholder.png',
   '/img/spinner.gif',
-  '/js/account.build.js',
-  '/js/communities.build.js',
-  '/js/forgot-password.build.js',
-  '/js/main.build.js',
-  '/js/notifications.build.js',
-  '/js/post.build.js',
-  '/js/signup.build.js',
-  '/js/user.build.js',
+  '/js/app.build.js',
   '/webfonts/fa-brands-400.woff2',
   '/webfonts/fa-regular-400.woff2',
   '/webfonts/fa-solid-900.woff2'

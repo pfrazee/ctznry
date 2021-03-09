@@ -1,19 +1,16 @@
-import { LitElement, html } from '../vendor/lit-element/lit-element.js'
-import { ViewThreadPopup } from './com/popups/view-thread.js'
-import * as toast from './com/toast.js'
-import * as session from './lib/session.js'
-import { getProfile } from './lib/getters.js'
-import { joinPath, ucfirst } from './lib/strings.js'
-import * as history from './lib/history.js'
-import './com/header.js'
-import './com/button.js'
-import './com/thread.js'
-import './com/user-list.js'
-import './com/register-service-worker.js'
+import { LitElement, html } from '../../vendor/lit-element/lit-element.js'
+import * as toast from '../com/toast.js'
+import { getProfile } from '../lib/getters.js'
+import { joinPath, ucfirst } from '../lib/strings.js'
+import '../com/header.js'
+import '../com/button.js'
+import '../com/thread.js'
+import '../com/user-list.js'
 
-class CtznPostPage extends LitElement {
+class CtznPostView extends LitElement {
   static get properties () {
     return {
+      currentPath: {type: String, attribute: 'current-path'},
       authorProfile: {type: Object},
       subject: {type: Object},
       loadError: {type: Object}
@@ -26,17 +23,16 @@ class CtznPostPage extends LitElement {
 
   constructor () {
     super()
-    history.setup()
     this.authorProfile = undefined
     this.subject = undefined
     this.loadError = undefined
+    this.scrollToOnLoad = undefined
 
     this.load()
   }
 
   async load () {
-    await session.setup()
-
+    this.scrollToOnLoad = undefined
     let pathname = window.location.pathname
     let [userId, schemaDomain, schemaName, key] = pathname.split('/').filter(Boolean)
 
@@ -50,6 +46,18 @@ class CtznPostPage extends LitElement {
       this.loadError = e
     }
     document.title = `${ucfirst(schemaName)} by ${this.authorProfile?.value.displayName || userId} | CTZN`
+  }
+
+  updated (changedProperties) {
+    if (changedProperties.get('currentPath')) {
+      this.load()
+    }
+  }
+
+  async pageLoadScrollTo (y) {
+    await this.requestUpdate()
+    this.scrollToOnLoad = y
+    // window.scrollTo(0, y)
   }
 
   // rendering
@@ -104,11 +112,13 @@ class CtznPostPage extends LitElement {
     return html`
       <main>
         <div class="py-2">
+          <a @click=${this.onClickBack}>
+            <span class="fas fa-arrow-left cursor-pointer fa-arrow-left fas mb-2 ml-1 sm:hover:text-gray-600 text-2xl text-gray-500"></span>
+          </a>
           ${this.subject ? html`
             <ctzn-thread
               .subject=${this.subject}
               @load=${this.onLoadThread}
-              @view-thread=${this.onViewThread}
             ></ctzn-thread>
           ` : ''}
         </div>
@@ -130,19 +140,26 @@ class CtznPostPage extends LitElement {
   // =
 
   onLoadThread () {
-    this.querySelector('ctzn-thread').scrollHighlightedPostIntoView()
-  }
-
-  onViewThread (e) {
-    ViewThreadPopup.create({
-      subject: e.detail.subject
-    })
+    if (this.scrollToOnLoad) {
+      window.scrollTo(0, this.scrollToOnLoad)
+    } else {
+      this.querySelector('ctzn-thread').scrollHighlightedPostIntoView()
+    }
   }
 
   onPublishReply (e) {
     toast.create('Reply published', '', 10e3)
     this.load()
   }
+
+  onClickBack (e) {
+    e.preventDefault()
+    if (window.history.length > 1) {
+      window.history.back()
+    } else {
+      window.location = '/'
+    }
+  }
 }
 
-customElements.define('ctzn-post-page', CtznPostPage)
+customElements.define('ctzn-post-view', CtznPostView)

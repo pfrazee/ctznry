@@ -1,15 +1,12 @@
-import { LitElement, html } from '../vendor/lit-element/lit-element.js'
-import * as session from './lib/session.js'
-import * as history from './lib/history.js'
-import * as toast from './com/toast.js'
-import './com/header.js'
-import './com/button.js'
-import './com/register-service-worker.js'
+import { LitElement, html } from '../../vendor/lit-element/lit-element.js'
+import * as session from '../lib/session.js'
+import * as toast from '../com/toast.js'
+import '../com/header.js'
+import '../com/button.js'
 
 class CtznForgotPassword extends LitElement {
   static get properties () {
     return {
-      isLoading: {type: Boolean},
       isProcessing: {type: Boolean},
       userHasPasswordChangeCode: {type: Boolean},
       isFinished: {type: Boolean},
@@ -23,8 +20,6 @@ class CtznForgotPassword extends LitElement {
 
   constructor () {
     super()
-    history.setup()
-    this.isLoading = true
     this.isProcessing = false
     this.userHasPasswordChangeCode = false
     this.isFinished = false
@@ -34,11 +29,10 @@ class CtznForgotPassword extends LitElement {
   }
 
   async load () {
-    await session.setup()
+    document.title = `Forgot Password | CTZN`
     if (session.isActive()) {
       window.location = '/account'
     }
-    this.isLoading = false
   }
 
   // rendering
@@ -51,9 +45,6 @@ class CtznForgotPassword extends LitElement {
   }
 
   renderCurrentView () {
-    if (this.isLoading) {
-      return this.renderLoading()
-    }
     return html`
       <ctzn-header></ctzn-header>
       <main>
@@ -134,16 +125,6 @@ class CtznForgotPassword extends LitElement {
     `
   }
 
-  renderLoading () {
-    return html`
-      <div class="max-w-4xl mx-auto">
-        <div class="py-32 text-center text-gray-400">
-          <span class="spinner h-7 w-7"></span>
-        </div>
-      </div>
-    `
-  }
-
   // events
   // =
 
@@ -181,4 +162,4 @@ class CtznForgotPassword extends LitElement {
   }
 }
 
-customElements.define('ctzn-forgot-password', CtznForgotPassword)
+customElements.define('ctzn-forgot-password-view', CtznForgotPassword)
