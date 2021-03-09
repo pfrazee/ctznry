@@ -12,6 +12,7 @@ import './com/login.js'
 import './com/feed.js'
 import './com/mobile-compose-btn.js'
 import './com/img-fallbacks.js'
+import './com/register-service-worker.js'
 
 const SUGGESTED_COMMUNITIES = [
   {
@@ -118,7 +119,7 @@ class CtznApp extends LitElement {
     if (this.querySelector('ctzn-feed')) {
       this.querySelector('ctzn-feed').load()
     }
-    
+
     if ((new URL(window.location)).searchParams.has('composer')) {
       await this.requestUpdate()
       document.querySelector('ctzn-composer').focus()
