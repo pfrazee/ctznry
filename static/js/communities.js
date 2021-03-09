@@ -7,6 +7,7 @@ import { getProfile, listMemberships } from './lib/getters.js'
 import * as displayNames from './lib/display-names.js'
 import * as history from './lib/history.js'
 import './com/header.js'
+import './com/register-service-worker.js'
 
 const SUGGESTED_COMMUNITIES = [
   {

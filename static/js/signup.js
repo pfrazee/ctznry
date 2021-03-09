@@ -6,6 +6,7 @@ import { HTTP_ENDPOINT } from './lib/const.js'
 import * as history from './lib/history.js'
 import './com/header.js'
 import './com/button.js'
+import './com/register-service-worker.js'
 
 const CANVAS_SIZE = 200
 const SERVERS = ['ctzn.one']

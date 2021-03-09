@@ -4,6 +4,7 @@ import * as history from './lib/history.js'
 import * as toast from './com/toast.js'
 import './com/header.js'
 import './com/button.js'
+import './com/register-service-worker.js'
 
 class CtznAccount extends LitElement {
   static get properties () {
