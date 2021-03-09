@@ -45,24 +45,6 @@ export class Header extends LitElement {
       }
       lastScrollY = scrollY
     }, 250)
-
-    // detect swipes to the right and open the menu
-    let touchstartX = 0
-    let touchstartY = 0
-    document.body.addEventListener('touchstart', event => {
-      touchstartX = event.changedTouches[0].screenX
-      touchstartY = event.changedTouches[0].screenY
-    }, false)
-    document.body.addEventListener('touchend', event => {
-      let touchendX = event.changedTouches[0].screenX
-      let touchendY = event.changedTouches[0].screenY
-      let diffX = touchendX - touchstartX
-      let diffY = touchendY - touchstartY
-      let diffXNormalized = diffX / Math.abs(diffY + 1)
-      if (diffX > 100 && diffXNormalized > 10) {
-        this.isMenuOpen = true
-      }
-    }, false);
   }
 
   firstUpdated () {
