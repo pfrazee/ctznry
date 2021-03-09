@@ -1,12 +1,14 @@
 import { LitElement, html } from '../../vendor/lit-element/lit-element.js'
 import { unsafeHTML } from '../../vendor/lit-element/lit-html/directives/unsafe-html.js'
 import { repeat } from '../../vendor/lit-element/lit-html/directives/repeat.js'
+import { ifDefined } from '../../vendor/lit-element/lit-html/directives/if-defined.js'
 import { AVATAR_URL, POST_URL, FULL_POST_URL, BLOB_URL, SUGGESTED_REACTIONS } from '../lib/const.js'
 import * as session from '../lib/session.js'
 import { emit } from '../lib/dom.js'
-import { makeSafe, linkify } from '../lib/strings.js'
+import { makeSafe, linkify, pluralize } from '../lib/strings.js'
 import { emojify } from '../lib/emojify.js'
 import { writeToClipboard } from '../lib/clipboard.js'
+import { ReactionsListPopup } from './popups/reactions-list.js'
 import * as displayNames from '../lib/display-names.js'
 import * as contextMenu from './context-menu.js'
 import * as toast from './toast.js'
@@ -159,6 +161,7 @@ export class PostExpanded extends LitElement {
           <div class="text-sm text-gray-600 px-1">
             ${this.renderRepliesCtrl()}
             ${this.renderReactionsBtn()}
+            ${this.renderReactionsSummary()}
           </div>
           ${this.renderReactions()}
           ${this.renderReactionsCtrl()}
@@ -194,12 +197,12 @@ export class PostExpanded extends LitElement {
   renderRepliesCtrl () {
     let aCls = `inline-block mr-6 tooltip-right`
     if (this.canInteract) {
-      aCls += ` text-gray-500 cursor-pointer hover:bg-gray-100`
+      aCls += ` text-gray-500`
     } else {
       aCls += ` text-gray-400`
     }
     return html`
-      <a class=${aCls} @click=${this.onViewThread} data-tooltip=${this.ctrlTooltip || 'Replies'}>
+      <a class=${aCls} @click=${this.onViewThread} data-tooltip=${ifDefined(this.ctrlTooltip)}>
         <span class="far fa-comment"></span>
         ${this.replyCount}
       </a>
@@ -209,13 +212,23 @@ export class PostExpanded extends LitElement {
   renderReactionsBtn () {
     let aCls = `inline-block ml-1 mr-6 rounded`
     if (this.canInteract) {
-      aCls += ` text-gray-500 hover:bg-gray-200`
+      aCls += ` text-gray-500 cursor-pointer hover:bg-gray-200`
     } else {
       aCls += ` text-gray-400`
     }
     return html`
-      <a class=${aCls} @click=${e => {this.isReactionsOpen = !this.isReactionsOpen}}>
+      <a class=${aCls} @click=${e => {this.isReactionsOpen = !this.isReactionsOpen}} data-tooltip=${ifDefined(this.ctrlTooltip)}>
         <span class="fas fa-fw fa-${this.isReactionsOpen ? 'minus' : 'plus'}"></span>
+      </a>
+    `
+  }
+
+  renderReactionsSummary () {
+    const count = Object.values(this.post.reactions).reduce((acc, v) => acc + v.length, 0)
+    let aCls = `inline-block ml-1 mr-6 rounded text-gray-500 ${count ? 'cursor-pointer hover:underline' : ''}`
+    return html`
+      <a class=${aCls} @click=${count ? this.onClickViewReactions : undefined}>
+        <span class="far fa-hand-point-up"></span> ${count} ${pluralize(count, 'reaction')}
       </a>
     `
   }
@@ -262,7 +275,7 @@ export class PostExpanded extends LitElement {
           const colors = this.haveIReacted(reaction) ? 'bg-blue-50 sm:hover:bg-blue-100 text-blue-600' : 'bg-gray-100 sm:hover:bg-gray-200'
           return html`
             <a
-              class="inline-block mr-1.5 px-1.5 py-0.5 rounded cursor-pointer ${colors}"
+              class="inline-block mt-1 px-1.5 py-0.5 rounded cursor-pointer ${colors}"
               @click=${e => this.onClickReaction(e, reaction)}
             >
               ${unsafeHTML(emojify(makeSafe(reaction)))}
@@ -403,6 +416,12 @@ export class PostExpanded extends LitElement {
       return
     }
     emit(this, 'moderator-remove-post', {detail: {post: this.post}})
+  }
+
+  onClickViewReactions (e) {
+    ReactionsListPopup.create({
+      reactions: this.post.reactions
+    })
   }
 }
 

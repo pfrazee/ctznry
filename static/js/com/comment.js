@@ -6,8 +6,9 @@ import { AVATAR_URL, COMMENT_URL, FULL_COMMENT_URL, SUGGESTED_REACTIONS } from '
 import { writeToClipboard } from '../lib/clipboard.js'
 import * as session from '../lib/session.js'
 import { emit } from '../lib/dom.js'
-import { makeSafe, linkify } from '../lib/strings.js'
+import { makeSafe, linkify, pluralize } from '../lib/strings.js'
 import { emojify } from '../lib/emojify.js'
+import { ReactionsListPopup } from './popups/reactions-list.js'
 import * as displayNames from '../lib/display-names.js'
 import * as contextMenu from './context-menu.js'
 import * as toast from './toast.js'
@@ -143,6 +144,7 @@ export class Comment extends LitElement {
             >
               <span class="fas fa-fw fa-${this.isReactionsOpen ? 'minus' : 'plus'}"></span>
             </a>
+            ${this.renderReactionsSummary()}
             <a
               class="cursor-pointer tooltip-right hover:bg-gray-100 px-2 py-1 text-xs text-gray-500 font-bold"
               @click=${this.onClickMenu}
@@ -221,6 +223,16 @@ export class Comment extends LitElement {
           `
         })}
       </div>
+    `
+  }
+
+  renderReactionsSummary () {
+    const count = Object.values(this.comment.reactions).reduce((acc, v) => acc + v.length, 0)
+    let aCls = `inline-block ml-1 mr-6 rounded text-sm text-gray-500 ${count ? 'cursor-pointer hover:underline' : ''}`
+    return html`
+      <a class=${aCls} @click=${count ? this.onClickViewReactions : undefined}>
+        ${count} ${pluralize(count, 'reaction')}
+      </a>
     `
   }
 
@@ -359,6 +371,12 @@ export class Comment extends LitElement {
       return
     }
     emit(this, 'moderator-remove-comment', {detail: {comment: this.comment}})
+  }
+
+  onClickViewReactions (e) {
+    ReactionsListPopup.create({
+      reactions: this.comment.reactions
+    })
   }
 }
 
