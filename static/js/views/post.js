@@ -57,7 +57,6 @@ class CtznPostView extends LitElement {
   async pageLoadScrollTo (y) {
     await this.requestUpdate()
     this.scrollToOnLoad = y
-    // window.scrollTo(0, y)
   }
 
   // rendering
@@ -113,7 +112,7 @@ class CtznPostView extends LitElement {
       <main>
         <div class="py-2">
           <a @click=${this.onClickBack}>
-            <span class="fas fa-arrow-left cursor-pointer fa-arrow-left fas mb-2 ml-1 sm:hover:text-gray-600 text-2xl text-gray-500"></span>
+            <span class="fas fa-arrow-left cursor-pointer fa-arrow-left fas mb-2 ml-3 sm:hover:text-gray-700 text-2xl text-gray-600"></span>
           </a>
           ${this.subject ? html`
             <ctzn-thread

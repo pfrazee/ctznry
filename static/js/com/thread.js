@@ -95,7 +95,7 @@ export class Thread extends LitElement {
 
   render () {
     return html`
-      <div class="border mb-1 border-gray-200 bg-white rounded">
+      <div class="border-t border-b sm:border-l sm:border-r mb-1 border-gray-200 bg-white sm:rounded">
         ${this.post ? html`
           <ctzn-post-expanded
             .post=${this.post}
@@ -120,7 +120,7 @@ export class Thread extends LitElement {
         return ''
       }
       return html`
-        <div class="pl-3 py-2 border-l border-gray-200">
+        <div class="pl-3 py-2 border-l border-gray-200 mx-2 sm:mx-0">
           <div class="font-semibold text-gray-500">
             <span class="fas fa-fw fa-exclamation-circle"></span>
             Failed to load thread
@@ -135,7 +135,7 @@ export class Thread extends LitElement {
     }
     if (!replies?.length) return ''
     return html`
-      <div class="pl-3 border-l-2 border-gray-200">
+      <div class="pl-3 border-l-2 border-gray-200 mx-2 sm:mx-0">
         ${repeat(replies, r => r.url, reply => {
           const isSubject = this.subject.dbUrl === reply.url
           return html`
@@ -161,7 +161,7 @@ export class Thread extends LitElement {
     if (this.post?.value?.community) {
       if (!session.isInCommunity(this.post.value.community.userId)) {
         return html`
-          <div class="bg-white border border-gray-200 py-2 px-3 my-2 rounded">
+          <div class="bg-white border border-gray-200 py-2 px-3 my-2 rounded mx-2 sm:mx-0">
             <div class="italic text-gray-500 text-sm">
               Join <a href="/${this.post.value.community.userId}" class="hover:underline">${displayNames.render(this.post.value.community.userId)}</a> to reply.
             </div>
@@ -171,7 +171,7 @@ export class Thread extends LitElement {
     } else {
       if (!session.isFollowingMe(this.post?.author?.userId)) {
         return html`
-          <div class="bg-white border border-gray-200 py-2 px-3 my-2 rounded">
+          <div class="bg-white border border-gray-200 py-2 px-3 my-2 rounded mx-2 sm:mx-0">
             <div class="italic text-gray-500 text-sm">
               Only people followed by <a href="/${this.post.author.userId}" class="hover:underline">${this.post.author.displayName}</a> can reply.
             </div>
@@ -180,7 +180,7 @@ export class Thread extends LitElement {
       }
     }
     return html`
-      <div class="bg-white border border-gray-200 py-3 px-3 my-2 rounded">
+      <div class="bg-white border border-gray-200 py-3 px-3 my-2 rounded mx-2 sm:mx-0">
         ${this.isReplying ? html`
           <ctzn-comment-composer
             autofocus
