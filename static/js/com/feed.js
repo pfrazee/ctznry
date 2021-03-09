@@ -85,6 +85,7 @@ export class Feed extends LitElement {
     } else if (_cache.path === window.location.pathname) {
       // use cached results
       this.results = _cache.results
+      /* dont await */ this.queueQuery() // queue up a load to make sure we're getting latest
       return
     }
     return this.queueQuery()
@@ -141,8 +142,12 @@ export class Feed extends LitElement {
       results = results.concat(await session.api.posts.listHomeFeed({limit: this.limit, reverse: true, lt}))
     }
     console.log(results)
-    this.results = results
-    _cache = {path: window.location.pathname, results}
+
+    if (_cache?.path !== window.location.pathname || _cache?.results?.[0].url !== results[0]?.url) {
+      this.results = results
+      _cache = {path: window.location.pathname, results}
+    }
+
     this.activeQuery = undefined
     this.hasNewItems = false
     emit(this, 'load-state-updated', {detail: {isEmpty: this.results.length === 0}})
