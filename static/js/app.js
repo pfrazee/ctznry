@@ -139,6 +139,8 @@ class CtznApp extends LitElement {
     if (!anchor) return
 
     const href = anchor.getAttribute('href')
+    if (href === null) return
+    
     const url = new URL(href, window.location.origin)
     if (url.origin === window.location.origin) {
       e.preventDefault()
