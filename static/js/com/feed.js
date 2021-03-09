@@ -8,6 +8,10 @@ import { emit } from '../lib/dom.js'
 import './post.js'
 
 const CHECK_NEW_ITEMS_INTERVAL = 15e3
+let _cache = {
+  path: undefined,
+  results: undefined
+}
 
 export class Feed extends LitElement {
   static get properties () {
@@ -70,10 +74,19 @@ export class Feed extends LitElement {
   }
 
   async load ({clearCurrent} = {clearCurrent: false}) {
+    if (this.activeQuery) {
+      return this.activeQuery
+    }
     if (!session.isActive()) {
       session.onChange(() => this.load({clearCurrent}), {once: true})
     }
-    if (clearCurrent) this.results = undefined
+    if (clearCurrent) {
+      this.results = undefined
+    } else if (_cache.path === window.location.pathname) {
+      // use cached results
+      this.results = _cache.results
+      return
+    }
     return this.queueQuery()
   }
 
@@ -85,17 +98,10 @@ export class Feed extends LitElement {
   updated (changedProperties) {
     if (typeof this.results === 'undefined') {
       if (!this.activeQuery) {
-        this.queueQuery()
+        this.load()
       }
-    }
-    if (changedProperties.has('filter') && changedProperties.get('filter') != this.filter) {
-      this.queueQuery()
-    } else if (changedProperties.has('pathQuery') && changedProperties.get('pathQuery') != this.pathQuery) {
-      // NOTE ^ to correctly track this, the query arrays must be reused
-      this.results = undefined // clear results while loading
-      this.queueQuery()
     } else if (changedProperties.has('source') && this.source !== changedProperties.get('source')) {
-      this.queueQuery()
+      this.load()
     }
 
     const botOfFeedEl = this.querySelector('.bottom-of-feed')
@@ -136,6 +142,7 @@ export class Feed extends LitElement {
     }
     console.log(results)
     this.results = results
+    _cache = {path: window.location.pathname, results}
     this.activeQuery = undefined
     this.hasNewItems = false
     emit(this, 'load-state-updated', {detail: {isEmpty: this.results.length === 0}})
@@ -156,18 +163,31 @@ export class Feed extends LitElement {
 
   async pageLoadScrollTo (y) {
     window.scrollTo(0, y)
+    let first = true
     while (true) {
-      if (Math.abs(window.scrollY - y) < 100) {
-        return
+      if (Math.abs(window.scrollY - y) < 10) {
+        break
       }
 
       let numResults = this.results?.length || 0
-      await this.queueQuery({more: true})
+      if (first) {
+        await this.load()
+        first = false
+      } else {
+        await this.queueQuery({more: true})
+      }
+      await this.updateComplete
       window.scrollTo(0, y)
       if (numResults === this.results?.length || 0) {
-        return
+        break
       }
     }
+
+    setTimeout(() => {
+      if (Math.abs(window.scrollY - y) > 10) {
+        window.scrollTo(0, y)
+      }
+    }, 500)
   }
 
   // rendering

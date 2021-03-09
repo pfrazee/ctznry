@@ -10,6 +10,8 @@ import { getPost, getComment } from '../lib/getters.js'
 import * as displayNames from '../lib/display-names.js'
 import './post.js'
 
+const _itemCache = {}
+
 export class Notification extends LitElement {
   static get properties () {
     return {
@@ -131,13 +133,17 @@ export class Notification extends LitElement {
 
 
   async *renderSubject () {
-    yield html`Loading...`
-
     const {authorId, dbUrl} = this.notification.item.subject
+    
+    if (!_itemCache[dbUrl]) {
+      yield html`Loading...`
+    }
+
     const schemaId = extractSchemaId(dbUrl)
     let record
     if (schemaId === 'ctzn.network/post') {
-      record = await getPost(authorId, dbUrl)
+      record = _itemCache[dbUrl] ? _itemCache[dbUrl] : await getPost(authorId, dbUrl)
+      _itemCache[dbUrl] = record
       yield html`
         <ctzn-post
           .post=${record}
@@ -147,7 +153,8 @@ export class Notification extends LitElement {
         ></ctzn-post>
       `
     } else if (schemaId === 'ctzn.network/comment') {
-      record = await getComment(authorId, dbUrl)
+      record = _itemCache[dbUrl] ? _itemCache[dbUrl] : await getComment(authorId, dbUrl)
+      _itemCache[dbUrl] = record
       yield html`
         <ctzn-post
           .post=${record}
@@ -160,9 +167,12 @@ export class Notification extends LitElement {
   }
 
   async *renderReplyComment (commentInfo) {
-    yield html`Loading...`
+    if (!_itemCache[commentInfo.dbUrl]) {
+      yield html`Loading...`
+    }
 
-    let record = await getComment(commentInfo.userId, commentInfo.dbUrl)
+    let record = _itemCache[commentInfo.dbUrl] ? _itemCache[commentInfo.dbUrl] : await getComment(commentInfo.userId, commentInfo.dbUrl)
+    _itemCache[commentInfo.dbUrl] = record
     yield html`
       <ctzn-post
         .post=${record}
@@ -184,7 +194,6 @@ export class Notification extends LitElement {
       emit(this, 'view-thread', {detail: {subject: {dbUrl: subject.url, authorId: subject.author.userId}}})
     } else if (schemaId === 'ctzn.network/comment') {
       const subject = await getComment(this.notification.author.userId, this.notification.itemUrl)
-      // const subject = await getPost(comment.value.reply.root.authorId, comment.value.reply.root.dbUrl)
       emit(this, 'view-thread', {detail: {subject: {dbUrl: subject.url, authorId: subject.author.userId}}})
     } else if (schemaId === 'ctzn.network/follow') {
       window.location = `/${this.notification.author.userId}`

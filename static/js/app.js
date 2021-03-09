@@ -56,6 +56,10 @@ class CtznApp extends LitElement {
   }
 
   navigateTo (pathname) {
+    if (history.scrollRestoration) {
+      history.scrollRestoration = 'manual'
+    }
+
     window.history.replaceState({scrollY: window.scrollY}, null)
     window.history.pushState({}, null, pathname)
     this.currentPath = pathname

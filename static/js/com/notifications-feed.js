@@ -6,6 +6,8 @@ import { extractSchemaId } from '../lib/strings.js'
 import * as session from '../lib/session.js'
 import './notification.js'
 
+let _cache = undefined
+
 export class NotificationsFeed extends LitElement {
   static get properties () {
     return {
@@ -55,7 +57,13 @@ export class NotificationsFeed extends LitElement {
       session.onChange(() => this.load({clearCurrent}), {once: true})
       return
     }
-    if (clearCurrent) this.results = undefined
+    if (clearCurrent) {
+      this.results = undefined
+    } else if (_cache) {
+      // use cached results
+      this.results = _cache
+      // dont return -- we're going to render and then fetch latest anyway
+    }
     return this.queueQuery()
   }
 
@@ -114,9 +122,11 @@ export class NotificationsFeed extends LitElement {
         return results.findIndex(entry2 => entry2.itemUrl === entry.itemUrl) === index
       })
     } while (results.length < this.limit)
-    
-    console.log(results)
-    this.results = results
+
+    if (_cache?.[0].itemUrl !== results[0]?.itemUrl) {
+      this.results = results
+      _cache = results
+    }
     this.activeQuery = undefined
     emit(this, 'load-state-updated', {detail: {isEmpty: this.results.length === 0}})
   }
@@ -129,7 +139,12 @@ export class NotificationsFeed extends LitElement {
     while (num) {
       let subresults = await session.api.notifications.list({limit: num})
       if (!subresults?.length) break
+
+      let n = subresults.length
+      subresults = subresults.filter(r => r.itemUrl !== this.results?.[0]?.itemUrl)
       results = results.concat(subresults)
+      if (n > subresults.length) break // ran into an item we already have
+
       num -= subresults.length
     }
     if (results?.length) {
@@ -139,18 +154,31 @@ export class NotificationsFeed extends LitElement {
 
   async pageLoadScrollTo (y) {
     window.scrollTo(0, y)
+    let first = true
     while (true) {
-      if (Math.abs(window.scrollY - y) < 100) {
-        return
+      if (Math.abs(window.scrollY - y) < 10) {
+        break
       }
 
       let numResults = this.results?.length || 0
-      await this.queueQuery({more: true})
+      if (first) {
+        await this.load()
+        first = false
+      } else {
+        await this.queueQuery({more: true})
+      }
+      await this.updateComplete
       window.scrollTo(0, y)
       if (numResults === this.results?.length || 0) {
-        return
+        break
       }
     }
+
+    setTimeout(() => {
+      if (Math.abs(window.scrollY - y) > 10) {
+        window.scrollTo(0, y)
+      }
+    }, 500)
   }
 
   // rendering
