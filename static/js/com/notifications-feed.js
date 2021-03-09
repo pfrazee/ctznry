@@ -121,6 +121,22 @@ export class NotificationsFeed extends LitElement {
     emit(this, 'load-state-updated', {detail: {isEmpty: this.results.length === 0}})
   }
 
+  async loadNew (num) {
+    if (!this.results) {
+      return
+    }
+    let results = []
+    while (num) {
+      let subresults = await session.api.notifications.list({limit: num})
+      if (!subresults?.length) break
+      results = results.concat(subresults)
+      num -= subresults.length
+    }
+    if (results?.length) {
+      this.results = results.concat(results)
+    }
+  }
+
   // rendering
   // =
 
