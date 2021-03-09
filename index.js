@@ -9,10 +9,12 @@ export async function start ({port, configDir, domain}) {
 
   app = express()
 
-  app.get('/', (req, res) => {
-    res.sendFile('./static/index.html', {root: process.cwd()})
-  })
+  const staticFile = (path) => (req, res) => res.sendFile(path, {root: process.cwd()})
 
+  app.get('/', staticFile('./static/index.html'))
+  app.get('/manifest.json', staticFile('./static/manifest.json'))
+  // for the dev server, just serve the SW template
+  app.get('/service-worker.js', staticFile('./static/service-worker-template.js'))
   app.use('/img', express.static('static/img'))
   app.use('/css', express.static('static/css'))
   app.get('/js/:filename([^\.]+).build.js', (req, res) => {
@@ -22,46 +24,16 @@ export async function start ({port, configDir, domain}) {
   app.use('/js', express.static('static/js'))
   app.use('/vendor', express.static('static/vendor'))
   app.use('/webfonts', express.static('static/webfonts'))
-
-  app.get('/signup', (req, res) => {
-    res.sendFile('static/signup.html', {root: process.cwd()})
-  })
-
-  app.get('/forgot-password', (req, res) => {
-    res.sendFile('static/forgot-password.html', {root: process.cwd()})
-  })
-
-  app.get('/notifications', (req, res) => {
-    res.sendFile('static/notifications.html', {root: process.cwd()})
-  })
-
-  app.get('/communities', (req, res) => {
-    res.sendFile('static/communities.html', {root: process.cwd()})
-  })
-
-  app.get('/account', (req, res) => {
-    res.sendFile('static/account.html', {root: process.cwd()})
-  })
-
-  app.get('/profile', (req, res) => {
-    res.sendFile('static/user.html', {root: process.cwd()})
-  })
-
-  app.get('/search', (req, res) => {
-    res.sendFile('static/search.html', {root: process.cwd()})
-  })
-
-  app.get('/:username([^\/]{3,})/ctzn.network/post/:key', (req, res) => {
-    res.sendFile('static/post.html', {root: process.cwd()})
-  })
-
-  app.get('/:username([^\/]{3,})/ctzn.network/comment/:key', (req, res) => {
-    res.sendFile('static/comment.html', {root: process.cwd()})
-  })
-
-  app.get('/:username([^\/]{3,})', (req, res) => {
-    res.sendFile('static/user.html', {root: process.cwd()})
-  })
+  app.get('/signup', staticFile('static/signup.html'))
+  app.get('/forgot-password', staticFile('static/forgot-password.html'))
+  app.get('/notifications', staticFile('static/notifications.html'))
+  app.get('/communities', staticFile('static/communities.html'))
+  app.get('/account', staticFile('static/account.html'))
+  app.get('/profile', staticFile('static/user.html'))
+  app.get('/search', staticFile('static/search.html'))
+  app.get('/:username([^\/]{3,})/ctzn.network/post/:key', staticFile('static/post.html'))
+  app.get('/:username([^\/]{3,})/ctzn.network/comment/:key', staticFile('static/comment.html'))
+  app.get('/:username([^\/]{3,})', staticFile('static/user.html'))
 
   app.use((req, res) => {
     res.status(404).send('404 Page not found')
