@@ -62,7 +62,8 @@ export class NotificationsFeed extends LitElement {
     } else if (_cache) {
       // use cached results
       this.results = _cache
-      // dont return -- we're going to render and then fetch latest anyway
+      /* dont await */ this.queueQuery() // queue up a load to make sure we're getting latest
+      return
     }
     return this.queueQuery()
   }
@@ -167,7 +168,7 @@ export class NotificationsFeed extends LitElement {
       } else {
         await this.queueQuery({more: true})
       }
-      await this.updateComplete
+      await this.requestUpdate()
       window.scrollTo(0, y)
       if (numResults === this.results?.length || 0) {
         break
@@ -188,7 +189,7 @@ export class NotificationsFeed extends LitElement {
     if (!this.results) {
       return html`
         ${this.title ? html`<h2  class="results-header"><span>${this.title}</span></h2>` : ''}
-        <div class="border border-gray-200 px-6 py-5 text-gray-500">
+        <div class="border border-t-0 border-gray-300 px-6 py-5 text-gray-500">
           <span class="spinner"></span>
         </div>
       `

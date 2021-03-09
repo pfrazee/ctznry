@@ -176,7 +176,7 @@ export class Feed extends LitElement {
       } else {
         await this.queueQuery({more: true})
       }
-      await this.updateComplete
+      await this.requestUpdate()
       window.scrollTo(0, y)
       if (numResults === this.results?.length || 0) {
         break
