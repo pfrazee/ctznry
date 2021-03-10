@@ -4,7 +4,7 @@ export function emojify (str = '') {
   const re = regex()
   return str.replace(re, (match) => {
     const url = `/img/twemoji/72x72/${toCodePoints(removeVS16s(match)).join('-')}.png`
-    return `<img class="inline-block w-4" src="${makeSafe(url)}" alt="${makeSafe(match)}" style="vertical-align: -0.1rem; margin: 0 .05em 0 .1em">`
+    return `<img class="inline-block w-4 emoji" src="${makeSafe(url)}" alt="${makeSafe(match)}" style="vertical-align: -0.1rem; margin: 0 .05em 0 .1em">`
   })
 }
 

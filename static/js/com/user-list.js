@@ -1,9 +1,12 @@
 import { LitElement, html } from '../../vendor/lit-element/lit-element.js'
 import { repeat } from '../../vendor/lit-element/lit-html/directives/repeat.js'
+import { unsafeHTML } from '../../vendor/lit-element/lit-html/directives/unsafe-html.js'
 import css from '../../css/com/user-list.css.js'
 import { AVATAR_URL } from '../lib/const.js'
 import * as session from '../lib/session.js'
 import { getProfile, listFollowers, listFollows } from '../lib/getters.js'
+import { makeSafe, linkify } from '../lib/strings.js'
+import { emojify } from '../lib/emojify.js'
 
 export class UserList extends LitElement {
   static get properties () {
@@ -92,7 +95,7 @@ export class UserList extends LitElement {
               </div>
               <div class="id">
                 <a class="display-name" href="/${profile.userId}" title=${profile.value.displayName}>
-                  ${profile.value.displayName}
+                  ${unsafeHTML(emojify(makeSafe(profile.value.displayName)))}
                 </a>
               </div>
               <div class="id">
@@ -100,7 +103,7 @@ export class UserList extends LitElement {
                   ${userId}
                 </a>
               </div>
-              <div class="description">${profile.value.description}</div>
+              <div class="description">${unsafeHTML(linkify(emojify(makeSafe(profile.value.description))))}</div>
               ${profile.isFollowingMe ? html`
                 <div>
                   <span class="label">Follows you</span>

@@ -23,6 +23,11 @@ a:hover {
   text-decoration: underline;
 }
 
+.emoji {
+  display: inline-block;
+  width: 1rem;
+}
+
 .profiles {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -75,6 +80,7 @@ a:hover {
 
 .description {
   margin: 10px 0;
+  font-size: 14px;
 }
 
 .stat {
