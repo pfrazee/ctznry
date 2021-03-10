@@ -44,8 +44,8 @@ export async function getComment (userId, key) {
   return httpGet(domain, `/ctzn/comment/${username}/${encodeURIComponent(key)}`)
 }
 
-export async function getThread (authorId, subjectUrl) {
-  const domain = getDomain(authorId)
+export async function getThread (authorId, subjectUrl, communityId = undefined) {
+  const domain = getDomain(communityId || authorId)
   if (session.isActive(domain)) {
     return session.api.comments.getThread(subjectUrl)
   }

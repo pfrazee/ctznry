@@ -63,11 +63,19 @@ export class Thread extends LitElement {
         this.post = comment
       } else {
         this.post = await getPost(comment.value.reply.root.authorId, comment.value.reply.root.dbUrl).catch(onError)
-        this.thread = await getThread(comment.value.reply.root.authorId, comment.value.reply.root.dbUrl).catch(onError)
+        this.thread = await getThread(
+          comment.value.reply.root.authorId,
+          comment.value.reply.root.dbUrl,
+          comment.value.community?.userId
+        ).catch(onError)
       }
     } else {
       this.post = await getPost(this.subject.authorId, this.subject.dbUrl).catch(onError)
-      this.thread = await getThread(this.subject.authorId, this.subject.dbUrl).catch(onError)
+      this.thread = await getThread(
+        this.subject.authorId,
+        this.subject.dbUrl,
+        this.post.value.community?.userId
+      ).catch(onError)
     }
     await this.updateComplete
     emit(this, 'load')
