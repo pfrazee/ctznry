@@ -110,7 +110,15 @@ export class NotificationsFeed extends LitElement {
     let results = more ? (this.results || []) : []
 
     // because we collapse results, we need to run the query until the limit is fulfilled
-    let lt = more ? results[results?.length - 1]?.key : undefined
+    // let lt = more ? results[results?.length - 1]?.key : undefined
+    let lt = undefined
+    if (more && results?.length) {
+      let last = results[results.length - 1]
+      if (last.mergedNotes) {
+        last = last.mergedNotes[last.mergedNotes.length - 1]
+      }
+      lt = last.key
+    }
     do {
       let subresults = await session.api.notifications.list({lt})
       if (subresults.length === 0) break
@@ -122,9 +130,13 @@ export class NotificationsFeed extends LitElement {
       results = results.filter((entry, index) => {
         return results.findIndex(entry2 => entry2.itemUrl === entry.itemUrl) === index
       })
+
+      // group together notifications
+      results = results.reduce(reduceSimilarNotifications, [])
     } while (results.length < this.limit)
 
-    if (_cache?.[0].itemUrl !== results[0]?.itemUrl) {
+    console.log(results)
+    if (more || _cache?.[0].itemUrl !== results[0]?.itemUrl) {
       this.results = results
       _cache = results
     }
@@ -236,6 +248,7 @@ export class NotificationsFeed extends LitElement {
     return html`
       <ctzn-notification
         class="block border-b border-gray-300"
+        style="content-visibility: auto; contain-intrinsic-size: 640px 120px;"
         .notification=${note}
         ?is-unread=${blendedCreatedAt > this.clearedAt}
       ></ctzn-notification>
@@ -257,4 +270,21 @@ function dateHeader (ts, range) {
   if (diff < DAY * 6) return (new Date(ts)).toLocaleDateString('default', { weekday: 'long' })
   if (range === 'month') return (new Date(ts)).toLocaleDateString('default', { month: 'short', year: 'numeric' })
   return (new Date(ts)).toLocaleDateString('default', { weekday: 'long', month: 'short', day: 'numeric' })
+}
+
+function reduceSimilarNotifications (acc, note) {
+  if (note.item?.reaction && note.item?.subject?.dbUrl) {
+    const {dbUrl} = note.item.subject
+    // is a reaction
+    for (let note2 of acc) {
+      if (!note2.item?.reaction) continue
+      if (note2.item?.subject?.dbUrl === dbUrl) {
+        note2.mergedNotes = note2.mergedNotes || []
+        note2.mergedNotes.push(note)
+        return acc
+      }
+    }
+  }
+  acc.push(note)
+  return acc
 }

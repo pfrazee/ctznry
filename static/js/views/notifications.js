@@ -116,6 +116,7 @@ class CtznNotifications extends LitElement {
   onUnreadNotificationsChanged (e) {
     document.title = e.detail.count ? `(${e.detail.count}) Notifications | CTZN` : `Notifications | CTZN`
     this.querySelector('ctzn-notifications-feed').loadNew(e.detail.count)
+    session.api.notifications.updateNotificationsClearedAt()
   }
 }
 

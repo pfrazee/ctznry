@@ -176,8 +176,8 @@ export class Post extends LitElement {
             </div>
           `}
           ${this.renderPostText()}
+          ${this.renderMedia()}
           ${this.nometa ? '' : html`
-            ${this.renderMedia()}
             ${this.renderReactions()}
             <div class="flex pl-1 mt-1.5 text-gray-500 text-sm items-center">
               ${this.renderRepliesCtrl()}

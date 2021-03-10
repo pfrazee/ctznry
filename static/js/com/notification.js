@@ -1,10 +1,11 @@
 import { LitElement, html } from '../../vendor/lit-element/lit-element.js'
 import { unsafeHTML } from '../../vendor/lit-element/lit-html/directives/unsafe-html.js'
 import { asyncReplace } from '../../vendor/lit-element/lit-html/directives/async-replace.js'
+import { repeat } from '../../vendor/lit-element/lit-html/directives/repeat.js'
 import * as session from '../lib/session.js'
 import { AVATAR_URL } from '../lib/const.js'
 import { emit } from '../lib/dom.js'
-import { extractSchemaId, makeSafe } from '../lib/strings.js'
+import { extractSchemaId, makeSafe, pluralize } from '../lib/strings.js'
 import { emojify } from '../lib/emojify.js'
 import { getPost, getComment } from '../lib/getters.js'
 import * as displayNames from '../lib/display-names.js'
@@ -67,6 +68,13 @@ export class Notification extends LitElement {
     let subjectSchemaId
     let replyCommentInfo
 
+    let otherAuthors
+    if (note.mergedNotes?.length) {
+      let others = new Set(note.mergedNotes.map(n => n?.author?.userId).filter(Boolean))
+      others.delete(note.author.userId)
+      if (others.size > 0) otherAuthors = Array.from(others)
+    }
+
     var icon
     var action = ''
     if (schemaId === 'ctzn.network/comment') {
@@ -87,7 +95,7 @@ export class Notification extends LitElement {
       icon = 'fas fa-user-plus'
     } else if (schemaId === 'ctzn.network/reaction') {
       subject = note.item.subject
-      action = html`reacted <span class="inline-block px-1.5 py-0.5 rounded bg-blue-50 text-blue-600 text-sm">${unsafeHTML(emojify(makeSafe(note.item.reaction)))}</span> to`
+      action = 'reacted to'
       icon = 'far fa-hand-point-up'
     } else {
       return ''
@@ -109,19 +117,31 @@ export class Notification extends LitElement {
           <a href="/${note.author.userId}" title=${note.author.userId}>
             <img class="w-8 h-8 rounded-full object-cover mr-2" src=${AVATAR_URL(note.author.userId)}>
           </a>
+          ${otherAuthors?.length ? html`
+            ${repeat(otherAuthors.slice(0, 5), userId => html`
+              <a href="/${userId}" title=${userId}>
+                <img class="w-8 h-8 rounded-full object-cover mr-2" src=${AVATAR_URL(userId)}>
+              </a>
+            `)}
+            ${otherAuthors.length > 5 ? html`
+              <span class="font-semibold ml-1 text-base text-gray-500">+${otherAuthors.length - 5}</span>
+            ` : ''}
+          ` : ''}
         </div>
-        <div class="pl-16 pr-4 pb-2">
+        <div class="pl-14 pr-4 pb-2">
           <a class="font-bold" href="/${note.author.userId}" title=${note.author.userId}>
            ${displayNames.render(note.author.userId)}
           </a>
+          ${otherAuthors ? html`and ${otherAuthors.length} ${pluralize(otherAuthors.length, 'other')}` : ''}
           ${action} ${target} &middot; ${relativeDate(note.blendedCreatedAt)}
         </div>
         ${schemaId === 'ctzn.network/comment' ? html`
-          <div class="reply pl-16 pb-4 pr-6">
+          <div class="border border-gray-300 mb-5 ml-14 mr-6 px-4 py-4 reply rounded-xl">
             ${asyncReplace(this.renderReplyComment(replyCommentInfo))}
           </div>
         ` : schemaId === 'ctzn.network/reaction' ? html`
-          <div class="reply pl-16 pb-4 pr-6">
+          ${this.renderReactions()}
+          <div class="reply pl-14 pr-6 pb-4">
             ${asyncReplace(this.renderSubject())}
           </div>
         ` : html`
@@ -179,6 +199,29 @@ export class Notification extends LitElement {
         nometa
         noclick
       ></ctzn-post>
+    `
+  }
+
+  renderReactions () {
+    const note = this.notification
+    let reactions = {}
+    reactions[note.item.reaction] = 1
+    if (note.mergedNotes) {
+      for (let note2 of note.mergedNotes) {
+        if (note2.item?.reaction) {
+          reactions[note2.item.reaction] = (reactions[note2.item.reaction] || 0) + 1
+        }
+      }
+    }
+    return html`
+      <div class="pl-14 pb-3 pr-6">
+        ${repeat(Object.entries(reactions), ([reaction, count]) => html`
+          <span class="inline-block px-1.5 py-0.5 rounded bg-gray-100 text-gray-700 text-sm">
+            ${unsafeHTML(emojify(makeSafe(reaction)))}
+            <sup>${count}</sup>
+          </span>
+        `)}
+      </div>
     `
   }
 
