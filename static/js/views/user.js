@@ -1,5 +1,6 @@
 import { LitElement, html } from '../../vendor/lit-element/lit-element.js'
 import { repeat } from '../../vendor/lit-element/lit-html/directives/repeat.js'
+import { unsafeHTML } from '../../vendor/lit-element/lit-html/directives/unsafe-html.js'
 import { EditProfilePopup } from '../com/popups/edit-profile.js'
 import { ComposerPopup } from '../com/popups/composer.js'
 import { EditRolePopup } from '../com/popups/edit-role.js'
@@ -11,7 +12,8 @@ import { AVATAR_URL, PERM_DESCRIPTIONS } from '../lib/const.js'
 import * as session from '../lib/session.js'
 import { getProfile, listFollowers, listFollows, listMembers, listMemberships, listRoles } from '../lib/getters.js'
 import * as displayNames from '../lib/display-names.js'
-import { pluralize } from '../lib/strings.js'
+import { pluralize, makeSafe, linkify } from '../lib/strings.js'
+import { emojify } from '../lib/emojify.js'
 import '../com/header.js'
 import '../com/button.js'
 import '../com/feed.js'
@@ -204,7 +206,7 @@ class CtznUser extends LitElement {
                   title=${this.userProfile?.value.displayName}
                   style="max-width: 320px"
                 >
-                  ${this.userProfile?.value.displayName}
+                  ${unsafeHTML(emojify(makeSafe(this.userProfile?.value.displayName)))}
                 </a>
               </h2>
               <h2 class="text-gray-500 font-semibold">
@@ -217,7 +219,7 @@ class CtznUser extends LitElement {
             </div>
           </div>
           ${this.userProfile?.value.description ? html`
-            <div class="pb-3 px-7 border border-gray-200 border-t-0 border-b-0 bg-white">${this.userProfile?.value.description}</div>
+            <div class="pb-3 px-4 sm:px-7 border border-gray-200 border-t-0 border-b-0 bg-white">${unsafeHTML(linkify(emojify(makeSafe(this.userProfile?.value.description))))}</div>
           ` : ''}
           <div class="flex border border-gray-200 border-t-0 bg-white text-gray-400 sticky top-0 z-10">
             <a class="${navCls('feed')}" href="/${this.userId}">Feed</a>
