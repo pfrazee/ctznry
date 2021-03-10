@@ -129,6 +129,7 @@ async function httpGet (domain, path, query = undefined) {
   const origin = DEBUG_ENDPOINTS[domain] ? `http://${DEBUG_ENDPOINTS[domain]}/` : `https://${domain}/`
   let url = joinPath(origin, path)
   if (query) {
+    query = Object.fromEntries(Object.entries(query).filter(([k, v]) => typeof v !== 'undefined'))
     url += '?' + (new URLSearchParams(query)).toString()
   }
   return (await fetch(url)).json()
