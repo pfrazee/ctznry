@@ -110,7 +110,7 @@ class CtznPostView extends LitElement {
   renderThread () {
     return html`
       <main>
-        <div class="py-2">
+        <div class="py-2 min-h-screen bg-white sm:bg-transparent">
           <a @click=${this.onClickBack}>
             <span class="fas fa-arrow-left cursor-pointer fa-arrow-left fas mb-2 ml-3 sm:hover:text-gray-700 text-2xl text-gray-600"></span>
           </a>
