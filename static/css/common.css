@@ -295,6 +295,11 @@ main {
   object-fit: cover;
 }
 
+.img-sizing-medium {
+  height: 225px;
+  object-fit: cover;
+}
+
 .img-sizing-small {
   height: 150px;
   object-fit: cover;
@@ -308,6 +313,11 @@ main {
 @media (max-width: 640px) {
   .img-sizing-big {
     height: 150px;
+  }
+
+  .img-sizing-medium {
+    height: 100px;
+    object-fit: cover;
   }
   
   .img-sizing-small {

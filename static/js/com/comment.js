@@ -182,6 +182,12 @@ export class Comment extends LitElement {
     return html`
       <div class="pl-5">
         <div class="overflow-x-auto px-1 sm:whitespace-normal whitespace-nowrap">
+          <a
+            class="inline-block text-sm px-2 py-0.5 mt-1 text-gray-500 rounded cursor-pointer bg-gray-100 sm:hover:bg-gray-200"
+            @click=${this.onClickCustomReaction}
+          >
+            Custom...
+          </a>
           ${repeat(SUGGESTED_REACTIONS, reaction => {
             const colors = this.haveIReacted(reaction) ? 'bg-green-500 sm:hover:bg-green-400 text-white' : 'bg-gray-100 sm:hover:bg-gray-200'
             return html`
@@ -193,12 +199,6 @@ export class Comment extends LitElement {
               </a>
             `
           })}
-          <a
-            class="inline-block text-sm px-2 py-0.5 mt-1 text-gray-500 rounded cursor-pointer sm:hover:bg-gray-100"
-            @click=${this.onClickCustomReaction}
-          >
-            Custom
-          </a>
         </div>
       </div>
     `
@@ -227,7 +227,7 @@ export class Comment extends LitElement {
   }
 
   renderReactionsSummary () {
-    const count = Object.values(this.comment.reactions).reduce((acc, v) => acc + v.length, 0)
+    const count = this.comment.reactions ? Object.values(this.comment.reactions).reduce((acc, v) => acc + v.length, 0) : 0
     let aCls = `inline-block ml-1 mr-6 rounded text-sm text-gray-500 ${count ? 'cursor-pointer hover:underline' : ''}`
     return html`
       <a class=${aCls} @click=${count ? this.onClickViewReactions : undefined}>

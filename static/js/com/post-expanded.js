@@ -152,18 +152,18 @@ export class PostExpanded extends LitElement {
             <span class="fas fa-fw fa-ellipsis-h"></span>
           </a>
         </div>
-        <div class="whitespace-pre-wrap break-words text-lg leading-tight font-medium text-gray-700 pb-1.5">${this.renderPostText()}</div>
+        <div class="whitespace-pre-wrap break-words text-lg leading-tight font-medium text-gray-700 mb-1.5">${this.renderPostText()}</div>
         ${this.post.value.extendedText ? html`
-          <div class="whitespace-pre-wrap break-words leading-snug text-gray-600 pt-2 pb-3">${this.renderPostExtendedText()}</div>
+          <div class="whitespace-pre-wrap break-words leading-snug text-gray-600 my-2">${this.renderPostExtendedText()}</div>
         ` : ''}
         ${this.renderMedia()}
         ${this.noctrls ? '' : html`
+          ${this.renderReactions()}
           <div class="text-sm text-gray-600 px-1">
             ${this.renderRepliesCtrl()}
             ${this.renderReactionsBtn()}
             ${this.renderReactionsSummary()}
           </div>
-          ${this.renderReactions()}
           ${this.renderReactionsCtrl()}
         `}
       </div>
@@ -188,7 +188,7 @@ export class PostExpanded extends LitElement {
       </a>
     `
     return html`
-      <div class="mt-1 mb-3">
+      <div class="mt-1 mb-2">
         ${repeat(media, item => img(item))}
       </div>
     `
@@ -224,7 +224,7 @@ export class PostExpanded extends LitElement {
   }
 
   renderReactionsSummary () {
-    const count = Object.values(this.post.reactions).reduce((acc, v) => acc + v.length, 0)
+    const count = this.post.reactions ? Object.values(this.post.reactions).reduce((acc, v) => acc + v.length, 0) : 0
     let aCls = `inline-block ml-1 mr-6 rounded text-gray-500 ${count ? 'cursor-pointer hover:underline' : ''}`
     return html`
       <a class=${aCls} @click=${count ? this.onClickViewReactions : undefined}>
@@ -243,6 +243,12 @@ export class PostExpanded extends LitElement {
           Add a reaction
         </div>
         <div class="overflow-x-auto px-1 sm:whitespace-normal whitespace-nowrap">
+          <a
+            class="inline-block text-sm px-2 py-0.5 mt-1 text-gray-500 rounded cursor-pointer bg-gray-100 sm:hover:bg-gray-200"
+            @click=${this.onClickCustomReaction}
+          >
+            Custom...
+          </a>
           ${repeat(SUGGESTED_REACTIONS, reaction => {
             const colors = this.haveIReacted(reaction) ? 'bg-green-500 sm:hover:bg-green-400 text-white' : 'bg-gray-100 sm:hover:bg-gray-200'
             return html`
@@ -254,12 +260,6 @@ export class PostExpanded extends LitElement {
               </a>
             `
           })}
-          <a
-            class="inline-block text-sm px-2 py-0.5 mt-1 text-gray-500 rounded cursor-pointer sm:hover:bg-gray-100"
-            @click=${this.onClickCustomReaction}
-          >
-            Custom
-          </a>
         </div>
       </div>
     `
@@ -270,7 +270,7 @@ export class PostExpanded extends LitElement {
       return ''
     }
     return html`
-      <div class="pt-1 text-gray-500 text-sm">
+      <div class="my-1.5 text-gray-500 text-sm">
         ${repeat(Object.entries(this.post.reactions), ([reaction, userIds]) => {
           const colors = this.haveIReacted(reaction) ? 'bg-blue-50 sm:hover:bg-blue-100 text-blue-600' : 'bg-gray-100 sm:hover:bg-gray-200'
           return html`

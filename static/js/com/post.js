@@ -175,16 +175,11 @@ export class Post extends LitElement {
               </span>
             </div>
           `}
-          <div
-            class="whitespace-pre-wrap break-words text-gray-${this.light ? '500' : '900'} ${this.nometa ? '' : 'pt-1 pb-2 pl-1 pr-2.5'}"
-            style="font-size: 16px; letter-spacing: 0.1px; line-height: 1.3;"
-          >${this.renderPostText()}${this.post.value.extendedText
-              ? html`<span class="bg-gray-200 ml-1 px-1 rounded text-gray-600 text-xs">more</span>`
-              : ''
-          }</div>
+          ${this.renderPostText()}
           ${this.nometa ? '' : html`
             ${this.renderMedia()}
-            <div class="flex pl-1 text-gray-500 text-sm items-center">
+            ${this.renderReactions()}
+            <div class="flex pl-1 mt-1.5 text-gray-500 text-sm items-center">
               ${this.renderRepliesCtrl()}
               ${this.renderReactionsBtn()}
               <div>
@@ -193,7 +188,6 @@ export class Post extends LitElement {
                 </a>
               </div>
             </div>
-            ${this.renderReactions()}
             ${this.renderReactionsCtrl()}
           `}
         </div>
@@ -207,9 +201,9 @@ export class Post extends LitElement {
     }
     const media = this.post.value.media
     const img = (item, size) => html`
-      <div class="bg-gray-100 rounded img-sizing-${size} img-placeholder">
+      <div class="bg-gray-100 rounded-xl img-sizing-${size} img-placeholder">
         <img
-          class="box-border object-cover rounded w-full img-sizing-${size}"
+          class="box-border object-cover rounded-xl border border-gray-200 w-full img-sizing-${size}"
           src="${BLOB_URL(this.post.author.userId, (item.blobs.thumb || item.blobs.original).blobName)}"
           alt=${item.caption || 'Image'}
         >
@@ -217,7 +211,7 @@ export class Post extends LitElement {
     `
     const moreImages = media.length - 4
     return html`
-      <div class="flex mt-1">
+      <div class="flex mt-1 mb-2 sm:px-1">
         ${media.length >= 4 ? html`
           <div class="flex-1 flex flex-col pr-0.5">
             <div class="flex-1 pb-0.5">${img(media[0], 'small')}</div>
@@ -225,7 +219,15 @@ export class Post extends LitElement {
           </div>
           <div class="flex-1 flex flex-col pl-0.5">
             <div class="flex-1 pb-0.5">${img(media[1], 'small')}</div>
-            <div class="flex-1 pt-0.5">${img(media[3], 'small')}</div>
+            <div class="flex-1 pt-0.5 relative">
+              ${moreImages > 0 ? html`
+                <span
+                  class="absolute inline-block font-bold px-2 py-0.5 rounded sm:text-lg text-white"
+                  style="left: 50%; top: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,.85);"
+                >+${moreImages}</span>
+              ` : ''}
+              ${img(media[3], 'small')}
+            </div>
           </div>
         ` : media.length === 3 ? html`
           <div class="flex-1 pr-0.5">${img(media[0], 'big')}</div>
@@ -234,14 +236,11 @@ export class Post extends LitElement {
             <div class="flex-1 pt-0.5">${img(media[2], 'smaller')}</div>
           </div>
         ` : media.length === 2 ? html`
-          <div class="flex-1 pr-0.5">${img(media[0], 'small')}</div>
-          <div class="flex-1 pl-0.5">${img(media[1], 'small')}</div>
+          <div class="flex-1 pr-0.5">${img(media[0], 'medium')}</div>
+          <div class="flex-1 pl-0.5">${img(media[1], 'medium')}</div>
         ` : html`
           <div class="flex-1">${img(media[0], 'big')}</div>
         `}
-      </div>
-      <div class="mb-3">
-        ${moreImages > 0 ? html`<div class="bg-gray-100 font-bold mt-1 px-2 py-0.5 rounded text-sm">+${moreImages} more...</div>` : ''}
       </div>
     `
   }
@@ -285,6 +284,12 @@ export class Post extends LitElement {
           Add a reaction
         </div>
         <div class="overflow-x-auto px-1 sm:whitespace-normal whitespace-nowrap">
+          <a
+            class="inline-block text-sm px-2 py-0.5 mt-1 text-gray-500 rounded cursor-pointer bg-gray-100 sm:hover:bg-gray-200"
+            @click=${this.onClickCustomReaction}
+          >
+            Custom...
+          </a>
           ${repeat(SUGGESTED_REACTIONS, reaction => {
             const colors = this.haveIReacted(reaction) ? 'bg-green-500 sm:hover:bg-green-400 text-white' : 'bg-gray-100 sm:hover:bg-gray-200'
             return html`
@@ -296,12 +301,6 @@ export class Post extends LitElement {
               </a>
             `
           })}
-          <a
-            class="inline-block text-sm px-2 py-0.5 mt-1 text-gray-500 rounded cursor-pointer sm:hover:bg-gray-100"
-            @click=${this.onClickCustomReaction}
-          >
-            Custom
-          </a>
         </div>
       </div>
     `
@@ -312,7 +311,7 @@ export class Post extends LitElement {
       return ''
     }
     return html`
-      <div class="mt-1.5 mx-1 text-gray-500 text-sm truncate">
+      <div class="my-1.5 mx-0.5 text-gray-500 text-sm truncate">
         ${repeat(Object.entries(this.post.reactions), ([reaction, userIds]) => {
           const colors = this.haveIReacted(reaction) ? 'bg-blue-50 sm:hover:bg-blue-100 text-blue-600' : 'bg-gray-100 sm:hover:bg-gray-200'
           return html`
@@ -330,7 +329,19 @@ export class Post extends LitElement {
   }
 
   renderPostText () {
-    return html`${unsafeHTML(linkify(emojify(makeSafe(this.post.value.text))))}`
+    const {text, extendedText} = this.post.value
+    if (!text?.trim() && !extendedText?.trim()) {
+      return ''
+    }
+    return html`
+      <div
+        class="whitespace-pre-wrap break-words text-${this.light ? 'gray-500' : 'black'} ${this.nometa ? '' : 'mt-1 mb-2 ml-1 mr-2.5'}"
+        style="font-size: 16px; letter-spacing: 0.1px; line-height: 1.3;"
+      >${unsafeHTML(linkify(emojify(makeSafe(this.post.value.text))))}${this.post.value.extendedText
+          ? html`<span class="bg-gray-200 ml-1 px-1 rounded text-gray-600 text-xs">more</span>`
+          : ''
+      }</div>
+    `
   }
 
   renderMatchText () {
