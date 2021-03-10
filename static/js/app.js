@@ -1,5 +1,6 @@
 import { LitElement, html } from '../vendor/lit-element/lit-element.js'
 import * as session from './lib/session.js'
+import { emit } from './lib/dom.js'
 import { DRIVE_KEY_REGEX } from './lib/strings.js'
 import './com/header.js'
 import './views/account.js'
@@ -154,6 +155,7 @@ class CtznApp extends LitElement {
   }
 
   async onHistoryPopstate (e) {
+    emit(document, 'close-all-popups')
     this.currentPath = window.location.pathname
     if (e.state.scrollY) {
       this.targetScrollY = e.state.scrollY

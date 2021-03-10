@@ -6,7 +6,6 @@ import { LitElement, html } from '../../../vendor/lit-element/lit-element.js'
 export class BasePopup extends LitElement {
   constructor () {
     super()
-    this.originalPathname = undefined
 
     const onGlobalKeyUp = e => {
       // listen for the escape key
@@ -14,12 +13,17 @@ export class BasePopup extends LitElement {
         this.onReject()
       }
     }
+    const onGlobalCloseAllPopups = e => {
+      this.onReject()
+    }
     document.addEventListener('keyup', onGlobalKeyUp)
+    document.addEventListener('close-all-popups', onGlobalCloseAllPopups)
     window.closePopup = () => this.onReject()
 
     // cleanup function called on cancel
     this.cleanup = () => {
       document.removeEventListener('keyup', onGlobalKeyUp)
+      document.removeEventListener('close-all-popups', onGlobalCloseAllPopups)
     }
   }
 
@@ -54,10 +58,6 @@ export class BasePopup extends LitElement {
       window.closePopup = undefined
       popupEl.cleanup()
       popupEl.remove()
-      if (popupEl.originalPathname && window.location.pathname !== popupEl.originalPathname) {
-        // closed popup without popping state and need to restore the old pathname
-        window.history.replaceState({}, null, popupEl.originalPathname)
-      }
     }
 
     // return a promise that resolves with resolve/reject events
