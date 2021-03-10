@@ -143,7 +143,14 @@ export class Feed extends LitElement {
     }
     console.log(results)
 
-    if (_cache?.path !== window.location.pathname || _cache?.results?.[0].url !== results[0]?.url) {
+    if (_cache?.path === window.location.pathname && _cache?.results?.[0].url === results[0]?.url) {
+      // stick with the cache but update the signal metrics
+      for (let i = 0; i < results.length; i++) {
+        this.results[i].reactions = _cache.results[i].reactions = results[i].reactions
+        this.results[i].replyCount = _cache.results[i].replyCount = results[i].replyCount
+      }
+      this.requestResultUpdates()
+    } else {
       this.results = results
       _cache = {path: window.location.pathname, results}
     }
@@ -193,6 +200,13 @@ export class Feed extends LitElement {
         window.scrollTo(0, y)
       }
     }, 500)
+  }
+
+  requestResultUpdates () {
+    let postEls = this.querySelectorAll('ctzn-post')
+    for (let el of Array.from(postEls)) {
+      el.requestUpdate()
+    }
   }
 
   // rendering
