@@ -78,7 +78,7 @@ export class Comment extends LitElement {
   }
 
   async reloadSignals () {
-    this.comment.reactions = (await session.api.reactions.getReactionsForSubject(this.comment.url))?.reactions
+    this.comment.reactions = (await session.api.view.get('ctzn.network/reactions-to-view', this.comment.url))?.reactions
     this.requestUpdate()
   }
 
@@ -338,7 +338,8 @@ export class Comment extends LitElement {
     }
     if (this.communityUserId && session.isInCommunity(this.communityUserId)) {
       items.push(
-        session.api.communities.getUserPermission(
+        session.api.view.get(
+          'ctzn.network/community-user-permission-view',
           this.communityUserId,
           session.info.userId,
           'ctzn.network/perm-community-remove-comment'

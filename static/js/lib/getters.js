@@ -5,61 +5,61 @@ import * as session from './session.js'
 export async function getProfile (userId) {
   const domain = getDomain(userId)
   if (session.isActive(domain)) {
-    return session.api.profiles.get(userId)
+    return session.api.view.get('ctzn.network/profile-view', userId)
   }
-  return httpGet(domain, `/ctzn/profile/${encodeURIComponent(userId)}`)
+  return httpGet(domain, `.view/ctzn.network/profile-view/${encodeURIComponent(userId)}`)
 }
 
 export async function listUserFeed (userId, opts) {
   const domain = getDomain(userId)
   if (session.isActive(domain)) {
-    return session.api.posts.listUserFeed(userId, opts)
+    return (await session.api.view.get('ctzn.network/posts-view', userId, opts))?.posts
   }
-  return httpGet(domain, `/ctzn/posts/${encodeURIComponent(userId)}`, opts)  
+  return (await httpGet(domain, `.view/ctzn.network/posts-view/${encodeURIComponent(userId)}`, opts))?.posts
 }
 
 export async function getPost (userId, key) {
   const domain = getDomain(userId)
   if (session.isActive(domain)) {
     if (key.startsWith('hyper://')) {
-      return session.api.posts.get(key)
+      return session.api.view.get('ctzn.network/post-view', key)
     }
-    return session.api.posts.get(userId, key)
+    return session.api.view.get('ctzn.network/post-view', userId, key)
   }
   const username = getUsername(userId)
   key = toKey(key)
-  return httpGet(domain, `/ctzn/post/${username}/${encodeURIComponent(key)}`)
+  return httpGet(domain, `.view/ctzn.network/post-view/${username}/${encodeURIComponent(key)}`)
 }
 
 export async function getComment (userId, key) {
   const domain = getDomain(userId)
   if (session.isActive(domain)) {
     if (key.startsWith('hyper://')) {
-      return session.api.comments.get(key)
+      return session.api.view.get('ctzn.network/comment-view', key)
     }
-    return session.api.comments.get(userId, key)
+    return session.api.view.get('ctzn.network/comment-view', userId, key)
   }
   const username = getUsername(userId)
   key = toKey(key)
-  return httpGet(domain, `/ctzn/comment/${username}/${encodeURIComponent(key)}`)
+  return httpGet(domain, `.view/ctzn.network/comment-view/${username}/${encodeURIComponent(key)}`)
 }
 
 export async function getThread (authorId, subjectUrl, communityId = undefined) {
   const domain = getDomain(communityId || authorId)
   if (session.isActive(domain)) {
-    return session.api.comments.getThread(subjectUrl)
+    return (await session.api.view.get('ctzn.network/thread-view', subjectUrl))?.comments
   }
-  return httpGet(domain, `/ctzn/thread/${encodeURIComponent(subjectUrl)}`)
+  return (await httpGet(domain, `.view/ctzn.network/thread-view/${encodeURIComponent(subjectUrl)}`))?.comments
 }
 
 export async function listFollowers (userId) {
   const domain = getDomain(userId)
   if (session.isActive(domain)) {
-    return session.api.follows.listFollowers(userId)
+    return session.api.view.get('ctzn.network/followers-view', userId)
   }
   let [mine, theirs] = await Promise.all([
-    session.isActive() ? session.api.follows.listFollowers(userId) : undefined,
-    httpGet(domain, `/ctzn/followers/${encodeURIComponent(userId)}`).catch(e => undefined)
+    session.isActive() ? session.api.view.get('ctzn.network/followers-view', userId) : undefined,
+    httpGet(domain, `/.view/ctzn.network/followers-view/${encodeURIComponent(userId)}`).catch(e => undefined)
   ])
   if (!mine && !theirs) throw new Error('Failed to fetch any follower information')
   return {
@@ -73,41 +73,41 @@ export async function listFollowers (userId) {
 export async function listFollows (userId) {
   const domain = getDomain(userId)
   if (session.isActive(domain)) {
-    return session.api.follows.listFollows(userId)
+    return (await session.api.table.list(userId, 'ctzn.network/follow'))?.entries
   }
-  return httpGet(domain, `/ctzn/follows/${encodeURIComponent(userId)}`)
+  return (await httpGet(domain, `.table/${encodeURIComponent(userId)}/ctzn.network/follow`))?.entries
 }
 
 export async function listMembers (userId, opts) {
   const domain = getDomain(userId)
   if (session.isActive(domain)) {
-    return session.api.communities.listMembers(userId, opts)
+    return (await session.api.table.list(userId, 'ctzn.network/community-member', opts))?.entries
   }
-  return httpGet(domain, `/ctzn/members/${encodeURIComponent(userId)}`, opts)
+  return (await httpGet(domain, `.table/${encodeURIComponent(userId)}/ctzn.network/community-member`, opts))?.entries
 }
 
 export async function listMemberships (userId) {
   const domain = getDomain(userId)
   if (session.isActive(domain)) {
-    return session.api.communities.listMemberships(userId)
+    return (await session.api.table.list(userId, 'ctzn.network/community-membership'))?.entries
   }
-  return httpGet(domain, `/ctzn/memberships/${encodeURIComponent(userId)}`)
+  return (await httpGet(domain, `.table/${encodeURIComponent(userId)}/ctzn.network/community-membership`))?.entries
 }
 
 export async function listRoles (userId) {
   const domain = getDomain(userId)
   if (session.isActive(domain)) {
-    return session.api.communities.listRoles(userId)
+    return (await session.api.table.list(userId, 'ctzn.network/community-role'))?.entries
   }
-  return httpGet(domain, `/ctzn/roles/${encodeURIComponent(userId)}`)
+  return (await httpGet(domain, `.table/${encodeURIComponent(userId)}/ctzn.network/community-role`))?.entries
 }
 
 export async function listBans (userId) {
   const domain = getDomain(userId)
   if (session.isActive(domain)) {
-    return session.api.communities.listBans(userId)
+    return (await session.api.table.list(userId, 'ctzn.network/community-ban'))?.entries
   }
-  return httpGet(domain, `/ctzn/bans/${encodeURIComponent(userId)}`)
+  return (await httpGet(domain, `.table/${encodeURIComponent(userId)}/ctzn.network/community-ban`))?.entries
 }
 
 function getDomain (userId) {

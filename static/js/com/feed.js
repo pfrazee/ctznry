@@ -139,7 +139,7 @@ export class Feed extends LitElement {
     if (this.source) {
       results = results.concat(await listUserFeed(this.source, {limit: this.limit, reverse: true, lt}))
     } else {
-      results = results.concat(await session.api.posts.listHomeFeed({limit: this.limit, reverse: true, lt}))
+      results = results.concat((await session.api.view.get('ctzn.network/feed-view', {limit: this.limit, reverse: true, lt}))?.feed)
     }
     console.log(results)
 
@@ -168,7 +168,7 @@ export class Feed extends LitElement {
     if (this.source) {
       results = await listUserFeed(this.source, {limit: 1, reverse: true})
     } else {
-      results = await session.api.posts.listHomeFeed({limit: 1, reverse: true})
+      results = (await session.api.view.get('ctzn.network/feed-view', {limit: 1, reverse: true}))?.feed
     }
     this.hasNewItems = (results[0] && results[0].key !== this.results[0].key)
   }

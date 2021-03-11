@@ -96,7 +96,7 @@ export class PostExpanded extends LitElement {
   }
 
   async reloadSignals () {
-    this.post.reactions = (await session.api.reactions.getReactionsForSubject(this.post.url))?.reactions
+    this.post.reactions = (await session.api.view.get('ctzn.network/reactions-to-view', this.post.url))?.reactions
     this.requestUpdate()
   }
 
@@ -382,7 +382,8 @@ export class PostExpanded extends LitElement {
     }
     if (this.communityUserId && session.isInCommunity(this.communityUserId)) {
       items.push(
-        session.api.communities.getUserPermission(
+        session.api.view.get(
+          'ctzn.network/community-user-permission-view',
           this.communityUserId,
           session.info.userId,
           'ctzn.network/perm-community-remove-post'

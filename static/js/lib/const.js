@@ -13,7 +13,7 @@ export function HTTP_ENDPOINT (domain) {
 
 export function AVATAR_URL (userId) {
   const {domain, username} = parseUserId(userId)
-  return joinPath(HTTP_ENDPOINT(domain), 'ctzn/avatar', username)
+  return joinPath(HTTP_ENDPOINT(domain), '.view/ctzn.network/avatar-view', username)
 }
 
 export function POST_URL (post) {
@@ -34,7 +34,7 @@ export function FULL_COMMENT_URL (comment) {
 
 export function BLOB_URL (userId, blobName) {
   const {domain, username} = parseUserId(userId)
-  return joinPath(HTTP_ENDPOINT(domain), 'ctzn/blobs', userId, blobName)
+  return joinPath(HTTP_ENDPOINT(domain), '.view/ctzn.network/blob-view', userId, blobName)
 }
 
 export const PERM_DESCRIPTIONS = {
