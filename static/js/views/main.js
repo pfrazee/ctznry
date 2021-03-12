@@ -2,6 +2,7 @@ import { LitElement, html } from '../../vendor/lit-element/lit-element.js'
 import { repeat } from '../../vendor/lit-element/lit-html/directives/repeat.js'
 import * as toast from '../com/toast.js'
 import * as session from '../lib/session.js'
+import * as dbmethods from '../lib/dbmethods.js'
 import { listMemberships } from '../lib/getters.js'
 import * as displayNames from '../lib/display-names.js'
 import '../com/header.js'
@@ -329,7 +330,11 @@ class CtznMainView extends LitElement {
   async onModeratorRemovePost (e) {
     try {
       const post = e.detail.post
-      await session.api.communities.removePost(post.value.community.userId, post.url)
+      await dbmethods.call(
+        post.value.community.userId,
+        'ctzn.network/community-remove-content-method',
+        {contentUrl: post.url}
+      )
       this.load()
     } catch (e) {
       console.log(e)

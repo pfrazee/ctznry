@@ -1,7 +1,7 @@
 /* globals beaker */
 import { html } from '../../../vendor/lit-element/lit-element.js'
 import { BasePopup } from './base.js'
-import * as session from '../../lib/session.js'
+import * as dbmethods from '../../lib/dbmethods.js'
 import '../button.js'
 
 // exported api
@@ -20,7 +20,7 @@ export class BanPopup extends BasePopup {
     this.currentError = undefined
     this.isProcessing = false
     this.communityId = opts.communityId
-    this.citizenId = opts.citizenId
+    this.member = opts.member
   }
 
   get shouldShowHead () {
@@ -58,7 +58,7 @@ export class BanPopup extends BasePopup {
             id="citizenId-input"
             name="citizenId"
             class="block box-border w-full border border-gray-300 rounded p-3"
-            value=${this.citizenId}
+            value=${this.member.userId}
             disabled
           />
         </section>
@@ -130,10 +130,15 @@ export class BanPopup extends BasePopup {
     let res
     this.currentError = undefined
     try {
-      res = await session.api.communities.removeMember(this.communityId, this.citizenId, {
-        ban,
-        banReason
-      })
+      res = await dbmethods.call(
+        this.communityId,
+        'ctzn.network/community-remove-member-method',
+        {
+          member: this.member,
+          ban,
+          banReason: ban ? banReason : undefined
+        }
+      )
     } catch (e) {
       this.currentError = e.toString()
       return

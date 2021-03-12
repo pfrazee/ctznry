@@ -36,11 +36,11 @@ export class BasePopup extends LitElement {
   }
 
   get shouldCloseOnOuterClick () {
-    return true
+    return false
   }
 
   get shouldCloseOnEscape () {
-    return true
+    return false
   }
 
   get maxWidth () {

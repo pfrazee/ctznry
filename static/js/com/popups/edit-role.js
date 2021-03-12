@@ -4,6 +4,7 @@ import { repeat } from '../../../vendor/lit-element/lit-html/directives/repeat.j
 import { PERM_DESCRIPTIONS } from '../../lib/const.js'
 import { BasePopup } from './base.js'
 import * as session from '../../lib/session.js'
+import * as dbmethods from '../../lib/dbmethods.js'
 import '../button.js'
 
 // exported api
@@ -166,25 +167,39 @@ export class EditRolePopup extends BasePopup {
     let res
     this.currentError = undefined
     try {
-      if (this.isNewRole) {
-        res = await session.api.communities.createRole(this.communityId, {
-          roleId: this.roleId,
-          permissions: this.permissions
-        })
-        this.isNewRole = false // if a resubmit is needed due to errors in assignment, dont create again
-      } else {
-        res = await session.api.communities.editRole(this.communityId, this.roleId, {
-          permissions: this.permissions
-        })
-      }
+      res = await dbmethods.call(
+        this.communityId,
+        'ctzn.network/community-put-role-method',
+        {roleId: this.roleId, permissions: this.permissions}
+      )
       for (let memberId of memberIds) {
         if (!this.members?.find(member => member.value.user.userId === memberId)) {
-          await session.api.communities.assignRole(this.communityId, memberId, this.roleId)
+          let record = await session.api.table.get(this.communityId, 'ctzn.network/community-member', memberId)
+          if (!record) {
+            throw new Error(`${memberId} is not a member of this community`)
+          }
+          let roles = new Set(record.value.roles || [])
+          roles.add(this.roleId)
+          res = await dbmethods.call(
+            this.communityId,
+            'ctzn.network/community-set-member-roles-method',
+            {member: record.value.user, roles: Array.from(roles)}
+          )
         }
       }
       for (let member of this.members) {
         if (!memberIds.includes(member.value.user.userId)) {
-          await session.api.communities.unassignRole(this.communityId, member.value.user.userId, this.roleId)
+          let record = await session.api.table.get(this.communityId, 'ctzn.network/community-member', member.value.user.userId)
+          if (!record) {
+            throw new Error(`${member.value.user.userId} is not a member of this community`)
+          }
+          let roles = new Set(record.value.roles || [])
+          roles.delete(this.roleId)
+          res = await dbmethods.call(
+            this.communityId,
+            'ctzn.network/community-set-member-roles-method',
+            {member: record.value.user, roles: Array.from(roles)}
+          )
         }
       }
     } catch (e) {

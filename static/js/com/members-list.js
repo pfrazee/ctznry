@@ -108,7 +108,7 @@ export class MembersList extends LitElement {
 
   async onClickBan (e, member) {
     e.preventDefault()
-    emit(this, 'ban', {detail: {userId: member.value.user.userId}})
+    emit(this, 'ban', {detail: {member: member.value.user}})
   }
 
   async onClickFollow (e, member) {

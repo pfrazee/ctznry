@@ -2,6 +2,7 @@ import { LitElement, html } from '../../vendor/lit-element/lit-element.js'
 import { repeat } from '../../vendor/lit-element/lit-html/directives/repeat.js'
 import * as toast from './toast.js'
 import { getPost, getComment, getThread } from '../lib/getters.js'
+import * as dbmethods from '../lib/dbmethods.js'
 import { emit } from '../lib/dom.js'
 import * as session from '../lib/session.js'
 import * as displayNames from '../lib/display-names.js'
@@ -249,7 +250,11 @@ export class Thread extends LitElement {
   async onModeratorRemovePost (e) {
     try {
       const post = e.detail.post
-      await session.api.communities.removePost(post.value.community.userId, post.url)
+      await dbmethods.call(
+        post.value.community.userId,
+        'ctzn.network/community-remove-content-method',
+        {contentUrl: post.url}
+      )
       this.load()
     } catch (e) {
       console.log(e)
@@ -260,10 +265,10 @@ export class Thread extends LitElement {
   async onModeratorRemoveComment (e) {
     try {
       const comment = e.detail.comment
-      await session.api.communities.removeComment(
+      await dbmethods.call(
         comment.value.community.userId,
-        comment.value.reply.root.dbUrl,
-        comment.url
+        'ctzn.network/community-remove-content-method',
+        {contentUrl: comment.url}
       )
       this.load()
     } catch (e) {

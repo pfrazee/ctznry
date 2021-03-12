@@ -10,6 +10,7 @@ import * as contextMenu from '../com/context-menu.js'
 import * as toast from '../com/toast.js'
 import { AVATAR_URL, PERM_DESCRIPTIONS } from '../lib/const.js'
 import * as session from '../lib/session.js'
+import * as dbmethods from '../lib/dbmethods.js'
 import { getProfile, listFollowers, listFollows, listMembers, listMemberships, listRoles } from '../lib/getters.js'
 import * as displayNames from '../lib/display-names.js'
 import { pluralize, makeSafe, linkify } from '../lib/strings.js'
@@ -463,7 +464,7 @@ class CtznUser extends LitElement {
         </div>
         <div class="border border-gray-200 border-t-0 border-b-0  bg-white">
           ${renderRole('admin')}
-          ${repeat(this.roles, r => r.value.roleId, r => renderRole(r.value.roleId, r.value.permissions))}
+          ${repeat(this.roles || [], r => r.value.roleId, r => renderRole(r.value.roleId, r.value.permissions))}
           <div class="px-4 py-2 border-b border-gray-300">
             <div class="flex items-center">
               <span class="font-semibold text-lg flex-1"><span class="text-sm far fa-fw fa-user"></span> default</span>
@@ -525,10 +526,16 @@ class CtznUser extends LitElement {
   async onClickEditProfile (e) {
     let newProfile = await EditProfilePopup.create(this.userId, AVATAR_URL(this.userId), this.userProfile.value)
     try {
+      let isPending = false
       if (this.isCitizen) {
         await session.api.profiles.put(newProfile.profile)
       } else if (this.isCommunity) {
-        await session.api.communities.putProfile(this.userId, newProfile.profile)
+        let res = await dbmethods.call(
+          this.userId,
+          'ctzn.network/put-profile-method',
+          newProfile.profile
+        )
+        isPending = isPending || res.pending()
       }
       this.userProfile.value = newProfile.profile
       if (newProfile.uploadedAvatar) {
@@ -536,10 +543,21 @@ class CtznUser extends LitElement {
         if (this.isCitizen) {
           await session.api.profiles.putAvatar(newProfile.uploadedAvatar.base64buf)
         } else if (this.isCommunity) {
-          await session.api.communities.putAvatar(this.userId, newProfile.uploadedAvatar.base64buf)
+          const blobRes = await session.api.blobs.create(newProfile.uploadedAvatar.base64buf)
+          let res = await dbmethods.call(
+            this.userId,
+            'ctzn.network/put-avatar-method',
+            {
+              blobSource: {userId: session.info.userId, dbUrl: session.info.dbUrl},
+              blobName: blobRes.name
+            }
+          )
+          isPending = isPending || res.pending()
         }
       }
-      toast.create('Profile updated', 'success')
+      if (!isPending) {
+        toast.create('Profile updated', 'success')
+      }
       this.requestUpdate()
 
       if (newProfile.uploadedAvatar) {
@@ -637,7 +655,11 @@ class CtznUser extends LitElement {
       return
     }
     try {
-      await session.api.communities.deleteRole(this.userId, roleId)
+      await dbmethods.call(
+        this.userId,
+        'ctzn.network/community-delete-role-method',
+        {roleId}
+      )
       toast.create(`${roleId} role removed`)
       this.load()
     } catch (e) {
@@ -650,7 +672,7 @@ class CtznUser extends LitElement {
     try {
       await BanPopup.create({
         communityId: this.userId,
-        citizenId: e.detail.userId
+        member: e.detail.member
       })
       this.load()
     } catch (e) {
@@ -684,7 +706,11 @@ class CtznUser extends LitElement {
   async onModeratorRemovePost (e) {
     try {
       const post = e.detail.post
-      await session.api.communities.removePost(post.value.community.userId, post.url)
+      await dbmethods.call(
+        post.value.community.userId,
+        'ctzn.network/community-remove-content-method',
+        {contentUrl: post.url}
+      )
       this.load()
     } catch (e) {
       console.log(e)

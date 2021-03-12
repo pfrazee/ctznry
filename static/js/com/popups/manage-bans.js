@@ -2,8 +2,8 @@
 import { html } from '../../../vendor/lit-element/lit-element.js'
 import { repeat } from '../../../vendor/lit-element/lit-html/directives/repeat.js'
 import { BasePopup } from './base.js'
-import * as session from '../../lib/session.js'
 import { listBans } from '../../lib/getters.js'
+import * as dbmethods from '../../lib/dbmethods.js'
 import * as toast from '../toast.js'
 import '../button.js'
 
@@ -109,8 +109,14 @@ export class ManageBansPopup extends BasePopup {
       return
     }
     try {
-      await session.api.communities.deleteBan(this.communityId, ban.value.bannedUser.userId)
-      toast.create('Ban lifted', 'success')
+      let res = await dbmethods.call(
+        this.communityId,
+        'ctzn.network/community-delete-ban-method',
+        {bannedUser: ban.value.bannedUser}
+      )
+      if (res.success()) {
+        toast.create('Ban lifted', 'success')
+      }
       this.load()
     } catch (e) {
       toast.create(e.toString(), 'error')
