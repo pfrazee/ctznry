@@ -104,7 +104,7 @@ export class Post extends LitElement {
   }
 
   async reloadSignals () {
-    this.post.reactions = (await session.api.view.get('ctzn.network/reactions-to-view', this.post.url))?.reactions
+    this.post.reactions = (await session.ctzn.view('ctzn.network/reactions-to-view', this.post.url))?.reactions
     this.requestUpdate()
   }
 
@@ -424,11 +424,11 @@ export class Post extends LitElement {
     if (this.haveIReacted(reaction)) {
       this.post.reactions[reaction] = this.post.reactions[reaction].filter(userId => userId !== session.info.userId)
       this.requestUpdate()
-      await session.api.reactions.del(this.post.url, reaction)
+      await session.ctzn.user.table('ctzn.network/reaction').delete(`${reaction}:${this.post.url}`)
     } else {
       this.post.reactions[reaction] = (this.post.reactions[reaction] || []).concat([session.info.userId])
       this.requestUpdate()
-      await session.api.reactions.put({
+      await session.ctzn.user.table('ctzn.network/reaction').create({
         subject: {dbUrl: this.post.url, authorId: this.post.author.userId},
         reaction
       })
@@ -453,7 +453,7 @@ export class Post extends LitElement {
     if (this.haveIReacted(reaction)) {
       return
     }
-    await session.api.reactions.put({
+    await session.ctzn.user.table('ctzn.network/reaction').create({
       subject: {dbUrl: this.post.url, authorId: this.post.author.userId},
       reaction
     })
@@ -492,7 +492,7 @@ export class Post extends LitElement {
     }
     if (this.communityUserId && session.isInCommunity(this.communityUserId)) {
       items.push(
-        session.api.view.get(
+        session.ctzn.view(
           'ctzn.network/community-user-permission-view',
           this.communityUserId,
           session.info.userId,

@@ -4,7 +4,6 @@ import { unsafeHTML } from '../../vendor/lit-element/lit-html/directives/unsafe-
 import css from '../../css/com/user-list.css.js'
 import { AVATAR_URL } from '../lib/const.js'
 import * as session from '../lib/session.js'
-import { getProfile, listFollowers, listFollows } from '../lib/getters.js'
 import { makeSafe, linkify } from '../lib/strings.js'
 import { emojify } from '../lib/emojify.js'
 
@@ -29,7 +28,7 @@ export class UserList extends LitElement {
   async load () {
     this.profiles = []
     for (let id of this.ids) {
-      const profile = await getProfile(id)
+      const profile = await session.ctzn.getProfile(id)
       if (profile.error) {
         profile.userId = id
       }
@@ -41,8 +40,8 @@ export class UserList extends LitElement {
       }
 
       const [followers, following] = await Promise.all([
-        listFollowers(id).catch(e => undefined),
-        listFollows(id).catch(e => undefined)
+        session.ctzn.listFollowers(id).catch(e => undefined),
+        session.ctzn.db(id).table('ctzn.network/follow').list().catch(e => undefined)
       ])
       let uniqFollowers = followers ? getUniqFollowers(followers) : []
       profile.isFollowingMe = session.isActive() && !!following?.find(f => f.value.subject.userId === session.info.userId)
@@ -136,14 +135,16 @@ export class UserList extends LitElement {
 
   async onClickFollow (e, profile) {
     e.preventDefault()
-    await session.api.follows.follow(profile.userId)
+    await session.ctzn.user.table('ctzn.network/follow').create({
+      subject: {userId: profile.userId, dbUrl: profile.dbUrl}
+    })
     profile.amIFollowing = true
     this.requestUpdate()
   }
 
   async onClickUnfollow (e, profile) {
     e.preventDefault()
-    await session.api.follows.unfollow(profile.userId)
+    await session.ctzn.user.table('ctzn.network/follow').delete(profile.userId)
     profile.amIFollowing = false
     this.requestUpdate()
   }

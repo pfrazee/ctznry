@@ -3,7 +3,6 @@ import { repeat } from '../../vendor/lit-element/lit-html/directives/repeat.js'
 import { AVATAR_URL } from '../lib/const.js'
 import * as session from '../lib/session.js'
 import { emit } from '../lib/dom.js'
-import { listFollows } from '../lib/getters.js'
 
 export class MembersList extends LitElement {
   static get properties () {
@@ -27,7 +26,8 @@ export class MembersList extends LitElement {
 
   async load () {
     if (session.isActive()) {
-      this.myFollows = (await listFollows(session.info.userId).catch(e => [])).map(f => f.value.subject.userId)
+      let f = await session.ctzn.user.table('ctzn.network/follow').list().catch(e => [])
+      this.myFollows = f.map(f => f.value.subject.userId)
     }
   }
 
@@ -113,14 +113,16 @@ export class MembersList extends LitElement {
 
   async onClickFollow (e, member) {
     e.preventDefault()
-    await session.api.follows.follow(member.value.user.userId)
+    await session.ctzn.user.table('ctzn.network/follow').create({
+      subject: member.value.user
+    })
     this.myFollows.push(member.value.user.userId)
     this.requestUpdate()
   }
 
   async onClickUnfollow (e, member) {
     e.preventDefault()
-    await session.api.follows.unfollow(member.value.user.userId)
+    await session.ctzn.user.table('ctzn.network/follow').delete(member.value.user.userId)
     this.myFollows.splice(this.myFollows.indexOf(member.value.user.userId))
     this.requestUpdate()
   }

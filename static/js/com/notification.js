@@ -7,7 +7,6 @@ import { AVATAR_URL } from '../lib/const.js'
 import { emit } from '../lib/dom.js'
 import { extractSchemaId, makeSafe, pluralize } from '../lib/strings.js'
 import { emojify } from '../lib/emojify.js'
-import { getPost, getComment } from '../lib/getters.js'
 import * as displayNames from '../lib/display-names.js'
 import './post.js'
 
@@ -162,7 +161,7 @@ export class Notification extends LitElement {
     const schemaId = extractSchemaId(dbUrl)
     let record
     if (schemaId === 'ctzn.network/post') {
-      record = _itemCache[dbUrl] ? _itemCache[dbUrl] : await getPost(authorId, dbUrl)
+      record = _itemCache[dbUrl] ? _itemCache[dbUrl] : await session.ctzn.getPost(authorId, dbUrl)
       _itemCache[dbUrl] = record
       yield html`
         <ctzn-post
@@ -173,7 +172,7 @@ export class Notification extends LitElement {
         ></ctzn-post>
       `
     } else if (schemaId === 'ctzn.network/comment') {
-      record = _itemCache[dbUrl] ? _itemCache[dbUrl] : await getComment(authorId, dbUrl)
+      record = _itemCache[dbUrl] ? _itemCache[dbUrl] : await session.ctzn.getComment(authorId, dbUrl)
       _itemCache[dbUrl] = record
       yield html`
         <ctzn-post
@@ -191,7 +190,7 @@ export class Notification extends LitElement {
       yield html`Loading...`
     }
 
-    let record = _itemCache[commentInfo.dbUrl] ? _itemCache[commentInfo.dbUrl] : await getComment(commentInfo.userId, commentInfo.dbUrl)
+    let record = _itemCache[commentInfo.dbUrl] ? _itemCache[commentInfo.dbUrl] : await session.ctzn.getComment(commentInfo.userId, commentInfo.dbUrl)
     _itemCache[commentInfo.dbUrl] = record
     yield html`
       <ctzn-post
@@ -233,10 +232,10 @@ export class Notification extends LitElement {
 
     let schemaId = extractSchemaId(this.notification.itemUrl)
     if (schemaId === 'ctzn.network/post'){
-      const subject = await getPost(this.notification.author.userId, this.notification.itemUrl)
+      const subject = await session.ctzn.getPost(this.notification.author.userId, this.notification.itemUrl)
       emit(this, 'view-thread', {detail: {subject: {dbUrl: subject.url, authorId: subject.author.userId}}})
     } else if (schemaId === 'ctzn.network/comment') {
-      const subject = await getComment(this.notification.author.userId, this.notification.itemUrl)
+      const subject = await session.ctzn.getComment(this.notification.author.userId, this.notification.itemUrl)
       emit(this, 'view-thread', {detail: {subject: {dbUrl: subject.url, authorId: subject.author.userId}}})
     } else if (schemaId === 'ctzn.network/follow') {
       window.location = `/${this.notification.author.userId}`
@@ -244,9 +243,9 @@ export class Notification extends LitElement {
       let subject
       const subjectSchemaId = extractSchemaId(this.notification.item.subject.dbUrl)
       if (subjectSchemaId === 'ctzn.network/post') {
-        subject = await getPost(this.notification.item.subject.authorId, this.notification.item.subject.dbUrl)
+        subject = await session.ctzn.getPost(this.notification.item.subject.authorId, this.notification.item.subject.dbUrl)
       } else if (subjectSchemaId === 'ctzn.network/comment') {
-        subject = await getComment(this.notification.item.subject.authorId, this.notification.item.subject.dbUrl)
+        subject = await session.ctzn.getComment(this.notification.item.subject.authorId, this.notification.item.subject.dbUrl)
       }
       if (subject) {
         emit(this, 'view-thread', {detail: {subject: {dbUrl: subject.url, authorId: subject.author.userId}}})

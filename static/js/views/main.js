@@ -2,8 +2,6 @@ import { LitElement, html } from '../../vendor/lit-element/lit-element.js'
 import { repeat } from '../../vendor/lit-element/lit-html/directives/repeat.js'
 import * as toast from '../com/toast.js'
 import * as session from '../lib/session.js'
-import * as dbmethods from '../lib/dbmethods.js'
-import { listMemberships } from '../lib/getters.js'
 import * as displayNames from '../lib/display-names.js'
 import '../com/header.js'
 import '../com/button.js'
@@ -105,7 +103,7 @@ class CtznMainView extends LitElement {
       document.body.classList.add('bg-gray-50')
       return this.requestUpdate()
     }
-    this.memberships = await listMemberships(session.info.userId)
+    this.memberships = await session.ctzn.user.table('ctzn.network/community-membership').list()
     if (!this.suggestedCommunities) {
       this.suggestedCommunities = SUGGESTED_COMMUNITIES.filter(c => !this.memberships?.find(m => c.userId === m.value.community.userId))
       this.suggestedCommunities = this.suggestedCommunities.sort(() => Math.random() - 0.5).slice(0, 5)
@@ -318,7 +316,7 @@ class CtznMainView extends LitElement {
 
   async onDeletePost (e) {
     try {
-      await session.api.posts.del(e.detail.post.key)
+      await session.ctzn.user.table('ctzn.network/post').delete(e.detail.post.key)
       toast.create('Post deleted')
       this.load()
     } catch (e) {
@@ -330,8 +328,7 @@ class CtznMainView extends LitElement {
   async onModeratorRemovePost (e) {
     try {
       const post = e.detail.post
-      await dbmethods.call(
-        post.value.community.userId,
+      await session.ctzn.db(post.value.community.userId).method(
         'ctzn.network/community-remove-content-method',
         {contentUrl: post.url}
       )

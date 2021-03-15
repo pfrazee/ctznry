@@ -1,7 +1,7 @@
 /* globals beaker */
 import { html } from '../../../vendor/lit-element/lit-element.js'
 import { BasePopup } from './base.js'
-import * as dbmethods from '../../lib/dbmethods.js'
+import * as session from '../../lib/session.js'
 import '../button.js'
 
 // exported api
@@ -130,8 +130,7 @@ export class BanPopup extends BasePopup {
     let res
     this.currentError = undefined
     try {
-      res = await dbmethods.call(
-        this.communityId,
+      res = await session.ctzn.db(this.communityId).method(
         'ctzn.network/community-remove-member-method',
         {
           member: this.member,

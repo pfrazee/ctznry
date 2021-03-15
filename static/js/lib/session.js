@@ -1,5 +1,6 @@
 import { DEBUG_ENDPOINTS } from './const.js'
 import { create as createRpcApi } from './rpc-api.js'
+import { CtznAPI } from './api.js'
 import * as toast from '../com/toast.js'
 
 let emitter = new EventTarget()
@@ -7,6 +8,7 @@ export let info = undefined
 export let myCommunities = undefined
 export let myFollowers = undefined
 export let api = undefined
+export let ctzn = new CtznAPI()
 
 export async function setup () {
   let oldSessionInfo
@@ -37,6 +39,7 @@ export async function setup () {
 
   // DEBUG
   window.api = api
+  window.ctzn = ctzn
 }
 
 export async function loadSecondaryState () {
@@ -73,6 +76,7 @@ export async function doLogout () {
   localStorage.removeItem('session-info')
   info = undefined
   api = undefined
+  ctzn = undefined
   emitter.dispatchEvent(new Event('change'))
 }
 
@@ -93,7 +97,7 @@ export async function doSignup ({domain, username, displayName, description, ava
 
     if (avatar) {
       const avatarBase64 = avatar.split(',').pop()
-      await newApi.profiles.putAvatar(avatarBase64).catch(e => console.log(e))
+      await newApi.blob.update('avatar', avatarBase64).catch(e => console.log(e))
     }
 
     localStorage.setItem('session-info', JSON.stringify(newSessionInfo))

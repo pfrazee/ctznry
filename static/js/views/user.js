@@ -10,8 +10,6 @@ import * as contextMenu from '../com/context-menu.js'
 import * as toast from '../com/toast.js'
 import { AVATAR_URL, PERM_DESCRIPTIONS } from '../lib/const.js'
 import * as session from '../lib/session.js'
-import * as dbmethods from '../lib/dbmethods.js'
-import { getProfile, listFollowers, listFollows, listMembers, listMemberships, listRoles } from '../lib/getters.js'
 import * as displayNames from '../lib/display-names.js'
 import { pluralize, makeSafe, linkify } from '../lib/strings.js'
 import { emojify } from '../lib/emojify.js'
@@ -21,6 +19,7 @@ import '../com/feed.js'
 import '../com/mobile-compose-btn.js'
 import '../com/simple-user-list.js'
 import '../com/members-list.js'
+import '../com/dbmethod-result-feed.js'
 
 class CtznUser extends LitElement {
   static get properties () {
@@ -116,7 +115,7 @@ class CtznUser extends LitElement {
   }
 
   async load () {
-    this.userProfile = await getProfile(this.userId).catch(e => ({error: true, message: e.toString()}))
+    this.userProfile = await session.ctzn.getProfile(this.userId).catch(e => ({error: true, message: e.toString()}))
     if (this.userProfile.error) {
       document.title = `Not Found | CTZN`
       return this.requestUpdate()
@@ -124,9 +123,9 @@ class CtznUser extends LitElement {
     document.title = `${this.userProfile?.value.displayName || this.userId} | CTZN`
     if (this.isCitizen) {
       const [followers, following, memberships] = await Promise.all([
-        listFollowers(this.userId),
-        listFollows(this.userId),
-        listMemberships(this.userId)
+        session.ctzn.listFollowers(this.userId),
+        session.ctzn.db(this.userId).table('ctzn.network/follow').list(),
+        session.ctzn.db(this.userId).table('ctzn.network/community-membership').list()
       ])
       this.followers = followers
       this.uniqFollowers = Array.from(getUniqFollowers(followers))
@@ -136,7 +135,7 @@ class CtznUser extends LitElement {
     } else if (this.isCommunity) {
       const [members, roles] = await Promise.all([
         listAllMembers(this.userId),
-        listRoles(this.userId).catch(e => [])
+        session.ctzn.db(this.userId).table('ctzn.network/community-role').list().catch(e => [])
       ])
       this.members = members
       this.roles = roles
@@ -408,7 +407,7 @@ class CtznUser extends LitElement {
         `}
         </div>
       `
-    }  else if (this.currentView === 'members') {
+    } else if (this.currentView === 'members') {
       return html`
         <div class="border border-gray-200 border-t-0 border-b-0 bg-white">
           <ctzn-members-list
@@ -416,6 +415,14 @@ class CtznUser extends LitElement {
             ?canban=${this.hasPermission('ctzn.network/perm-community-ban')}
             @ban=${this.onBan}
           ></ctzn-members-list>
+        </div>
+      `
+    } else if (this.currentView === 'activity') {
+      return html`
+        <div class="border border-gray-200 border-t-0 border-b-0 bg-white">
+          <ctzn-dbmethod-result-feed
+            user-id=${this.userId}
+          ></ctzn-dbmethod-result-feed>
         </div>
       `
     } else if (this.currentView === 'about') {
@@ -528,10 +535,9 @@ class CtznUser extends LitElement {
     try {
       let isPending = false
       if (this.isCitizen) {
-        await session.api.profiles.put(newProfile.profile)
+        await session.ctzn.user.table('ctzn.network/profile').create(newProfile.profile)
       } else if (this.isCommunity) {
-        let res = await dbmethods.call(
-          this.userId,
+        let res = await session.ctzn.db(this.userId).method(
           'ctzn.network/put-profile-method',
           newProfile.profile
         )
@@ -541,11 +547,10 @@ class CtznUser extends LitElement {
       if (newProfile.uploadedAvatar) {
         toast.create('Uploading avatar...')
         if (this.isCitizen) {
-          await session.api.profiles.putAvatar(newProfile.uploadedAvatar.base64buf)
+          await session.ctzn.blob.update('avatar', newProfile.uploadedAvatar.base64buf)
         } else if (this.isCommunity) {
-          const blobRes = await session.api.blobs.create(newProfile.uploadedAvatar.base64buf)
-          let res = await dbmethods.call(
-            this.userId,
+          const blobRes = await session.ctzn.blob.create(newProfile.uploadedAvatar.base64buf)
+          let res = await session.ctzn.db(this.userId).method(
             'ctzn.network/put-avatar-method',
             {
               blobSource: {userId: session.info.userId, dbUrl: session.info.dbUrl},
@@ -570,14 +575,16 @@ class CtznUser extends LitElement {
   }
 
   async onClickFollow (e) {
-    await session.api.follows.follow(this.userId)
-    this.followers = await listFollowers(this.userId)
+    await session.ctzn.user.table('ctzn.network/follow').create({
+      subject: {userId: this.userId, dbUrl: this.userProfile.dbUrl}
+    })
+    this.followers = await session.ctzn.listFollowers(this.userId)
     this.uniqFollowers = Array.from(getUniqFollowers(this.followers))
   }
 
   async onClickUnfollow (e) {
-    await session.api.follows.unfollow(this.userId)
-    this.followers = await listFollowers(this.userId)
+    await session.ctzn.user.table('ctzn.network/follow').delete(this.userId)
+    this.followers = await session.ctzn.listFollowers(this.userId)
     this.uniqFollowers = Array.from(getUniqFollowers(this.followers))
   }
 
@@ -586,7 +593,7 @@ class CtznUser extends LitElement {
       this.isJoiningOrLeaving = true
       await session.api.communities.join(this.userId)
       await session.loadSecondaryState()
-      this.members = await listMembers(this.userId)
+      this.members = await listAllMembers(this.userId)
     } catch (e) {
       console.log(e)
       toast.create(e.toString(), 'error')
@@ -599,7 +606,7 @@ class CtznUser extends LitElement {
       this.isJoiningOrLeaving = true
       await session.api.communities.leave(this.userId)
       await session.loadSecondaryState()
-      this.members = await listMembers(this.userId)
+      this.members = await listAllMembers(this.userId)
     } catch (e) {
       console.log(e)
       toast.create(e.toString(), 'error')
@@ -655,12 +662,13 @@ class CtznUser extends LitElement {
       return
     }
     try {
-      await dbmethods.call(
-        this.userId,
+      let res = await session.ctzn.db(this.userId).method(
         'ctzn.network/community-delete-role-method',
         {roleId}
       )
-      toast.create(`${roleId} role removed`)
+      if (!res.pending()) {
+        toast.create(`${roleId} role removed`)
+      }
       this.load()
     } catch (e) {
       console.log(e)
@@ -694,7 +702,7 @@ class CtznUser extends LitElement {
 
   async onDeletePost (e) {
     try {
-      await session.api.posts.del(e.detail.post.key)
+      await session.ctzn.user.table('ctzn.network/post').delete(e.detail.post.key)
       toast.create('Post deleted')
       this.load()
     } catch (e) {
@@ -706,8 +714,7 @@ class CtznUser extends LitElement {
   async onModeratorRemovePost (e) {
     try {
       const post = e.detail.post
-      await dbmethods.call(
-        post.value.community.userId,
+      await session.ctzn.db(post.value.community.userId).method(
         'ctzn.network/community-remove-content-method',
         {contentUrl: post.url}
       )
@@ -721,6 +728,13 @@ class CtznUser extends LitElement {
   onClickControlsMenu (e) {
     e.preventDefault()
     e.stopPropagation()
+
+    const setView = (view) => {
+      const pathname = `/${this.userId}/${view}`
+      window.history.pushState({}, null, pathname)
+      this.currentView = view
+    }
+
     let items = []
     if (this.isCommunity) {
       if (this.hasPermission('ctzn.network/perm-community-edit-profile')) {
@@ -730,6 +744,8 @@ class CtznUser extends LitElement {
         })
         items.push('-')
       }
+      items.push({label: 'View activity log', click: () => setView('activity')})
+      items.push('-')
       items.push({label: 'Leave community', click: () => this.onClickLeave()})
     }
     let rect = e.currentTarget.getClientRects()[0]
@@ -784,7 +800,7 @@ async function listAllMembers (userId) {
   let members = []
   let gt = undefined
   for (let i = 0; i < 1000; i++) {
-    let m = await listMembers(userId, {gt, limit: 100})
+    let m = await session.ctzn.db(userId).table('ctzn.network/community-member').list({gt, limit: 100})
     members = m.length ? members.concat(m) : members
     if (m.length < 100) break
     gt = m[m.length - 1].key

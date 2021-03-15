@@ -31,7 +31,7 @@ class CtznNotifications extends LitElement {
       window.location = '/'
       return this.requestUpdate()
     }
-    const res = await session.api.view.get('ctzn.network/notifications-cleared-at-view')
+    const res = await session.ctzn.view('ctzn.network/notifications-cleared-at-view')
     this.notificationsClearedAt = res?.notificationsClearedAt ? Number(new Date(res?.notificationsClearedAt)) : 0
     await session.api.notifications.updateNotificationsClearedAt()
     return this.requestUpdate()

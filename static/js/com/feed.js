@@ -3,7 +3,6 @@ import { repeat } from '../../vendor/lit-element/lit-html/directives/repeat.js'
 import PullToRefresh from '../../vendor/pulltorefreshjs/index.js'
 import { AVATAR_URL } from '../lib/const.js'
 import * as session from '../lib/session.js'
-import { listUserFeed } from '../lib/getters.js'
 import { emit } from '../lib/dom.js'
 import './post.js'
 
@@ -137,13 +136,13 @@ export class Feed extends LitElement {
     let results = more ? (this.results || []) : []
     let lt = more ? results[results?.length - 1]?.key : undefined
     if (this.source) {
-      results = results.concat(await listUserFeed(this.source, {limit: this.limit, reverse: true, lt}))
+      results = results.concat(await session.ctzn.listUserFeed(this.source, {limit: this.limit, reverse: true, lt}))
     } else {
-      results = results.concat((await session.api.view.get('ctzn.network/feed-view', {limit: this.limit, reverse: true, lt}))?.feed)
+      results = results.concat((await session.ctzn.view('ctzn.network/feed-view', {limit: this.limit, reverse: true, lt}))?.feed)
     }
     console.log(results)
 
-    if (!more && _cache?.path === window.location.pathname && _cache?.results?.[0].url === results[0]?.url) {
+    if (!more && _cache?.path === window.location.pathname && _cache?.results?.[0]?.url === results[0]?.url) {
       // stick with the cache but update the signal metrics
       for (let i = 0; i < results.length; i++) {
         this.results[i].reactions = _cache.results[i].reactions = results[i].reactions
@@ -166,9 +165,9 @@ export class Feed extends LitElement {
     }
     let results
     if (this.source) {
-      results = await listUserFeed(this.source, {limit: 1, reverse: true})
+      results = await session.ctzn.listUserFeed(this.source, {limit: 1, reverse: true})
     } else {
-      results = (await session.api.view.get('ctzn.network/feed-view', {limit: 1, reverse: true}))?.feed
+      results = (await session.ctzn.view('ctzn.network/feed-view', {limit: 1, reverse: true}))?.feed
     }
     this.hasNewItems = (results[0] && results[0].key !== this.results[0].key)
   }
@@ -313,12 +312,6 @@ export class Feed extends LitElement {
 
 customElements.define('ctzn-feed', Feed)
 
-function isArrayEq (a, b) {
-  if (!a && !!b) return false
-  if (!!a && !b) return false
-  return a.sort().toString() == b.sort().toString() 
-}
-
 const HOUR = 1e3 * 60 * 60
 const DAY = HOUR * 24
 function dateHeader (ts, range) {
@@ -328,21 +321,4 @@ function dateHeader (ts, range) {
   if (diff < DAY * 6) return (new Date(ts)).toLocaleDateString('default', { weekday: 'long' })
   if (range === 'month') return (new Date(ts)).toLocaleDateString('default', { month: 'short', year: 'numeric' })
   return (new Date(ts)).toLocaleDateString('default', { weekday: 'long', month: 'short', day: 'numeric' })
-}
-
-function reduceMultipleActions (acc, result) {
-  acc.push(result)
-  return acc
-
-  // TODO
-  let last = acc[acc.length - 1]
-  if (last) {
-    if (last.site.url === result.site.url && getRecordType(result) === 'subscription' && getRecordType(last) === 'subscription') {
-      last.mergedItems = last.mergedItems || []
-      last.mergedItems.push(result)
-      return acc
-    }
-  }
-  acc.push(result)
-  return acc
 }

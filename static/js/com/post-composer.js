@@ -317,7 +317,7 @@ class PostComposer extends LitElement {
         if (!item.blobs.thumb?.blobName && item.blobs.original?.dataUrl) {
           let thumbDataUrl = await images.resizeImage(item.blobs.original.dataUrl, THUMB_WIDTH)
           let thumbData = parseDataUrl(thumbDataUrl)
-          let res = await session.api.blobs.create(thumbData.base64buf)
+          let res = await session.ctzn.blob.create(thumbData.base64buf)
           item.blobs.thumb = {
             blobName: res.name,
             mimeType: thumbData.mimeType
@@ -330,7 +330,7 @@ class PostComposer extends LitElement {
           let lastError
           for (let i = 1; i < 6; i++) {
             try {
-              res = await session.api.blobs.create(originalData.base64buf)
+              res = await session.ctzn.blob.create(originalData.base64buf)
             } catch (e) {
               lastError = e
               let dataUrl = await images.shrinkImage(item.blobs.original.dataUrl, (10 - i) / 10, originalMimeType)
@@ -358,7 +358,7 @@ class PostComposer extends LitElement {
       let media = this.media.filter(Boolean)
       let text = this.querySelector('#text').value
       let extendedText = this.querySelector('#extendedText').value
-      res = await session.api.posts.create({
+      res = await session.ctzn.user.table('ctzn.network/post').create({
         text,
         media: media?.length ? media : undefined,
         extendedText,

@@ -120,7 +120,7 @@ export class NotificationsFeed extends LitElement {
       lt = last.key
     }
     do {
-      let subresults = (await session.api.view.get('ctzn.network/notifications-view', {lt}))?.notifications
+      let subresults = (await session.ctzn.view('ctzn.network/notifications-view', {lt}))?.notifications
       if (subresults.length === 0) break
       
       lt = subresults[subresults.length - 1].key
@@ -150,7 +150,7 @@ export class NotificationsFeed extends LitElement {
     }
     let results = []
     while (num) {
-      let subresults = (await session.api.view.get('ctzn.network/notifications-view', {limit: num}))?.notifications
+      let subresults = (await session.ctzn.view('ctzn.network/notifications-view', {limit: num}))?.notifications
       if (!subresults?.length) break
 
       let n = subresults.length

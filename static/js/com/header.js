@@ -53,9 +53,9 @@ export class Header extends LitElement {
 
   async checkNotifications () {
     if (!session.isActive()) return
-    const clearedAt = (await session.api.view.get('ctzn.network/notifications-cleared-at-view'))?.notificationsClearedAt || undefined
+    const clearedAt = (await session.ctzn.view('ctzn.network/notifications-cleared-at-view'))?.notificationsClearedAt || undefined
     let oldCount = this.unreadNotificationsCount
-    this.unreadNotificationsCount = (await session.api.view.get('ctzn.network/notifications-count-view', {after: clearedAt})).count
+    this.unreadNotificationsCount = (await session.ctzn.view('ctzn.network/notifications-count-view', {after: clearedAt})).count
     if (oldCount !== this.unreadNotificationsCount) {
       emit(this, 'unread-notifications-changed', {detail: {count: this.unreadNotificationsCount}})
     }

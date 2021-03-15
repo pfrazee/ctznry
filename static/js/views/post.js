@@ -1,7 +1,7 @@
 import { LitElement, html } from '../../vendor/lit-element/lit-element.js'
 import * as toast from '../com/toast.js'
-import { getProfile } from '../lib/getters.js'
 import { joinPath, ucfirst } from '../lib/strings.js'
+import * as session from '../lib/session.js'
 import '../com/header.js'
 import '../com/button.js'
 import '../com/thread.js'
@@ -37,7 +37,7 @@ class CtznPostView extends LitElement {
     let [userId, schemaDomain, schemaName, key] = pathname.split('/').filter(Boolean)
 
     try {
-      this.authorProfile = await getProfile(userId)
+      this.authorProfile = await session.ctzn.getProfile(userId)
       this.subject = {
         authorId: userId,
         dbUrl: joinPath(this.authorProfile.dbUrl, schemaDomain, schemaName, key)

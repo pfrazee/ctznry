@@ -3,7 +3,6 @@ import { repeat } from '../../vendor/lit-element/lit-html/directives/repeat.js'
 import * as toast from '../com/toast.js'
 import * as session from '../lib/session.js'
 import { AVATAR_URL } from '../lib/const.js'
-import { getProfile, listMemberships } from '../lib/getters.js'
 import * as displayNames from '../lib/display-names.js'
 import '../com/header.js'
 
@@ -95,7 +94,7 @@ class CtznCommunities extends LitElement {
   async load () {
     document.title = `Communities | CTZN`
     if (session.isActive()) {
-      this.memberships = await listMemberships(session.info.userId)
+      this.memberships = await session.ctzn.user.table('ctzn.network/community-membership').list()
       this.memberships.sort((a, b) => a.value.community.userId.localeCompare(b.value.community.userId))
       if (!this.suggestedCommunities) {
         this.suggestedCommunities = SUGGESTED_COMMUNITIES.filter(c => !this.memberships?.find(m => c.userId === m.value.community.userId))
@@ -103,7 +102,7 @@ class CtznCommunities extends LitElement {
       }
 
       for (let membership of this.memberships) {
-        membership.communityProfile = await getProfile(membership.value.community.userId)
+        membership.communityProfile = await session.ctzn.getProfile(membership.value.community.userId)
         this.requestUpdate()
       }
     } else {

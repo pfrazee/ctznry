@@ -2,7 +2,6 @@ import { LitElement, html } from '../../vendor/lit-element/lit-element.js'
 import { repeat } from '../../vendor/lit-element/lit-html/directives/repeat.js'
 import { AVATAR_URL } from '../lib/const.js'
 import * as session from '../lib/session.js'
-import { listFollows } from '../lib/getters.js'
 
 export class SimpleUserList extends LitElement {
   static get properties () {
@@ -26,7 +25,8 @@ export class SimpleUserList extends LitElement {
 
   async load () {
     if (session.isActive()) {
-      this.myFollows = (await listFollows(session.info.userId).catch(e => [])).map(f => f.value.subject.userId)
+      let f = await session.ctzn.user.table('ctzn.network/follow').list().catch(e => [])
+      this.myFollows = f.map(f => f.value.subject.userId)
     }
   }
 
@@ -95,14 +95,18 @@ export class SimpleUserList extends LitElement {
 
   async onClickFollow (e, userId) {
     e.preventDefault()
-    await session.api.follows.follow(userId)
+    const userInfo = await session.ctzn.lookupUser(userId)
+    console.log(userInfo)
+    await session.ctzn.user.table('ctzn.network/follow').create({
+      subject: {userId, dbUrl: userInfo.dbUrl}
+    })
     this.myFollows.push(userId)
     this.requestUpdate()
   }
 
   async onClickUnfollow (e, userId) {
     e.preventDefault()
-    await session.api.follows.unfollow(userId)
+    await session.ctzn.user.table('ctzn.network/follow').delete(userId)
     this.myFollows.splice(this.myFollows.indexOf(userId))
     this.requestUpdate()
   }

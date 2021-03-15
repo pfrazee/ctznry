@@ -1,9 +1,9 @@
 import { html } from '../../vendor/lit-element/lit-element.js'
 import { unsafeHTML } from '../../vendor/lit-element/lit-html/directives/unsafe-html.js'
 import { asyncReplace } from '../../vendor/lit-element/lit-html/directives/async-replace.js'
-import { getProfile } from './getters.js'
 import { makeSafe } from './strings.js'
 import { emojify } from './emojify.js'
+import * as session from './session.js'
 
 let _activeFetches = {}
 
@@ -21,7 +21,7 @@ export async function* fetcher (userId) {
 
   if (!_activeFetches[userId]) {
     _activeFetches[userId] = (async () => {
-      let profile = await getProfile(userId).catch(e => undefined)
+      let profile = await session.ctzn.getProfile(userId).catch(e => undefined)
       return profile?.value?.displayName || userId
     })()
   }

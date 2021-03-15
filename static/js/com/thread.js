@@ -1,8 +1,6 @@
 import { LitElement, html } from '../../vendor/lit-element/lit-element.js'
 import { repeat } from '../../vendor/lit-element/lit-html/directives/repeat.js'
 import * as toast from './toast.js'
-import { getPost, getComment, getThread } from '../lib/getters.js'
-import * as dbmethods from '../lib/dbmethods.js'
 import { emit } from '../lib/dom.js'
 import * as session from '../lib/session.js'
 import * as displayNames from '../lib/display-names.js'
@@ -59,20 +57,20 @@ export class Thread extends LitElement {
       message: e.toString()
     })
     if (this.subject.dbUrl.includes('ctzn.network/comment')) {
-      let comment = await getComment(this.subject.authorId, this.subject.dbUrl).catch(onError)
+      let comment = await session.ctzn.getComment(this.subject.authorId, this.subject.dbUrl).catch(onError)
       if (comment.error) {
         this.post = comment
       } else {
-        this.post = await getPost(comment.value.reply.root.authorId, comment.value.reply.root.dbUrl).catch(onError)
-        this.thread = await getThread(
+        this.post = await session.ctzn.getPost(comment.value.reply.root.authorId, comment.value.reply.root.dbUrl).catch(onError)
+        this.thread = await session.ctzn.getThread(
           comment.value.reply.root.authorId,
           comment.value.reply.root.dbUrl,
           comment.value.community?.userId
         ).catch(onError)
       }
     } else {
-      this.post = await getPost(this.subject.authorId, this.subject.dbUrl).catch(onError)
-      this.thread = await getThread(
+      this.post = await session.ctzn.getPost(this.subject.authorId, this.subject.dbUrl).catch(onError)
+      this.thread = await session.ctzn.getThread(
         this.subject.authorId,
         this.subject.dbUrl,
         this.post.value.community?.userId
@@ -227,7 +225,7 @@ export class Thread extends LitElement {
 
   async onDeletePost (e) {
     try {
-      await session.api.posts.del(e.detail.post.key)
+      await session.ctzn.user.table('ctzn.network/post').delete(e.detail.post.key)
       toast.create('Post deleted')
       this.load()
     } catch (e) {
@@ -238,7 +236,7 @@ export class Thread extends LitElement {
 
   async onDeleteComment (e) {
     try {
-      await session.api.comments.del(e.detail.comment.key)
+      await session.ctzn.user.table('ctzn.network/comment').delete(e.detail.comment.key)
       toast.create('Comment deleted')
       this.load()
     } catch (e) {
@@ -250,8 +248,7 @@ export class Thread extends LitElement {
   async onModeratorRemovePost (e) {
     try {
       const post = e.detail.post
-      await dbmethods.call(
-        post.value.community.userId,
+      await session.ctzn.db(post.value.community.userId).method(
         'ctzn.network/community-remove-content-method',
         {contentUrl: post.url}
       )
@@ -265,8 +262,7 @@ export class Thread extends LitElement {
   async onModeratorRemoveComment (e) {
     try {
       const comment = e.detail.comment
-      await dbmethods.call(
-        comment.value.community.userId,
+      await session.ctzn.db(comment.value.community.userId).method(
         'ctzn.network/community-remove-content-method',
         {contentUrl: comment.url}
       )
