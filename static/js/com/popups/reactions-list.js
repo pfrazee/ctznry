@@ -45,6 +45,14 @@ export class ReactionsListPopup extends BasePopup {
     return false
   }
 
+  get shouldCloseOnEscape () {
+    return true
+  }
+
+  get shouldCloseOnOuterClick () {
+    return true
+  }
+
   renderBody () {
     return html`
       ${repeat(Object.keys(this.users), userId => html`

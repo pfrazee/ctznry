@@ -36,6 +36,14 @@ export class ManageBansPopup extends BasePopup {
     return false
   }
 
+  get shouldCloseOnEscape () {
+    return true
+  }
+
+  get shouldCloseOnOuterClick () {
+    return true
+  }
+
   get maxWidth () {
     return '520px'
   }
