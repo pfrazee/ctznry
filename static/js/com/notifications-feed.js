@@ -140,6 +140,9 @@ export class NotificationsFeed extends LitElement {
       this.results = results
       _cache = results
     }
+    if (!results?.length && !this.results) {
+      this.results = []
+    }
     this.activeQuery = undefined
     emit(this, 'load-state-updated', {detail: {isEmpty: this.results.length === 0}})
   }

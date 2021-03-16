@@ -82,7 +82,7 @@ class CtznNotifications extends LitElement {
 
   renderEmptyMessage () {
     return html`
-      <div class="bg-gray-100 text-gray-500 py-44 text-center border border-gray-200">
+      <div class="bg-gray-100 text-gray-500 py-44 text-center border border-t-0 border-gray-200">
         <div class="fas fa-bell text-6xl text-gray-300 mb-8"></div>
         <div>You have no notifications!</div>
       </div>
