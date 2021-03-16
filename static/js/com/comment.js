@@ -267,6 +267,7 @@ export class Comment extends LitElement {
     e.preventDefault()
     e.stopPropagation()
 
+    this.isReactionsOpen = false
     if (this.haveIReacted(reaction)) {
       this.comment.reactions[reaction] = this.comment.reactions[reaction].filter(userId => userId !== session.info.userId)
       this.requestUpdate()
@@ -279,7 +280,6 @@ export class Comment extends LitElement {
         reaction
       })
     }
-    this.isReactionsOpen = false
     this.reloadSignals()
   }
 
@@ -299,13 +299,13 @@ export class Comment extends LitElement {
     if (this.haveIReacted(reaction)) {
       return
     }
+    this.isReactionsOpen = false
     await session.ctzn.user.table('ctzn.network/reaction').create({
       subject: {dbUrl: this.comment.url, authorId: this.comment.author.userId},
       reaction
     })
     this.comment.reactions[reaction] = (this.comment.reactions[reaction] || []).concat([session.info.userId])
     this.requestUpdate()
-    this.isReactionsOpen = false
     this.reloadSignals()
   }
 

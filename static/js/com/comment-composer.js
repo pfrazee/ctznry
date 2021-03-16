@@ -6,6 +6,7 @@ import * as session from '../lib/session.js'
 class CommentComposer extends LitElement {
   static get properties () {
     return {
+      isProcessing: {type: Boolean},
       autofocus: {type: Boolean},
       draftText: {type: String},
       placeholder: {type: String},
@@ -17,6 +18,7 @@ class CommentComposer extends LitElement {
 
   constructor () {
     super()
+    this.isProcessing = false
     this.autofocus = false
     this.draftText = ''
     this.placeholder = 'Write your comment'
@@ -29,7 +31,7 @@ class CommentComposer extends LitElement {
   }
 
   get canPost () {
-    return this.draftText.length > 0
+    return this.draftText.length > 0 && !this.isProcessing
   }
 
   firstUpdated () {
@@ -65,7 +67,7 @@ class CommentComposer extends LitElement {
             class="inline-block rounded px-3 py-1 shadow-sm text-white ${this.canPost ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-300 cursor-default'}"
             tabindex="3"
             ?disabled=${!this.canPost}
-          >Post comment</button>
+          >${this.isProcessing ? html`<span class="spinner"></span>` : 'Post comment'}</button>
         </div>
       </form>
     `
@@ -98,6 +100,7 @@ class CommentComposer extends LitElement {
     if (!this.canPost) {
       return
     }
+    this.isProcessing = true
 
     let res
     try {
@@ -118,8 +121,10 @@ class CommentComposer extends LitElement {
       console.log(res)
     } catch (e) {
       toast.create(e.message, 'error')
+      this.isProcessing = false
       return
     }
+    this.isProcessing = false
     
     this.draftText = ''
     this.querySelector('textarea').value = ''
