@@ -22,17 +22,17 @@ export async function start ({port, configDir, domain}) {
       }
     })
   )
-  const staticFile = (path) => (req, res) => {
+  const staticFile = (path, opts) => (req, res) => {
     for (let k in CUSTOM_HEADERS) {
       res.setHeader(k, CUSTOM_HEADERS[k])
     }
-    res.sendFile(path, {root: process.cwd()})
+    res.sendFile(path, {root: process.cwd(), cacheControl: opts?.cacheControl})
   }
 
   app.get('/', staticFile('./static/index.html'))
   app.get('/manifest.json', staticFile('./static/manifest.json'))
   // for the dev server, just serve the SW template
-  app.get('/service-worker.js', staticFile('./static/service-worker-template.js'))
+  app.get('/service-worker.js', staticFile('./static/service-worker-template.js', {cacheControl: false}))
   app.use('/img', staticDir('static/img'))
   app.use('/css', staticDir('static/css'))
   app.get('/js/:filename([^\.]+).build.js', (req, res) => {

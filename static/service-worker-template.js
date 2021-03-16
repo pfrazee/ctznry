@@ -23,6 +23,7 @@ const CACHE_LIST = [
 ]
 
 async function install () {
+  self.skipWaiting()
   const cache = await caches.open(CACHE_NAME)
   cache.addAll(CACHE_LIST)
 }
