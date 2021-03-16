@@ -1,22 +1,74 @@
 {
-  "headers": [
+  "routes": [
     {
-      "source": "/(.*)",
+      "src": "/([^/]+@[^/]+)/ctzn.network/post/([^/]+)",
+      "dest": "/index.html",
+      "headers": [
+        { "key": "Content-Security-Policy", "value": "script-src 'self' 'unsafe-inline'; style-src 'self'; font-src 'self';" }
+      ]
+    },
+    {
+      "src": "/([^/]+@[^/]+)/ctzn.network/comment/([^/]+)",
+      "dest": "/index.html",
+      "headers": [
+        { "key": "Content-Security-Policy", "value": "script-src 'self' 'unsafe-inline'; style-src 'self'; font-src 'self';" }
+      ]
+    },
+    {
+      "src": "/([^/]+@[^/]+)/(.+)",
+      "dest": "/index.html",
+      "headers": [
+        { "key": "Content-Security-Policy", "value": "script-src 'self' 'unsafe-inline'; style-src 'self'; font-src 'self';" }
+      ]
+    },
+    {
+      "src": "/([^/]+@[^/]+)",
+      "dest": "/index.html",
+      "headers": [
+        { "key": "Content-Security-Policy", "value": "script-src 'self' 'unsafe-inline'; style-src 'self'; font-src 'self';" }
+      ]
+    },
+    {
+      "src": "/forgot-password",
+      "dest": "/index.html",
+      "headers": [
+        { "key": "Content-Security-Policy", "value": "script-src 'self' 'unsafe-inline'; style-src 'self'; font-src 'self';" }
+      ]
+    },
+    {
+      "src": "/notifications",
+      "dest": "/index.html",
+      "headers": [
+        { "key": "Content-Security-Policy", "value": "script-src 'self' 'unsafe-inline'; style-src 'self'; font-src 'self';" }
+      ]
+    },
+    {
+      "src": "/communities",
+      "dest": "/index.html",
+      "headers": [
+        { "key": "Content-Security-Policy", "value": "script-src 'self' 'unsafe-inline'; style-src 'self'; font-src 'self';" }
+      ]
+    },
+    {
+      "src": "/account",
+      "dest": "/index.html",
+      "headers": [
+        { "key": "Content-Security-Policy", "value": "script-src 'self' 'unsafe-inline'; style-src 'self'; font-src 'self';" }
+      ]
+    },
+    {
+      "src": "/search",
+      "dest": "/index.html",
+      "headers": [
+        { "key": "Content-Security-Policy", "value": "script-src 'self' 'unsafe-inline'; style-src 'self'; font-src 'self';" }
+      ]
+    },
+    {
+      "src": "/signup",
+      "dest": "/index.html",
       "headers": [
         { "key": "Content-Security-Policy", "value": "script-src 'self' 'unsafe-inline'; style-src 'self'; font-src 'self';" }
       ]
     }
-  ],
-  "routes": [
-    { "src": "/([^/]+@[^/]+)/ctzn.network/post/([^/]+)", "dest": "/index.html" },
-    { "src": "/([^/]+@[^/]+)/ctzn.network/comment/([^/]+)", "dest": "/index.html" },
-    { "src": "/([^/]+@[^/]+)/(.+)", "dest": "/index.html" },
-    { "src": "/([^/]+@[^/]+)", "dest": "/index.html" },
-    { "src": "/forgot-password", "dest": "/index.html" },
-    { "src": "/notifications", "dest": "/index.html" },
-    { "src": "/communities", "dest": "/index.html" },
-    { "src": "/account", "dest": "/index.html" },
-    { "src": "/search", "dest": "/index.html" },
-    { "src": "/signup", "dest": "/index.html" }
   ]
 }
