@@ -70,11 +70,11 @@ export class Thread extends LitElement {
       }
     } else {
       this.post = await session.ctzn.getPost(this.subject.authorId, this.subject.dbUrl).catch(onError)
-      this.thread = await session.ctzn.getThread(
+      this.thread = !this.post.error ? await session.ctzn.getThread(
         this.subject.authorId,
         this.subject.dbUrl,
         this.post.value.community?.userId
-      ).catch(onError)
+      ).catch(onError) : undefined
     }
     await this.updateComplete
     emit(this, 'load')

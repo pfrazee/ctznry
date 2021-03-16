@@ -1,7 +1,6 @@
 import { LitElement, html } from '../../vendor/lit-element/lit-element.js'
 import { repeat } from '../../vendor/lit-element/lit-html/directives/repeat.js'
 import PullToRefresh from '../../vendor/pulltorefreshjs/index.js'
-import { AVATAR_URL } from '../lib/const.js'
 import * as displayNames from '../lib/display-names.js'
 import * as session from '../lib/session.js'
 import { emit } from '../lib/dom.js'

@@ -4,26 +4,44 @@ import * as os from 'os'
 
 let app
 
+const CUSTOM_HEADERS = {
+  "Content-Security-Policy": "script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self';"
+}
+
 export async function start ({port, configDir, domain}) {
   configDir = configDir || path.join(os.homedir(), '.ctznry')
 
   app = express()
 
-  const staticFile = (path) => (req, res) => res.sendFile(path, {root: process.cwd()})
+  const staticDir = (path) => (
+    express.static(path, {
+      setHeaders: (res) => {
+        for (let k in CUSTOM_HEADERS) {
+          res.setHeader(k, CUSTOM_HEADERS[k])
+        }
+      }
+    })
+  )
+  const staticFile = (path) => (req, res) => {
+    for (let k in CUSTOM_HEADERS) {
+      res.setHeader(k, CUSTOM_HEADERS[k])
+    }
+    res.sendFile(path, {root: process.cwd()})
+  }
 
   app.get('/', staticFile('./static/index.html'))
   app.get('/manifest.json', staticFile('./static/manifest.json'))
   // for the dev server, just serve the SW template
   app.get('/service-worker.js', staticFile('./static/service-worker-template.js'))
-  app.use('/img', express.static('static/img'))
-  app.use('/css', express.static('static/css'))
+  app.use('/img', staticDir('static/img'))
+  app.use('/css', staticDir('static/css'))
   app.get('/js/:filename([^\.]+).build.js', (req, res) => {
     // for the dev server, just serve the non-built assets
     res.sendFile(`static/js/${req.params.filename}.js`, {root: process.cwd()})
   })
-  app.use('/js', express.static('static/js'))
-  app.use('/vendor', express.static('static/vendor'))
-  app.use('/webfonts', express.static('static/webfonts'))
+  app.use('/js', staticDir('static/js'))
+  app.use('/vendor', staticDir('static/vendor'))
+  app.use('/webfonts', staticDir('static/webfonts'))
   app.get('/signup', staticFile('static/index.html'))
   app.get('/forgot-password', staticFile('static/index.html'))
   app.get('/notifications', staticFile('static/index.html'))

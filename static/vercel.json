@@ -1,4 +1,12 @@
 {
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "Content-Security-Policy", "value": "script-src 'self' 'unsafe-inline'; style-src 'self'; font-src 'self';" }
+      ]
+    }
+  ],
   "routes": [
     { "src": "/([^/]+@[^/]+)/ctzn.network/post/([^/]+)", "dest": "/index.html" },
     { "src": "/([^/]+@[^/]+)/ctzn.network/comment/([^/]+)", "dest": "/index.html" },
