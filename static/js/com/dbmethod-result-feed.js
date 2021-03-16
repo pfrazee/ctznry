@@ -197,37 +197,35 @@ export class DbmethodResultFeed extends LitElement {
     const call = result.call.value
     const isSuccess = result.value.code === 'success'
     return html`
-      <div class="relative border-b border-gray-300 pl-8 pr-2 py-3 text-gray-700">
-        <div class="mb-2">
-          ${isSuccess ? html`
-            <span class="absolute fas fa-fw fa-check-circle text-gray-600" style="top: 17px; left: 7px"></span>
-          ` : html`
-            <span class="absolute fas fa-fw fa-times-circle text-red-500" style="top: 17px; left: 7px"></span>
-          `}
-          <a
-            class="text-${isSuccess ? 'gray' : 'red'}-800 bg-${isSuccess ? 'gray' : 'red'}-50 font-mono px-2 py-1 rounded sm:hover:underline text-sm"
-            href="https://${call.method}"
-            target="_blank"
-          >${call.method}</a>
-          <a
-            href="/${authorId}"
-            title=${authorId}
-            class="text-sm text-blue-600 sm:hover:underline"
-          >${displayNames.render(authorId)}</a>
-          <span class="text-sm">${relativeDate(result.value.createdAt)}</span>
-        </div>
+      <div class="relative border-b border-gray-300 pl-10 pr-4 py-4 text-gray-700">
+        <details>
+          <summary>
+            ${isSuccess ? html`
+              <span class="absolute fas fa-fw fa-check-circle text-gray-500" style="top: 21px; left: 11px"></span>
+            ` : html`
+              <span class="absolute fas fa-fw fa-times-circle text-red-500" style="top: 21px; left: 11px"></span>
+            `}
+            <a
+              class="text-${isSuccess ? 'gray' : 'red'}-800 bg-${isSuccess ? 'gray' : 'red'}-50 font-mono px-2 py-1 rounded sm:hover:underline text-sm"
+              href="https://${call.method}"
+              target="_blank"
+            >${call.method}</a>
+            <a
+              href="/${authorId}"
+              title=${authorId}
+              class="text-sm text-blue-600 sm:hover:underline"
+            >${displayNames.render(authorId)}</a>
+            <span class="text-sm">${relativeDate(result.value.createdAt)}</span>
+          </summary>
         ${call.args ? html`
-          <details>
-            <summary class="mt-2 text-gray-600 text-xs">Params</summary>
+            <div class="mt-2 text-gray-600 text-xs">Params</div>
             <div class="bg-gray-50 rounded p-2 text-sm text-gray-600 font-mono whitespace-pre overflow-x-auto">${JSON.stringify(call.args, null, 2)}</div>
-          </details>
         ` : ''}
         ${result.value.code !== 'success' || !!result.value.details ? html`
-          <details>
-            <summary class="mt-2 text-gray-600 text-xs">Result</summary>
+            <div class="mt-2 text-gray-600 text-xs">Result</div>
             <div class="bg-gray-50 rounded p-2 text-sm text-gray-600 font-mono whitespace-pre overflow-x-auto">${JSON.stringify({code: result.value.code, details: result.value.details}, null, 2)}</div>
-          </details>
         ` : ''}
+        </details>
       </div>
     `
   }
