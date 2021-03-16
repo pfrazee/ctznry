@@ -56,6 +56,7 @@ class CtznApp extends LitElement {
     this.scrollPositionCache = undefined
     this.addEventListener('click', this.onGlobalClick.bind(this))
     this.addEventListener('view-thread', this.onViewThread.bind(this))
+    this.addEventListener('navigate-to', this.onNavigateTo.bind(this))
     window.addEventListener('popstate', this.onHistoryPopstate.bind(this))
 
     this.load()
@@ -188,6 +189,10 @@ class CtznApp extends LitElement {
   onViewThread (e) {
     let [_, path] = e.detail.subject.dbUrl.split(DRIVE_KEY_REGEX)
     this.navigateTo(`/${e.detail.subject.authorId}${path}`)
+  }
+
+  onNavigateTo (e) {
+    this.navigateTo(e.detail.url)
   }
 
   onHistoryPopstate (e) {

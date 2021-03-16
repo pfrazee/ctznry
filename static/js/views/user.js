@@ -12,6 +12,7 @@ import { AVATAR_URL, PERM_DESCRIPTIONS } from '../lib/const.js'
 import * as session from '../lib/session.js'
 import * as displayNames from '../lib/display-names.js'
 import { pluralize, makeSafe, linkify } from '../lib/strings.js'
+import { emit } from '../lib/dom.js'
 import { emojify } from '../lib/emojify.js'
 import '../com/header.js'
 import '../com/button.js'
@@ -730,9 +731,7 @@ class CtznUser extends LitElement {
     e.stopPropagation()
 
     const setView = (view) => {
-      const pathname = `/${this.userId}/${view}`
-      window.history.pushState({}, null, pathname)
-      this.currentView = view
+      emit(this, 'navigate-to', {detail: {url: `/${this.userId}/${view}`}})
     }
 
     let items = []
@@ -765,9 +764,7 @@ class CtznUser extends LitElement {
     e.stopPropagation()
 
     const setView = (view) => {
-      const pathname = `/${this.userId}/${view}`
-      window.history.pushState({}, null, pathname)
-      this.currentView = view
+      emit(this, 'navigate-to', {detail: {url: `/${this.userId}/${view}`}})
     }
 
     let items = []
