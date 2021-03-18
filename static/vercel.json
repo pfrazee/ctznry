@@ -4,70 +4,70 @@
       "src": "/([^/]+@[^/]+)/ctzn.network/post/([^/]+)",
       "dest": "/index.html",
       "headers": {
-        "Content-Security-Policy": "script-src 'self' 'unsafe-inline'; style-src 'self'; font-src 'self';"
+        "Content-Security-Policy": "script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self';"
       }
     },
     {
       "src": "/([^/]+@[^/]+)/ctzn.network/comment/([^/]+)",
       "dest": "/index.html",
       "headers": {
-        "Content-Security-Policy": "script-src 'self' 'unsafe-inline'; style-src 'self'; font-src 'self';"
+        "Content-Security-Policy": "script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self';"
       }
     },
     {
       "src": "/([^/]+@[^/]+)/(.+)",
       "dest": "/index.html",
       "headers": {
-        "Content-Security-Policy": "script-src 'self' 'unsafe-inline'; style-src 'self'; font-src 'self';"
+        "Content-Security-Policy": "script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self';"
       }
     },
     {
       "src": "/([^/]+@[^/]+)",
       "dest": "/index.html",
       "headers": {
-        "Content-Security-Policy": "script-src 'self' 'unsafe-inline'; style-src 'self'; font-src 'self';"
+        "Content-Security-Policy": "script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self';"
       }
     },
     {
       "src": "/forgot-password",
       "dest": "/index.html",
       "headers": {
-        "Content-Security-Policy": "script-src 'self' 'unsafe-inline'; style-src 'self'; font-src 'self';"
+        "Content-Security-Policy": "script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self';"
       }
     },
     {
       "src": "/notifications",
       "dest": "/index.html",
       "headers": {
-        "Content-Security-Policy": "script-src 'self' 'unsafe-inline'; style-src 'self'; font-src 'self';"
+        "Content-Security-Policy": "script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self';"
       }
     },
     {
       "src": "/communities",
       "dest": "/index.html",
       "headers": {
-        "Content-Security-Policy": "script-src 'self' 'unsafe-inline'; style-src 'self'; font-src 'self';"
+        "Content-Security-Policy": "script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self';"
       }
     },
     {
       "src": "/account",
       "dest": "/index.html",
       "headers": {
-        "Content-Security-Policy": "script-src 'self' 'unsafe-inline'; style-src 'self'; font-src 'self';"
+        "Content-Security-Policy": "script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self';"
       }
     },
     {
       "src": "/search",
       "dest": "/index.html",
       "headers": {
-        "Content-Security-Policy": "script-src 'self' 'unsafe-inline'; style-src 'self'; font-src 'self';"
+        "Content-Security-Policy": "script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self';"
       }
     },
     {
       "src": "/signup",
       "dest": "/index.html",
       "headers": {
-        "Content-Security-Policy": "script-src 'self' 'unsafe-inline'; style-src 'self'; font-src 'self';"
+        "Content-Security-Policy": "script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self';"
       }
     }
   ]
