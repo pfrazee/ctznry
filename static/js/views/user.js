@@ -20,6 +20,7 @@ import '../com/feed.js'
 import '../com/mobile-compose-btn.js'
 import '../com/simple-user-list.js'
 import '../com/members-list.js'
+import '../com/items-list.js'
 import '../com/dbmethod-result-feed.js'
 
 class CtznUser extends LitElement {
@@ -418,6 +419,18 @@ class CtznUser extends LitElement {
           ></ctzn-members-list>
         </div>
       `
+    } else if (this.currentView === 'items') {
+      return html`
+        <div class="border border-gray-200 border-t-0 border-b-0 bg-white">
+          <ctzn-items-list
+            user-id=${this.userId}
+            .members=${this.members}
+            ?canManageItemClasses=${this.hasPermission('ctzn.network/perm-manage-item-classes')}
+            ?canCreateItem=${this.hasPermission('ctzn.network/perm-create-item')}
+            ?canTransferUnownedItem=${this.hasPermission('ctzn.network/perm-transfer-unowned-item')}
+          ></ctzn-items-list
+        </div>
+      `
     } else if (this.currentView === 'activity') {
       return html`
         <div class="border border-gray-200 border-t-0 border-b-0 bg-white">
@@ -743,7 +756,8 @@ class CtznUser extends LitElement {
         })
         items.push('-')
       }
-      items.push({label: 'View activity log', click: () => setView('activity')})
+      items.push({icon: 'far fa-fw fa-gem', label: 'Virtual items', click: () => setView('items')})
+      items.push({icon: 'fas fa-fw fa-stream', label: 'Activity log', click: () => setView('activity')})
       items.push('-')
       items.push({label: 'Leave community', click: () => this.onClickLeave()})
     }

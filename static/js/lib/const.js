@@ -43,8 +43,13 @@ export const PERM_DESCRIPTIONS = {
   'ctzn.network/perm-community-remove-comment': `Can remove comments from the community.`,
   'ctzn.network/perm-community-edit-profile': `Can edit the profile of the community.`,
   'ctzn.network/perm-community-manage-roles': `Can create, edit, and delete roles.`,
-  'ctzn.network/perm-community-assign-roles': `Can assign roles to community members.`
+  'ctzn.network/perm-community-assign-roles': `Can assign roles to community members.`,
+  'ctzn.network/perm-manage-item-classes': 'Can create, edit, and delete item class records.',
+  'ctzn.network/perm-create-item': 'Can create new items.',
+  'ctzn.network/perm-transfer-unowned-item': 'Can transfer ownership of items they do not own.',
+  'ctzn.network/perm-destroy-unowned-item': 'Can destroy items they do not own.'
 }
+
 
 export const SUGGESTED_REACTIONS = [
   'like',

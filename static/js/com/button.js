@@ -54,7 +54,7 @@ export class Button extends LitElement {
     else if (this.hasAttribute('primary')) borders = 'border border-blue-800'
     else if (this.hasAttribute('transparent')) { borders = ''; shadow = '' }
     else if (this.hasAttribute('color')) borders = `border border-${this.getAttribute('color')}-800`
-    return `rounded ${colors} ${paddings} ${borders} ${shadow} ${parentClass}`
+    return `rounded ${colors} ${paddings} ${borders} ${shadow} ${parentClass} ${this.disabled ? 'cursor-default' : ''}`
   }
 
   renderSpinner () {
