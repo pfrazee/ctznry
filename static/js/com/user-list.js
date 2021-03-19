@@ -43,9 +43,8 @@ export class UserList extends LitElement {
         session.ctzn.listFollowers(id).catch(e => undefined),
         session.ctzn.db(id).table('ctzn.network/follow').list().catch(e => undefined)
       ])
-      let uniqFollowers = followers ? getUniqFollowers(followers) : []
       profile.isFollowingMe = session.isActive() && !!following?.find(f => f.value.subject.userId === session.info.userId)
-      profile.amIFollowing = session.isActive() && !!uniqFollowers?.find(f => f === session.info.userId)
+      profile.amIFollowing = session.isActive() && !!followers?.find(f => f === session.info.userId)
       this.requestUpdate()
     }
   }
@@ -151,7 +150,3 @@ export class UserList extends LitElement {
 }
 
 customElements.define('ctzn-user-list', UserList)
-
-function getUniqFollowers (followers) {
-  return [...new Set(followers.community.concat(followers.myCommunity).concat(followers.myFollowed))]
-}

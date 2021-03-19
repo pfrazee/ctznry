@@ -98,19 +98,14 @@ export class CtznAPI {
   async listFollowers (userId) {
     const domain = getDomain(userId)
     if (session.isActive(domain)) {
-      return this.view('ctzn.network/followers-view', userId)
+      return (await this.view('ctzn.network/followers-view', userId))?.followers
     }
     let [mine, theirs] = await Promise.all([
       session.isActive() ? this.view('ctzn.network/followers-view', userId) : undefined,
       httpGet(domain, `/.view/ctzn.network/followers-view/${encodeURIComponent(userId)}`).catch(e => undefined)
     ])
     if (!mine && !theirs) throw new Error('Failed to fetch any follower information')
-    return {
-      subject: theirs?.subject || mine.subject,
-      community: theirs?.community,
-      myCommunity: mine?.myCommunity,
-      myFollowed: mine?.myFollowed
-    }
+    return union(mine?.followers, theirs?.followers)
   }
 
   // utils
@@ -298,4 +293,9 @@ async function httpGet (domain, path, query = undefined) {
     url += '?' + (new URLSearchParams(query)).toString()
   }
   return (await fetch(url)).json()
+}
+
+function union (arr1 = [], arr2 = []) {
+  const s = new Set(arr1.concat(arr2))
+  return Array.from(s)
 }

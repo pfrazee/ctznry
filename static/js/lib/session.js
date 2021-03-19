@@ -48,7 +48,7 @@ export async function loadSecondaryState () {
     api.view.get('ctzn.network/followers-view', info.userId).catch(e => [])
   ])
   myCommunities = memberships.map(m => m.value.community)
-  myFollowers = getUniqFollowers(followers)
+  myFollowers = followers
 }
 
 export async function doLogin ({userId, password}) {
@@ -145,6 +145,7 @@ export function isInCommunity (communityUserId) {
 }
 
 export function isFollowingMe (citizenUserId) {
+  if (info?.userId === citizenUserId) return true
   return !!myFollowers?.has?.(citizenUserId)
 }
 
@@ -174,10 +175,4 @@ async function connectApi (domain) {
       return _sessionRecoverPromise
     }
   })
-}
-
-function getUniqFollowers (followers) {
-  const s = new Set(followers.community.concat(followers.myCommunity || []).concat(followers.myFollowed || []))
-  s.add(followers.subject.userId)
-  return s
 }

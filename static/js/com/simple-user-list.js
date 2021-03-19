@@ -113,7 +113,3 @@ export class SimpleUserList extends LitElement {
 }
 
 customElements.define('ctzn-simple-user-list', SimpleUserList)
-
-function getUniqFollowers (followers) {
-  return [...new Set(followers.community.concat(followers.myCommunity).concat(followers.myFollowed))]
-}

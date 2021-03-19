@@ -48,7 +48,6 @@ class CtznUser extends LitElement {
     this.userProfile = undefined
     this.currentView = 'feed'
     this.followers = undefined
-    this.uniqFollowers = undefined
     this.following = undefined
     this.members = undefined
     this.roles = undefined
@@ -81,7 +80,7 @@ class CtznUser extends LitElement {
   }
 
   get amIFollowing () {
-    return !!this.uniqFollowers?.find?.(id => id === session.info.userId)
+    return !!this.followers?.find?.(id => id === session.info.userId)
   }
 
   get isFollowingMe () {
@@ -130,7 +129,6 @@ class CtznUser extends LitElement {
         session.ctzn.db(this.userId).table('ctzn.network/community-membership').list()
       ])
       this.followers = followers
-      this.uniqFollowers = Array.from(getUniqFollowers(followers))
       this.following = following
       this.memberships = memberships
       console.log({userProfile: this.userProfile, followers, following, memberships})
@@ -322,7 +320,7 @@ class CtznUser extends LitElement {
   }
 
   renderCitizenRightSidebar () {
-    const nSharedFollowers = this.followers?.myFollowed?.length || 0
+    const nSharedFollowers = 0 // TODOthis.followers?.myFollowed?.length || 0
     const nMemberships = this.memberships?.length
     return html`
       <nav>
@@ -369,7 +367,7 @@ class CtznUser extends LitElement {
     if (this.currentView === 'followers') {
       return html`
         <div class="border border-gray-200 border-t-0 border-b-0 bg-white">
-          <ctzn-simple-user-list .ids=${this.uniqFollowers} empty-message="${this.userProfile.value.displayName} has no followers."></ctzn-simple-user-list>
+          <ctzn-simple-user-list .ids=${this.followers} empty-message="${this.userProfile.value.displayName} has no followers."></ctzn-simple-user-list>
         </div>
       `
     } else if (this.currentView === 'following') {
@@ -593,13 +591,11 @@ class CtznUser extends LitElement {
       subject: {userId: this.userId, dbUrl: this.userProfile.dbUrl}
     })
     this.followers = await session.ctzn.listFollowers(this.userId)
-    this.uniqFollowers = Array.from(getUniqFollowers(this.followers))
   }
 
   async onClickUnfollow (e) {
     await session.ctzn.user.table('ctzn.network/follow').delete(this.userId)
     this.followers = await session.ctzn.listFollowers(this.userId)
-    this.uniqFollowers = Array.from(getUniqFollowers(this.followers))
   }
 
   async onClickJoin (e) {
@@ -802,10 +798,6 @@ class CtznUser extends LitElement {
 }
 
 customElements.define('ctzn-user-view', CtznUser)
-
-function getUniqFollowers (followers) {
-  return new Set(followers.community.concat(followers.myCommunity || []).concat(followers.myFollowed || []))
-}
 
 async function listAllMembers (userId) {
   let members = []
