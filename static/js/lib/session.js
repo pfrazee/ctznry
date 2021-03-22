@@ -48,7 +48,7 @@ export async function loadSecondaryState () {
     api.view.get('ctzn.network/followers-view', info.userId).catch(e => [])
   ])
   myCommunities = memberships.map(m => m.value.community)
-  myFollowers = followers
+  myFollowers = followers?.followers
 }
 
 export async function doLogin ({userId, password}) {
@@ -146,7 +146,7 @@ export function isInCommunity (communityUserId) {
 
 export function isFollowingMe (citizenUserId) {
   if (info?.userId === citizenUserId) return true
-  return !!myFollowers?.has?.(citizenUserId)
+  return !!myFollowers?.includes?.(citizenUserId)
 }
 
 export function onChange (cb, opts) {
