@@ -7,7 +7,6 @@ import '../com/header.js'
 import '../com/button.js'
 import '../com/login.js'
 import '../com/feed.js'
-import '../com/mobile-compose-btn.js'
 import '../com/img-fallbacks.js'
 
 const SUGGESTED_COMMUNITIES = [
@@ -196,7 +195,6 @@ class CtznMainView extends LitElement {
       <main>
         <div>
           ${this.isEmpty ? this.renderEmptyMessage() : ''}
-          <ctzn-mobile-compose-btn @post-created=${e => this.load()}></ctzn-mobile-compose-btn>
           <ctzn-feed
             limit="50"
             @load-state-updated=${this.onFeedLoadStateUpdated}

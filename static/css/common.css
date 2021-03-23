@@ -8,29 +8,14 @@ body.no-pad {
 
 header .menu {
   position: fixed;
-  top: 10px;
+  top: 0px;
   left: calc(50vw - 550px);
-  height: calc(100vh - 10px);
+  height: 100vh;
   width: 175px;
 }
 
 header .menu.open {
   transform: translateX(0%);
-}
-
-header .mobile-top {
-  display: none;
-  position: fixed;
-  z-index: 42;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 50px;
-  transition: top 0.1s;
-}
-
-header .mobile-top.hidden {
-  top: -50px;
 }
 
 header .mobile-bot {
@@ -59,12 +44,9 @@ main {
 }
 
 @media (max-width: 1100px) {
-  body {
-    padding: 50px 0 100px;
-  }
-
   main {
     margin: 0 auto;
+    padding-bottom: 100px;
   }
 
   nav {
@@ -87,10 +69,6 @@ main {
   header .menu.open {
     transform: translateX(0%);
     border-right: 1px solid #ccc;
-  }
-
-  header .mobile-top {
-    display: flex;
   }
 
   header .mobile-bot {

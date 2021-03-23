@@ -89,7 +89,7 @@ export class BasePopup extends LitElement {
   render () {
     return html`
       <div
-        class="popup-wrapper fixed left-0 top-0 w-full h-full z-30 overflow-y-auto py-12 sm:py-0"
+        class="popup-wrapper fixed left-0 top-0 w-full h-full z-30 overflow-y-auto"
         @click=${this.onClickWrapper}
       >
         <div class="popup-inner bg-white sm:shadow sm:border border-gray-400 rounded overflow-hidden mx-auto sm:my-10" style="max-width: ${this.maxWidth}">

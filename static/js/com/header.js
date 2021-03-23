@@ -8,7 +8,6 @@ import * as toast from './toast.js'
 import './button.js'
 
 const CHECK_NOTIFICATIONS_INTERVAL = 10e3
-const HEADER_HEIGHT = 50
 
 export class Header extends LitElement {
   static get properties () {
@@ -30,21 +29,6 @@ export class Header extends LitElement {
     this.community = undefined
     setInterval(this.checkNotifications.bind(this), CHECK_NOTIFICATIONS_INTERVAL)
     session.onChange(() => this.requestUpdate())
-
-    // hide the header menu on scrolls (in mobile)
-    let lastScrollY = window.pageYOffset || 0
-    setInterval(() => {
-      const scrollY = window.pageYOffset
-      if (Math.abs(lastScrollY - scrollY) <= 5) {
-        return
-      }
-      if (scrollY > HEADER_HEIGHT && scrollY > lastScrollY) {
-        this.querySelector('.mobile-top').classList.add('hidden')
-      } else {
-        this.querySelector('.mobile-top').classList.remove('hidden')
-      }
-      lastScrollY = scrollY
-    }, 250)
   }
 
   firstUpdated () {
@@ -75,7 +59,7 @@ export class Header extends LitElement {
     let info = session.getSavedInfo()
     return html`
       <header>
-        <div class="menu ${this.isMenuOpen ? 'open transition-enabled' : 'closed'} flex flex-col leading-none text-lg bg-gray-50 pt-12 lg:pt-0">
+        <div class="menu ${this.isMenuOpen ? 'open transition-enabled' : 'closed'} flex flex-col leading-none text-lg bg-gray-50 pt-4 lg:pt-0">
           <div class="px-3 py-2 hidden lg:block">
             <div class="font-bold text-3xl text-gray-800">CTZN</div>
             <div class="font-bold pl-0.5 text-gray-500 tracking-tight">alpha</div>
@@ -123,30 +107,21 @@ export class Header extends LitElement {
           ` : ''}
           ${this.renderSessionCtrls()}
         </div>
-        <div class="mobile-top box-border flex bg-white border-b border-gray-300">
-          <a class="font-semibold px-4 py-3 text-gray-500" @click=${this.onToggleMenu}>
-            <span class="fas fa-fw fa-bars"></span>
-          </a>
-          <span class="flex-grow"></span>
-          <a class="font-bold px-3 py-2 text-2xl text-gray-800" href="/" @click=${this.onClickTopNavCTZN}>
-            C T Z N <span class="text-gray-500 tracking-tight">alpha</span>
-          </a>
-          <span class="flex-grow"></span>
-          ${session.hasOneSaved()
-            ? html`
-              <a href="/${info.userId}" title=${info.userId} class="p-1.5 px-5">
-                <img class="inline-block w-9 h-9 object-cover rounded-full" src=${AVATAR_URL(info.userId)}>
-              </a>
-            ` : html`
-              <a href="/" class="px-4 py-2 text-lg text-blue-600" style="line-height: 1.8">Log in</a>
-            `
-          }
-        </div>
         <div class="mobile-bot box-border flex bg-white border-t border-gray-300">
-          <a href="/" class="flex-1 text-center ${this.getMobileNavClass('/')}">
+          <a href="/" class="flex-1 text-center ${this.getMobileNavClass('/')}" @click=${this.onClickBotNavHome}>
             <span class="fas fa-fw navicon fa-home"></span>
           </a>
+          <a href="/communities" class="flex-1 text-center ${this.getMobileNavClass('/communities')}">
+            <span class="fas fa-fw navicon fa-users"></span>
+          </a>
           ${session.hasOneSaved() ? html`
+            <span class="flex-1 px-4 py-2">
+              <span
+                class="bg-blue-500 flex h-12 items-center justify-center relative rounded-full shadow-md text-white w-12"
+                @click=${this.onClickCreatePost}
+                style="top: -20px;"
+              ><span class="fas fa-plus"></span></span>
+            </span>
             <a href="/notifications" class="relative flex-1 text-center ${this.getMobileNavClass('/notifications')}">
               ${this.unreadNotificationsCount > 0 ? html`
                 <span class="absolute bg-blue-500 font-medium leading-none px-1.5 py-0.5 rounded-2xl text-white text-xs" style="top: 8px; right: calc(50% - 24px);">${this.unreadNotificationsCount}</span>
@@ -154,12 +129,9 @@ export class Header extends LitElement {
               <span class="fas fa-fw navicon fa-bell"></span>
             </a>
           ` : html`<span class="flex-1"></span>`}
-          <a href="/communities" class="flex-1 text-center ${this.getMobileNavClass('/communities')}">
-            <span class="fas fa-fw navicon fa-users"></span>
+          <a class="flex-1 text-center ${this.getMobileNavClass()}" @click=${this.onToggleMenu}>
+            <span class="fas fa-fw fa-bars"></span>
           </a>
-          <span class="flex-1 px-6 py-2">
-            <span class="fas fa-fw navicon fa-users" style="visibility: hidden"></span>
-          </span>
         </div>
       </header>
       ${this.isMenuOpen ? html`
@@ -211,7 +183,7 @@ export class Header extends LitElement {
     location.reload()
   }
 
-  onClickTopNavCTZN (e) {
+  onClickBotNavHome (e) {
     if (window.location.pathname === '/') {
       e.preventDefault()
       window.scrollTo(0, 0)

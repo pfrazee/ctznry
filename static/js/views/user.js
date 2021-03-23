@@ -17,7 +17,6 @@ import { emojify } from '../lib/emojify.js'
 import '../com/header.js'
 import '../com/button.js'
 import '../com/feed.js'
-import '../com/mobile-compose-btn.js'
 import '../com/simple-user-list.js'
 import '../com/members-list.js'
 import '../com/items-list.js'
@@ -234,10 +233,6 @@ class CtznUser extends LitElement {
             ` : ''}
           </div>
           ${this.renderCurrentView()}
-          <ctzn-mobile-compose-btn
-            .community=${this.isCommunity && this.amIAMember ? ({userId: this.userId, dbUrl: this.userProfile?.dbUrl}) : undefined}
-            @post-created=${e => this.querySelector('ctzn-feed').load()}
-          ></ctzn-mobile-compose-btn>
         </div>
         <div>
           ${this.renderRightSidebar()}
