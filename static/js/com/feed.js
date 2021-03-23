@@ -280,7 +280,7 @@ export class Feed extends LitElement {
   renderNormalResult (post) {
     return html`
       <div
-        class="grid grid-post px-1 py-0.5 border-b border-gray-200 bg-white"
+        class="grid grid-post px-1 py-0.5 bg-white mb-0.5"
         style="content-visibility: auto; contain-intrinsic-size: 640px 120px;"
       >
         <div class="pl-2 pt-2">

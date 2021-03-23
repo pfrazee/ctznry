@@ -70,6 +70,10 @@ class CtznUser extends LitElement {
     }
   }
 
+  get isMe () {
+    return session.info.userId === this.userId
+  }
+
   get isCitizen () {
     return this.userProfile?.dbType === 'ctzn.network/public-citizen-db'
   }
@@ -171,10 +175,8 @@ class CtznUser extends LitElement {
       return this.renderError()
     }
 
-    const navCls = (id, desktopOnly = false, mobileOnly = false) => `
-      text-center pt-2 pb-2.5 px-7 font-semibold cursor-pointer hover:bg-gray-50 hover:text-blue-600
-      ${desktopOnly ? 'hidden sm:block' : ''}
-      ${mobileOnly ? 'block sm:hidden' : ''}
+    const navCls = (id) => `
+      block text-center pt-2 pb-2.5 px-5 sm:px-7 font-semibold cursor-pointer hover:bg-gray-50 hover:text-blue-600
       ${id === this.currentView ? 'border-b-2 border-blue-600 text-blue-600' : ''}
     `.replace('\n', '')
 
@@ -209,7 +211,7 @@ class CtznUser extends LitElement {
               >
             </a>
           </div>
-          <div class="text-center pt-20 pb-4 px-4 sm:border sm:border-t-0 sm:border-b-0 border-gray-200 bg-white">
+          <div class="text-center pt-20 pb-4 px-4 bg-white">
             <h2 class="text-3xl font-semibold">
               <a
                 class="inline-block"
@@ -227,9 +229,9 @@ class CtznUser extends LitElement {
             </h2>
           </div>
           ${this.userProfile?.value.description ? html`
-            <div class="text-center pb-4 px-4 sm:px-7 border border-gray-200 border-t-0 border-b-0 bg-white">${unsafeHTML(linkify(emojify(makeSafe(this.userProfile?.value.description))))}</div>
+            <div class="text-center pb-4 px-4 sm:px-7 bg-white">${unsafeHTML(linkify(emojify(makeSafe(this.userProfile?.value.description))))}</div>
           ` : ''}
-          ${this.isCitizen && this.amIFollowing === false ? html`
+          ${!this.isMe && this.isCitizen && this.amIFollowing === false ? html`
             <div class="bg-white text-center pb-4 px-4">
               <ctzn-button
                 btn-class="font-semibold py-1 text-base block w-full rounded-lg sm:px-10 sm:inline sm:w-auto sm:rounded-full"
@@ -250,13 +252,12 @@ class CtznUser extends LitElement {
               ></ctzn-button>
             </div>
           ` : ''}
-          <div class="flex border border-gray-200 border-t-0 bg-white text-gray-400 sticky top-0 z-10">
+          <div class="flex border-b border-gray-200 bg-white text-gray-400 sticky top-0 z-10 overflow-x-auto">
             <a class="${navCls('feed')}" href="/${this.userId}">Feed</a>
             ${this.isCitizen ? html`
               <a class="${navCls('followers')}" href="/${this.userId}/followers">Followers</a>
-              <a class="${navCls('following', true)}" href="/${this.userId}/following">Following</a>
-              <a class="${navCls('communities', true)}" href="/${this.userId}/communities">Communities</a>
-              <a class="${navCls('menu', false, true)}" @click=${this.onClickNavMore}>More <span class="fas fa-caret-down fa-fw"></span></a>
+              <a class="${navCls('following')}" href="/${this.userId}/following">Following</a>
+              <a class="${navCls('communities')}" href="/${this.userId}/communities">Communities</a>
             ` : this.isCommunity ? html`
               <a class="${navCls('members')}" href="/${this.userId}/members">${nMembers} ${pluralize(nMembers, 'Member')}</a>
               <a class="${navCls('about')}" href="/${this.userId}/about">About</a>
@@ -420,32 +421,32 @@ class CtznUser extends LitElement {
     }
     if (this.currentView === 'followers') {
       return html`
-        <div class="border border-gray-200 border-t-0 border-b-0 bg-white">
+        <div class="bg-white">
           <ctzn-simple-user-list .ids=${this.followers} empty-message="${this.userProfile.value.displayName} has no followers."></ctzn-simple-user-list>
         </div>
       `
     } else if (this.currentView === 'following') {
       return html`
-        <div class="border border-gray-200 border-t-0 border-b-0 bg-white">
+        <div class="bg-white">
           <ctzn-simple-user-list .ids=${this.following?.map(f => f.value.subject.userId)} empty-message="${this.userProfile.value.displayName} is not following anybody."></ctzn-simple-user-list>
         </div>
       `
     } else if (this.currentView === 'communities') {
       return html`
-        <div class="border border-t-0 border-gray-200 px-4 py-2 bg-white">
+        <div class="px-4 py-2 bg-white">
           <div class="text-lg font-semibold">Communities</div>
         </div>
         ${this.memberships?.length === 0 ? html`
-          <div class="border border-b-0 border-gray-200 border-t-0 p-4">
+          <div class="p-4">
             ${this.userProfile?.value.displayName || this.userId} is not a member of any communities.
           </div>
         ` : html`
-          <div class="border border-gray-200 border-t-0 border-b-0 bg-white">
+          <div class="bg-white">
             ${repeat(this.memberships || [], membership => {
               const userId = membership.value.community.userId
               const [username, domain] = userId.split('@')
               return html`
-                <div class="flex items-center border-b border-gray-200 px-2 py-2">
+                <div class="flex items-center px-2 py-2">
                   <a class="ml-1 mr-3" href="/${userId}" title=${userId}>
                     <img class="block rounded-full w-10 h-10 object-cover shadow-sm" src=${AVATAR_URL(userId)}>
                   </a>
@@ -463,7 +464,7 @@ class CtznUser extends LitElement {
       `
     } else if (this.currentView === 'members') {
       return html`
-        <div class="border border-gray-200 border-t-0 border-b-0 bg-white">
+        <div class="bg-white">
           <ctzn-members-list
             .members=${this.members}
             ?canban=${this.hasPermission('ctzn.network/perm-community-ban')}
@@ -473,7 +474,7 @@ class CtznUser extends LitElement {
       `
     } else if (this.currentView === 'items') {
       return html`
-        <div class="border border-gray-200 border-t-0 border-b-0 bg-white">
+        <div class="bg-white">
           <ctzn-items-list
             user-id=${this.userId}
             .members=${this.members}
@@ -485,7 +486,7 @@ class CtznUser extends LitElement {
       `
     } else if (this.currentView === 'activity') {
       return html`
-        <div class="border border-gray-200 border-t-0 border-b-0 bg-white">
+        <div class="bg-white">
           <ctzn-dbmethod-result-feed
             user-id=${this.userId}
           ></ctzn-dbmethod-result-feed>
@@ -495,7 +496,7 @@ class CtznUser extends LitElement {
       const renderRole = (roleId, permissions) => {
         let members = this.getMembersWithRole(roleId)
         return html`
-          <div class="px-4 py-2 border-b border-gray-300">
+          <div class="px-4 py-2">
             <div class="flex items-center">
               <span class="font-semibold text-lg flex-1"><span class="text-sm far fa-fw fa-user"></span> ${roleId}</span>
               ${roleId !== 'admin' && this.hasPermission('ctzn.network/perm-community-manage-roles') ? html`
@@ -529,13 +530,13 @@ class CtznUser extends LitElement {
         `
       }
       return html`
-        <div class="flex items-center border border-t-0 border-gray-200 px-4 py-2  bg-white">
+        <div class="flex items-center px-4 py-2  bg-white">
           <div class="flex-1 text-lg font-semibold">Member Roles</div>
           ${this.hasPermission('ctzn.network/perm-community-manage-roles') ? html`
             <ctzn-button btn-class="text-sm px-3 py-0 ml-1 rounded-3xl" label="Create Role" @click=${this.onCreateRole}></ctzn-button>
           ` : ''}
         </div>
-        <div class="border border-gray-200 border-t-0 border-b-0  bg-white">
+        <div class="bg-white">
           ${renderRole('admin')}
           ${repeat(this.roles || [], r => r.value.roleId, r => renderRole(r.value.roleId, r.value.permissions))}
           <div class="px-4 py-2 border-b border-gray-300">
@@ -553,7 +554,7 @@ class CtznUser extends LitElement {
           </div>
         </div>
         ${this.hasPermission('ctzn.network/perm-community-ban') ? html`
-          <div class="border border-t-0 border-gray-200 px-3 py-2">
+          <div class="px-3 py-2">
             <ctzn-button btn-class="text-sm px-4 py-1 ml-1 rounded-3xl" label="Manage Banned Users" @click=${this.onClickManageBans}></ctzn-button>
           </div>
         ` : ''}
@@ -576,7 +577,7 @@ class CtznUser extends LitElement {
 
   renderEmptyMessage () {
     return html`
-      <div class="bg-gray-100 text-gray-500 py-44 text-center border border-t-0 border-gray-200">
+      <div class="bg-gray-100 text-gray-500 py-44 text-center">
         ${this.isCitizen ? html`
           <div>${this.userProfile?.value?.displayName} hasn't posted anything yet.</div>
         ` : this.isCommunity ? html`
@@ -819,33 +820,6 @@ class CtznUser extends LitElement {
       roomy: true,
       noBorders: true,
       style: `padding: 4px 0; font-size: 16px; font-weight: 500; min-width: 140px`,
-      items
-    })
-  }
-
-  onClickNavMore (e) {
-    e.preventDefault()
-    e.stopPropagation()
-
-    const setView = (view) => {
-      emit(this, 'navigate-to', {detail: {url: `/${this.userId}/${view}`}})
-    }
-
-    let items = []
-    if (this.isCitizen) {
-      items = [
-        {label: 'Following', click: () => setView('following')},
-        {label: 'Communities', click: () => setView('communities')}
-      ]
-    }
-    let rect = e.currentTarget.getClientRects()[0]
-    contextMenu.create({
-      x: rect.right,
-      y: rect.bottom,
-      right: true,
-      roomy: true,
-      noBorders: true,
-      style: `padding: 4px 0; font-size: 16px; font-weight: 500`,
       items
     })
   }
