@@ -28,6 +28,7 @@ header .mobile-bot {
   height: 56px;
   height: calc(56px + env(safe-area-inset-bottom));
   backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
   background: rgba(255, 255, 255, 0.9);
 }
 
