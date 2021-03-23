@@ -316,7 +316,7 @@ class CtznMainView extends LitElement {
         community: this.community
       })
       toast.create('Post published', '', 10e3)
-      emit(this, 'post-created')
+      this.load()
     } catch (e) {
       // ignore
       console.log(e)
