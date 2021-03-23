@@ -280,12 +280,12 @@ export class Feed extends LitElement {
   renderNormalResult (post) {
     return html`
       <div
-        class="grid grid-post px-1 py-0.5 bg-white mb-0.5"
+        class="grid grid-post px-1 py-0.5 bg-white mb-0.5 sm:rounded sm:my-1 sm:py-1"
         style="content-visibility: auto; contain-intrinsic-size: 640px 120px;"
       >
         <div class="pl-2 pt-2">
           <a class="block" href="/${post.author.userId}" title=${post.author.displayName}>
-            <img class="block object-cover rounded-full mt-1 w-10 h-10" src=${AVATAR_URL(post.author.userId)}>
+            <img class="block object-cover rounded-md mt-1 w-10 h-10" src=${AVATAR_URL(post.author.userId)}>
           </a>
         </div>
         <ctzn-post

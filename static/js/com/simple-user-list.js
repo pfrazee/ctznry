@@ -2,6 +2,7 @@ import { LitElement, html } from '../../vendor/lit-element/lit-element.js'
 import { repeat } from '../../vendor/lit-element/lit-html/directives/repeat.js'
 import { AVATAR_URL } from '../lib/const.js'
 import * as session from '../lib/session.js'
+import * as displayNames from '../lib/display-names.js'
 
 export class SimpleUserList extends LitElement {
   static get properties () {
@@ -45,21 +46,22 @@ export class SimpleUserList extends LitElement {
     }
     return html`
       ${this.ids.length === 0 ? html`
-        <div class="border-b border-gray-200 px-3 py-3 text-gray-500 bg-gray-50">
+        <div class="px-3 py-3 text-gray-500 bg-gray-50">
           ${this.emptyMessage}
         </div>
       ` : ''}
-      ${repeat(this.ids, userId => {
+      ${repeat(this.ids, (userId, i) => {
         const [username, domain] = userId.split('@')
         return html`
-          <div class="flex items-center border-b border-gray-200 px-2 py-2">
+          <div class="flex items-center px-2 py-2 bg-white rounded ${i !== 0 ? 'mt-1' : ''}">
             <a class="ml-1 mr-3" href="/${userId}" title=${userId}>
-              <img class="block rounded-full w-10 h-10 object-cover shadow-sm" src=${AVATAR_URL(userId)}>
+              <img class="block rounded-lg w-10 h-10 object-cover" src=${AVATAR_URL(userId)}>
             </a>
             <div class="flex-1 min-w-0 truncate">
-              <a class="hover:underline" href="/${userId}" title=${userId}>
-                <span class="font-bold">${username}</span><span class="text-gray-500">@${domain}</span>
+              <a class="font-medium sm:hover:underline" href="/${userId}" title=${userId}>
+                ${displayNames.render(userId)}
               </a>
+              <span class="hidden sm:inline text-sm text-gray-500">${domain}</span>
             </div>
             <div>
               ${this.renderControls(userId)}

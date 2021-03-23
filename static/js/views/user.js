@@ -34,7 +34,8 @@ class CtznUser extends LitElement {
       members: {type: Array},
       roles: {type: Array},
       isEmpty: {type: Boolean},
-      isJoiningOrLeaving: {type: Boolean}
+      isJoiningOrLeaving: {type: Boolean},
+      expandedSections: {type: Object}
     }
   }
 
@@ -49,9 +50,12 @@ class CtznUser extends LitElement {
     this.followers = undefined
     this.following = undefined
     this.members = undefined
+    this.sharedFollowers = []
+    this.sharedCommunities = []
     this.roles = undefined
     this.isEmpty = false
     this.isJoiningOrLeaving = false
+    this.expandedSections = {}
 
     const pathParts = (new URL(location)).pathname.split('/')
     this.userId = pathParts[1]
@@ -119,6 +123,7 @@ class CtznUser extends LitElement {
   }
 
   async load () {
+    this.expandedSections = {}
     this.userProfile = await session.ctzn.getProfile(this.userId).catch(e => ({error: true, message: e.toString()}))
     if (this.userProfile.error) {
       document.title = `Not Found | CTZN`
@@ -132,8 +137,17 @@ class CtznUser extends LitElement {
         session.ctzn.db(this.userId).table('ctzn.network/community-membership').list()
       ])
       this.followers = followers
+      if (session.isActive() && !this.isMe) {
+        this.sharedFollowers = intersect(session.myFollowing, followers)
+      }
       this.following = following
       this.memberships = memberships
+      if (session.isActive() && !this.isMe) {
+        this.sharedCommunities = intersect(
+          session.myCommunities.map(c => c.userId),
+          memberships.map(m => m.value.community.userId)
+        )
+      }
       console.log({userProfile: this.userProfile, followers, following, memberships})
     } else if (this.isCommunity) {
       const [members, roles] = await Promise.all([
@@ -200,12 +214,13 @@ class CtznUser extends LitElement {
             ${this.renderProfileControls()}
           </div>
           <div
+            class="sm:mt-1 sm:rounded-t"
             style="height: 200px; background: linear-gradient(0deg, #3c4af6, #2663eb)"
           ></div>
           <div class="absolute text-center w-full" style="top: 130px">
             <a href="/${this.userId}" title=${this.userProfile?.value.displayName}>
               <img
-                class="border-4 border-white inline-block object-cover rounded-full shadow-md"
+                class="border-4 border-white inline-block object-cover rounded-3xl shadow-md"
                 src=${AVATAR_URL(this.userId)}
                 style="width: 130px; height: 130px"
               >
@@ -252,12 +267,10 @@ class CtznUser extends LitElement {
               ></ctzn-button>
             </div>
           ` : ''}
-          <div class="flex border-b border-gray-200 bg-white text-gray-400 sticky top-0 z-10 overflow-x-auto">
+          <div class="flex bg-white text-gray-400 sticky top-0 z-10 overflow-x-auto mb-1 sm:rounded-b">
             <a class="${navCls('feed')}" href="/${this.userId}">Feed</a>
             ${this.isCitizen ? html`
-              <a class="${navCls('followers')}" href="/${this.userId}/followers">Followers</a>
-              <a class="${navCls('following')}" href="/${this.userId}/following">Following</a>
-              <a class="${navCls('communities')}" href="/${this.userId}/communities">Communities</a>
+              <a class="${navCls('about')}" href="/${this.userId}/about">About</a>
             ` : this.isCommunity ? html`
               <a class="${navCls('members')}" href="/${this.userId}/members">${nMembers} ${pluralize(nMembers, 'Member')}</a>
               <a class="${navCls('about')}" href="/${this.userId}/about">About</a>
@@ -419,50 +432,7 @@ class CtznUser extends LitElement {
     if (!this.userProfile) {
       return ''
     }
-    if (this.currentView === 'followers') {
-      return html`
-        <div class="bg-white">
-          <ctzn-simple-user-list .ids=${this.followers} empty-message="${this.userProfile.value.displayName} has no followers."></ctzn-simple-user-list>
-        </div>
-      `
-    } else if (this.currentView === 'following') {
-      return html`
-        <div class="bg-white">
-          <ctzn-simple-user-list .ids=${this.following?.map(f => f.value.subject.userId)} empty-message="${this.userProfile.value.displayName} is not following anybody."></ctzn-simple-user-list>
-        </div>
-      `
-    } else if (this.currentView === 'communities') {
-      return html`
-        <div class="px-4 py-2 bg-white">
-          <div class="text-lg font-semibold">Communities</div>
-        </div>
-        ${this.memberships?.length === 0 ? html`
-          <div class="p-4">
-            ${this.userProfile?.value.displayName || this.userId} is not a member of any communities.
-          </div>
-        ` : html`
-          <div class="bg-white">
-            ${repeat(this.memberships || [], membership => {
-              const userId = membership.value.community.userId
-              const [username, domain] = userId.split('@')
-              return html`
-                <div class="flex items-center px-2 py-2">
-                  <a class="ml-1 mr-3" href="/${userId}" title=${userId}>
-                    <img class="block rounded-full w-10 h-10 object-cover shadow-sm" src=${AVATAR_URL(userId)}>
-                  </a>
-                  <div class="flex-1 min-w-0 truncate">
-                    <a class="hover:underline" href="/${userId}" title=${userId}>
-                      <span class="font-bold">${username}</span><span class="text-gray-500">@${domain}</span>
-                    </a>
-                  </div>
-                </div>
-              `
-            })}
-          </div>
-        `}
-        </div>
-      `
-    } else if (this.currentView === 'members') {
+    if (this.currentView === 'members') {
       return html`
         <div class="bg-white">
           <ctzn-members-list
@@ -493,72 +463,11 @@ class CtznUser extends LitElement {
         </div>
       `
     } else if (this.currentView === 'about') {
-      const renderRole = (roleId, permissions) => {
-        let members = this.getMembersWithRole(roleId)
-        return html`
-          <div class="px-4 py-2">
-            <div class="flex items-center">
-              <span class="font-semibold text-lg flex-1"><span class="text-sm far fa-fw fa-user"></span> ${roleId}</span>
-              ${roleId !== 'admin' && this.hasPermission('ctzn.network/perm-community-manage-roles') ? html`
-                <ctzn-button btn-class="text-sm px-3 py-0 rounded-3xl" label="Remove" @click=${e => this.onRemoveRole(e, roleId)}></ctzn-button>
-              ` : ''}
-              ${this.hasPermission('ctzn.network/perm-community-manage-roles') ? html`
-                <ctzn-button btn-class="text-sm px-3 py-0 ml-1 rounded-3xl" label="Edit" @click=${e => this.onEditRole(e, roleId, permissions)}></ctzn-button>
-              ` : ''}
-            </div>
-            <div class="text-gray-500">
-              ${roleId === 'admin' ? html`
-                <div>&bull; Runs this community. Full permissions.</div>
-              ` : permissions.length ? html`
-                ${repeat(permissions, p => p.permId, p => html`
-                  <div>&bull; ${PERM_DESCRIPTIONS[p.permId] || p.permId}</div>
-                `)}
-              ` : html`
-                <em>This role has no permissions</em>
-              `}
-            </div>
-            ${members.length > 0 ? html`
-              <div class="flex px-1 py-1 mt-2 rounded bg-gray-100">
-                ${repeat(members, member => html`
-                  <a class="block" href="/${member.value.user.userId}" data-tooltip=${member.value.user.userId}>
-                    <img class="block rounded object-cover w-10 h-10" src=${AVATAR_URL(member.value.user.userId)}>
-                  </a>
-                `)}
-              </div>
-            ` : ''}
-          </div>
-        `
+      if (this.isCitizen) {
+        return this.renderCitzenAbout()
+      } else if (this.isCommunity) {
+        return this.renderCommunityAbout()
       }
-      return html`
-        <div class="flex items-center px-4 py-2  bg-white">
-          <div class="flex-1 text-lg font-semibold">Member Roles</div>
-          ${this.hasPermission('ctzn.network/perm-community-manage-roles') ? html`
-            <ctzn-button btn-class="text-sm px-3 py-0 ml-1 rounded-3xl" label="Create Role" @click=${this.onCreateRole}></ctzn-button>
-          ` : ''}
-        </div>
-        <div class="bg-white">
-          ${renderRole('admin')}
-          ${repeat(this.roles || [], r => r.value.roleId, r => renderRole(r.value.roleId, r.value.permissions))}
-          <div class="px-4 py-2 border-b border-gray-300">
-            <div class="flex items-center">
-              <span class="font-semibold text-lg flex-1"><span class="text-sm far fa-fw fa-user"></span> default</span>
-            </div>
-            <div class="text-gray-500">
-              <div>&bull; Can join or leave the community.</div>
-              <div>&bull; Can create and delete posts.</div>
-              <div>&bull; Can create and delete comments.</div>
-            </div>
-            <div class="flex px-4 py-2 mt-2 rounded bg-gray-100 text-gray-500">
-              This role includes everybody.
-            </div>
-          </div>
-        </div>
-        ${this.hasPermission('ctzn.network/perm-community-ban') ? html`
-          <div class="px-3 py-2">
-            <ctzn-button btn-class="text-sm px-4 py-1 ml-1 rounded-3xl" label="Manage Banned Users" @click=${this.onClickManageBans}></ctzn-button>
-          </div>
-        ` : ''}
-      `
     }
     return html`
       <div>
@@ -572,6 +481,161 @@ class CtznUser extends LitElement {
           @moderator-remove-post=${this.onModeratorRemovePost}
         ></ctzn-feed>
       </div>
+    `
+  }
+
+  renderCitzenAbout () {
+    const onToggleExpandSection = id => {
+      this.expandedSections = Object.assign(this.expandedSections, {[id]: !this.expandedSections[id]})
+      this.requestUpdate()
+    }
+    const expandableSectionHeader = (id, label, count, extra = '') => html`
+      <div
+        class="px-5 py-3 sm:rounded ${count ? 'cursor-pointer sm:hover:bg-gray-50 sm:hover:text-blue-600' : ''}"
+        @click=${count ? e => onToggleExpandSection(id) : undefined}
+      >
+        <div class="flex items-center justify-between">
+          <span>
+            <span class="text-lg font-medium mr-1">${label}</span>
+            <span class="text-gray-500 font-bold">${count || '0'}</span>
+          </span>
+          ${count ? html`
+            <span class="fas fa-angle-${this.expandedSections[id] ? 'up' : 'down'}"></span>
+          ` : ''}
+        </div>
+        ${extra}
+      </div>
+    `
+    return html`
+      <div class="bg-white sm:rounded my-1 ${this.expandedSections.followers ? 'pb-1' : ''}">
+        ${expandableSectionHeader('followers', 'Followers', this.followers?.length, this.sharedFollowers?.length ? html`
+          <div class="pt-1 flex items-center text-gray-500">
+            <span class="mr-2">Shared:</span>
+            ${repeat(this.sharedFollowers.slice(0, 7), (userId, i) => html`
+              <span data-tooltip=${userId}>
+                <img src=${AVATAR_URL(userId)} class="inline-block rounded-md w-7 h-7 mr-1">
+              </span>
+            `)}
+            ${this.sharedFollowers.length > 7 ? html`<span class="font-semibold ml-1">+${this.sharedFollowers.length - 7}` : ''}
+          </div>
+        ` : '')}
+        ${this.expandedSections.followers ? html`
+          <div class="sm:mx-2 mb-1 sm:rounded px-1 py-1 bg-gray-50">
+            <ctzn-simple-user-list .ids=${this.followers} empty-message="${this.userProfile.value.displayName} has no followers."></ctzn-simple-user-list>
+          </div>
+        ` : ''}
+      </div>
+      <div class="bg-white sm:rounded my-1 ${this.expandedSections.following ? 'pb-1' : ''}">
+        ${expandableSectionHeader('following', 'Following', this.following?.length)}
+        ${this.expandedSections.following ? html`
+          <div class="sm:mx-2 mb-1 sm:rounded px-1 py-1 bg-gray-50">
+            <ctzn-simple-user-list .ids=${this.following?.map(f => f.value.subject.userId)} empty-message="${this.userProfile.value.displayName} is not following anybody."></ctzn-simple-user-list>
+          </div>
+        ` : ''}
+      </div>
+      <div class="bg-white sm:rounded my-1 ${this.expandedSections.communities ? 'pb-1' : ''}">
+        ${expandableSectionHeader('communities', 'Communities', this.memberships?.length, this.sharedCommunities?.length ? html`
+          <div class="pt-1 flex items-center text-gray-500">
+            <span class="mr-2">Shared:</span>
+            ${repeat(this.sharedCommunities.slice(0, 7), (userId, i) => html`
+              <span data-tooltip=${userId}>
+                <img src=${AVATAR_URL(userId)} class="inline-block rounded-md w-7 h-7 mr-1">
+              </span>
+            `)}
+            ${this.sharedCommunities.length > 7 ? html`<span class="font-semibold ml-1">+${this.sharedCommunities.length - 7}</span>` : ''}
+          </div>
+        ` : '')}
+        ${this.expandedSections.communities ? html`
+          <div class="sm:mx-2 mb-1 sm:rounded px-1 py-1 bg-gray-50">
+            ${repeat(this.memberships || [], (membership, i) => {
+              const userId = membership.value.community.userId
+              const [username, domain] = userId.split('@')
+              return html`
+                <div class="flex items-center px-2 py-2 bg-white rounded ${i !== 0 ? 'mt-1' : ''}">
+                  <a class="ml-1 mr-3" href="/${userId}" title=${userId}>
+                    <img class="block rounded-lg w-10 h-10 object-cover shadow-sm" src=${AVATAR_URL(userId)}>
+                  </a>
+                  <div class="flex-1 min-w-0 truncate">
+                    <a class="hover:underline" href="/${userId}" title=${userId}>
+                      <span class="font-medium">${displayNames.render(userId)}</span>
+                    </a>
+                    <span class="hidden sm:inline text-sm text-gray-500">${domain}</span>
+                  </div>
+                </div>
+              `
+            })}
+          </div>
+        ` : ''}
+      </div>
+    `
+  }
+
+  renderCommunityAbout () {
+    const renderRole = (roleId, permissions) => {
+      let members = this.getMembersWithRole(roleId)
+      return html`
+        <div class="px-4 py-2">
+          <div class="flex items-center">
+            <span class="font-semibold text-lg flex-1"><span class="text-sm far fa-fw fa-user"></span> ${roleId}</span>
+            ${roleId !== 'admin' && this.hasPermission('ctzn.network/perm-community-manage-roles') ? html`
+              <ctzn-button btn-class="text-sm px-3 py-0 rounded-3xl" label="Remove" @click=${e => this.onRemoveRole(e, roleId)}></ctzn-button>
+            ` : ''}
+            ${this.hasPermission('ctzn.network/perm-community-manage-roles') ? html`
+              <ctzn-button btn-class="text-sm px-3 py-0 ml-1 rounded-3xl" label="Edit" @click=${e => this.onEditRole(e, roleId, permissions)}></ctzn-button>
+            ` : ''}
+          </div>
+          <div class="text-gray-500">
+            ${roleId === 'admin' ? html`
+              <div>&bull; Runs this community. Full permissions.</div>
+            ` : permissions.length ? html`
+              ${repeat(permissions, p => p.permId, p => html`
+                <div>&bull; ${PERM_DESCRIPTIONS[p.permId] || p.permId}</div>
+              `)}
+            ` : html`
+              <em>This role has no permissions</em>
+            `}
+          </div>
+          ${members.length > 0 ? html`
+            <div class="flex px-1 py-1 mt-2 rounded bg-gray-100">
+              ${repeat(members, member => html`
+                <a class="block" href="/${member.value.user.userId}" data-tooltip=${member.value.user.userId}>
+                  <img class="block rounded object-cover w-10 h-10" src=${AVATAR_URL(member.value.user.userId)}>
+                </a>
+              `)}
+            </div>
+          ` : ''}
+        </div>
+      `
+    }
+    return html`
+      <div class="flex items-center px-4 py-2  bg-white">
+        <div class="flex-1 text-lg font-semibold">Member Roles</div>
+        ${this.hasPermission('ctzn.network/perm-community-manage-roles') ? html`
+          <ctzn-button btn-class="text-sm px-3 py-0 ml-1 rounded-3xl" label="Create Role" @click=${this.onCreateRole}></ctzn-button>
+        ` : ''}
+      </div>
+      <div class="bg-white">
+        ${renderRole('admin')}
+        ${repeat(this.roles || [], r => r.value.roleId, r => renderRole(r.value.roleId, r.value.permissions))}
+        <div class="px-4 py-2 border-b border-gray-300">
+          <div class="flex items-center">
+            <span class="font-semibold text-lg flex-1"><span class="text-sm far fa-fw fa-user"></span> default</span>
+          </div>
+          <div class="text-gray-500">
+            <div>&bull; Can join or leave the community.</div>
+            <div>&bull; Can create and delete posts.</div>
+            <div>&bull; Can create and delete comments.</div>
+          </div>
+          <div class="flex px-4 py-2 mt-2 rounded bg-gray-100 text-gray-500">
+            This role includes everybody.
+          </div>
+        </div>
+      </div>
+      ${this.hasPermission('ctzn.network/perm-community-ban') ? html`
+        <div class="px-3 py-2">
+          <ctzn-button btn-class="text-sm px-4 py-1 ml-1 rounded-3xl" label="Manage Banned Users" @click=${this.onClickManageBans}></ctzn-button>
+        </div>
+      ` : ''}
     `
   }
 
@@ -837,4 +901,14 @@ async function listAllMembers (userId) {
     gt = m[m.length - 1].key
   }
   return members
+}
+
+function intersect (a, b) {
+  var arr = []
+  for (let av of a) {
+    if (b.includes(av)) {
+      arr.push(av)
+    }
+  }
+  return arr
 }

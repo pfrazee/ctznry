@@ -87,7 +87,7 @@ export class Header extends LitElement {
               href="/${info.userId}"
               title=${info.userId}
             >
-              <img class="absolute inline-block w-7 h-7 object-cover rounded-full" src=${AVATAR_URL(info.userId)} style="left: 10px; top: 6px">
+              <img class="absolute inline-block w-7 h-7 object-cover rounded" src=${AVATAR_URL(info.userId)} style="left: 10px; top: 6px">
               <span class="inline-block" style="width: 29px"></span>
               Profile
             </a>
