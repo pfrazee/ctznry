@@ -154,7 +154,7 @@ export class Post extends LitElement {
             ${this.context}
           </div>
         ` : ''}
-        <div class="${this.nometa ? '' : 'pr-2 py-2 sm:px-2 sm:py-3'} min-w-0">
+        <div class="${this.nometa ? '' : 'pr-2 py-2'} min-w-0">
           ${this.nometa ? '' : html`
             <div class="pl-1 pr-2.5 text-gray-600 truncate">
               <span class="sm:mr-1 whitespace-nowrap">

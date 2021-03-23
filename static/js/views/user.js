@@ -185,40 +185,70 @@ class CtznUser extends LitElement {
       ></ctzn-header>
       <main>
         <div class="relative">
+          <div class="absolute" style="top: 8px; left: 10px">
+            <ctzn-button
+              btn-class="px-3 py-1 rounded-full text-base text-white"
+              href="/"
+              icon="fas fa-angle-left"
+              transparent
+              btn-style="background: rgba(0,0,0,.3); backdrop-filter: blur(5px) contrast(0.9); -webkit-backdrop-filter: blur(5px) contrast(0.9); "
+            ></ctzn-button>
+          </div>
           <div class="absolute" style="top: 8px; right: 10px">
             ${this.renderProfileControls()}
           </div>
-          <div class="bg-white pt-4 pl-2 sm:hidden">
+          <div
+            style="height: 200px; background: linear-gradient(0deg, #3c4af6, #2663eb)"
+          ></div>
+          <div class="absolute text-center w-full" style="top: 130px">
             <a href="/${this.userId}" title=${this.userProfile?.value.displayName}>
-              <img class="block h-14 ml-2 mr-6 mx-auto object-cover rounded-full shadow-md w-14" src=${AVATAR_URL(this.userId)}>
+              <img
+                class="border-4 border-white inline-block object-cover rounded-full shadow-md"
+                src=${AVATAR_URL(this.userId)}
+                style="width: 130px; height: 130px"
+              >
             </a>
           </div>
-          <div class="flex items-center py-4 px-4 border border-gray-200 border-t-0 border-b-0 bg-white">
-            <a class="hidden sm:block" href="/${this.userId}" title=${this.userProfile?.value.displayName}>
-              <img class="block mx-auto ml-2 mr-6 w-16 h-16 object-cover rounded-full shadow-md" src=${AVATAR_URL(this.userId)}>
-            </a>
-            <div class="flex-1">
-              <h2 class="text-3xl font-semibold">
-                <a
-                  class="inline-block"
-                  href="/${this.userId}"
-                  title=${this.userProfile?.value.displayName}
-                  style="max-width: 320px"
-                >
-                  ${unsafeHTML(emojify(makeSafe(this.userProfile?.value.displayName)))}
-                </a>
-              </h2>
-              <h2 class="text-gray-500 font-semibold">
-                <a href="/${this.userId}" title="${this.userId}">
-                  ${this.isCitizen ? html`<span class="fas fa-fw fa-user"></span>` : ''}
-                  ${this.isCommunity ? html`<span class="fas fa-fw fa-users"></span>` : ''}
-                  ${this.userId}
-                </a>
-              </h2>
-            </div>
+          <div class="text-center pt-20 pb-4 px-4 sm:border sm:border-t-0 sm:border-b-0 border-gray-200 bg-white">
+            <h2 class="text-3xl font-semibold">
+              <a
+                class="inline-block"
+                href="/${this.userId}"
+                title=${this.userProfile?.value.displayName}
+                style="max-width: 320px"
+              >
+                ${unsafeHTML(emojify(makeSafe(this.userProfile?.value.displayName)))}
+              </a>
+            </h2>
+            <h2 class="text-gray-500 font-semibold">
+              <a href="/${this.userId}" title="${this.userId}">
+                ${this.userId}
+              </a>
+            </h2>
           </div>
           ${this.userProfile?.value.description ? html`
-            <div class="pb-3 px-4 sm:px-7 border border-gray-200 border-t-0 border-b-0 bg-white">${unsafeHTML(linkify(emojify(makeSafe(this.userProfile?.value.description))))}</div>
+            <div class="text-center pb-4 px-4 sm:px-7 border border-gray-200 border-t-0 border-b-0 bg-white">${unsafeHTML(linkify(emojify(makeSafe(this.userProfile?.value.description))))}</div>
+          ` : ''}
+          ${this.isCitizen && this.amIFollowing === false ? html`
+            <div class="bg-white text-center pb-4 px-4">
+              <ctzn-button
+                btn-class="font-semibold py-1 text-base block w-full rounded-lg sm:px-10 sm:inline sm:w-auto sm:rounded-full"
+                @click=${this.onClickFollow}
+                label="Follow ${this.userProfile?.value.displayName || this.userId}"
+                primary
+              ></ctzn-button>
+            </div>
+          ` : ''}
+          ${this.isCommunity && this.amIAMember === false ? html`
+            <div class="bg-white text-center pb-4 px-4">
+              <ctzn-button
+                btn-class="font-semibold py-1 text-base block w-full rounded-lg sm:px-10 sm:inline sm:w-auto sm:rounded-full"
+                @click=${this.onClickJoin}
+                label="Join community"
+                ?spinner=${this.isJoiningOrLeaving}
+                primary
+              ></ctzn-button>
+            </div>
           ` : ''}
           <div class="flex border border-gray-200 border-t-0 bg-white text-gray-400 sticky top-0 z-10">
             <a class="${navCls('feed')}" href="/${this.userId}">Feed</a>
@@ -259,17 +289,36 @@ class CtznUser extends LitElement {
   }
 
   renderProfileControls () {
+    const btnStyle = `background: rgba(0,0,0,.3); backdrop-filter: blur(5px) contrast(0.9); -webkit-backdrop-filter: blur(5px) contrast(0.9);`
     if (this.isCitizen) {
       return html`
         <div>
           ${session.isActive() ? html`
             ${session.info.userId === this.userId ? html`
-              <ctzn-button btn-class="font-semibold px-5 py-1 rounded-full text-base" @click=${this.onClickEditProfile} label="Edit profile"></ctzn-button>
+              <ctzn-button
+                btn-class="font-medium px-5 py-1 rounded-full text-base text-white"
+                @click=${this.onClickEditProfile}
+                label="Edit profile"
+                transparent
+                btn-style=${btnStyle}
+              ></ctzn-button>
             ` : html`
               ${this.amIFollowing === true ? html`
-                <ctzn-button btn-class="font-semibold px-5 py-1 rounded-full text-base" @click=${this.onClickUnfollow} label="Unfollow"></ctzn-button>
+                <ctzn-button
+                  btn-class="font-medium px-5 py-1 rounded-full text-base text-white"
+                  @click=${this.onClickUnfollow}
+                  label="Unfollow"
+                  transparent
+                  btn-style=${btnStyle}
+                ></ctzn-button>
               ` : this.amIFollowing === false ? html`
-                <ctzn-button btn-class="font-semibold px-6 py-1 rounded-full text-base" primary @click=${this.onClickFollow} label="Follow"></ctzn-button>
+                <ctzn-button
+                  btn-class="font-medium px-6 py-1 rounded-full text-base text-white"
+                  @click=${this.onClickFollow}
+                  label="Follow"
+                  transparent
+                  btn-style=${btnStyle}
+                ></ctzn-button>
               ` : ``}
             `}
           ` : html`
@@ -284,18 +333,28 @@ class CtznUser extends LitElement {
           ${session.isActive() ? html`
             ${this.amIAMember === true ? html`
               <ctzn-button
-                primary
-                btn-class="font-medium px-5 py-1 rounded-full text-base"
+                btn-class="font-medium px-5 py-1 rounded-full text-base text-white"
                 @click=${this.onClickCreatePost}
                 label="Create Post"
+                transparent
+                btn-style=${btnStyle}
               ></ctzn-button>
               <ctzn-button
-                btn-class="font-semibold px-4 py-1 rounded-full text-base"
+                btn-class="font-semibold px-3 py-1 rounded-full text-base text-white"
                 @click=${(e) => this.onClickControlsMenu(e)}
                 icon="fas fa-fw fa-ellipsis-h"
+                transparent
+                btn-style=${btnStyle}
               ></ctzn-button>
             ` : this.amIAMember === false ? html`
-              <ctzn-button btn-class="font-semibold px-5 py-1 rounded-full text-base" primary @click=${this.onClickJoin} label="Join" ?spinner=${this.isJoiningOrLeaving}></ctzn-button>
+              <ctzn-button
+                btn-class="font-semibold px-5 py-1 rounded-full text-base text-white"
+                @click=${this.onClickJoin}
+                label="Join"
+                ?spinner=${this.isJoiningOrLeaving}
+                transparent
+                btn-style=${btnStyle}
+              ></ctzn-button>
             ` : ``}
           ` : html`
             ${''/*TODO logged out UI*/}

@@ -1,4 +1,5 @@
-import {LitElement, html} from '../../vendor/lit-element/lit-element.js'
+import { LitElement, html } from '../../vendor/lit-element/lit-element.js'
+import { ifDefined } from '../../vendor/lit-element/lit-html/directives/if-defined.js'
 
 export class Button extends LitElement {
   static get properties () {
@@ -7,6 +8,7 @@ export class Button extends LitElement {
       icon: {type: String},
       href: {type: String},
       btnClass: {type: String, attribute: 'btn-class'},
+      btnStyle: {type: String, attribute: 'btn-style'},
       disabled: {type: Boolean},
       spinner: {type: Boolean}
     }
@@ -19,6 +21,7 @@ export class Button extends LitElement {
   constructor () {
     super()
     this.btnClass = ''
+    this.btnStyle = undefined
   }
 
   getClass () {
@@ -72,7 +75,12 @@ export class Button extends LitElement {
   render () {
     if (this.href) {
       return html`
-        <a href=${this.href} class="inline-block ${this.getClass()}" ?disabled=${this.disabled}>${this.spinner ? this.renderSpinner() : this.label}</a>
+        <a
+          href=${this.href}
+          class="inline-block ${this.getClass()}"
+          ?disabled=${this.disabled}
+          style=${ifDefined(this.btnStyle)}
+        >${this.spinner ? this.renderSpinner() : this.renderLabel()}</a>
       `
     }
     return html`
@@ -81,6 +89,7 @@ export class Button extends LitElement {
         tabindex=${this.getAttribute('tabindex')}
         class=${this.getClass()}
         ?disabled=${this.disabled}
+        style=${ifDefined(this.btnStyle)}
       >${this.spinner ? this.renderSpinner() : this.renderLabel()}</button>
     `
   }
