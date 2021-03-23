@@ -4,7 +4,9 @@ import * as session from '../lib/session.js'
 import * as displayNames from '../lib/display-names.js'
 import { AVATAR_URL } from '../lib/const.js'
 import { emit } from '../lib/dom.js'
+import { ComposerPopup } from './popups/composer.js'
 import { CreateCommunityPopup } from './popups/create-community.js'
+import * as toast from './toast.js'
 import './button.js'
 
 const CHECK_NOTIFICATIONS_INTERVAL = 10e3
@@ -210,11 +212,6 @@ export class Header extends LitElement {
     this.isMenuOpen = false
   }
 
-  async onClickNewPost (e) {
-    e.preventDefault()
-    window.location = '/?composer'
-  }
-
   async onLogOut () {
     await session.doLogout()
     location.reload()
@@ -225,6 +222,22 @@ export class Header extends LitElement {
       e.preventDefault()
       window.scrollTo(0, 0)
       window.closePopup?.()
+    }
+  }
+
+  async onClickCreatePost (e) {
+    e.preventDefault()
+    e.stopPropagation()
+    this.isMenuOpen = false
+    try {
+      await ComposerPopup.create({
+        community: this.community
+      })
+      toast.create('Post published', '', 10e3)
+      emit(this, 'post-created')
+    } catch (e) {
+      // ignore
+      console.log(e)
     }
   }
 

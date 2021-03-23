@@ -2,7 +2,7 @@ import { LitElement, html } from '../../vendor/lit-element/lit-element.js'
 import { repeat } from '../../vendor/lit-element/lit-html/directives/repeat.js'
 import * as toast from '../com/toast.js'
 import * as session from '../lib/session.js'
-import * as displayNames from '../lib/display-names.js'
+import { ComposerPopup } from '../com/popups/composer.js'
 import '../com/header.js'
 import '../com/button.js'
 import '../com/login.js'
@@ -193,6 +193,19 @@ class CtznMainView extends LitElement {
       <ctzn-header @post-created=${e => this.load()}></ctzn-header>
       <main>
         <div>
+          <div class="hidden lg:flex items-center justify-between mb-0.5 px-4 py-3 bg-white">
+            <span class="text-xl font-medium mr-2">Home</span>
+            <span>
+              <span class="hidden lg:inline">
+                <ctzn-button
+                  primary
+                  btn-class="rounded-full py-1"
+                  label="New post"
+                  @click=${this.onClickCreatePost}
+                ></ctzn-button>
+              </span>
+            </span>
+          </div>
           ${this.isEmpty ? this.renderEmptyMessage() : ''}
           <ctzn-feed
             limit="50"
@@ -292,6 +305,22 @@ class CtznMainView extends LitElement {
   onPublishReply (e) {
     toast.create('Reply published', '', 10e3)
     this.load()
+  }
+
+  async onClickCreatePost (e) {
+    e.preventDefault()
+    e.stopPropagation()
+    this.isMenuOpen = false
+    try {
+      await ComposerPopup.create({
+        community: this.community
+      })
+      toast.create('Post published', '', 10e3)
+      emit(this, 'post-created')
+    } catch (e) {
+      // ignore
+      console.log(e)
+    }
   }
 
   async onDeletePost (e) {
