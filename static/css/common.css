@@ -25,8 +25,10 @@ header .mobile-bot {
   bottom: 0;
   left: 0;
   width: 100vw;
-  height: 55px;
-  height: calc(55px + env(safe-area-inset-bottom));
+  height: 56px;
+  height: calc(56px + env(safe-area-inset-bottom));
+  backdrop-filter: blur(4px);
+  background: rgba(255, 255, 255, 0.9);
 }
 
 nav {

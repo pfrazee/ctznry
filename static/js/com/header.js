@@ -107,7 +107,7 @@ export class Header extends LitElement {
           ` : ''}
           ${this.renderSessionCtrls()}
         </div>
-        <div class="mobile-bot box-border flex bg-white border-t border-gray-300">
+        <div class="mobile-bot box-border flex">
           <a href="/" class="flex-1 text-center ${this.getMobileNavClass('/')}" @click=${this.onClickBotNavHome}>
             <span class="fas fa-fw navicon fa-home"></span>
           </a>
