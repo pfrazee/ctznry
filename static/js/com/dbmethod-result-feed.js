@@ -148,7 +148,7 @@ export class DbmethodResultFeed extends LitElement {
   render () {
     if (!this.results) {
       return html`
-        <div class="bg-gray-50 text-gray-500 py-44 text-center my-5">
+        <div class="bg-gray-100 text-gray-500 py-44 text-center my-5">
           <span class="spinner"></span>
         </div>
       `

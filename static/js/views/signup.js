@@ -46,7 +46,6 @@ class CtznSignup extends LitElement {
   async load () {
     document.title = `Sign up | CTZN`
     document.body.classList.add('no-pad')
-    document.body.classList.add('sm:bg-gray-50')
   }
 
   loadImg (url) {

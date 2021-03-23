@@ -412,6 +412,7 @@ class CtznUser extends LitElement {
   }
 
   renderCitizenRightSidebar () {
+    return '' // TODO
     const nSharedFollowers = 0 // TODOthis.followers?.myFollowed?.length || 0
     const nMemberships = this.memberships?.length
     return html`

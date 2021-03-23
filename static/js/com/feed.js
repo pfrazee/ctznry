@@ -215,7 +215,7 @@ export class Feed extends LitElement {
     if (!this.results) {
       return html`
         ${this.title ? html`<h2  class="results-header"><span>${this.title}</span></h2>` : ''}
-        <div class="bg-gray-50 text-gray-500 py-44 text-center my-5">
+        <div class="bg-gray-100 text-gray-500 py-44 text-center my-5">
           <span class="spinner"></span>
         </div>
       `
@@ -285,7 +285,7 @@ export class Feed extends LitElement {
       >
         <div class="pl-2 pt-2">
           <a class="block" href="/${post.author.userId}" title=${post.author.displayName}>
-            <img class="block object-cover rounded-md mt-1 w-10 h-10" src=${AVATAR_URL(post.author.userId)}>
+            <img class="block object-cover rounded mt-1 w-10 h-10" src=${AVATAR_URL(post.author.userId)}>
           </a>
         </div>
         <ctzn-post

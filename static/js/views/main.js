@@ -99,13 +99,12 @@ class CtznMainView extends LitElement {
     document.title = `CTZN`
     if (!session.isActive()) {
       document.body.classList.add('no-pad')
-      document.body.classList.add('bg-gray-50')
       return this.requestUpdate()
     }
     this.memberships = await session.ctzn.user.table('ctzn.network/community-membership').list()
     if (!this.suggestedCommunities) {
       this.suggestedCommunities = SUGGESTED_COMMUNITIES.filter(c => !this.memberships?.find(m => c.userId === m.value.community.userId))
-      this.suggestedCommunities = this.suggestedCommunities.sort(() => Math.random() - 0.5).slice(0, 5)
+      this.suggestedCommunities = this.suggestedCommunities.sort(() => Math.random() - 0.5).slice(0, 8)
     }
 
     if (this.querySelector('ctzn-feed')) {
@@ -227,7 +226,7 @@ class CtznMainView extends LitElement {
 
   renderRightSidebar () {
     return html`
-      <nav class="pl-1">
+      <nav class="pt-2 pr-4">
         ${''/*todo <section class="mb-4">
           <span class="fas fa-search"></span>
           ${!!this.searchQuery ? html`
@@ -235,29 +234,12 @@ class CtznMainView extends LitElement {
           ` : ''}
           <input @keyup=${this.onKeyupSearch} placeholder="Search" value=${this.searchQuery}>
         </section>*/}
-        <section class="pt-1 mb-8">
-          <h3 class="font-bold mb-2 text-gray-500 text-xs">My Communities</h3>
-          ${this.memberships?.length ? html`
-            <div class="mt-2">
-              ${repeat(this.memberships, membership => html`
-                <div>
-                  <a class="text-sm hover:pointer hover:underline" href="/${membership.value.community.userId}">${displayNames.render(membership.value.community.userId)}</a>
-                </div>
-              `)}
-            </div>
-          ` : html`
-            <div>
-              Join a community to get connected to more people!
-            </div>
-          `}
-        </section>
         ${this.suggestedCommunities?.length ? html`
           <section class="pt-1 mb-4">
-            <h3 class="font-bold mb-2 text-gray-500 text-xs">Suggested Communities</h3>
             ${repeat(this.suggestedCommunities, community => community.userId, community => {
               const hasJoined = this.memberships?.find(m => community.userId === m.value.community.userId)
               return html`
-                <div class="text-sm mb-3">
+                <div class="text-sm mb-4">
                   <div>
                     <a class="text-sm hover:pointer hover:underline" href="/${community.userId}" title=${community.displayName}>
                     ${community.displayName}
