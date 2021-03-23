@@ -2,6 +2,7 @@ import { LitElement, html } from '../../vendor/lit-element/lit-element.js'
 import { repeat } from '../../vendor/lit-element/lit-html/directives/repeat.js'
 import { AVATAR_URL } from '../lib/const.js'
 import * as session from '../lib/session.js'
+import * as displayNames from '../lib/display-names.js'
 import { emit } from '../lib/dom.js'
 
 export class MembersList extends LitElement {
@@ -49,15 +50,16 @@ export class MembersList extends LitElement {
         const userId = member.value.user.userId
         const [username, domain] = userId.split('@')
         return html`
-          <div class="flex items-center border-b border-gray-200 px-2 py-2">
+          <div class="flex items-center px-2 py-2 mb-1 bg-white sm:rounded">
             <a class="ml-1 mr-3" href="/${userId}" title=${userId}>
-              <img class="block rounded-full w-10 h-10 object-cover shadow-sm" src=${AVATAR_URL(userId)}>
+              <img class="block rounded-md w-10 h-10 object-cover shadow-sm" src=${AVATAR_URL(userId)}>
             </a>
             <div class="flex-1 min-w-0">
               <div class="truncate">
-                <a class="hover:underline" href="/${userId}" title=${userId}>
-                  <span class="font-bold">${username}</span><span class="text-gray-500">@${domain}</span>
+                <a class="font-medium sm:hover:underline" href="/${userId}" title=${userId}>
+                  ${displayNames.render(userId)}
                 </a>
+                <span class="hidden sm:inline text-sm text-gray-500">${domain}</span>
               </div>
               <div class="text-sm text-gray-500 font-medium">
                 <span class="mr-1">Joined ${(new Date(member.value.joinDate)).toLocaleDateString()}</span>

@@ -55,7 +55,7 @@ export class SimpleUserList extends LitElement {
         return html`
           <div class="flex items-center px-2 py-2 bg-white rounded ${i !== 0 ? 'mt-1' : ''}">
             <a class="ml-1 mr-3" href="/${userId}" title=${userId}>
-              <img class="block rounded-lg w-10 h-10 object-cover" src=${AVATAR_URL(userId)}>
+              <img class="block rounded-md w-10 h-10 object-cover" src=${AVATAR_URL(userId)}>
             </a>
             <div class="flex-1 min-w-0 truncate">
               <a class="font-medium sm:hover:underline" href="/${userId}" title=${userId}>
