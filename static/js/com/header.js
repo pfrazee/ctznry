@@ -123,8 +123,7 @@ export class Header extends LitElement {
                   @click=${this.onClickCreateCommunity}
                 >
                   <span
-                    class="w-8 py-1.5 text-center object-cover rounded-md mr-2 text-white"
-                    style="background: linear-gradient(45deg, #2663eb, #2e26eb)"
+                    class="w-8 py-1.5 text-center object-cover rounded-md mr-2 bg-gray-300 text-gray-600"
                   ><span class="fas fa-plus"></span></span>
                   <span class="truncate font-semibold text-gray-600">Create community</span>
                 </a>
@@ -133,8 +132,7 @@ export class Header extends LitElement {
                   href="/communities"
                 >
                   <span
-                    class="w-8 py-1.5 text-center object-cover rounded-md mr-2 text-white"
-                    style="background: linear-gradient(45deg, #2663eb, #2e26eb)"
+                    class="w-8 py-1.5 text-center object-cover rounded-md mr-2 bg-gray-300 text-gray-600"
                   ><span class="fas fa-users"></span></span>
                   <span class="truncate font-semibold text-gray-600">Browse</span>
                 </a>
