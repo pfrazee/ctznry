@@ -77,7 +77,7 @@ export class Thread extends LitElement {
       ).catch(onError) : undefined
     }
     await this.updateComplete
-    emit(this, 'load')
+    emit(this, 'load', {detail: {post: this.post}})
     console.log(this.post)
     console.log(this.thread)
     this.isLoading = false
@@ -102,22 +102,24 @@ export class Thread extends LitElement {
 
   render () {
     return html`
-      <div class="border-t border-b sm:border-l sm:border-r mb-1 border-gray-200 bg-white sm:rounded">
+      <div class="mb-1 bg-white sm:rounded-b">
         ${this.post ? html`
           <ctzn-post-expanded
             .post=${this.post}
             hover-bg-color=${this.subject.dbUrl === this.post?.url ? 'indigo-100' : 'gray-50'}
             noborders
             view-content-on-click
-            @delete-post=${this.onDeletePost}
-            @moderator-remove-post=${this.onModeratorRemovePost}
           ></ctzn-post-expanded>
         ` : html`
           <span class="spinner"></span>
         `}
       </div>
       ${this.post ? this.renderCommentBox() : ''}
-      ${this.thread ? this.renderReplies(this.thread) : ''}
+      ${this.thread?.length ? html`
+        <div class="bg-white sm:rounded px-1 py-2">
+          ${this.renderReplies(this.thread)}
+        </div>
+      ` : ''}
     `
   }
 
@@ -127,7 +129,7 @@ export class Thread extends LitElement {
         return ''
       }
       return html`
-        <div class="pl-3 py-2 border-l border-gray-200 mx-2 sm:mx-0">
+        <div class="pl-3 py-2 border-l border-gray-200">
           <div class="font-semibold text-gray-500">
             <span class="fas fa-fw fa-exclamation-circle"></span>
             Failed to load thread
@@ -142,7 +144,7 @@ export class Thread extends LitElement {
     }
     if (!replies?.length) return ''
     return html`
-      <div class="pl-3 border-l-2 border-gray-200 mx-2 sm:mx-0">
+      <div class="pl-3 border-l-2 border-gray-200">
         ${repeat(replies, r => r.url, reply => {
           const isSubject = this.subject.dbUrl === reply.url
           return html`
@@ -168,7 +170,7 @@ export class Thread extends LitElement {
     if (this.post?.value?.community) {
       if (!session.isInCommunity(this.post.value.community.userId)) {
         return html`
-          <div class="bg-white border border-gray-200 py-2 px-3 my-2 rounded mx-2 sm:mx-0">
+          <div class="bg-white py-2 px-3 mb-1 sm:rounded">
             <div class="italic text-gray-500 text-sm">
               Join <a href="/${this.post.value.community.userId}" class="hover:underline">${displayNames.render(this.post.value.community.userId)}</a> to reply.
             </div>
@@ -178,7 +180,7 @@ export class Thread extends LitElement {
     } else {
       if (!session.isFollowingMe(this.post?.author?.userId)) {
         return html`
-          <div class="bg-white border border-gray-200 py-2 px-3 my-2 rounded mx-2 sm:mx-0">
+          <div class="bg-white py-2 px-3 mb-1 sm:rounded">
             <div class="italic text-gray-500 text-sm">
               Only people followed by <a href="/${this.post.author.userId}" class="hover:underline">${this.post.author.displayName}</a> can reply.
             </div>
@@ -187,7 +189,7 @@ export class Thread extends LitElement {
       }
     }
     return html`
-      <div class="bg-white border border-gray-200 py-3 px-3 my-2 rounded mx-2 sm:mx-0">
+      <div class="bg-white py-3 px-3 mb-1 sm:rounded">
         ${this.isReplying ? html`
           <ctzn-comment-composer
             autofocus
@@ -223,35 +225,10 @@ export class Thread extends LitElement {
     this.isReplying = false
   }
 
-  async onDeletePost (e) {
-    try {
-      await session.ctzn.user.table('ctzn.network/post').delete(e.detail.post.key)
-      toast.create('Post deleted')
-      this.load()
-    } catch (e) {
-      console.log(e)
-      toast.create(e.toString(), 'error')
-    }
-  }
-
   async onDeleteComment (e) {
     try {
       await session.ctzn.user.table('ctzn.network/comment').delete(e.detail.comment.key)
       toast.create('Comment deleted')
-      this.load()
-    } catch (e) {
-      console.log(e)
-      toast.create(e.toString(), 'error')
-    }
-  }
-
-  async onModeratorRemovePost (e) {
-    try {
-      const post = e.detail.post
-      await session.ctzn.db(post.value.community.userId).method(
-        'ctzn.network/community-remove-content-method',
-        {contentUrl: post.url}
-      )
       this.load()
     } catch (e) {
       console.log(e)

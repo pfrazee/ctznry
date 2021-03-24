@@ -1,11 +1,12 @@
 import { LitElement, html } from '../../vendor/lit-element/lit-element.js'
 import { repeat } from '../../vendor/lit-element/lit-html/directives/repeat.js'
 import { unsafeHTML } from '../../vendor/lit-element/lit-html/directives/unsafe-html.js'
-import css from '../../css/com/user-list.css.js'
-import { AVATAR_URL } from '../lib/const.js'
+import { AVATAR_URL, BLOB_URL } from '../lib/const.js'
 import * as session from '../lib/session.js'
 import { makeSafe, linkify } from '../lib/strings.js'
 import { emojify } from '../lib/emojify.js'
+import './button.js'
+import './img-fallbacks.js'
 
 export class UserList extends LitElement {
   static get properties () {
@@ -15,8 +16,8 @@ export class UserList extends LitElement {
     }
   }
 
-  static get styles () {
-    return css
+  createRenderRoot() {
+    return this // dont use shadow dom
   }
 
   constructor () {
@@ -64,7 +65,7 @@ export class UserList extends LitElement {
     }
     return html`
       <link rel="stylesheet" href="/css/fontawesome.css">
-      <div class="profiles">
+      <div>
         ${repeat(this.profiles, profile => {
           if (profile.error) {
             return html`
@@ -84,29 +85,49 @@ export class UserList extends LitElement {
           }
           const userId = (new URL(profile.url)).pathname.split('/')[1]
           return html`
-            <div class="profile">
-              <div class="header">
-                <a class="avatar" href="/${profile.userId}" title=${profile.value.displayName}>
-                  <img src=${AVATAR_URL(profile.userId)}>
-                </a>
-                ${this.renderProfileControls(profile)}
+            <div class="rounded relative">
+              <div
+                class="rounded-t"
+                style="height: 80px; background: linear-gradient(0deg, #3c4af6, #2663eb);"
+              >
+                <ctzn-img-fallbacks>
+                  <img
+                    slot="img1"
+                    class="rounded-t"
+                    style="display: block; object-fit: cover; width: 100%; height: 80px;"
+                    src=${BLOB_URL(userId, 'profile-banner')}
+                  >
+                  <div slot="img2"></div>
+                </ctzn-img-fallbacks>
               </div>
-              <div class="id">
-                <a class="display-name" href="/${profile.userId}" title=${profile.value.displayName}>
-                  ${unsafeHTML(emojify(makeSafe(profile.value.displayName)))}
+              <div class="absolute text-center w-full" style="top: 40px">
+                <a href="/${userId}" title=${profile.value.displayName}>
+                  <img
+                    class="border-2 border-white inline-block object-cover rounded-xl shadow-md bg-white"
+                    src=${AVATAR_URL(userId)}
+                    style="width: 60px; height: 60px"
+                  >
                 </a>
               </div>
-              <div class="id">
-                <a class="username" href="/${profile.userId}" title=${profile.value.displayName}>
-                  ${userId}
-                </a>
-              </div>
-              <div class="description">${unsafeHTML(linkify(emojify(makeSafe(profile.value.description))))}</div>
-              ${profile.isFollowingMe ? html`
-                <div>
-                  <span class="label">Follows you</span>
+              <div class="bg-white rounded-b px-3 pt-8 pb-2">
+                <div class="text-center">
+                  <div class="font-medium text-lg truncate leading-tight">
+                    <a href="/${profile.userId}" title=${profile.value.displayName}>
+                      ${unsafeHTML(emojify(makeSafe(profile.value.displayName)))}
+                    </a>
+                  </div>
+                  <div class="mb-3">
+                    <a class="font-medium text-gray-500 text-sm truncate" href="/${profile.userId}" title=${profile.value.displayName}>
+                      ${userId}
+                    </a>
+                  </div>
+                  <div class="text-sm text-gray-600 mb-4">${unsafeHTML(linkify(emojify(makeSafe(profile.value.description))))}</div>
                 </div>
-              ` : ''}
+                ${this.renderProfileControls(profile)}
+                ${profile.isFollowingMe ? html`
+                  <div class="text-center bg-gray-100 rounded text-sm text-gray-500 py-0.5">Follows you</div>
+                ` : ''}
+              </div>
             </div>
           `
         })}
@@ -117,15 +138,13 @@ export class UserList extends LitElement {
   renderProfileControls (profile) {
     if (!session.isActive()) return ''
     return html`
-      <div class="ctrls">
-        ${profile.userId === session?.info?.userId ? html`
-          <span class="label">This is you</span>
-        ` : profile.amIFollowing ? html`
-          <button @click=${e => this.onClickUnfollow(e, profile)}>Unfollow</button>
-        ` : html`
-          <button @click=${e => this.onClickFollow(e, profile)}>Follow</button>
-        `}
-      </div>
+      ${profile.userId === session?.info?.userId ? html`
+        <div class="text-center bg-gray-100 rounded text-sm text-gray-500 py-0.5">This is you</span>
+      ` : profile.amIFollowing ? html`
+        <ctzn-button btn-class="block w-full text-center mb-2 py-1" @click=${e => this.onClickUnfollow(e, profile)} label="Unfollow"></ctzn-button>
+      ` : html`
+        <ctzn-button primary btn-class="block w-full text-center mb-2 py-1" @click=${e => this.onClickFollow(e, profile)} label="Follow"></ctzn-button>
+      `}
     `
   }
 

@@ -1,7 +1,11 @@
 import { LitElement, html } from '../../vendor/lit-element/lit-element.js'
 import * as toast from '../com/toast.js'
+import * as contextMenu from '../com/context-menu.js'
 import { joinPath, ucfirst } from '../lib/strings.js'
 import * as session from '../lib/session.js'
+import * as displayNames from '../lib/display-names.js'
+import { writeToClipboard } from '../lib/clipboard.js'
+import { AVATAR_URL, FULL_POST_URL } from '../lib/const.js'
 import '../com/header.js'
 import '../com/button.js'
 import '../com/thread.js'
@@ -13,6 +17,7 @@ class CtznPostView extends LitElement {
       currentPath: {type: String, attribute: 'current-path'},
       authorProfile: {type: Object},
       subject: {type: Object},
+      post: {type: Object},
       loadError: {type: Object}
     }
   }
@@ -25,10 +30,22 @@ class CtznPostView extends LitElement {
     super()
     this.authorProfile = undefined
     this.subject = undefined
+    this.post = undefined
     this.loadError = undefined
     this.scrollToOnLoad = undefined
 
     this.load()
+  }
+
+  get communityUserId () {
+    return this.post?.value?.community?.userId
+  }
+
+  get isMyPost () {
+    if (!session.isActive() || !this.post?.author.userId) {
+      return false
+    }
+    return session.info?.userId === this.post?.author.userId
   }
 
   async load () {
@@ -37,6 +54,7 @@ class CtznPostView extends LitElement {
     let [userId, schemaDomain, schemaName, key] = pathname.split('/').filter(Boolean)
 
     try {
+      this.post = undefined
       this.authorProfile = await session.ctzn.getProfile(userId)
       this.subject = {
         authorId: userId,
@@ -65,13 +83,49 @@ class CtznPostView extends LitElement {
   render () {
     return html`
       <ctzn-header></ctzn-header>
-      ${this.renderCurrentView()}
+      <div>
+        ${this.renderCurrentView()}
+      </div>
+    `
+  }
+
+  renderHeader () {
+    const spaceUserId = this.communityUserId || this.authorProfile?.userId
+    return html`
+      <div
+        class="flex items-center justify-between sticky top-0 z-10 mb-0.5 px-4 py-3"
+        style="
+          backdrop-filter: blur(4px);
+          -webkit-backdrop-filter: blur(4px);
+          background: rgba(255, 255, 255, 0.9);
+        "
+      >
+        <span>
+          <a @click=${this.onClickBack}>
+            <span class="fas fa-arrow-left cursor-pointer sm:hover:text-gray-700 text-xl text-gray-600"></span>
+          </a>
+        </span>
+        <a class="flex items-center font-medium truncate mx-3" href="/${spaceUserId}" title=${spaceUserId}>
+          ${this.post ? html`
+            <img
+              class="w-6 h-6 rounded object-cover mr-2"
+              src=${AVATAR_URL(spaceUserId)}
+            >
+            ${displayNames.render(spaceUserId)}
+          ` : ''}
+        </a>
+        <span>
+          <a @click=${this.onClickMenu}>
+            <span class="fas fa-ellipsis-h cursor-pointer sm:hover:text-gray-700 text-xl text-gray-600"></span>
+          </a>
+        </span>
+      </div>
     `
   }
 
   renderRightSidebar () {
     return html`
-      <nav>
+      <nav class="pr-3 pt-2">
         <ctzn-user-list cols="1" .ids=${[this.authorProfile.userId]}></ctzn-user-list>
       </nav>
     `
@@ -99,21 +153,20 @@ class CtznPostView extends LitElement {
 
   renderLoading () {
     return html`
-      <div class="max-w-4xl mx-auto">
+      <main>
+        ${this.renderHeader()}
         <div class="py-32 text-center text-gray-400">
           <span class="spinner h-7 w-7"></span>
         </div>
-      </div>
+      </main>
     `
   }
 
   renderThread () {
     return html`
       <main>
-        <div class="py-2 min-h-screen bg-white sm:bg-transparent">
-          <a @click=${this.onClickBack}>
-            <span class="fas fa-arrow-left cursor-pointer fa-arrow-left fas mb-2 ml-3 sm:hover:text-gray-700 text-2xl text-gray-600"></span>
-          </a>
+        ${this.renderHeader()}
+        <div class="min-h-screen sm:bg-transparent">
           ${this.subject ? html`
             <ctzn-thread
               .subject=${this.subject}
@@ -138,17 +191,13 @@ class CtznPostView extends LitElement {
   // events
   // =
 
-  onLoadThread () {
+  onLoadThread (e) {
+    this.post = e.detail.post
     if (this.scrollToOnLoad) {
       window.scrollTo(0, this.scrollToOnLoad)
     } else {
       this.querySelector('ctzn-thread').scrollHighlightedPostIntoView()
     }
-  }
-
-  onPublishReply (e) {
-    toast.create('Reply published', '', 10e3)
-    this.load()
   }
 
   onClickBack (e) {
@@ -157,6 +206,92 @@ class CtznPostView extends LitElement {
       window.history.back()
     } else {
       window.location = '/'
+    }
+  }
+
+  onClickMenu (e) {
+    e.preventDefault()
+    e.stopPropagation()
+    const rect = e.currentTarget.getClientRects()[0]
+    let items = [
+      {
+        icon: 'fas fa-fw fa-link',
+        label: 'Copy link',
+        click: () => {
+          writeToClipboard(FULL_POST_URL(this.post))
+          toast.create('Copied to clipboard')
+        }
+      }
+    ]
+    if (this.isMyPost) {
+      items.push('-')
+      items.push({
+        icon: 'fas fa-fw fa-trash',
+        label: 'Delete post',
+        click: () => {
+          if (!confirm('Are you sure you want to delete this post?')) {
+            return
+          }
+          this.onDeletePost()
+        }
+      })
+    }
+    if (this.communityUserId && session.isInCommunity(this.communityUserId)) {
+      items.push(
+        session.ctzn.view(
+          'ctzn.network/community-user-permission-view',
+          this.communityUserId,
+          session.info.userId,
+          'ctzn.network/perm-community-remove-post'
+        ).then(perm => {
+          if (perm) {
+            return html`
+              <div class="dropdown-item" @click=${() => this.onClickModeratorRemove()}>
+                <i class="fas fa-times fa-fw"></i>
+                Remove post (moderator)
+              </div>
+            `
+          } else {
+            return ''
+          }
+        })
+      )
+    }
+    contextMenu.create({
+      x: rect.right,
+      y: rect.bottom,
+      right: true,
+      roomy: true,
+      noBorders: true,
+      style: `padding: 4px 0; font-size: 13px`,
+      items
+    })
+  }
+
+  async onDeletePost () {
+    try {
+      await session.ctzn.user.table('ctzn.network/post').delete(this.post.key)
+      toast.create('Post deleted')
+      this.load()
+    } catch (e) {
+      console.log(e)
+      toast.create(e.toString(), 'error')
+    }
+  }
+
+  async onClickModeratorRemove () {
+    if (!confirm('Are you sure you want to remove this post?')) {
+      return
+    }
+    try {
+      await session.ctzn.db(this.communityUserId).method(
+        'ctzn.network/community-remove-content-method',
+        {contentUrl: this.post.url}
+      )
+      this.load()
+    } catch (e) {
+      console.log(e)
+      toast.create(e.toString(), 'error')
     }
   }
 }

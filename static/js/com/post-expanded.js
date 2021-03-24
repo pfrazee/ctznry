@@ -2,16 +2,12 @@ import { LitElement, html } from '../../vendor/lit-element/lit-element.js'
 import { unsafeHTML } from '../../vendor/lit-element/lit-html/directives/unsafe-html.js'
 import { repeat } from '../../vendor/lit-element/lit-html/directives/repeat.js'
 import { ifDefined } from '../../vendor/lit-element/lit-html/directives/if-defined.js'
-import { AVATAR_URL, POST_URL, FULL_POST_URL, BLOB_URL, SUGGESTED_REACTIONS } from '../lib/const.js'
+import { AVATAR_URL, POST_URL, BLOB_URL, SUGGESTED_REACTIONS } from '../lib/const.js'
 import * as session from '../lib/session.js'
-import { emit } from '../lib/dom.js'
 import { makeSafe, linkify, pluralize } from '../lib/strings.js'
 import { emojify } from '../lib/emojify.js'
-import { writeToClipboard } from '../lib/clipboard.js'
 import { ReactionsListPopup } from './popups/reactions-list.js'
 import * as displayNames from '../lib/display-names.js'
-import * as contextMenu from './context-menu.js'
-import * as toast from './toast.js'
 
 export class PostExpanded extends LitElement {
   static get properties () {
@@ -125,41 +121,43 @@ export class PostExpanded extends LitElement {
     }
 
     return html`
-      <div class="px-4 py-3 min-w-0">
-        <div class="text-gray-500 text-sm pb-2">
-          <a class="inline-block w-4 h-4 relative mr-1" href="/${this.post.author.userId}" title=${this.post.author.displayName}>
-            <img
-              class="inline-block absolute w-4 h-4 object-cover rounded-full"
-              src=${AVATAR_URL(this.post.author.userId)}
-              style="left: 0; top: 3px"
-            >
-          </a>
-          <a class="hover:underline" href="/${this.post.author.userId}" title=${this.post.author.displayName}>
-            <span class="text-gray-700 font-bold">${displayNames.render(this.post.author.userId)}</span>
-          </a>
-          <a class="text-gray-500 hover:underline" href="${POST_URL(this.post)}" data-tooltip=${(new Date(this.post.value.createdAt)).toLocaleString()}>
-            ${relativeDate(this.post.value.createdAt)}
-          </a>
-          ${this.post.value.community ? html`
-            <span class="text-gray-600">
-              in
-              <a href="/${this.communityUserId}" class="whitespace-nowrap font-semibold hover:underline">
-                ${displayNames.render(this.communityUserId)}
-              </a>
-            </span>
-          ` : ''}
-          <a class="hover:bg-gray-200 px-1 ml-1 rounded" @click=${this.onClickMenu}>
-            <span class="fas fa-fw fa-ellipsis-h"></span>
-          </a>
+      <div class="flex items-center pt-2 px-3">
+        <a class="inline-block w-10 h-10 mr-2" href="/${this.post.author.userId}" title=${this.post.author.displayName}>
+          <img
+            class="inline-block w-10 h-10 object-cover rounded"
+            src=${AVATAR_URL(this.post.author.userId)}
+          >
+        </a>
+        <div class="flex-1">
+          <div>
+            <a class="hover:underline" href="/${this.post.author.userId}" title=${this.post.author.displayName}>
+              <span class="text-black font-bold">${displayNames.render(this.post.author.userId)}</span>
+            </a>
+          </div>
+          <div class="text-sm">
+            <a class="text-gray-600 hover:underline" href="${POST_URL(this.post)}" data-tooltip=${(new Date(this.post.value.createdAt)).toLocaleString()}>
+              ${relativeDate(this.post.value.createdAt)}
+            </a>
+            ${this.post.value.community ? html`
+              <span class="text-gray-700">
+                in
+                <a href="/${this.communityUserId}" class="whitespace-nowrap font-semibold hover:underline">
+                  ${displayNames.render(this.communityUserId)}
+                </a>
+              </span>
+            ` : ''}
+          </div>
         </div>
-        <div class="whitespace-pre-wrap break-words text-lg leading-tight font-medium text-gray-700 mb-1.5">${this.renderPostText()}</div>
+      </div>
+      <div class="px-3 py-3 min-w-0">
+        <div class="whitespace-pre-wrap break-words text-lg leading-tight font-medium text-black mb-1.5">${this.renderPostText()}</div>
         ${this.post.value.extendedText ? html`
-          <div class="whitespace-pre-wrap break-words leading-snug text-gray-600 my-2">${this.renderPostExtendedText()}</div>
+          <div class="whitespace-pre-wrap break-words leading-snug text-gray-800 my-2">${this.renderPostExtendedText()}</div>
         ` : ''}
         ${this.renderMedia()}
         ${this.noctrls ? '' : html`
           ${this.renderReactions()}
-          <div class="text-sm text-gray-600 px-1">
+          <div class="text-sm text-gray-600 px-1 pt-1">
             ${this.renderRepliesCtrl()}
             ${this.renderReactionsBtn()}
             ${this.renderReactionsSummary()}
@@ -351,72 +349,6 @@ export class PostExpanded extends LitElement {
     this.post.reactions[reaction] = (this.post.reactions[reaction] || []).concat([session.info.userId])
     this.requestUpdate()
     this.reloadSignals()
-  }
-
-  onClickMenu (e) {
-    e.preventDefault()
-    e.stopPropagation()
-    const rect = e.currentTarget.getClientRects()[0]
-    let items = [
-      {
-        icon: 'fas fa-fw fa-link',
-        label: 'Copy link',
-        click: () => {
-          writeToClipboard(FULL_POST_URL(this.post))
-          toast.create('Copied to clipboard')
-        }
-      }
-    ]
-    if (this.isMyPost) {
-      items.push('-')
-      items.push({
-        icon: 'fas fa-fw fa-trash',
-        label: 'Delete post',
-        click: () => {
-          if (!confirm('Are you sure you want to delete this post?')) {
-            return
-          }
-          emit(this, 'delete-post', {detail: {post: this.post}})
-        }
-      })
-    }
-    if (this.communityUserId && session.isInCommunity(this.communityUserId)) {
-      items.push(
-        session.ctzn.view(
-          'ctzn.network/community-user-permission-view',
-          this.communityUserId,
-          session.info.userId,
-          'ctzn.network/perm-community-remove-post'
-        ).then(perm => {
-          if (perm) {
-            return html`
-              <div class="dropdown-item" @click=${() => this.onClickModeratorRemove()}>
-                <i class="fas fa-times fa-fw"></i>
-                Remove post (moderator)
-              </div>
-            `
-          } else {
-            return ''
-          }
-        })
-      )
-    }
-    contextMenu.create({
-      x: rect.right,
-      y: rect.bottom,
-      right: true,
-      roomy: true,
-      noBorders: true,
-      style: `padding: 4px 0; font-size: 13px`,
-      items
-    })
-  }
-
-  onClickModeratorRemove () {
-    if (!confirm('Are you sure you want to remove this post?')) {
-      return
-    }
-    emit(this, 'moderator-remove-post', {detail: {post: this.post}})
   }
 
   onClickViewReactions (e) {
