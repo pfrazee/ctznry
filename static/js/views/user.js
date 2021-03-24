@@ -71,9 +71,14 @@ class CtznUser extends LitElement {
 
   updated (changedProperties) {
     if (changedProperties.get('currentPath')) {
-      const pathParts = (new URL(location)).pathname.split('/')
+      const urlp = new URL(location)
+      const pathParts = urlp.pathname.split('/')
       this.userId = pathParts[1]
       this.currentView = pathParts[2] || 'feed'
+      this.expandedSections = {}
+      if (urlp.hash.length > 1) {
+        this.expandedSections[urlp.hash.slice(1)] = true
+      }
       this.load()
     }
   }
@@ -127,7 +132,6 @@ class CtznUser extends LitElement {
   }
 
   async load () {
-    this.expandedSections = {}
     this.userProfile = await session.ctzn.getProfile(this.userId).catch(e => ({error: true, message: e.toString()}))
     if (this.userProfile.error) {
       document.title = `Not Found | CTZN`
@@ -171,6 +175,17 @@ class CtznUser extends LitElement {
 
     if (this.querySelector('ctzn-feed')) {
       this.querySelector('ctzn-feed').load()
+    }
+
+    let expanded = Object.keys(this.expandedSections)
+    if (expanded.length > 0 && this.querySelector(`#expandable-section-${expanded[0]}`)) {
+      const el = this.querySelector(`#expandable-section-${expanded[0]}`)
+      window.scrollTo({
+        top: el.getBoundingClientRect().top - 40,
+        behavior: 'smooth'
+      })
+    } else {
+      window.scrollTo({top: 0})
     }
   }
 
@@ -267,11 +282,11 @@ class CtznUser extends LitElement {
           </div>
           ${this.isCitizen ? html`
             <div class="bg-white text-center pb-4">
-              <a class="bg-gray-50 font-semibold px-2 py-1 rounded sm:hover:bg-gray-100 text-gray-500" href="/${this.userId}/about">
+              <a class="bg-gray-50 font-semibold px-2 py-1 rounded sm:hover:bg-gray-100 text-gray-500" href="/${this.userId}/about" @click=${e => this.onGotoExpandedView(e, 'followers')}>
                 <span class="fas fa-fw fa-user"></span>
                 ${nFollowers} ${pluralize(nFollowers, 'Follower')}
               </a>
-              <a class="ml-1 bg-gray-50 font-semibold px-2 py-1 rounded sm:hover:bg-gray-100 text-gray-500" href="/${this.userId}/about">
+              <a class="ml-1 bg-gray-50 font-semibold px-2 py-1 rounded sm:hover:bg-gray-100 text-gray-500" href="/${this.userId}/about" @click=${e => this.onGotoExpandedView(e, 'communities')}>
                 <span class="fas fa-fw fa-users"></span>
                 ${nCommunities} ${nCommunities === 1 ? 'Community' : 'Communities'}
               </a>
@@ -279,7 +294,7 @@ class CtznUser extends LitElement {
           ` : ''}
           ${this.isCommunity ? html`
             <div class="bg-white text-center pb-4">
-              <a class="bg-gray-50 font-bold px-2 py-1 rounded sm:hover:bg-gray-100 text-gray-500" href="/${this.userId}/about">
+              <a class="bg-gray-50 font-bold px-2 py-1 rounded sm:hover:bg-gray-100 text-gray-500" href="/${this.userId}/about" @click=${e => this.onGotoExpandedView(e, 'members')}>
                 <span class="fas fa-users"></span>
                 ${nMembers} ${pluralize(nMembers, 'Member')}
               </a>
@@ -519,6 +534,7 @@ class CtznUser extends LitElement {
     }
     const expandableSectionHeader = (id, label, count, extra = '') => html`
       <div
+        id="expandable-section-${id}"
         class="px-5 py-3 sm:rounded ${count ? 'cursor-pointer sm:hover:text-blue-600' : ''}"
         @click=${count ? e => onToggleExpandSection(id) : undefined}
       >
@@ -607,6 +623,7 @@ class CtznUser extends LitElement {
     }
     const expandableSectionHeader = (id, label, count, extra = '') => html`
       <div
+        id="expandable-section-${id}"
         class="px-5 py-3 sm:rounded ${count ? 'cursor-pointer sm:hover:text-blue-600' : ''}"
         @click=${count ? e => onToggleExpandSection(id) : undefined}
       >
@@ -715,6 +732,12 @@ class CtznUser extends LitElement {
       this.isEmpty = e.detail.isEmpty
     }
     this.requestUpdate()
+  }
+
+  async onGotoExpandedView (e, id) {
+    e.preventDefault()
+    emit(this, 'navigate-to', {detail: {url: `/${this.userId}/about#${id}`}})
+    this.expandedSections = {[id]: true}
   }
 
   onClickAvatar (e) {
