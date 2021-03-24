@@ -47,6 +47,10 @@ export class BasePopup extends LitElement {
     return '450px'
   }
 
+  get bodyClass () {
+    return 'px-4 pt-4 lg:pb-4 pb-24'
+  }
+
   // management
   //
 
@@ -104,7 +108,7 @@ export class BasePopup extends LitElement {
               <span class="font-semibold">${this.renderTitle()}</span>
             </div>
           `}
-          <div class="px-4 pt-4 lg:pb-4 pb-24">
+          <div class="${this.bodyClass}">
             ${this.renderBody()}
           </div>
         </div>

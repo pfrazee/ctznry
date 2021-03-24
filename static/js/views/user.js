@@ -4,6 +4,7 @@ import { unsafeHTML } from '../../vendor/lit-element/lit-html/directives/unsafe-
 import { EditProfilePopup } from '../com/popups/edit-profile.js'
 import { ComposerPopup } from '../com/popups/composer.js'
 import { EditRolePopup } from '../com/popups/edit-role.js'
+import { ViewMediaPopup } from '../com/popups/view-media.js'
 import { BanPopup } from '../com/popups/ban.js'
 import { ManageBansPopup } from '../com/popups/manage-bans.js'
 import * as contextMenu from '../com/context-menu.js'
@@ -243,6 +244,7 @@ class CtznUser extends LitElement {
                 class="border-4 border-white inline-block object-cover rounded-3xl shadow-md bg-white"
                 src=${AVATAR_URL(this.userId)}
                 style="width: 130px; height: 130px"
+                @click=${this.onClickAvatar}
               >
             </a>
           </div>
@@ -713,6 +715,11 @@ class CtznUser extends LitElement {
       this.isEmpty = e.detail.isEmpty
     }
     this.requestUpdate()
+  }
+
+  onClickAvatar (e) {
+    e.preventDefault()
+    ViewMediaPopup.create({url: AVATAR_URL(this.userId)})
   }
 
   async onClickEditProfile (e) {
