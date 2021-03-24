@@ -87,13 +87,13 @@ export class UserList extends LitElement {
           return html`
             <div class="rounded relative">
               <div
-                class="rounded-t"
+                class="rounded"
                 style="height: 80px; background: linear-gradient(0deg, #3c4af6, #2663eb);"
               >
                 <ctzn-img-fallbacks>
                   <img
                     slot="img1"
-                    class="rounded-t"
+                    class="rounded"
                     style="display: block; object-fit: cover; width: 100%; height: 80px;"
                     src=${BLOB_URL(userId, 'profile-banner')}
                   >
@@ -109,7 +109,7 @@ export class UserList extends LitElement {
                   >
                 </a>
               </div>
-              <div class="bg-white rounded-b px-3 pt-8 pb-2">
+              <div class="pt-8 pb-2">
                 <div class="text-center">
                   <div class="font-medium text-lg truncate leading-tight">
                     <a href="/${profile.userId}" title=${profile.value.displayName}>
@@ -124,9 +124,6 @@ export class UserList extends LitElement {
                   <div class="text-sm text-gray-600 mb-4">${unsafeHTML(linkify(emojify(makeSafe(profile.value.description))))}</div>
                 </div>
                 ${this.renderProfileControls(profile)}
-                ${profile.isFollowingMe ? html`
-                  <div class="text-center bg-gray-100 rounded text-sm text-gray-500 py-0.5">Follows you</div>
-                ` : ''}
               </div>
             </div>
           `
@@ -139,11 +136,18 @@ export class UserList extends LitElement {
     if (!session.isActive()) return ''
     return html`
       ${profile.userId === session?.info?.userId ? html`
-        <div class="text-center bg-gray-100 rounded text-sm text-gray-500 py-0.5">This is you</span>
-      ` : profile.amIFollowing ? html`
-        <ctzn-button btn-class="block w-full text-center mb-2 py-1" @click=${e => this.onClickUnfollow(e, profile)} label="Unfollow"></ctzn-button>
+        <div class="text-center"><span class="bg-gray-200 rounded text-sm text-gray-500 py-0.5 px-2">This is you</span></div>
       ` : html`
-        <ctzn-button primary btn-class="block w-full text-center mb-2 py-1" @click=${e => this.onClickFollow(e, profile)} label="Follow"></ctzn-button>
+        <div class="text-center">
+          ${profile.amIFollowing ? html`
+            <ctzn-button transparent btn-class="rounded-full border border-gray-400 text-sm mb-2 py-1 shadow-none hover:bg-gray-200" @click=${e => this.onClickUnfollow(e, profile)} label="Unfollow"></ctzn-button>
+          ` : html`
+            <ctzn-button transparent btn-class="rounded-full border border-blue-500 text-blue-600 text-sm mb-2 py-1 shadow-none hover:bg-gray-200" @click=${e => this.onClickFollow(e, profile)} label="Follow"></ctzn-button>
+          `}
+          ${profile.isFollowingMe ? html`
+            <span class="text-sm text-gray-500 py-0.5 px-2">Follows you</span>
+          ` : ''}
+        </div>
       `}
     `
   }

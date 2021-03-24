@@ -125,7 +125,7 @@ class CtznPostView extends LitElement {
 
   renderRightSidebar () {
     return html`
-      <nav class="pr-3 pt-2">
+      <nav class="pr-2 pt-1.5">
         <ctzn-user-list cols="1" .ids=${[this.authorProfile.userId]}></ctzn-user-list>
       </nav>
     `
