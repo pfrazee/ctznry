@@ -204,7 +204,7 @@ export class NotificationsFeed extends LitElement {
     if (!this.results) {
       return html`
         ${this.title ? html`<h2  class="results-header"><span>${this.title}</span></h2>` : ''}
-        <div class="border border-t-0 border-gray-300 px-6 py-5 text-gray-500">
+        <div class="px-6 py-5 text-gray-500">
           <span class="spinner"></span>
         </div>
       `
@@ -215,10 +215,8 @@ export class NotificationsFeed extends LitElement {
     return html`
       <link rel="stylesheet" href="/css/fontawesome.css">
       ${this.title ? html`<h2  class="results-header"><span>${this.title}</span></h2>` : ''}
-      <div class="border border-gray-300 border-t-0">
-        ${this.renderResults()}
-        ${this.results?.length ? html`<div class="bottom-of-feed mb-10"></div>` : ''}
-      </div>
+      ${this.renderResults()}
+      ${this.results?.length ? html`<div class="bottom-of-feed mb-10"></div>` : ''}
     `
   }
 
@@ -250,7 +248,7 @@ export class NotificationsFeed extends LitElement {
     let blendedCreatedAt = Number(new Date(note.blendedCreatedAt))
     return html`
       <ctzn-notification
-        class="block border-b border-gray-300"
+        class="block bg-white mb-0.5 sm:rounded"
         style="content-visibility: auto; contain-intrinsic-size: 640px 120px;"
         .notification=${note}
         ?is-unread=${blendedCreatedAt > this.clearedAt}

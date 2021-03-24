@@ -64,18 +64,26 @@ class CtznNotifications extends LitElement {
     }
     return html`
       <main>
-        <div class="bg-white">
-          <div class="border border-gray-300 border-t-0 text-xl font-semibold px-4 py-2 sticky top-0 z-10 bg-white">
-            Notifications
-          </div>
-          <ctzn-notifications-feed
-            cleared-at=${this.notificationsClearedAt}
-            limit="50"
-            @load-state-updated=${this.onFeedLoadStateUpdated}
-            @publish-reply=${this.onPublishReply}
-          ></ctzn-notifications-feed>
-          ${this.isEmpty ? this.renderEmptyMessage() : ''}
+        <div
+          class="sticky top-0 z-10 mb-0.5 px-4 py-3 sm:rounded"
+          style="
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            background: rgba(255, 255, 255, 0.9);
+          "
+        >
+          <a @click=${this.onClickBack}>
+            <span class="fas fa-angle-left fa-fw cursor-pointer sm:hover:text-gray-700 text-xl text-gray-600"></span>
+          </a>
+          <span class="ml-2 font-medium text-lg">Notifications</span>
         </div>
+        <ctzn-notifications-feed
+          cleared-at=${this.notificationsClearedAt}
+          limit="50"
+          @load-state-updated=${this.onFeedLoadStateUpdated}
+          @publish-reply=${this.onPublishReply}
+        ></ctzn-notifications-feed>
+        ${this.isEmpty ? this.renderEmptyMessage() : ''}
       </main>
     `
   }
@@ -99,14 +107,13 @@ class CtznNotifications extends LitElement {
     this.requestUpdate()
   }
 
-  onKeyupSearch (e) {
-    if (e.code === 'Enter') {
-      window.location = `/search?q=${e.currentTarget.value.toLowerCase()}`
+  onClickBack (e) {
+    e.preventDefault()
+    if (window.history.length > 1) {
+      window.history.back()
+    } else {
+      window.location = '/'
     }
-  }
-
-  onClickClearSearch (e) {
-    window.location = '/'
   }
 
   onPublishReply (e) {

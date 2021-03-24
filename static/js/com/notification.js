@@ -135,8 +135,10 @@ export class Notification extends LitElement {
           ${action} ${target} &middot; ${relativeDate(note.blendedCreatedAt)}
         </div>
         ${schemaId === 'ctzn.network/comment' ? html`
-          <div class="border border-gray-300 mb-5 ml-14 mr-6 px-4 py-4 reply rounded-xl">
-            ${asyncReplace(this.renderReplyComment(replyCommentInfo))}
+          <div class="pb-5">
+            <div class="border border-gray-300 ml-14 mr-6 px-4 py-4 reply rounded-xl">
+              ${asyncReplace(this.renderReplyComment(replyCommentInfo))}
+            </div>
           </div>
         ` : schemaId === 'ctzn.network/reaction' ? html`
           ${this.renderReactions()}
