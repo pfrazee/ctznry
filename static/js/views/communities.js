@@ -100,11 +100,6 @@ class CtznCommunities extends LitElement {
         this.suggestedCommunities = SUGGESTED_COMMUNITIES.filter(c => !this.memberships?.find(m => c.userId === m.value.community.userId))
         this.suggestedCommunities = this.suggestedCommunities.sort(() => Math.random() - 0.5)
       }
-
-      for (let membership of this.memberships) {
-        membership.communityProfile = await session.ctzn.getProfile(membership.value.community.userId)
-        this.requestUpdate()
-      }
     } else {
       this.memberships = []
       this.suggestedCommunities = SUGGESTED_COMMUNITIES.sort(() => Math.random() - 0.5)
@@ -123,26 +118,33 @@ class CtznCommunities extends LitElement {
   renderCurrentView () {
     return html`
       <ctzn-header></ctzn-header>
-      <main>
-        <div class="pb-16">
-          ${session.isActive() ? html`
-            <div class="border border-gray-200 border-t-0 text-xl font-semibold px-4 py-2 sticky top-0 z-10 bg-white">
-              My Communities
+      <main class="pb-16">
+        ${session.isActive() ? html`
+          <div>
+            <div
+              class="sticky top-0 z-10 mb-0.5 px-4 py-3 sm:rounded"
+              style="
+                backdrop-filter: blur(4px);
+                -webkit-backdrop-filter: blur(4px);
+                background: rgba(255, 255, 255, 0.9);
+              "
+            >
+              <a @click=${this.onClickBack}>
+                <span class="fas fa-angle-left fa-fw cursor-pointer sm:hover:text-gray-700 text-xl text-gray-600"></span>
+              </a>
+              <span class="ml-2 font-medium text-lg">My Communities</span>
             </div>
-            <div class="bg-white mb-4">
+            <div class="mb-4">
               ${this.memberships?.length ? html`
                 ${repeat(this.memberships, membership => html`
                   <a
-                    class="flex border border-gray-200 border-t-0 px-4 py-4 hover:pointer hover:bg-gray-50"
+                    class="flex items-center bg-white mb-0.5 px-4 py-2 sm:rounded sm:hover:pointer sm:hover:bg-gray-50"
                     href="/${membership.value.community.userId}"
                     title="${membership.value.community.userId}"
                   >
-                    <img class="block rounded-full w-10 h-10 mr-4" src=${AVATAR_URL(membership.value.community.userId)}>
+                    <img class="block rounded-lg w-8 h-8 mr-4" src=${AVATAR_URL(membership.value.community.userId)}>
                     <span class="flex-1 min-w-0">
                       <span class="block font-medium">${displayNames.render(membership.value.community.userId)}</span>
-                      ${membership.communityProfile?.value?.description ? html`
-                        <div class="text-gray-600">${membership.communityProfile.value.description}</div>
-                      ` : ''}
                     </span>
                   </a>
                 `)}
@@ -154,14 +156,24 @@ class CtznCommunities extends LitElement {
             </div>
           ` : ''}
           ${this.suggestedCommunities?.length ? html`
-            <div class="border border-gray-200 text-xl font-semibold px-4 py-2 sticky top-0 z-10 bg-white">
-              Suggested Communities
+            <div
+              class="sticky top-0 z-10 mb-0.5 px-4 py-3 sm:rounded"
+              style="
+                backdrop-filter: blur(4px);
+                -webkit-backdrop-filter: blur(4px);
+                background: rgba(255, 255, 255, 0.9);
+              "
+            >
+              <a @click=${this.onClickBack}>
+                <span class="fas fa-angle-left fa-fw cursor-pointer sm:hover:text-gray-700 text-xl text-gray-600"></span>
+              </a>
+              <span class="ml-2 font-medium text-lg">Suggested Communities</span>
             </div>
             ${repeat(this.suggestedCommunities, community => community.userId, community => {
               const hasJoined = this.memberships?.find(m => community.userId === m.value.community.userId)
               return html`
-                <div class="flex bg-white border border-gray-200 border-t-0 px-4 py-3">
-                  <img class="block rounded-full w-10 h-10 mr-4" src=${AVATAR_URL(community.userId)}>
+                <div class="flex bg-white px-4 py-3 mb-0.5 sm:rounded">
+                  <img class="block rounded-lg w-10 h-10 mr-4" src=${AVATAR_URL(community.userId)}>
                   <div class="flex-1 min-w-0">
                     <div>
                       <a class="font-medium hover:pointer hover:underline" href="/${community.userId}" title=${community.displayName}>
@@ -210,6 +222,15 @@ class CtznCommunities extends LitElement {
     community.isJoining = false
     this.requestUpdate()
     this.load()
+  }
+
+  onClickBack (e) {
+    e.preventDefault()
+    if (window.history.length > 1) {
+      window.history.back()
+    } else {
+      window.location = '/'
+    }
   }
 }
 

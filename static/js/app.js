@@ -152,7 +152,7 @@ class CtznApp extends LitElement {
           <div class="text-lg text-gray-600 mb-4">No page exists at this URL.</div>
           <div class="text-lg text-gray-600">
             <a class="text-blue-600 hover:underline" href="/" title="Back to home">
-              <span class="fas fa-arrow-left fa-fw"></span> Home</div>
+              <span class="fas fa-angle-left fa-fw"></span> Home</div>
             </a>
           </div>
         </div>

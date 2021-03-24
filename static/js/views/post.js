@@ -102,7 +102,7 @@ class CtznPostView extends LitElement {
       >
         <span>
           <a @click=${this.onClickBack}>
-            <span class="fas fa-arrow-left cursor-pointer sm:hover:text-gray-700 text-xl text-gray-600"></span>
+            <span class="fas fa-angle-left cursor-pointer sm:hover:text-gray-700 text-xl text-gray-600"></span>
           </a>
         </span>
         <a class="flex items-center font-medium truncate mx-3" href="/${spaceUserId}" title=${spaceUserId}>
