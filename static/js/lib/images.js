@@ -44,6 +44,11 @@ export async function resizeImage (dataUrl, maxWidth, quality = 0.9) {
   return canvas.toDataURL('image/jpeg', quality)
 }
 
+export function parseDataUrl (url) {
+  const [prelude, base64buf] = url.split(',')
+  const mimeType = /data:([^\/]+\/[^;]+)/.exec(prelude)[1]
+  return {mimeType, base64buf}
+}
 
 export async function shrinkImage (dataUrl, factor = 0.9, mimeType = 'image/jpeg') {
   let canvas = await renderCanvas(dataUrl)

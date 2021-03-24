@@ -1,56 +1,27 @@
 import { html } from '../../../vendor/lit-element/lit-element.js'
 import { BasePopup } from './base.js'
+import { AVATAR_URL, BLOB_URL } from '../../lib/const.js'
 import '../button.js'
-
-const CANVAS_SIZE = 200
+import '../img-fallbacks.js'
 
 // exported api
 // =
 
-
 export class EditProfilePopup extends BasePopup {
-  constructor (userId, avatarUrl, profile) {
+  constructor (userId, profile) {
     super()
     this.userId = userId
     this.profile = profile
-    this.zoom = 1
-    this.avatarUrl = avatarUrl
     this.img = undefined
     this.uploadedAvatar = undefined
-  }
-
-  loadImg (url) {
-    this.zoom = 1
-    this.img = document.createElement('img')
-    this.img.src = url
-    this.img.onload = () => {
-      var smallest = (this.img.width < this.img.height) ? this.img.width : this.img.height
-      this.zoom = CANVAS_SIZE / smallest
-      this.updateCanvas()
-    }
-  }
-
-  async updateCanvas () {
-    this.avatarUrl = undefined
-    await this.requestUpdate()
-    var canvas = document.getElementById('avatar-canvas')
-    if (canvas) {
-      var ctx = canvas.getContext('2d')
-      ctx.globalCompositeOperation = 'source-over'
-      ctx.fillStyle = '#fff'
-      ctx.fillRect(0, 0, CANVAS_SIZE, CANVAS_SIZE)
-      ctx.save()
-      ctx.scale(this.zoom, this.zoom)
-      ctx.drawImage(this.img, 0, 0, this.img.width, this.img.height)
-      ctx.restore()
-    }
+    this.uploadedBanner = undefined
   }
 
   // management
   //
 
-  static async create (userId, avatarUrl, profile) {
-    return BasePopup.create(EditProfilePopup, userId, avatarUrl, profile)
+  static async create (userId, profile) {
+    return BasePopup.create(EditProfilePopup, userId, profile)
   }
 
   static destroy () {
@@ -67,35 +38,71 @@ export class EditProfilePopup extends BasePopup {
   renderBody () {
     return html`
       <form @submit=${this.onSubmit}>      
-        <div class="">
-          ${this.avatarUrl ? html`
-            <img class="block mx-auto my-4 w-48 h48 rounded-full cursor-pointer hover:opacity-50" src=${this.avatarUrl} @click=${this.onClickAvatar}>
-          ` : html`
-            <canvas class="block mx-auto my-4 w-48 h-48 rounded-full cursor-pointer hover:opacity-50" id="avatar-canvas" width=${CANVAS_SIZE} height=${CANVAS_SIZE} @click=${this.onClickAvatar}></canvas>
-          `}
-          <div class="text-center mb-4">
-            <ctzn-button tabindex="1" @click=${this.onClickAvatar} label="Change Avatar"></ctzn-button>
-            <input class="hidden" type="file" accept=".jpg,.jpeg,.png" @change=${this.onChooseAvatarFile}>
+        <div style="height: 190px">
+          <div style="height: 130px">
+            ${!this.uploadedBanner ? html`
+              <ctzn-img-fallbacks>
+                <img
+                  slot="img1"
+                  class="block rounded w-full object-cover cursor-pointer hover:opacity-50"
+                  style="height: 130px"
+                  src=${BLOB_URL(this.userId, 'profile-banner')} 
+                  @click=${this.onClickBanner}
+                >
+                <div
+                  slot="img2"
+                  class="block rounded cursor-pointer hover:opacity-50"
+                  style="height: 130px; background: linear-gradient(0deg, #3c4af6, #2663eb);"
+                  @click=${this.onClickBanner}
+                ></div>
+              </ctzn-img-fallbacks>
+            ` : html`
+              <img
+                class="block rounded w-full object-cover cursor-pointer hover:opacity-50"
+                style="height: 130px"
+                src=${this.uploadedBanner} 
+                @click=${this.onClickBanner}
+              >
+            `}
           </div>
-
-          <label class="block font-semibold p-1" for="displayName-input">Display Name</label>
-          <input
-            autofocus
-            type="text"
-            id="displayName-input"
-            name="displayName"
-            value="${this.profile.displayName}"
-            class="block box-border w-full border border-gray-300 rounded p-3 mb-1"
-            placeholder="Anonymous"
-          />
-
-          <label class="block font-semibold p-1" for="description-input">Bio</label>
-          <textarea
-            id="description-input"
-            name="description"
-            class="block box-border w-full border border-gray-300 rounded p-3"
-          >${this.profile.description}</textarea>
+          <div
+            class="relative bg-white rounded-3xl shadow-md"
+            style="
+              top: -100px;
+              left: 50%;
+              transform: translateX(-50%);
+              width: 150px;
+              height: 150px
+            "
+          >
+            <img 
+              class="block mx-auto border-4 border-white rounded-3xl object-cover cursor-pointer hover:opacity-50"
+              style="width: 150px; height: 150px;"
+              src=${this.uploadedAvatar || AVATAR_URL(this.userId)}
+              @click=${this.onClickAvatar}
+            >
+          </div>
         </div>
+        <input id="banner-file-input" class="hidden" type="file" accept=".jpg,.jpeg,.png" @change=${this.onChooseBannerFile}>
+        <input id="avatar-file-input" class="hidden" type="file" accept=".jpg,.jpeg,.png" @change=${this.onChooseAvatarFile}>
+
+        <label class="block font-semibold p-1" for="displayName-input">Display Name</label>
+        <input
+          autofocus
+          type="text"
+          id="displayName-input"
+          name="displayName"
+          value="${this.profile.displayName}"
+          class="block box-border w-full border border-gray-300 rounded p-3 mb-1"
+          placeholder="Anonymous"
+        />
+
+        <label class="block font-semibold p-1" for="description-input">Bio</label>
+        <textarea
+          id="description-input"
+          name="description"
+          class="block box-border w-full border border-gray-300 rounded p-3"
+        >${this.profile.description}</textarea>
 
         <div class="flex justify-between mt-4">
           <ctzn-button @click=${this.onReject} tabindex="3" label="Cancel"></ctzn-button>
@@ -113,9 +120,25 @@ export class EditProfilePopup extends BasePopup {
   // events
   // =
 
-  async onClickAvatar (e) {
+  onClickBanner (e) {
     e.preventDefault()
-    this.querySelector('input[type="file"]').click()
+    this.querySelector('#banner-file-input').click()
+  }
+
+  onChooseBannerFile (e) {
+    var file = e.currentTarget.files[0]
+    if (!file) return
+    var fr = new FileReader()
+    fr.onload = () => {
+      this.uploadedBanner = fr.result
+      this.requestUpdate()
+    }
+    fr.readAsDataURL(file)
+  }
+
+  onClickAvatar (e) {
+    e.preventDefault()
+    this.querySelector('#avatar-file-input').click()
   }
 
   onChooseAvatarFile (e) {
@@ -123,10 +146,8 @@ export class EditProfilePopup extends BasePopup {
     if (!file) return
     var fr = new FileReader()
     fr.onload = () => {
-      var ext = file.name.split('.').pop()
-      this.loadImg(fr.result)
-      var base64buf = fr.result.split(',').pop()
-      this.uploadedAvatar = {ext, base64buf}
+      this.uploadedAvatar = fr.result
+      this.requestUpdate()
     }
     fr.readAsDataURL(file)
   }
@@ -135,19 +156,14 @@ export class EditProfilePopup extends BasePopup {
     e.preventDefault()
     e.stopPropagation()
 
-    if (this.uploadedAvatar) {
-      let dataUrl = document.getElementById('avatar-canvas').toDataURL()
-      this.uploadedAvatar.ext = 'png'
-      this.uploadedAvatar.base64buf = dataUrl.split(',').pop()
-    }
-
     this.dispatchEvent(new CustomEvent('resolve', {
       detail: {
         profile: {
           displayName: e.target.displayName.value,
           description: e.target.description.value
         },
-        uploadedAvatar: this.uploadedAvatar
+        uploadedAvatar: this.uploadedAvatar,
+        uploadedBanner: this.uploadedBanner
       }
     }))
   }

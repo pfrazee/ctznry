@@ -8,14 +8,16 @@ import { BanPopup } from '../com/popups/ban.js'
 import { ManageBansPopup } from '../com/popups/manage-bans.js'
 import * as contextMenu from '../com/context-menu.js'
 import * as toast from '../com/toast.js'
-import { AVATAR_URL, PERM_DESCRIPTIONS } from '../lib/const.js'
+import { AVATAR_URL, BLOB_URL, PERM_DESCRIPTIONS } from '../lib/const.js'
 import * as session from '../lib/session.js'
 import * as displayNames from '../lib/display-names.js'
 import { pluralize, makeSafe, linkify } from '../lib/strings.js'
+import * as images from '../lib/images.js'
 import { emit } from '../lib/dom.js'
 import { emojify } from '../lib/emojify.js'
 import '../com/header.js'
 import '../com/button.js'
+import '../com/img-fallbacks.js'
 import '../com/feed.js'
 import '../com/simple-user-list.js'
 import '../com/members-list.js'
@@ -224,12 +226,21 @@ class CtznUser extends LitElement {
           </div>
           <div
             class="sm:mt-1 sm:rounded-t"
-            style="height: 200px; background: linear-gradient(0deg, #3c4af6, #2663eb)"
-          ></div>
+            style="height: 200px; background: linear-gradient(0deg, #3c4af6, #2663eb);"
+          >
+            <ctzn-img-fallbacks>
+              <img
+                slot="img1"
+                style="display: block; object-fit: cover; width: 100%; height: 200px;"
+                src=${BLOB_URL(this.userId, 'profile-banner')}
+              >
+              <div slot="img2"></div>
+            </ctzn-img-fallbacks>
+          </div>
           <div class="absolute text-center w-full" style="top: 130px">
             <a href="/${this.userId}" title=${this.userProfile?.value.displayName}>
               <img
-                class="border-4 border-white inline-block object-cover rounded-3xl shadow-md"
+                class="border-4 border-white inline-block object-cover rounded-3xl shadow-md bg-white"
                 src=${AVATAR_URL(this.userId)}
                 style="width: 130px; height: 130px"
               >
@@ -466,7 +477,7 @@ class CtznUser extends LitElement {
             ?canManageItemClasses=${this.hasPermission('ctzn.network/perm-manage-item-classes')}
             ?canCreateItem=${this.hasPermission('ctzn.network/perm-create-item')}
             ?canTransferUnownedItem=${this.hasPermission('ctzn.network/perm-transfer-unowned-item')}
-          ></ctzn-items-list
+          ></ctzn-items-list>
         </div>
       `
     } else if (this.currentView === 'activity') {
@@ -705,7 +716,31 @@ class CtznUser extends LitElement {
   }
 
   async onClickEditProfile (e) {
-    let newProfile = await EditProfilePopup.create(this.userId, AVATAR_URL(this.userId), this.userProfile.value)
+    const uploadBlob = async (blobName, dataUrl) => {
+      let {base64buf, mimeType} = images.parseDataUrl(dataUrl)
+      let res, lastError
+      for (let i = 1; i < 6; i++) {
+        try {
+          if (blobName) {
+            res = await session.ctzn.blob.update(blobName, base64buf)
+          } else {
+            res = await session.ctzn.blob.create(base64buf)
+          }
+        } catch (e) {
+          lastError = e
+          let shrunkDataUrl = await images.shrinkImage(dataUrl, (10 - i) / 10, mimeType)
+          base64buf = images.parseDataUrl(shrunkDataUrl).base64buf
+        }
+      }
+      if (!res) {
+        console.error(lastError)
+        throw new Error(`Failed to upload ${blobName}: ${lastError.toString()}`)
+      }
+      return res
+    }
+
+    let newProfile = await EditProfilePopup.create(this.userId, this.userProfile.value)
+    
     try {
       let isPending = false
       if (this.isCitizen) {
@@ -721,9 +756,9 @@ class CtznUser extends LitElement {
       if (newProfile.uploadedAvatar) {
         toast.create('Uploading avatar...')
         if (this.isCitizen) {
-          await session.ctzn.blob.update('avatar', newProfile.uploadedAvatar.base64buf)
+          await uploadBlob('avatar', newProfile.uploadedAvatar)
         } else if (this.isCommunity) {
-          const blobRes = await session.ctzn.blob.create(newProfile.uploadedAvatar.base64buf)
+          const blobRes = await uploadBlob(undefined, newProfile.uploadedAvatar)
           let res = await session.ctzn.db(this.userId).method(
             'ctzn.network/put-avatar-method',
             {
@@ -734,12 +769,34 @@ class CtznUser extends LitElement {
           isPending = isPending || res.pending()
         }
       }
+      if (newProfile.uploadedBanner) {
+        toast.create('Uploading banner image...')
+        if (this.isCitizen) {
+          await uploadBlob('profile-banner', newProfile.uploadedBanner)
+        } else if (this.isCommunity) {
+          const blobRes = await uploadBlob(undefined, newProfile.uploadedBanner)
+          let res = await session.ctzn.db(this.userId).method(
+            'ctzn.network/put-blob-method',
+            {
+              source: {
+                userId: session.info.userId,
+                dbUrl: session.info.dbUrl,
+                blobName: blobRes.name
+              },
+              target: {
+                blobName: 'profile-banner'
+              }
+            }
+          )
+          isPending = isPending || res.pending()
+        }
+      }
       if (!isPending) {
         toast.create('Profile updated', 'success')
       }
       this.requestUpdate()
 
-      if (newProfile.uploadedAvatar) {
+      if (newProfile.uploadedAvatar || newProfile.uploadedBanner) {
         setTimeout(() => location.reload(), 1e3)
       }
     } catch (e) {
