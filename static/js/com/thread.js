@@ -1,5 +1,6 @@
 import { LitElement, html } from '../../vendor/lit-element/lit-element.js'
 import { repeat } from '../../vendor/lit-element/lit-html/directives/repeat.js'
+import { CommentComposerPopup } from './popups/comment-composer.js'
 import * as toast from './toast.js'
 import { emit } from '../lib/dom.js'
 import * as session from '../lib/session.js'
@@ -211,8 +212,14 @@ export class Thread extends LitElement {
   // events
   // =
 
-  onStartReply (e) {
-    this.isReplying = true
+  async onStartReply (e) {
+    if (matchMedia('(max-width: 1150px)').matches) {
+      await CommentComposerPopup.create({post: this.post})
+      toast.create('Reply published', '', 10e3)
+      this.load()
+    } else {
+      this.isReplying = true
+    }
   }
 
   onPublishReply (e) {

@@ -4,6 +4,7 @@ import { ifDefined } from '../../vendor/lit-element/lit-html/directives/if-defin
 import { repeat } from '../../vendor/lit-element/lit-html/directives/repeat.js'
 import { AVATAR_URL, COMMENT_URL, FULL_COMMENT_URL, SUGGESTED_REACTIONS } from '../lib/const.js'
 import { writeToClipboard } from '../lib/clipboard.js'
+import { CommentComposerPopup } from './popups/comment-composer.js'
 import * as session from '../lib/session.js'
 import { emit } from '../lib/dom.js'
 import { makeSafe, linkify, pluralize } from '../lib/strings.js'
@@ -239,9 +240,16 @@ export class Comment extends LitElement {
   // events
   // =
 
-  onClickReply (e) {
+  async onClickReply (e) {
     e.preventDefault()
-    this.isReplyOpen = true
+    if (matchMedia('(max-width: 1150px)').matches) {
+      await CommentComposerPopup.create({
+        comment: this.comment
+      })
+      emit(this, 'publish-reply')
+    } else {
+      this.isReplyOpen = true
+    }
   }
 
   onPublishReply (e) {

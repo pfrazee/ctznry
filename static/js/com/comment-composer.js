@@ -12,7 +12,8 @@ class CommentComposer extends LitElement {
       placeholder: {type: String},
       community: {type: Object},
       subject: {type: Object},
-      parent: {type: Object}
+      parent: {type: Object},
+      modalMode: {type: Boolean, attribute: 'modal-mode'}
     }
   }
 
@@ -24,6 +25,7 @@ class CommentComposer extends LitElement {
     this.placeholder = 'Write your comment'
     this.subject = undefined
     this.parent = undefined
+    this.modalMode = false
   }
 
   createRenderRoot() {
@@ -49,7 +51,10 @@ class CommentComposer extends LitElement {
         <div class="mb-2">
           <textarea
             id="text"
-            class="w-full box-border resize-none outline-none h-32 text-base"
+            class="
+              w-full box-border resize-none outline-none h-32 text-base
+              ${this.modalMode ? 'border border-gray-300 px-3 py-2 h-56 rounded' : 'h-32'}
+            "
             placeholder=${this.placeholder}
             @keyup=${this.onTextareaKeyup}
             @keydown=${this.onTextareaKeydown}
