@@ -23,6 +23,7 @@ import '../com/feed.js'
 import '../com/simple-user-list.js'
 import '../com/members-list.js'
 import '../com/items-list.js'
+import '../com/owned-items-list.js'
 import '../com/dbmethod-result-feed.js'
 
 class CtznUser extends LitElement {
@@ -247,6 +248,7 @@ class CtznUser extends LitElement {
             <ctzn-img-fallbacks>
               <img
                 slot="img1"
+                class="sm:rounded-t"
                 style="display: block; object-fit: cover; width: 100%; height: 200px;"
                 src=${BLOB_URL(this.userId, 'profile-banner')}
               >
@@ -326,6 +328,7 @@ class CtznUser extends LitElement {
           ` : ''}
           <div class="flex bg-white text-gray-400 sticky top-0 z-10 overflow-x-auto mb-1 sm:rounded-b">
             <a class="${navCls('feed')}" href="/${this.userId}">Feed</a>
+            <a class="${navCls('inventory')}" href="/${this.userId}/inventory">${this.isCommunity ? 'Items' : 'Inventory'}</a>
             <a class="${navCls('about')}" href="/${this.userId}/about">About</a>
           </div>
           ${this.renderCurrentView()}
@@ -485,18 +488,12 @@ class CtznUser extends LitElement {
     if (!this.userProfile) {
       return ''
     }
-    if (this.currentView === 'items') {
-      return html`
-        <div class="bg-white">
-          <ctzn-items-list
-            user-id=${this.userId}
-            .members=${this.members}
-            ?canManageItemClasses=${this.hasPermission('ctzn.network/perm-manage-item-classes')}
-            ?canCreateItem=${this.hasPermission('ctzn.network/perm-create-item')}
-            ?canTransferUnownedItem=${this.hasPermission('ctzn.network/perm-transfer-unowned-item')}
-          ></ctzn-items-list>
-        </div>
-      `
+    if (this.currentView === 'inventory') {
+      if (this.isCitizen) {
+        return this.renderCitizenInventory()
+      } else if (this.isCommunity) {
+        return this.renderCommunityInventory()
+      }
     } else if (this.currentView === 'activity') {
       return html`
         <div class="bg-white">
@@ -611,6 +608,26 @@ class CtznUser extends LitElement {
           </div>
         ` : ''}
       </div>
+    `
+  }
+
+  renderCommunityInventory () {
+    return html`
+      <ctzn-items-list
+        user-id=${this.userId}
+        .members=${this.members}
+        ?canManageItemClasses=${this.hasPermission('ctzn.network/perm-manage-item-classes')}
+        ?canCreateItem=${this.hasPermission('ctzn.network/perm-create-item')}
+        ?canTransferUnownedItem=${this.hasPermission('ctzn.network/perm-transfer-unowned-item')}
+      ></ctzn-items-list>
+    `
+  }
+
+  renderCitizenInventory () {
+    return html`
+      <ctzn-owned-items-list
+        user-id=${this.userId}
+      ></ctzn-owned-items-list>
     `
   }
 

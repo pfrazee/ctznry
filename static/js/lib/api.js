@@ -90,7 +90,7 @@ export class CtznAPI {
   async getThread (authorId, subjectUrl, communityId = undefined) {
     const domain = getDomain(communityId || authorId)
     if (session.isActive(domain)) {
-      return (await this.view('ctzn.network/thread-view', subjectUrl))?.comments
+      return (await this.view('ctzn.network/thread-view', subjectUrl))?.items
     }
     return (await httpGet(domain, `.view/ctzn.network/thread-view/${encodeURIComponent(subjectUrl)}`))?.comments
   }
@@ -106,6 +106,23 @@ export class CtznAPI {
     ])
     if (!mine && !theirs) throw new Error('Failed to fetch any follower information')
     return union(mine?.followers, theirs?.followers)
+  }
+  
+  async listOwnedItems (userId, opts = {}) {
+    const domain = getDomain(userId)
+    if (session.isActive(domain)) {
+      return (await this.view('ctzn.network/owned-items-view', userId, opts))?.items
+    }
+    return (await httpGet(domain, `.view/ctzn.network/owned-items-view/${encodeURIComponent(userId)}`, opts))?.items
+  }
+  
+  async getCommunityUserPermission (communityId, citizenId, permId) {
+    const domain = getDomain(communityId)
+    if (session.isActive(domain)) {
+      return (await this.view('ctzn.network/community-user-permission-view', communityId, citizenId, permId))
+    }
+    const e = encodeURIComponent
+    return (await httpGet(domain, `.view/ctzn.network/community-user-permission-view/${e(communityId)}/${e(citizenId)}/${e(permId)}`))
   }
 
   // utils

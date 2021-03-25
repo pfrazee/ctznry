@@ -98,8 +98,8 @@ export class BasePopup extends LitElement {
       >
         <div class="popup-inner bg-white sm:shadow sm:border border-gray-400 rounded overflow-hidden mx-auto sm:my-10" style="max-width: ${this.maxWidth}">
           ${this.shouldShowHead ? html`
-            <div class="flex justify-between box-border relative bg-gray-100 py-2 px-3 w-full border-b border-gray-400 rounded-t">
-              <span class="font-semibold">${this.renderTitle()}</span>
+            <div class="bg-gray-100 box-border flex justify-between px-3 py-2 relative rounded-t text-gray-700 w-full">
+              <span>${this.renderTitle()}</span>
               <span title="Close" @click=${this.onReject} class="close-btn cursor-pointer"><span class="fas fa-times"></span></span>
             </div>
           ` : html`
@@ -131,6 +131,11 @@ export class BasePopup extends LitElement {
     if (e.target.classList.contains('popup-wrapper') && this.shouldCloseOnOuterClick) {
       this.onReject()
     }
+  }
+
+  onResolve (e) {
+    if (e) e.preventDefault()
+    this.dispatchEvent(new CustomEvent('resolve'))
   }
 
   onReject (e) {

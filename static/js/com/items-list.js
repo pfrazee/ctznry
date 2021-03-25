@@ -1,10 +1,11 @@
 import { LitElement, html } from '../../vendor/lit-element/lit-element.js'
 import { repeat } from '../../vendor/lit-element/lit-html/directives/repeat.js'
 import { CreateItemPopup } from './popups/create-item.js'
-import { TransferItemPopup } from './popups/transfer-item.js'
+import { ViewItemPopup } from './popups/view-item.js'
 import { ManageItemClasses } from './popups/manage-item-classes.js'
 import * as session from '../lib/session.js'
 import * as displayNames from '../lib/display-names.js'
+import { AVATAR_URL } from '../lib/const.js'
 
 export class ItemsList extends LitElement {
   static get properties () {
@@ -62,38 +63,44 @@ export class ItemsList extends LitElement {
   render () {
     if (this.currentItemClass) {
       return html`
-        <div class="flex items-center border-b border-gray-200 text-xl font-semibold px-4 py-2 sticky top-0 z-10 bg-white">
-          <span
-            class="fas fa-fw fa-angle-left sm:cursor-pointer"
-            @click=${this.onClickBack}
-          ></span>
-          ${this.currentItemClass.value.id}
-          <span class="flex-1"></span>
+        <div
+          class="relative bg-white mb-1 py-5 px-2 sm:rounded text-center"
+        >
+          <div class="absolute text-2xl" style="top: 10px; left: 10px">
+            <span
+              class="fas fa-fw fa-angle-left sm:cursor-pointer"
+              @click=${this.onClickBack}
+            ></span>
+          </div>
+          <div class="text-center">
+            ${this.currentItemClass.value.id === 'paulbucks' ? html`
+              <span class="fas fa-fw fa-money-bill text-2xl mb-1 text-green-500"></span>
+            ` : this.currentItemClass.value.id === 'ratings' ? html`
+              <span class="fas fa-fw fa-chart-line text-2xl mb-1 text-red-500"></span>
+            ` : html`
+              <span class="fas fa-fw fa-crown text-2xl mb-1 text-yellow-500"></span>
+            `}
+          </div>
+          <div class="text-xl font-medium">${this.currentItemClass.value.id}</div>
+          <div class="text-gray-700">
+            ${this.currentItemClass.value.id === 'paulbucks' ? 'The most valuable fake currency in the world.' : ''}
+            ${this.currentItemClass.value.id === 'ctznpocalypse-survivor' ? 'The mark of a survivor.' : ''}
+            ${this.currentItemClass.value.id === 'ratings' ? 'Only go up.' : ''}
+          </div>
           ${this.canCreateItem ? html`
-            <ctzn-button
-              btn-class="text-base py-1 rounded-2xl"
-              label="Generate"
-              @click=${this.onClickGenerateItem}
-            ></ctzn-button>
-          ` : ''}
+            <div class="mt-1">
+              <ctzn-button
+                btn-class="text-base py-1 rounded-2xl"
+                label="Generate"
+                @click=${this.onClickGenerateItem}
+              ></ctzn-button>
+            </div>
+            ` : ''}
         </div>
         ${this.renderItems()}
       `
     }
-    return html`
-      <div class="flex items-center border-b border-gray-200 text-xl font-semibold px-4 py-2 sticky top-0 z-10 bg-white">
-        <span>Virtual Items</span>
-        <span class="flex-1"></span>
-        ${this.canManageItemClasses ? html`
-          <ctzn-button
-            btn-class="text-base py-1 rounded-2xl"
-            label="Manage"
-            @click=${this.onClickManageItemClasses}
-          ></ctzn-button>
-        ` : ''}
-      </div>
-      ${this.renderItemClasses()}
-    `
+    return this.renderItemClasses()
   }
 
   renderItemClasses () {
@@ -102,23 +109,54 @@ export class ItemsList extends LitElement {
     }
     return html`
       ${this.itemClasses.length === 0 ? html`
-        <div class="bg-gray-100 text-gray-500 py-44 text-center border-b border-gray-200">
-          <div class="far fa-gem text-6xl text-gray-300 mb-8"></div>
-          <div>This community has no virtual items!</div>
+        <div class="bg-gray-50 py-24 sm:py-44 text-center">
+          <div class="far fa-gem text-6xl text-gray-300 mb-6"></div>
+          <div class="mb-6 text-gray-500">This community has no virtual items!</div>
+          ${this.canManageItemClasses ? html`
+            <ctzn-button
+              btn-class="rounded-full"
+              label="Create an item class"
+              @click=${this.onClickManageItemClasses}
+            ></ctzn-button>
+          ` : ''}
         </div>
-      ` : ''}
-      ${repeat(this.itemClasses, itemClass => {
-        return html`
-          <div
-            class="flex items-center border-b border-gray-200 text-xl px-4 py-3 sm:hover:bg-gray-50 sm:cursor-pointer bg-white"
-            @click=${e => this.onClickViewItemClass(e, itemClass)}
-          >
-            <span>${itemClass.value.id}</span>
-            <span class="flex-1"></span>
-            <span class="fas fa-fw fa-angle-right"></span>
-          </div>
-        `
-      })}
+      ` : html`
+        <div class="grid grid-2col gap-1 mb-16">
+          ${repeat(this.itemClasses, itemClass => {
+            return html`
+              <div
+                class="bg-white flex flex-col justify-center px-6 py-4 sm:cursor-pointer sm:hover:bg-gray-50 sm:rounded sm:text-center"
+                @click=${e => this.onClickViewItemClass(e, itemClass)}
+              >
+                <div class="sm:text-center">
+                  ${itemClass.value.id === 'paulbucks' ? html`
+                    <span class="fas fa-fw fa-money-bill text-2xl mb-1 text-green-500"></span>
+                  ` : itemClass.value.id === 'ratings' ? html`
+                    <span class="fas fa-fw fa-chart-line text-2xl mb-1 text-red-500"></span>
+                  ` : html`
+                    <span class="fas fa-fw fa-crown text-2xl mb-1 text-yellow-500"></span>
+                  `}
+                </div>
+                <div class="text-xl font-medium">${itemClass.value.id}</div>
+                <div class="text-gray-700">
+                  ${itemClass.value.id === 'paulbucks' ? 'The most valuable fake currency in the world.' : ''}
+                  ${itemClass.value.id === 'ctznpocalypse-survivor' ? 'The mark of a survivor.' : ''}
+                  ${itemClass.value.id === 'ratings' ? 'Only go up.' : ''}
+                </div>
+              </div>
+            `
+          })}
+          ${this.canManageItemClasses ? html`
+            <div
+              class="bg-white flex flex-col justify-center px-6 py-4 sm:cursor-pointer sm:hover:bg-gray-50 sm:rounded sm:text-center"
+              @click=${this.onClickManageItemClasses}
+            >
+              <div class="text-xl font-medium">Manage</div>
+              <div class="text-gray-700">Admin tools</div>
+            </div>
+          ` : ''}
+        </div>
+      `}
     `
   }
 
@@ -128,41 +166,38 @@ export class ItemsList extends LitElement {
     }
     return html`
       ${this.currentItems.length === 0 ? html`
-        <div class="bg-gray-100 text-gray-500 py-44 text-center border-b border-gray-200">
+        <div class="bg-gray-100 text-gray-500 py-44 text-center">
           <div class="far fa-gem text-6xl text-gray-300 mb-8"></div>
           <div>This community has not issued any ${this.currentItemClass.value.id}!</div>
         </div>
       ` : html`
-        <div class="border-b border-gray-200 px-4 py-3 bg-white">
-          <span class="font-semibold">Owner</span>
-          <span class="font-semibold float-right">Quantity</span>
+        <div class="mb-16">
+          ${repeat(this.currentItems, item => item.key, item => {
+            return html`
+              <div
+                class="flex items-center px-3 py-3 bg-white mb-0.5 cursor-pointer sm:rounded sm:hover:bg-gray-50"
+                @click=${e => this.onClickViewItem(e, item)}
+              >
+                <img src=${AVATAR_URL(item.value.owner.userId)} class="block rounded w-8 h-8 mr-2">
+                <span class="flex-1 truncate">
+                  <span>${displayNames.render(item.value.owner.userId)}</span>
+                  <span class="hidden text-gray-500 sm:inline">${item.value.owner.userId}</span>
+                </span>
+                <span class="pr-1">
+                  ${item.value.classId === 'paulbucks' ? html`
+                    <span class="fas fa-fw fa-money-bill mr-1 text-sm text-green-500"></span>
+                  ` : item.value.classId === 'ratings' ? html`
+                    <span class="fas fa-fw fa-chart-line mr-1 text-sm text-red-500"></span>
+                  ` : html`
+                    <span class="fas fa-fw fa-crown mr-1 text-sm text-yellow-500"></span>
+                  `}
+                  ${item.value.qty}
+                </span>
+              </div>
+            `
+          })}
         </div>
       `}
-      ${repeat(this.currentItems, item => item.key, item => {
-        return html`
-          <div class="border-b border-gray-200 px-4 py-3 bg-white" id=${item.key}>
-            <details>
-              <summary>
-                <a href="/${item.value.owner.userId}" title=${item.value.owner.userId}>
-                  ${displayNames.render(item.value.owner.userId)}
-                </a>
-                <span class="float-right">${item.value.qty}</span>
-              </summary>
-              <div class="mt-2 text-gray-600 text-xs">Details</div>
-              <div class="bg-gray-50 rounded p-2 text-sm text-gray-600 font-mono whitespace-pre overflow-x-auto">${JSON.stringify(item, null, 2)}</div>
-              ${this.canTransferUnownedItem || session.info?.userId === item.value.owner.userId ? html`
-                <div class="mt-2">
-                  <ctzn-button
-                    btn-class="text-base py-1 rounded-2xl"
-                    label="Transfer"
-                    @click=${e => this.onClickTransferItem(e, item)}
-                  ></ctzn-button>
-                </div>
-              ` : ''}
-            </details>
-          </div>
-        `
-      })}
     `
   }
 
@@ -194,8 +229,8 @@ export class ItemsList extends LitElement {
     this.load()
   }
 
-  async onClickTransferItem (e, item) {
-    await TransferItemPopup.create({
+  async onClickViewItem (e, item) {
+    await ViewItemPopup.create({
       communityId: this.userId,
       item: item,
       members: this.members
