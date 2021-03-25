@@ -90,7 +90,7 @@ export class CtznAPI {
   async getThread (authorId, subjectUrl, communityId = undefined) {
     const domain = getDomain(communityId || authorId)
     if (session.isActive(domain)) {
-      return (await this.view('ctzn.network/thread-view', subjectUrl))?.items
+      return (await this.view('ctzn.network/thread-view', subjectUrl))?.comments
     }
     return (await httpGet(domain, `.view/ctzn.network/thread-view/${encodeURIComponent(subjectUrl)}`))?.comments
   }
