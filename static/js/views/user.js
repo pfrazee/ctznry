@@ -85,7 +85,7 @@ class CtznUser extends LitElement {
   }
 
   get isMe () {
-    return session.info.userId === this.userId
+    return session.info?.userId === this.userId
   }
 
   get isCitizen () {
@@ -97,15 +97,15 @@ class CtznUser extends LitElement {
   }
 
   get amIFollowing () {
-    return !!this.followers?.find?.(id => id === session.info.userId)
+    return !!this.followers?.find?.(id => id === session.info?.userId)
   }
 
   get isFollowingMe () {
-    return !!this.following?.find?.(f => f.value.subject.userId === session.info.userId)
+    return !!this.following?.find?.(f => f.value.subject.userId === session.info?.userId)
   }
 
   get amIAMember () {
-    return !!this.members?.find?.(m => m.value.user.userId === session.info.userId)
+    return !!this.members?.find?.(m => m.value.user.userId === session.info?.userId)
   }
 
   get userUrl () {
