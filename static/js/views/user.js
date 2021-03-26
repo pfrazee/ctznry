@@ -24,6 +24,7 @@ import '../com/simple-user-list.js'
 import '../com/members-list.js'
 import '../com/items-list.js'
 import '../com/owned-items-list.js'
+import '../com/activity-feed.js'
 import '../com/dbmethod-result-feed.js'
 
 class CtznUser extends LitElement {
@@ -328,6 +329,7 @@ class CtznUser extends LitElement {
           ` : ''}
           <div class="flex bg-white text-gray-400 sticky top-0 z-10 overflow-x-auto mb-1 sm:rounded-b">
             <a class="${navCls('feed')}" href="/${this.userId}">Feed</a>
+            <a class="${navCls('activity')}" href="/${this.userId}/activity">Activity</a>
             <a class="${navCls('inventory')}" href="/${this.userId}/inventory">${this.isCommunity ? 'Items' : 'Inventory'}</a>
             <a class="${navCls('about')}" href="/${this.userId}/about">About</a>
           </div>
@@ -495,6 +497,13 @@ class CtznUser extends LitElement {
         return this.renderCommunityInventory()
       }
     } else if (this.currentView === 'activity') {
+      return html`
+        <ctzn-activity-feed
+          user-id=${this.userId}
+          dataview=${this.isCommunity ? 'ctzn.network/dbmethod-results-view' : 'ctzn.network/dbmethod-calls-view'}
+        ></ctzn-activity-feed>
+      `
+    } else if (this.currentView === 'audit-log') {
       return html`
         <div class="bg-white">
           <ctzn-dbmethod-result-feed
@@ -1018,8 +1027,7 @@ class CtznUser extends LitElement {
         })
         items.push('-')
       }
-      items.push({icon: 'far fa-fw fa-gem', label: 'Virtual items', click: () => setView('items')})
-      items.push({icon: 'fas fa-fw fa-stream', label: 'Activity log', click: () => setView('activity')})
+      items.push({label: 'Audit log', click: () => setView('audit-log')})
       items.push('-')
       items.push({label: 'Leave community', click: () => this.onClickLeave()})
     }

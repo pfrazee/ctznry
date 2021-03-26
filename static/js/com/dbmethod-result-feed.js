@@ -110,7 +110,7 @@ export class DbmethodResultFeed extends LitElement {
       return
     }
     let results = (await session.ctzn.view('ctzn.network/dbmethod-results-view', this.userId, {limit: 1, reverse: true}))?.results
-    this.hasNewItems = (results[0] && results[0].key !== this.results[0].key)
+    this.hasNewItems = (results[0] && results[0].key !== this.results[0]?.key)
   }
 
   async pageLoadScrollTo (y) {
