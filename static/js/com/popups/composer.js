@@ -17,6 +17,7 @@ export class ComposerPopup extends BasePopup {
   constructor (opts) {
     super()
     this.community = opts?.community
+    this.intent = opts?.intent
   }
 
   get shouldShowHead () {
@@ -29,6 +30,12 @@ export class ComposerPopup extends BasePopup {
 
   get maxWidth () {
     return '700px'
+  }
+
+  firstUpdated () {
+    if (this.intent === 'image') {
+      this.querySelector('ctzn-post-composer').triggerImageSelect()
+    }
   }
 
   // management

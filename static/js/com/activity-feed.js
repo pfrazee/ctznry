@@ -164,18 +164,24 @@ export class ActivityFeed extends LitElement {
   }
 
   async query ({more} = {more: false}) {
-    if (!this.userId || !this.dataview) return
+    if ((!this.userId || !this.dataview) && this.dataview !== 'ctzn.network/dbmethod-feed-view') {
+      return
+    }
 
     emit(this, 'load-state-updated')
     this.abortController = new AbortController()
     let entries = more ? (this.entries || []) : []
     let lt = more ? entries[entries?.length - 1]?.key : undefined
-    console.log(this.dataview)
-    const viewRes = await session.ctzn.view(this.dataview, this.userId, {limit: this.limit, reverse: true, lt})
+    
+    const viewRes = (this.dataview === 'ctzn.network/dbmethod-feed-view')
+      ? await session.ctzn.view(this.dataview, {limit: this.limit, lt})
+      : await session.ctzn.view(this.dataview, this.userId, {limit: this.limit, reverse: true, lt})
     if (viewRes.results) {
       entries = entries.concat(viewRes.results.map(resultToGeneric))
     } else if (viewRes.calls) {
       entries = entries.concat(viewRes.calls.map(entry => callToGeneric(this.userId, entry)))
+    } else if (viewRes.feed) {
+      entries = entries.concat(viewRes.feed.map(feedToGeneric))
     }
     console.log(entries)
     this.entries = entries
@@ -188,8 +194,10 @@ export class ActivityFeed extends LitElement {
     if (!this.entries) {
       return
     }
-    const viewRes = await session.ctzn.view(this.dataview, this.userId, {limit: 1, reverse: true})
-    const items = viewRes.calls || viewRes.results
+    const viewRes = (this.dataview === 'ctzn.network/dbmethod-feed-view')
+      ? await session.ctzn.view(this.dataview, {limit: 1})
+      : await session.ctzn.view(this.dataview, this.userId, {limit: 1, reverse: true})
+    const items = viewRes.calls || viewRes.results || viewRes.feed
     this.hasNewEntries = (items?.[0] && items[0].key !== this.entries[0]?.key)
   }
 
@@ -428,6 +436,15 @@ function relativeDate (d) {
   return rtf.format(Math.floor(dayDiff / 365) * -1, 'year')
 }
 
+function feedToGeneric (feedEntry) {
+  return {
+    key: feedEntry.key,
+    authorId: feedEntry.caller.userId,
+    call: feedEntry.call.value,
+    result: feedEntry.result.value
+  }
+}
+
 function callToGeneric (authorId, callEntry) {
   return {
     key: callEntry.key,
@@ -438,7 +455,6 @@ function callToGeneric (authorId, callEntry) {
 }
 
 function resultToGeneric (resultEntry) {
-  console.log(resultEntry)
   return {
     key: resultEntry.key,
     authorId: resultEntry.value.call.authorId,

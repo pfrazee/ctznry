@@ -7,6 +7,8 @@ import '../com/header.js'
 import '../com/button.js'
 import '../com/login.js'
 import '../com/feed.js'
+import '../com/post-composer.js'
+import '../com/activity-feed.js'
 import '../com/img-fallbacks.js'
 
 const SUGGESTED_COMMUNITIES = [
@@ -75,6 +77,8 @@ const SUGGESTED_COMMUNITIES = [
 class CtznMainView extends LitElement {
   static get properties () {
     return {
+      currentPath: {type: String, attribute: 'current-path'},
+      currentView: {type: String},
       searchQuery: {type: String},
       isEmpty: {type: Boolean},
       memberships: {type: Array}
@@ -92,7 +96,18 @@ class CtznMainView extends LitElement {
     this.memberships = undefined
     this.suggestedCommunities = undefined
 
+    const pathParts = (new URL(location)).pathname.split('/')
+    this.currentView = pathParts[1] || 'feed'
+
     this.load()
+  }
+
+  updated (changedProperties) {
+    if (changedProperties.get('currentPath')) {
+      const pathParts = (new URL(location)).pathname.split('/')
+      this.currentView = pathParts[1] || 'feed'
+      this.load()
+    }
   }
 
   async load () {
@@ -189,34 +204,75 @@ class CtznMainView extends LitElement {
   }
 
   renderWithSession () {
+    const navCls = (id) => `
+      block text-center pt-2 pb-2.5 px-5 sm:px-7 font-semibold cursor-pointer hover:bg-gray-50 hover:text-blue-600
+      ${id === this.currentView ? 'border-b-2 border-blue-600 text-blue-600' : ''}
+    `.replace('\n', '')
+
     return html`
       <ctzn-header @post-created=${e => this.load()}></ctzn-header>
       <main>
         <div>
-          <div class="hidden lg:flex items-center justify-between mb-0.5 px-4 py-3 bg-white">
-            <span class="text-xl font-medium mr-2">Home</span>
-            <span>
-              <span class="hidden lg:inline">
-                <ctzn-button
-                  primary
-                  btn-class="rounded-full py-1"
-                  label="New post"
-                  @click=${this.onClickCreatePost}
-                ></ctzn-button>
-              </span>
-            </span>
+          <div
+            class="sticky top-0 z-10 flex mb-0.5 sm:mt-0.5 sm:rounded"
+            style="
+              backdrop-filter: blur(4px);
+              -webkit-backdrop-filter: blur(4px);
+              background: rgba(255, 255, 255, 0.9);
+            "
+          >
+            <a class="${navCls('feed')}" href="/">Feed</a>
+            <a class="${navCls('activity')}" href="/activity">Activity</a>
           </div>
-          ${this.isEmpty ? this.renderEmptyMessage() : ''}
-          <ctzn-feed
-            limit="50"
-            @load-state-updated=${this.onFeedLoadStateUpdated}
-            @publish-reply=${this.onPublishReply}
-            @delete-post=${this.onDeletePost}
-            @moderator-remove-post=${this.onModeratorRemovePost}
-          ></ctzn-feed>
+          ${this.currentView === 'feed' ? html`
+            ${this.renderMockComposer()}
+            ${this.isEmpty ? this.renderEmptyMessage() : ''}
+            <ctzn-feed
+              limit="50"
+              @load-state-updated=${this.onFeedLoadStateUpdated}
+              @publish-reply=${this.onPublishReply}
+              @delete-post=${this.onDeletePost}
+              @moderator-remove-post=${this.onModeratorRemovePost}
+            ></ctzn-feed>
+          ` : this.currentView === 'activity' ? html`
+            <ctzn-activity-feed
+              dataview="ctzn.network/dbmethod-feed-view"
+            ></ctzn-activity-feed>
+          ` : ''}
         </div>
         ${this.renderRightSidebar()}
       </main>
+    `
+  }
+
+  renderMockComposer () {
+    return html`
+      <div class="bg-white mb-0.5 px-3 py-3 sm:rounded" @click=${this.onClickCreatePost}>
+        <section class="mb-1">
+          <textarea
+            id="text"
+            class="py-2 px-3 w-full h-20 box-border resize-y text-lg border border-gray-300 rounded"
+            placeholder="What's new?"
+          ></textarea>
+        </section>
+
+        <div class="flex">
+          <div class="flex-1"></div>
+          <ctzn-button
+            transparent
+            btn-class="mr-2 text-sm px-2 py-1 sm:text-base sm:px-4 sm:py-2"
+            label="Add Image"
+            icon="far fa-image"
+            @click=${e => this.onClickCreatePost(e, {intent: 'image'})}
+          ></ctzn-button>
+          <ctzn-button
+            primary
+            btn-class="text-sm px-2 py-1 sm:text-base sm:px-4 sm:py-2"
+            disabled
+            label="Create Post"
+          ></ctzn-button>
+        </div>
+      </div>
     `
   }
 
@@ -307,13 +363,13 @@ class CtznMainView extends LitElement {
     this.load()
   }
 
-  async onClickCreatePost (e) {
+  async onClickCreatePost (e, opts = {}) {
     e.preventDefault()
     e.stopPropagation()
-    this.isMenuOpen = false
     try {
       await ComposerPopup.create({
-        community: this.community
+        community: this.community,
+        ...opts
       })
       toast.create('Post published', '', 10e3)
       this.load()

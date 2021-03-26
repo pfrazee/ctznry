@@ -79,6 +79,11 @@ class PostComposer extends LitElement {
     return 'text-gray-500'
   }
 
+  async triggerImageSelect () {
+    await this.requestUpdate()
+    this.querySelector('#image-file-input').click()
+  }
+
   // rendering
   // =
 

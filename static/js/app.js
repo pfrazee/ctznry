@@ -121,7 +121,8 @@ class CtznApp extends LitElement {
       case '/':
       case '/index':
       case '/index.html':
-        return html`<ctzn-main-view id="view"></ctzn-main-view>`
+      case '/activity':
+        return html`<ctzn-main-view id="view" current-path=${this.currentPath}></ctzn-main-view>`
       case '/forgot-password':
         return html`<ctzn-forgot-password-view id="view"></ctzn-forgot-password-view>`
       case '/notifications':
