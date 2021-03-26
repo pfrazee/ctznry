@@ -101,7 +101,7 @@ export class CtznAPI {
       return (await this.view('ctzn.network/followers-view', userId))?.followers
     }
     let [mine, theirs] = await Promise.all([
-      session.isActive() ? this.view('ctzn.network/followers-view', userId) : undefined,
+      session.isActive(domain) ? this.view('ctzn.network/followers-view', userId) : undefined,
       httpGet(domain, `/.view/ctzn.network/followers-view/${encodeURIComponent(userId)}`).catch(e => undefined)
     ])
     if (!mine && !theirs) throw new Error('Failed to fetch any follower information')
