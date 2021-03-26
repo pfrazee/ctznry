@@ -10,7 +10,6 @@ const CHECK_NEW_ITEMS_INTERVAL = 15e3
 
 const METHOD_COLORS = {
   'ctzn.network/create-item-method': 'green-700',
-
   'ctzn.network/transfer-item-method': 'blue-700',
   'ctzn.network/community-remove-member-method': 'red-700',
   'ctzn.network/community-put-ban-method': 'red-700',

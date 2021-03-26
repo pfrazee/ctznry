@@ -5,7 +5,18 @@ module.exports = {
       './static/**/*.js'
     ],
     options: {
-      safelist: ['bg-red-50', 'bg-pink-600', 'hover:bg-pink-700', 'border-pink-800']
+      safelist: [
+        'bg-red-50',
+        'bg-pink-600',
+        'hover:bg-pink-700',
+        'border-pink-800',
+        'text-green-700',
+        'text-blue-700',
+        'text-red-700',
+        'bg-green-50',
+        'bg-blue-50',
+        'bg-red-50'
+      ]
     }
   },
   darkMode: 'media',
