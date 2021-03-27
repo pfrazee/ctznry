@@ -248,28 +248,17 @@ class CtznMainView extends LitElement {
   renderMockComposer () {
     return html`
       <div class="bg-white mb-0.5 px-3 py-3 sm:rounded" @click=${this.onClickCreatePost}>
-        <section class="mb-1">
-          <textarea
-            id="text"
-            class="py-2 px-3 w-full h-20 box-border resize-y text-lg border border-gray-300 rounded"
-            placeholder="What's new?"
-          ></textarea>
-        </section>
 
-        <div class="flex">
-          <div class="flex-1"></div>
+        <div class="flex items-center">
+          <div
+            class="flex-1 mr-1 py-1 px-3 bg-gray-100 text-gray-600 text-base rounded cursor-text"
+          >What's new?</div>
           <ctzn-button
             transparent
-            btn-class="mr-2 text-sm px-2 py-1 sm:text-base sm:px-4 sm:py-2"
+            btn-class="text-sm px-2 py-1 sm:px-4"
             label="Add Image"
             icon="far fa-image"
             @click=${e => this.onClickCreatePost(e, {intent: 'image'})}
-          ></ctzn-button>
-          <ctzn-button
-            primary
-            btn-class="text-sm px-2 py-1 sm:text-base sm:px-4 sm:py-2"
-            disabled
-            label="Create Post"
           ></ctzn-button>
         </div>
       </div>
