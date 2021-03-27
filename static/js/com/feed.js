@@ -311,6 +311,9 @@ export class Feed extends LitElement {
   }
 
   onClickPost (e, post) {
+    for (let el of e.composedPath()) {
+      if (el.tagName === 'A' || el.tagName === 'CTZN-POST') return
+    }
     emit(this, 'view-thread', {detail: {subject: {dbUrl: post.url, authorId: post.author.userId}}})
   }
 }
