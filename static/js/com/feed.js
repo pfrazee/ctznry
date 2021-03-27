@@ -280,8 +280,9 @@ export class Feed extends LitElement {
   renderNormalResult (post) {
     return html`
       <div
-        class="grid grid-post px-1 py-0.5 bg-white mb-0.5"
+        class="grid grid-post px-1 py-0.5 bg-white mb-0.5 cursor-pointer"
         style="content-visibility: auto; contain-intrinsic-size: 640px 120px;"
+        @click=${e => this.onClickPost(e, post)}
       >
         <div class="pl-2 pt-2">
           <a class="block" href="/${post.author.userId}" title=${post.author.displayName}>
@@ -307,6 +308,10 @@ export class Feed extends LitElement {
     this.hasNewItems = false
     this.load()
     window.scrollTo(0, 0)
+  }
+
+  onClickPost (e, post) {
+    emit(this, 'view-thread', {detail: {subject: {dbUrl: post.url, authorId: post.author.userId}}})
   }
 }
 
