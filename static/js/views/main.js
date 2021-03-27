@@ -284,7 +284,7 @@ class CtznMainView extends LitElement {
 
   renderRightSidebar () {
     return html`
-      <nav class="pt-2 pr-4">
+      <nav class="pt-2 pr-2">
         ${''/*todo <section class="mb-4">
           <span class="fas fa-search"></span>
           ${!!this.searchQuery ? html`
@@ -293,11 +293,11 @@ class CtznMainView extends LitElement {
           <input @keyup=${this.onKeyupSearch} placeholder="Search" value=${this.searchQuery}>
         </section>*/}
         ${this.suggestedCommunities?.length ? html`
-          <section class="pt-1 mb-4">
+          <section>
             ${repeat(this.suggestedCommunities, community => community.userId, community => {
               const hasJoined = this.memberships?.find(m => community.userId === m.value.community.userId)
               return html`
-                <div class="text-sm mb-4">
+                <div class="text-sm bg-gray-50 mb-2 px-2 py-2 rounded-lg">
                   <div>
                     <a class="text-sm hover:pointer hover:underline" href="/${community.userId}" title=${community.displayName}>
                     ${community.displayName}

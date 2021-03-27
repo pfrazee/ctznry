@@ -109,7 +109,7 @@ export class UserList extends LitElement {
                   >
                 </a>
               </div>
-              <div class="pt-8 pb-2">
+              <div class="pt-8 pb-2 bg-white rounded-lg mt-1">
                 <div class="text-center">
                   <div class="font-medium text-lg truncate leading-tight">
                     <a href="/${profile.userId}" title=${profile.value.displayName}>

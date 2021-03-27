@@ -117,7 +117,7 @@ export class Thread extends LitElement {
       </div>
       ${this.post ? this.renderCommentBox() : ''}
       ${this.thread?.length ? html`
-        <div class="bg-white sm:rounded px-1 py-2">
+        <div class="bg-white sm:rounded px-1 py-2 sm:px-3 sm:py-3">
           ${this.renderReplies(this.thread)}
         </div>
       ` : ''}
@@ -190,7 +190,7 @@ export class Thread extends LitElement {
       }
     }
     return html`
-      <div class="bg-white py-3 px-3 mb-1 sm:rounded">
+      <div class="bg-white p-3 sm:p-4 mb-1 sm:rounded">
         ${this.isReplying ? html`
           <ctzn-comment-composer
             autofocus

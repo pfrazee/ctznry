@@ -9,20 +9,20 @@ import { emit } from '../lib/dom.js'
 const CHECK_NEW_ITEMS_INTERVAL = 15e3
 
 const METHOD_COLORS = {
-  'ctzn.network/create-item-method': 'green-700',
-  'ctzn.network/transfer-item-method': 'blue-700',
-  'ctzn.network/community-remove-member-method': 'red-700',
-  'ctzn.network/community-put-ban-method': 'red-700',
-  'ctzn.network/delete-item-class-method': 'red-700',
-  'ctzn.network/destroy-item-method': 'red-700',
+  'ctzn.network/create-item-method': 'green-900',
+  'ctzn.network/transfer-item-method': 'blue-900',
+  'ctzn.network/community-remove-member-method': 'red-900',
+  'ctzn.network/community-put-ban-method': 'red-900',
+  'ctzn.network/delete-item-class-method': 'red-900',
+  'ctzn.network/destroy-item-method': 'red-900',
 }
 const METHOD_BGS = {
-  'ctzn.network/create-item-method': 'green-50',
-  'ctzn.network/transfer-item-method': 'blue-50',
-  'ctzn.network/community-remove-member-method': 'red-50',
-  'ctzn.network/community-put-ban-method': 'red-50',
-  'ctzn.network/delete-item-class-method': 'red-50',
-  'ctzn.network/destroy-item-method': 'red-50',
+  'ctzn.network/create-item-method': 'green-400',
+  'ctzn.network/transfer-item-method': 'blue-400',
+  'ctzn.network/community-remove-member-method': 'red-400',
+  'ctzn.network/community-put-ban-method': 'red-400',
+  'ctzn.network/delete-item-class-method': 'red-400',
+  'ctzn.network/destroy-item-method': 'red-400',
 }
 const METHOD_ICONS = {
   'ctzn.network/community-delete-ban-method': html`
@@ -288,7 +288,7 @@ export class ActivityFeed extends LitElement {
     if (!renderMethod) return ''
     return html`
       <div class="flex items-center bg-white px-2 py-3 sm:py-2 sm:rounded mb-0.5">
-        <span class="block rounded bg-${METHOD_BGS[entry.call.method] || 'gray-50'} w-10 h-10 pt-1.5 mr-2">
+        <span class="block rounded bg-${METHOD_BGS[entry.call.method] || 'gray-200'} w-10 h-10 pt-1.5 mr-2">
           <span class="block relative rounded w-10 h-6 text-${METHOD_COLORS[entry.call.method] || 'gray-700'}">
             ${METHOD_ICONS[entry.call.method]}
           </span>

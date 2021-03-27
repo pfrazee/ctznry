@@ -49,7 +49,7 @@ export class Header extends LitElement {
 
   getMenuNavClass (str) {
     const additions = str === location.pathname ? 'text-blue-600' : ''
-    return `pl-3 pr-4 py-3 font-semibold rounded hover:bg-gray-200 ${additions}`
+    return `pl-3 pr-4 py-3 font-semibold rounded hover:bg-gray-100 ${additions}`
   }
 
   getMobileNavClass (str) {
@@ -61,7 +61,7 @@ export class Header extends LitElement {
     let info = session.getSavedInfo()
     return html`
       <header>
-        <div class="menu ${this.isMenuOpen ? 'open transition-enabled' : 'closed'} flex flex-col leading-none text-lg bg-gray-100">
+        <div class="menu ${this.isMenuOpen ? 'open transition-enabled' : 'closed'} flex flex-col leading-none text-lg bg-white">
           <div class="hidden lg:block px-3 pt-2.5 pb-1">
             <div class="font-bold text-3xl text-gray-800">
               CTZN
@@ -105,7 +105,7 @@ export class Header extends LitElement {
                 ${session.myCommunities?.length ? html`
                   ${repeat(session.myCommunities.slice(0, 7), community => html`
                     <a
-                      class="flex items-center pl-2 pr-4 py-1 text-sm rounded hover:bg-gray-200"
+                      class="flex items-center pl-2 pr-4 py-1 text-sm rounded hover:bg-gray-100"
                       href="/${community.userId}"
                     >
                       <img
@@ -121,7 +121,7 @@ export class Header extends LitElement {
                   </div>
                 `}
                 <a
-                  class="flex items-center pl-2 pr-4 py-1 text-sm rounded cursor-pointer hover:bg-gray-200"
+                  class="flex items-center pl-2 pr-4 py-1 text-sm rounded cursor-pointer hover:bg-gray-100"
                   @click=${this.onClickCreateCommunity}
                 >
                   <span
@@ -130,7 +130,7 @@ export class Header extends LitElement {
                   <span class="truncate font-semibold text-gray-600">Create community</span>
                 </a>
                 <a
-                  class="flex items-center pl-2 pr-4 py-1 text-sm rounded cursor-pointer hover:bg-gray-200"
+                  class="flex items-center pl-2 pr-4 py-1 text-sm rounded cursor-pointer hover:bg-gray-100"
                   href="/communities"
                 >
                   <span

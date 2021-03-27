@@ -121,7 +121,7 @@ export class PostExpanded extends LitElement {
     }
 
     return html`
-      <div class="flex items-center pt-2 px-3">
+      <div class="flex items-center pt-2 px-3 sm:pt-3 sm:px-4">
         <a class="inline-block w-10 h-10 mr-2" href="/${this.post.author.userId}" title=${this.post.author.displayName}>
           <img
             class="inline-block w-10 h-10 object-cover rounded"
@@ -149,7 +149,7 @@ export class PostExpanded extends LitElement {
           </div>
         </div>
       </div>
-      <div class="px-3 py-3 min-w-0">
+      <div class="px-3 py-3 sm:px-4 sm:py-4 min-w-0">
         <div class="whitespace-pre-wrap break-words text-lg leading-tight font-medium text-black mb-1.5">${this.renderPostText()}</div>
         ${this.post.value.extendedText ? html`
           <div class="whitespace-pre-wrap break-words leading-snug text-gray-800 my-2">${this.renderPostExtendedText()}</div>
