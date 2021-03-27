@@ -58,9 +58,9 @@ class PostComposer extends LitElement {
 
   get communityExplanation () {
     if (this.community) {
-      return `The post will show up in the community and anybody in the community can reply.`
+      return html`Only people in ${displayNames.render(this.community.userId)} can reply.`
     }
-    return `The post will be shown to people who follow you, and only people you follow can reply.`
+    return `Only people you follow can reply.`
   }
 
   firstUpdated () {
@@ -99,7 +99,7 @@ class PostComposer extends LitElement {
               Post to: ${this.communityIcon} ${this.communityName} <span class="fas fa-fw fa-caret-down"></span>
             </button>
           </div>
-          <div class="p-1 text-gray-500">
+          <div class="p-1 pt-1.5 text-gray-500">
             ${this.communityExplanation}
           </div>
         </section>
