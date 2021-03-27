@@ -228,61 +228,10 @@ class CtznUser extends LitElement {
         @post-created=${e => this.load()}
         .community=${this.isCommunity && this.amIAMember ? ({userId: this.userId, dbUrl: this.userProfile?.dbUrl}) : undefined}
       ></ctzn-header>
+      ${this.renderDesktopHeader()}
+      ${this.renderMobileHeader()}
       <main>
-        <div class="relative">
-          <div class="absolute" style="top: 8px; left: 10px">
-            <ctzn-button
-              btn-class="px-3 py-1 rounded-full text-base text-white"
-              href="/"
-              icon="fas fa-angle-left"
-              transparent
-              btn-style="background: rgba(0,0,0,.3); backdrop-filter: blur(5px) contrast(0.9); -webkit-backdrop-filter: blur(5px) contrast(0.9); "
-            ></ctzn-button>
-          </div>
-          <div class="absolute" style="top: 8px; right: 10px">
-            ${this.renderProfileControls()}
-          </div>
-          <div
-            class="sm:mt-1 sm:rounded-t"
-            style="height: 200px; background: linear-gradient(0deg, #3c4af6, #2663eb);"
-          >
-            <ctzn-img-fallbacks>
-              <img
-                slot="img1"
-                class="sm:rounded-t"
-                style="display: block; object-fit: cover; width: 100%; height: 200px;"
-                src=${BLOB_URL(this.userId, 'profile-banner')}
-              >
-              <div slot="img2"></div>
-            </ctzn-img-fallbacks>
-          </div>
-          <div class="absolute text-center w-full" style="top: 130px">
-            <a href="/${this.userId}" title=${this.userProfile?.value.displayName}>
-              <img
-                class="border-4 border-white inline-block object-cover rounded-3xl shadow-md bg-white"
-                src=${AVATAR_URL(this.userId)}
-                style="width: 130px; height: 130px"
-                @click=${this.onClickAvatar}
-              >
-            </a>
-          </div>
-          <div class="text-center pt-20 pb-4 px-4 bg-white">
-            <h2 class="text-3xl font-semibold">
-              <a
-                class="inline-block"
-                href="/${this.userId}"
-                title=${this.userProfile?.value.displayName}
-                style="max-width: 320px"
-              >
-                ${unsafeHTML(emojify(makeSafe(this.userProfile?.value.displayName)))}
-              </a>
-            </h2>
-            <h2 class="text-gray-500 font-semibold">
-              <a href="/${this.userId}" title="${this.userId}">
-                ${this.userId}
-              </a>
-            </h2>
-          </div>
+        <div>
           ${this.isCitizen ? html`
             <div class="bg-white text-center pb-4">
               <a class="bg-gray-50 font-semibold px-2 py-1 rounded sm:hover:bg-gray-100 text-gray-500" href="/${this.userId}/about" @click=${e => this.onGotoExpandedView(e, 'followers')}>
@@ -359,8 +308,135 @@ class CtznUser extends LitElement {
     `
   }
 
+  renderDesktopHeader () {
+    return html`
+      <main class="hidden sm:block" style="padding: 0">
+        <div class="relative">
+          <div class="absolute" style="top: 8px; left: 10px">
+            <ctzn-button
+              btn-class="px-3 py-1 rounded-full text-base text-white"
+              href="/"
+              icon="fas fa-angle-left"
+              transparent
+              btn-style="background: rgba(0,0,0,.5); backdrop-filter: blur(5px) contrast(0.9); -webkit-backdrop-filter: blur(5px) contrast(0.9); "
+            ></ctzn-button>
+          </div>
+          <div class="absolute" style="top: 8px; right: 10px">
+            ${this.renderProfileControls()}
+          </div>
+          <div
+            class="mt-1 rounded-2xl bg-blue-600"
+            style="height: 300px"
+          >
+            <ctzn-img-fallbacks id=${this.userId}>
+              <img
+                slot="img1"
+                class="rounded-2xl"
+                style="display: block; object-fit: cover; width: 100%; height: 300px;"
+                src=${BLOB_URL(this.userId, 'profile-banner')}
+              >
+              <div slot="img2"></div>
+            </ctzn-img-fallbacks>
+          </div>
+          <div class="absolute" style="top: 150px; left: 20px">
+            <a href="/${this.userId}" title=${this.userProfile?.value.displayName}>
+              <img
+                class="border-2 border-white inline-block object-cover rounded-3xl shadow-md bg-white"
+                src=${AVATAR_URL(this.userId)}
+                style="width: 130px; height: 130px"
+                @click=${this.onClickAvatar}
+              >
+            </a>
+          </div>
+        </div>
+      </main>
+      <main class="hidden sm:block rounded-t-2xl mt-2 bg-white px-2 py-4 text-center">
+        <h2
+          class="text-5xl font-semibold"
+        >
+          <a
+            class="inline-block"
+            href="/${this.userId}"
+            title=${this.userProfile?.value.displayName}
+          >
+            ${unsafeHTML(emojify(makeSafe(this.userProfile?.value.displayName)))}
+          </a>
+        </h2>
+        <h2
+          class="text-gray-600 font-semibold"
+        >
+          <a href="/${this.userId}" title="${this.userId}">
+            ${this.userId}
+          </a>
+        </h2>
+      </main>
+    `
+  }
+
+  renderMobileHeader () {
+    return html`
+      <main class="block sm:hidden" style="padding: 0">
+        <div class="relative">
+          <div class="absolute" style="top: 8px; left: 10px">
+            <ctzn-button
+              btn-class="px-3 py-1 rounded-full text-base text-white"
+              href="/"
+              icon="fas fa-angle-left"
+              transparent
+              btn-style="background: rgba(0,0,0,.5); backdrop-filter: blur(5px) contrast(0.9); -webkit-backdrop-filter: blur(5px) contrast(0.9); "
+            ></ctzn-button>
+          </div>
+          <div class="absolute" style="top: 8px; right: 10px">
+            ${this.renderProfileControls()}
+          </div>
+          <div
+            class="sm:mt-1 sm:rounded-t"
+            style="height: 200px; background: linear-gradient(0deg, #3c4af6, #2663eb);"
+          >
+            <ctzn-img-fallbacks>
+              <img
+                slot="img1"
+                class="sm:rounded-t"
+                style="display: block; object-fit: cover; width: 100%; height: 200px;"
+                src=${BLOB_URL(this.userId, 'profile-banner')}
+              >
+              <div slot="img2"></div>
+            </ctzn-img-fallbacks>
+          </div>
+          <div class="absolute text-center w-full" style="top: 130px">
+            <a href="/${this.userId}" title=${this.userProfile?.value.displayName}>
+              <img
+                class="border-4 border-white inline-block object-cover rounded-3xl shadow-md bg-white"
+                src=${AVATAR_URL(this.userId)}
+                style="width: 130px; height: 130px"
+                @click=${this.onClickAvatar}
+              >
+            </a>
+          </div>
+          <div class="text-center pt-20 pb-4 px-4 bg-white">
+            <h2 class="text-3xl font-semibold">
+              <a
+                class="inline-block"
+                href="/${this.userId}"
+                title=${this.userProfile?.value.displayName}
+                style="max-width: 320px"
+              >
+                ${unsafeHTML(emojify(makeSafe(this.userProfile?.value.displayName)))}
+              </a>
+            </h2>
+            <h2 class="text-gray-500 font-semibold">
+              <a href="/${this.userId}" title="${this.userId}">
+                ${this.userId}
+              </a>
+            </h2>
+          </div>
+        </div>
+      </main>
+    `
+  }
+
   renderProfileControls () {
-    const btnStyle = `background: rgba(0,0,0,.3); backdrop-filter: blur(5px) contrast(0.9); -webkit-backdrop-filter: blur(5px) contrast(0.9);`
+    const btnStyle = `background: rgba(0,0,0,.5); backdrop-filter: blur(5px) contrast(0.9); -webkit-backdrop-filter: blur(5px) contrast(0.9);`
     if (this.isCitizen) {
       return html`
         <div>

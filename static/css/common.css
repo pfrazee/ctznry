@@ -56,8 +56,14 @@ main {
   max-width: 640px;
 }
 
+main.wide {
+  margin: 0 250px;
+  max-width: 940px;
+}
+
 @media (max-width: 1150px) {
-  main {
+  main,
+  main.wide {
     margin: 0 auto;
     padding-bottom: 100px;
   }

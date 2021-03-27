@@ -13,6 +13,7 @@ Usage:
 export class ImgFallbacks extends LitElement {
   static get properties () {
     return {
+      id: {type: 'string'},
       currentImage: {type: Number}
     }
   }
@@ -20,6 +21,12 @@ export class ImgFallbacks extends LitElement {
   constructor () {
     super()
     this.currentImage = 1
+  }
+
+  updated (changedProperties) {
+    if (changedProperties.has('id')) {
+      this.currentImage = 1
+    }
   }
 
   render () {
