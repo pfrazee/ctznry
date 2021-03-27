@@ -107,7 +107,7 @@ class PostComposer extends LitElement {
         <section class="mb-3">
           <textarea
             id="text"
-            class="py-2 px-3 w-full h-20 box-border resize-y text-lg border border-gray-300 rounded"
+            class="py-2 px-3 w-full h-32 sm:h-20 box-border resize-y text-lg border border-gray-300 rounded"
             placeholder="What's new?"
             @keyup=${this.onTextareaKeyup}
             @keydown=${this.onTextareaKeydown}

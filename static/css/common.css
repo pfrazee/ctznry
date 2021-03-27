@@ -6,6 +6,15 @@ body.no-pad {
   padding: 0;
 }
 
+/* reset some styles */
+input[type="text"],
+input[type="password"],
+textarea {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
 header .menu {
   position: fixed;
   top: 0px;
