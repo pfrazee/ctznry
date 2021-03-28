@@ -109,45 +109,48 @@ export class Notification extends LitElement {
     }
     
     return html`
-      <link rel="stylesheet" href="/css/fontawesome.css">
-      <div class="cursor-pointer hover:bg-gray-50 ${this.isUnread ? 'unread' : ''}" @click=${this.onClickWrapper}>
-        <div class="flex items-center text-sm pt-4 px-4 pb-2">
-          <span class="${icon} text-2xl mr-4 ml-1 text-gray-400"></span>
-          <a href="/${note.author.userId}" title=${note.author.userId}>
-            <img class="w-8 h-8 rounded-full object-cover mr-2" src=${AVATAR_URL(note.author.userId)}>
-          </a>
-          ${otherAuthors?.length ? html`
-            ${repeat(otherAuthors.slice(0, 5), userId => html`
-              <a href="/${userId}" title=${userId}>
-                <img class="w-8 h-8 rounded-full object-cover mr-2" src=${AVATAR_URL(userId)}>
-              </a>
-            `)}
-            ${otherAuthors.length > 5 ? html`
-              <span class="font-semibold ml-1 text-base text-gray-500">+${otherAuthors.length - 5}</span>
+      <div class="flex cursor-pointer bg-white hover:bg-gray-50 ${this.isUnread ? 'rounded border border-blue-200' : ''}" @click=${this.onClickWrapper}>
+        <div class="w-12 text-center pt-4 rounded-l leading-9 ${this.isUnread ? 'bg-blue-50' : ''}">
+          <span class="${icon} text-2xl ${this.isUnread ? 'text-blue-600' : 'text-gray-400'}"></span>
+        </div>
+        <div class="flex-1">
+          <div class="flex items-center text-sm pt-4 px-3 pb-2">
+            <a href="/${note.author.userId}" title=${note.author.userId}>
+              <img class="w-8 h-8 rounded-full object-cover mr-2" src=${AVATAR_URL(note.author.userId)}>
+            </a>
+            ${otherAuthors?.length ? html`
+              ${repeat(otherAuthors.slice(0, 5), userId => html`
+                <a href="/${userId}" title=${userId}>
+                  <img class="w-8 h-8 rounded-full object-cover mr-2" src=${AVATAR_URL(userId)}>
+                </a>
+              `)}
+              ${otherAuthors.length > 5 ? html`
+                <span class="font-semibold ml-1 text-base text-gray-500">+${otherAuthors.length - 5}</span>
+              ` : ''}
             ` : ''}
-          ` : ''}
-        </div>
-        <div class="pl-14 pr-4 pb-2">
-          <a class="font-bold" href="/${note.author.userId}" title=${note.author.userId}>
-           ${displayNames.render(note.author.userId)}
-          </a>
-          ${otherAuthors ? html`and ${otherAuthors.length} ${pluralize(otherAuthors.length, 'other')}` : ''}
-          ${action} ${target} &middot; ${relativeDate(note.blendedCreatedAt)}
-        </div>
-        ${schemaId === 'ctzn.network/comment' ? html`
-          <div class="pb-5">
-            <div class="border border-gray-300 ml-14 mr-6 px-4 py-4 reply rounded-xl">
-              ${asyncReplace(this.renderReplyComment(replyCommentInfo))}
+          </div>
+          <div class="pl-3 pr-4 pb-2">
+            <a class="font-bold" href="/${note.author.userId}" title=${note.author.userId}>
+            ${displayNames.render(note.author.userId)}
+            </a>
+            ${otherAuthors ? html`and ${otherAuthors.length} ${pluralize(otherAuthors.length, 'other')}` : ''}
+            ${action} ${target} &middot; ${relativeDate(note.blendedCreatedAt)}
+          </div>
+          ${schemaId === 'ctzn.network/comment' ? html`
+            <div class="pb-5">
+              <div class="border border-gray-300 ml-3 mr-6 px-4 py-4 reply rounded-xl">
+                ${asyncReplace(this.renderReplyComment(replyCommentInfo))}
+              </div>
             </div>
-          </div>
-        ` : schemaId === 'ctzn.network/reaction' ? html`
-          ${this.renderReactions()}
-          <div class="reply pl-14 pr-6 pb-4">
-            ${asyncReplace(this.renderSubject())}
-          </div>
-        ` : html`
-          <div class="pb-2"></div>
-        `}
+          ` : schemaId === 'ctzn.network/reaction' ? html`
+            ${this.renderReactions()}
+            <div class="reply pl-3 pr-6 pb-4">
+              ${asyncReplace(this.renderSubject())}
+            </div>
+          ` : html`
+            <div class="pb-2"></div>
+          `}
+        </div>
       </div>
     `
   }
@@ -215,7 +218,7 @@ export class Notification extends LitElement {
       }
     }
     return html`
-      <div class="pl-14 pb-3 pr-6">
+      <div class="pl-3 pb-3 pr-6">
         ${repeat(Object.entries(reactions), ([reaction, count]) => html`
           <span class="inline-block px-1.5 py-0.5 rounded bg-gray-100 text-gray-700 text-sm">
             ${unsafeHTML(emojify(makeSafe(reaction)))}
@@ -230,6 +233,9 @@ export class Notification extends LitElement {
   // =
 
   async onClickWrapper (e) {
+    for (let el of e.composedPath()) {
+      if (el.tagName === 'A') return
+    }
     e.preventDefault()
 
     let schemaId = extractSchemaId(this.notification.itemUrl)
