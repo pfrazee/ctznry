@@ -4,6 +4,7 @@ import * as session from '../lib/session.js'
 import '../com/header.js'
 import '../com/notifications-feed.js'
 import '../com/img-fallbacks.js'
+import '../com/suggestions-sidebar.js'
 
 class CtznNotifications extends LitElement {
   static get properties () {
@@ -63,27 +64,32 @@ class CtznNotifications extends LitElement {
       return ''
     }
     return html`
-      <main>
-        <div
-          class="sticky top-0 z-10 mb-0.5 px-4 py-3 sm:rounded"
-          style="
-            backdrop-filter: blur(4px);
-            -webkit-backdrop-filter: blur(4px);
-            background: rgba(255, 255, 255, 0.9);
-          "
-        >
-          <a @click=${this.onClickBack}>
-            <span class="fas fa-angle-left fa-fw cursor-pointer sm:hover:text-gray-700 text-xl text-gray-600"></span>
-          </a>
-          <span class="ml-2 font-medium text-lg">Notifications</span>
+      <main class="col2">
+        <div>
+          <div
+            class="sticky top-0 z-10 mb-0.5 px-4 py-3 sm:rounded"
+            style="
+              backdrop-filter: blur(4px);
+              -webkit-backdrop-filter: blur(4px);
+              background: rgba(255, 255, 255, 0.9);
+            "
+          >
+            <a @click=${this.onClickBack}>
+              <span class="fas fa-angle-left fa-fw cursor-pointer sm:hover:text-gray-700 text-xl text-gray-600"></span>
+            </a>
+            <span class="ml-2 font-medium text-lg">Notifications</span>
+          </div>
+          <ctzn-notifications-feed
+            cleared-at=${this.notificationsClearedAt}
+            limit="50"
+            @load-state-updated=${this.onFeedLoadStateUpdated}
+            @publish-reply=${this.onPublishReply}
+          ></ctzn-notifications-feed>
+          ${this.isEmpty ? this.renderEmptyMessage() : ''}
         </div>
-        <ctzn-notifications-feed
-          cleared-at=${this.notificationsClearedAt}
-          limit="50"
-          @load-state-updated=${this.onFeedLoadStateUpdated}
-          @publish-reply=${this.onPublishReply}
-        ></ctzn-notifications-feed>
-        ${this.isEmpty ? this.renderEmptyMessage() : ''}
+        <nav class="pt-2">
+          <ctzn-suggestions-sidebar></ctzn-suggestions-sidebar>
+        </nav>
       </main>
     `
   }

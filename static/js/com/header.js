@@ -145,6 +145,20 @@ export class Header extends LitElement {
             ${this.renderSessionCtrls()}
           </div>
         </div>
+        <div class="secondary-menu bg-white overflow-y-auto px-2 py-2">
+          ${repeat(session.myFollowing || [], f => f, f => html`
+            <a
+              class="flex items-center pl-2 pr-4 py-1 text-sm rounded hover:bg-gray-100"
+              href="/${f}"
+            >
+              <img
+                class="w-8 h-8 object-cover rounded-md mr-2"
+                src=${AVATAR_URL(f)}
+              >
+              <span class="truncate font-medium">${displayNames.render(f)}</span>
+            </a>
+          `)}
+        </div>
         <div class="mobile-bot box-border flex">
           <a href="/" class="flex-1 text-center ${this.getMobileNavClass('/')}" @click=${this.onClickBotNavHome}>
             <span class="fas fa-fw navicon fa-home"></span>

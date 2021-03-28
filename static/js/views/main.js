@@ -10,69 +10,7 @@ import '../com/feed.js'
 import '../com/post-composer.js'
 import '../com/activity-feed.js'
 import '../com/img-fallbacks.js'
-
-const SUGGESTED_COMMUNITIES = [
-  {
-    userId: 'alphatesters@ctzn.one',
-    displayName: 'CTZN Alpha Testers',
-    description: 'Find other CTZN alpha users and talk about what\'s going on with the network.'
-  },
-  {
-    userId: 'welcome@ctzn.one',
-    displayName: 'Welcome to CTZN',
-    description: 'A place for new users to ask questions!'
-  },
-  {
-    userId: 'ktzns@ctzn.one',
-    displayName: 'KTZNs',
-    description: 'A community for cat lovers.'
-  },
-  {
-    userId: 'quotes@ctzn.one',
-    displayName: 'Quotes',
-    description: 'Share the wisdom, or lack thereof.'
-  },
-  {
-    userId: 'gameboard@ctzn.one',
-    displayName: 'Boardgames',
-    description: 'A place to share what you\'ve been playing.'
-  },
-  {
-    userId: 'P2P@ctzn.one',
-    displayName: 'P2P',
-    description: 'A place to chat about P2P, Federated, and Decentralised Systems!'
-  },
-  {
-    userId: 'mlai@ctzn.one',
-    displayName: 'Machine Learning & artificial intelligence',
-    description: 'A space for ML & AI discussions.'
-  },
-  {
-    userId: 'rustaceans@ctzn.one',
-    displayName: 'Rustaceans',
-    description: 'Rustaceans are people who use Rust, contribute to Rust, or are interested in the development of Rust.'
-  },
-  {
-    userId: 'python@ctzn.one',
-    displayName: 'Python',
-    description: 'Python programming language'
-  },
-  {
-    userId: 'GeminiEnthusiasts@ctzn.one',
-    displayName: 'Gemini Protocol Enthusiasts',
-    description: 'Community for people who love the Gemeni protocol.'
-  },
-  {
-    userId: 'sports@ctzn.one',
-    displayName: 'Sports',
-    description: 'A place all around sports.'
-  },
-  {
-    userId: 'Hamradio@ctzn.one',
-    displayName: 'Hamradio',
-    description: 'Hamradio Community'
-  }
-]
+import '../com/suggestions-sidebar.js'
 
 class CtznMainView extends LitElement {
   static get properties () {
@@ -80,8 +18,7 @@ class CtznMainView extends LitElement {
       currentPath: {type: String, attribute: 'current-path'},
       currentView: {type: String},
       searchQuery: {type: String},
-      isEmpty: {type: Boolean},
-      memberships: {type: Array}
+      isEmpty: {type: Boolean}
     }
   }
 
@@ -93,8 +30,6 @@ class CtznMainView extends LitElement {
     super()
     this.searchQuery = ''
     this.isEmpty = false
-    this.memberships = undefined
-    this.suggestedCommunities = undefined
 
     const pathParts = (new URL(location)).pathname.split('/')
     this.currentView = pathParts[1] || 'feed'
@@ -115,11 +50,6 @@ class CtznMainView extends LitElement {
     if (!session.isActive()) {
       document.body.classList.add('no-pad')
       return this.requestUpdate()
-    }
-    this.memberships = await session.ctzn.user.table('ctzn.network/community-membership').list()
-    if (!this.suggestedCommunities) {
-      this.suggestedCommunities = SUGGESTED_COMMUNITIES.filter(c => !this.memberships?.find(m => c.userId === m.value.community.userId))
-      this.suggestedCommunities = this.suggestedCommunities.sort(() => Math.random() - 0.5).slice(0, 8)
     }
 
     if (this.querySelector('ctzn-feed')) {
@@ -211,7 +141,7 @@ class CtznMainView extends LitElement {
 
     return html`
       <ctzn-header @post-created=${e => this.load()}></ctzn-header>
-      <main>
+      <main class="col2">
         <div>
           <div
             class="sticky top-0 z-10 flex mb-0.5 sm:mt-0.5 sm:rounded"
@@ -284,45 +214,8 @@ class CtznMainView extends LitElement {
 
   renderRightSidebar () {
     return html`
-      <nav class="pt-2 pr-2">
-        ${''/*todo <section class="mb-4">
-          <span class="fas fa-search"></span>
-          ${!!this.searchQuery ? html`
-            <a class="clear-search" @click=${this.onClickClearSearch}><span class="fas fa-times"></span></a>
-          ` : ''}
-          <input @keyup=${this.onKeyupSearch} placeholder="Search" value=${this.searchQuery}>
-        </section>*/}
-        ${this.suggestedCommunities?.length ? html`
-          <section>
-            ${repeat(this.suggestedCommunities, community => community.userId, community => {
-              const hasJoined = this.memberships?.find(m => community.userId === m.value.community.userId)
-              return html`
-                <div class="text-sm bg-gray-50 mb-2 px-2 py-2 rounded-lg">
-                  <div>
-                    <a class="text-sm hover:pointer hover:underline" href="/${community.userId}" title=${community.displayName}>
-                    ${community.displayName}
-                    </a>
-                  </div>
-                  <div class="text-gray-600 mb-1">${community.description}</div>
-                  <div>
-                    ${hasJoined ? html`
-                      <button
-                        class="border border-blue-400 px-4 py-0.5 rounded-2xl text-blue-600 text-sm cursor-default"
-                        disabled
-                      >Joined!</button>
-                    ` : html`
-                      <button
-                        class="border border-blue-400 hover:bg-gray-100 hover:pointer px-4 py-0.5 rounded-2xl text-blue-600 text-sm"
-                        @click=${e => this.onClickJoinSuggestedCommunity(e, community)}
-                        ?disabled=${hasJoined}
-                      >${community.isJoining ? html`<span class="spinner"></span>` : 'Join'}</button>
-                    `}
-                  </div>
-                </div>
-              `
-            })}
-          </section>
-        ` : ''}
+      <nav class="pt-2">
+        <ctzn-suggestions-sidebar></ctzn-suggestions-sidebar>
       </nav>
     `
   }
@@ -391,22 +284,6 @@ class CtznMainView extends LitElement {
       console.log(e)
       toast.create(e.toString(), 'error')
     }
-  }
-
-  async onClickJoinSuggestedCommunity (e, community) {
-    community.isJoining = true
-    this.requestUpdate()
-    try {
-      await session.api.communities.join(community.userId)
-      await session.loadSecondaryState()
-      toast.create('Community joined')
-    } catch (e) {
-      console.log(e)
-      toast.create(e.toString(), 'error')
-    }
-    community.isJoining = false
-    this.requestUpdate()
-    this.load()
   }
 }
 

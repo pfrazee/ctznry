@@ -42,33 +42,45 @@ header .mobile-bot {
   background: rgba(255, 255, 255, 0.9);
 }
 
-nav {
+header .secondary-menu {
   position: fixed;
   z-index: 29;
   top: 0;
   right: 0;
   height: 100vh;
-  max-width: calc(100vw - 910px);
+  width: 250px;
+  padding-right: 5px;
 }
 
 main {
-  margin: 0 0 0 260px;
+  margin: 0 auto;
   max-width: 640px;
 }
 
-main.wide {
-  margin: 0 250px;
-  max-width: 940px;
+main.col2 {
+  display: grid;
+  grid-template-columns: 640px 1fr;
+  grid-gap: 10px;
+  max-width: 920px;
+}
+
+@media (max-width: 1400px) {
+  main.col2 {
+    display: block;
+    max-width: 640px;
+  }
+  main.col2 > :last-child {
+    display: none;
+  }
 }
 
 @media (max-width: 1150px) {
-  main,
-  main.wide {
+  main {
     margin: 0 auto;
     padding-bottom: 100px;
   }
 
-  nav {
+  header .secondary-menu {
     display: none;
   }
 

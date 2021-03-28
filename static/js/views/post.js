@@ -126,9 +126,7 @@ class CtznPostView extends LitElement {
   renderRightSidebar () {
     return html`
       <nav class="pt-1.5 w-full">
-        <div class="w-72">
-          <ctzn-user-list cols="1" .ids=${[this.authorProfile.userId]}></ctzn-user-list>
-        </div>
+        <ctzn-user-list cols="1" .ids=${[this.authorProfile.userId]}></ctzn-user-list>
       </nav>
     `
   }
@@ -166,15 +164,17 @@ class CtznPostView extends LitElement {
 
   renderThread () {
     return html`
-      <main class="mb-32">
-        ${this.renderHeader()}
-        <div class="min-h-screen sm:bg-transparent">
-          ${this.subject ? html`
-            <ctzn-thread
-              .subject=${this.subject}
-              @load=${this.onLoadThread}
-            ></ctzn-thread>
-          ` : ''}
+      <main class="col2 mb-32">
+        <div>
+          ${this.renderHeader()}
+          <div class="min-h-screen sm:bg-transparent">
+            ${this.subject ? html`
+              <ctzn-thread
+                .subject=${this.subject}
+                @load=${this.onLoadThread}
+              ></ctzn-thread>
+            ` : ''}
+          </div>
         </div>
         ${this.renderRightSidebar()}
       </main>

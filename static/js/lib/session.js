@@ -52,6 +52,7 @@ export async function loadSecondaryState () {
   myCommunities = memberships.map(m => m.value.community)
   myFollowers = followers?.followers
   myFollowing = follows?.entries?.map(e => e.value.subject.userId) || []
+  emitter.dispatchEvent(new Event('secondary-state'))
 }
 
 export async function doLogin ({userId, password}) {
@@ -154,6 +155,10 @@ export function isFollowingMe (citizenUserId) {
 
 export function onChange (cb, opts) {
   emitter.addEventListener('change', cb, opts)
+}
+
+export function onSecondaryState (cb, opts) {
+  emitter.addEventListener('secondary-state', cb, opts)
 }
 
 let _sessionRecoverPromise = undefined
