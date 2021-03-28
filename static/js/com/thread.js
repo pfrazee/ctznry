@@ -149,7 +149,7 @@ export class Thread extends LitElement {
         ${repeat(replies, r => r.url, reply => {
           const isSubject = this.subject.dbUrl === reply.url
           return html`
-            <div class="mb-1 ${isSubject ? 'highlight bg-indigo-50' : ''}">
+            <div class="mb-1 ${isSubject ? 'bg-blue-50 border border-blue-200 px-2 rounded' : ''}">
               <ctzn-comment
                 .comment=${reply}
                 @publish-reply=${this.onPublishReply}
