@@ -64,6 +64,10 @@ main.col2 {
   max-width: 920px;
 }
 
+main.col2 > :last-child {
+  min-width: 0;
+}
+
 @media (max-width: 1400px) {
   main.col2 {
     display: block;

@@ -121,7 +121,7 @@ export class UserList extends LitElement {
                       ${userId}
                     </a>
                   </div>
-                  <div class="text-sm text-gray-600 mb-4">${unsafeHTML(linkify(emojify(makeSafe(profile.value.description))))}</div>
+                  <div class="text-sm text-gray-600 mb-4 break-words">${unsafeHTML(linkify(emojify(makeSafe(profile.value.description))))}</div>
                 </div>
                 ${this.renderProfileControls(profile)}
               </div>
