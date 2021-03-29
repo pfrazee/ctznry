@@ -70,7 +70,7 @@ const METHOD_ICONS = {
   'ctzn.network/transfer-item-method': html`
     <span class="far fa-gem absolute" style="left: 9px; top: 6px; font-size: 13px;"></span>
     <span class="fas fa-arrow-right absolute" style="right: 9px; bottom: 0px; font-size: 11px"></span>
-  `,
+  `
 }
 
 export class ActivityFeed extends LitElement {
@@ -78,6 +78,7 @@ export class ActivityFeed extends LitElement {
     return {
       userId: {type: String, attribute: 'user-id'},
       dataview: {type: String},
+      methodsFilter: {type: Array},
       entries: {type: Array},
       emptyMessage: {type: String, attribute: 'empty-message'},
       hasNewEntries: {type: Boolean}
@@ -92,6 +93,7 @@ export class ActivityFeed extends LitElement {
     super()
     this.userId = undefined
     this.dataview = undefined
+    this.methodsFilter = undefined
     this.entries = undefined
     this.emptyMessage = undefined
     this.hasNewEntries = false
@@ -176,13 +178,20 @@ export class ActivityFeed extends LitElement {
     const viewRes = (this.dataview === 'ctzn.network/dbmethod-feed-view')
       ? await session.ctzn.view(this.dataview, {limit: this.limit, lt})
       : await session.ctzn.view(this.dataview, this.userId, {limit: this.limit, reverse: true, lt})
+    let newEntries
     if (viewRes.results) {
-      entries = entries.concat(viewRes.results.map(resultToGeneric))
+      newEntries = viewRes.results.map(resultToGeneric)
     } else if (viewRes.calls) {
-      entries = entries.concat(viewRes.calls.map(entry => callToGeneric(this.userId, entry)))
+      newEntries = viewRes.calls.map(entry => callToGeneric(this.userId, entry))
     } else if (viewRes.feed) {
-      entries = entries.concat(viewRes.feed.map(feedToGeneric))
+      newEntries = viewRes.feed.map(feedToGeneric)
     }
+
+    if (this.methodsFilter) {
+      newEntries = newEntries.filter(entry => this.methodsFilter.includes(entry.call.method))
+    }
+
+    entries = entries.concat(newEntries)
     console.log(entries)
     this.entries = entries
     this.activeQuery = undefined
@@ -197,8 +206,11 @@ export class ActivityFeed extends LitElement {
     const viewRes = (this.dataview === 'ctzn.network/dbmethod-feed-view')
       ? await session.ctzn.view(this.dataview, {limit: 1})
       : await session.ctzn.view(this.dataview, this.userId, {limit: 1, reverse: true})
-    const items = viewRes.calls || viewRes.results || viewRes.feed
-    this.hasNewEntries = (items?.[0] && items[0].key !== this.entries[0]?.key)
+    let entries = viewRes.calls || viewRes.results || viewRes.feed
+    if (this.methodsFilter) {
+      entries = entries.filter(entry => this.methodsFilter.includes(entry.call.method))
+    }
+    this.hasNewEntries = (entries?.[0] && entries[0].key !== this.entries[0]?.key)
   }
 
   async pageLoadScrollTo (y) {
@@ -287,7 +299,7 @@ export class ActivityFeed extends LitElement {
     const renderMethod = this[`render${methodName}`]
     if (!renderMethod) return ''
     return html`
-      <div class="flex items-center bg-white px-2 py-3 sm:py-2 sm:rounded mb-0.5">
+      <div class="flex items-center bg-white px-2 py-3 sm:py-2 sm:rounded mb-0.5 sm:hover:bg-gray-50 cursor-pointer">
         <span class="block rounded bg-${METHOD_BGS[entry.call.method] || 'gray-200'} w-10 h-10 pt-1.5 mr-2">
           <span class="block relative rounded w-10 h-6 text-${METHOD_COLORS[entry.call.method] || 'gray-700'}">
             ${METHOD_ICONS[entry.call.method]}

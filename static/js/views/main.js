@@ -167,6 +167,13 @@ class CtznMainView extends LitElement {
           ` : this.currentView === 'activity' ? html`
             <ctzn-activity-feed
               dataview="ctzn.network/dbmethod-feed-view"
+              .methodsFilter=${[
+                'ctzn.network/create-item-method',
+                'ctzn.network/delete-item-class-method',
+                'ctzn.network/destroy-item-method',
+                'ctzn.network/put-item-class-method',
+                'ctzn.network/transfer-item-method'
+              ]}
             ></ctzn-activity-feed>
           ` : ''}
         </div>
