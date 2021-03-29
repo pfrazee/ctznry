@@ -863,14 +863,16 @@ class CtznUser extends LitElement {
       for (let i = 1; i < 6; i++) {
         try {
           if (blobName) {
-            res = await session.ctzn.blob.update(blobName, base64buf)
+            res = await session.ctzn.blob.update(blobName, base64buf, {mimeType})
           } else {
-            res = await session.ctzn.blob.create(base64buf)
+            res = await session.ctzn.blob.create(base64buf, {mimeType})
           }
         } catch (e) {
           lastError = e
           let shrunkDataUrl = await images.shrinkImage(dataUrl, (10 - i) / 10, mimeType)
-          base64buf = images.parseDataUrl(shrunkDataUrl).base64buf
+          let parsed = images.parseDataUrl(shrunkDataUrl)
+          base64buf = parsed.base64buf
+          mimeType = parsed.mimeType
         }
       }
       if (!res) {

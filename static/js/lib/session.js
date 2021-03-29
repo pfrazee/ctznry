@@ -1,6 +1,7 @@
 import { DEBUG_ENDPOINTS } from './const.js'
 import { create as createRpcApi } from './rpc-api.js'
 import { CtznAPI } from './api.js'
+import * as images from './images.js'
 import * as toast from '../com/toast.js'
 
 let emitter = new EventTarget()
@@ -100,8 +101,8 @@ export async function doSignup ({domain, username, displayName, description, ava
     newSessionInfo.domain = domain
 
     if (avatar) {
-      const avatarBase64 = avatar.split(',').pop()
-      await newApi.blob.update('avatar', avatarBase64).catch(e => console.log(e))
+      const {mimeType, base64buf} = images.parseDataUrl(avatar)
+      await newApi.blob.update('avatar', base64buf, {mimeType}).catch(e => console.log(e))
     }
 
     localStorage.setItem('session-info', JSON.stringify(newSessionInfo))

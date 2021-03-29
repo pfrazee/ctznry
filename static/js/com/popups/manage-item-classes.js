@@ -400,10 +400,10 @@ export class ManageItemClasses extends BasePopup {
     try {
       let iconSource
       if (this.uploadedIcon) {
-        let {base64buf} = images.parseDataUrl(this.uploadedIcon)
+        let {base64buf, mimeType} = images.parseDataUrl(this.uploadedIcon)
         let blobRes
         try {
-          blobRes = await session.ctzn.blob.create(base64buf)
+          blobRes = await session.ctzn.blob.create(base64buf, {mimeType})
         } catch (err) {
           this.currentError = err.toString()
           this.isProcessing = false

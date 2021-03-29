@@ -83,8 +83,8 @@ export class EditProfilePopup extends BasePopup {
             >
           </div>
         </div>
-        <input id="banner-file-input" class="hidden" type="file" accept=".jpg,.jpeg,.png" @change=${this.onChooseBannerFile}>
-        <input id="avatar-file-input" class="hidden" type="file" accept=".jpg,.jpeg,.png" @change=${this.onChooseAvatarFile}>
+        <input id="banner-file-input" class="hidden" type="file" accept=".jpg,.jpeg,.png,.svg" @change=${this.onChooseBannerFile}>
+        <input id="avatar-file-input" class="hidden" type="file" accept=".jpg,.jpeg,.png,.svg" @change=${this.onChooseAvatarFile}>
 
         <label class="block font-semibold p-1" for="displayName-input">Display Name</label>
         <input
