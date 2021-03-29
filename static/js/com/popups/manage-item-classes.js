@@ -155,14 +155,36 @@ export class ManageItemClasses extends BasePopup {
               placeholder="E.g. moneybucks, cat, award"
               ?disabled=${!cls.isNew}
             />
+            <label class="block font-semibold p-1">Grouping</label>
+            <div class="flex items-center rounded border border-gray-300 px-4 py-2 mb-2">
+              <input
+                type="radio"
+                id="grouping-radio-unique"
+                name="grouping"
+                value="unique"
+                ?checked=${cls.value.grouping === 'unique'}
+                ?disabled=${!cls.isNew}
+              />
+              <label class="block p-1 mr-3" for="grouping-radio-unique">Unique</label>
+              <input
+                type="radio"
+                id="grouping-radio-fungible"
+                name="grouping"
+                value="fungible"
+                ?checked=${cls.value.grouping === 'fungible'}
+                ?disabled=${!cls.isNew}
+              />
+              <label class="block p-1" for="grouping-radio-fungible">Fungible</label>
+            </div>
             <label class="block font-semibold p-1" for="displayName-input">Display Name</label>
             <input
+              required
               type="text"
               id="displayName-input"
               name="displayName"
               value="${cls.value.displayName || ''}"
               class="block box-border w-full border border-gray-300 rounded p-3 mb-2"
-              placeholder="Optional"
+              placeholder="e.g. Money Bucks, Cat, Award"
             />
             <label class="block font-semibold p-1">Icon</label>
             <div class="border border-gray-300 flex items-center px-2 py-2 mb-2 rounded cursor-pointer hover:bg-gray-50" @click=${this.onClickIcon}>
@@ -181,17 +203,6 @@ export class ManageItemClasses extends BasePopup {
               class="block box-border w-full border border-gray-300 rounded p-3 mb-2"
               placeholder="Optional"
             >${cls.value.description || ''}</textarea>
-            <label class="block font-semibold p-1" for="keyTemplate-input">Key template</label>
-            <input
-              required
-              type="text"
-              id="keyTemplate-input"
-              name="keyTemplate"
-              value="${JSON.stringify(cls.value.keyTemplate)}"
-              class="block box-border w-full border border-gray-300 rounded p-3 mb-2"
-              placeholder=${`[{"type": "auto"}]`}
-              ?disabled=${!cls.isNew}
-            />
             <label class="block font-semibold p-1" for="definition-input">Properties schema</label>
             <textarea
               id="definition-input"
@@ -324,16 +335,16 @@ export class ManageItemClasses extends BasePopup {
   }
 
   onSelectNewTemplate (e) {
-    let keyTemplate = [{type: 'auto'}]
+    let grouping = 'unique'
     if (this.querySelector('input[name="item-type"]:checked').value === 'fungible') {
-      keyTemplate = [{type: 'json-pointer', value: '/owner/userId'}]
+      grouping = 'fungible'
     }
     this.itemClassBeingEdited = {
       isNew: true,
       key: undefined,
       value: {
         id: '',
-        keyTemplate,
+        grouping,
         definition: undefined,
         createdAt: undefined
       }
@@ -374,16 +385,6 @@ export class ManageItemClasses extends BasePopup {
       return
     }
 
-    if (isNew) {
-      try {
-        value.keyTemplate = JSON.parse(value.keyTemplate)
-      } catch (e) {
-        this.currentError = `Invalid key template: ${e.toString()}`
-        this.isProcessing = false
-        return
-      }
-    }
-
     if (value.definition) {
       try {
         value.definition = JSON.parse(value.definition)
@@ -416,16 +417,9 @@ export class ManageItemClasses extends BasePopup {
       }
 
       if (isNew) {
-        console.log('create:', {classId: value.id,
-          keyTemplate: value.keyTemplate,
-          iconSource,
-          displayName: value.displayName,
-          description: value.description,
-          definition: value.definition
-        })
         await session.ctzn.db(this.communityId).method('ctzn.network/create-item-class-method', {
           classId: value.id,
-          keyTemplate: value.keyTemplate,
+          grouping: value.grouping,
           iconSource,
           displayName: value.displayName,
           description: value.description,
@@ -440,7 +434,6 @@ export class ManageItemClasses extends BasePopup {
         }
         if (iconSource) updates.iconSource = iconSource
         if (Object.keys(iconSource).length) {
-          console.log('Update:', updates)
           await session.ctzn.db(this.communityId).method('ctzn.network/update-item-class-method', {
             classId: this.itemClassBeingEdited.value.id,
             ...updates
