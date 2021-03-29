@@ -1,10 +1,7 @@
 /* globals beaker */
 import { html } from '../../../vendor/lit-element/lit-element.js'
-import { repeat } from '../../../vendor/lit-element/lit-html/directives/repeat.js'
 import { BasePopup } from './base.js'
-import * as session from '../../lib/session.js'
-import * as toast from '../toast.js'
-import { AVATAR_URL } from '../../lib/const.js'
+import { AVATAR_URL, ITEM_CLASS_ICON_URL } from '../../lib/const.js'
 import * as displayNames from '../../lib/display-names.js'
 import { relativeDate } from '../../lib/time.js'
 import '../button.js'
@@ -194,8 +191,12 @@ export class ViewActivityPopup extends BasePopup {
         </div>
         <div class="flex-1">
           created
-          <span class="bg-gray-100 font-semibold inline-block px-1 rounded text-gray-800 text-sm">
-            <span class="fas fa-fw fa-money-bill text-sm text-green-500"></span>
+          <span class="font-semibold text-gray-800 text-sm">
+            <img
+              src=${ITEM_CLASS_ICON_URL(this.activity.call.database.userId, classId)}
+              class="relative inline-block w-4 h-4 object-cover"
+              style="top: -2px"
+            >
             ${qty}
           </span>
           <span class="text-black">${classId}</span>
@@ -211,6 +212,26 @@ export class ViewActivityPopup extends BasePopup {
     `
   }
   
+  renderCreateItemClassMethod () {
+    const {classId} = this.activity.call.args
+    return html`
+      <div class="flex rounded p-2 bg-white border border-gray-300 mt-1">
+        <div class="block w-8 mr-2 text-center">
+          {<span class="far fa-fw fa-gem"></span>}
+        </div>
+        <div class="flex-1">
+          created the item class
+          <img
+            src=${ITEM_CLASS_ICON_URL(this.activity.call.database.userId, classId)}
+            class="relative inline-block w-4 h-4 object-cover"
+            style="top: -2px"
+          >
+          <span class="text-black">${classId}</span>
+        </div>
+      </div>
+    `
+  }
+  
   renderDeleteItemClassMethod () {
     const {classId} = this.activity.call.args
     return html`
@@ -220,7 +241,11 @@ export class ViewActivityPopup extends BasePopup {
         </div>
         <div class="flex-1">
           deleted the item class
-          <span class="fas fa-fw fa-money-bill text-sm text-green-500"></span>
+          <img
+            src=${ITEM_CLASS_ICON_URL(this.activity.call.database.userId, classId)}
+            class="relative inline-block w-4 h-4 object-cover"
+            style="top: -2px"
+          >
           <span class="text-black">${classId}</span>
         </div>
       </div>
@@ -237,8 +262,12 @@ export class ViewActivityPopup extends BasePopup {
         </div>
         <div class="flex-1">
           destroyed
-          <span class="bg-gray-100 font-semibold inline-block px-1 rounded text-gray-800 text-sm">
-            <span class="fas fa-fw fa-money-bill text-sm text-green-500"></span>
+          <span class="font-semibold text-gray-800 text-sm">
+            <img
+              src=${ITEM_CLASS_ICON_URL(this.activity.call.database.userId, classId)}
+              class="relative inline-block w-4 h-4 object-cover"
+              style="top: -2px"
+            >
             ${qty}
           </span>
           <span class="text-black">${classId}</span>
@@ -295,7 +324,11 @@ export class ViewActivityPopup extends BasePopup {
         </div>
         <div class="flex-1">
           set up the item class
-          <span class="fas fa-fw fa-money-bill text-sm text-green-500"></span>
+          <img
+            src=${ITEM_CLASS_ICON_URL(this.activity.call.database.userId, classId)}
+            class="relative inline-block w-4 h-4 object-cover"
+            style="top: -2px"
+          >
           <span class="text-black">${classId}</span>
         </div>
       </div>
@@ -338,8 +371,12 @@ export class ViewActivityPopup extends BasePopup {
         </div>
         <div class="flex-1">
           gave
-          <span class="bg-gray-100 font-semibold inline-block px-1 rounded text-gray-800 text-sm">
-            <span class="fas fa-fw fa-money-bill text-sm text-green-500"></span>
+          <span class="font-semibold text-gray-800 text-sm">
+            <img
+              src=${ITEM_CLASS_ICON_URL(this.activity.call.database.userId, classId)}
+              class="relative inline-block w-4 h-4 object-cover"
+              style="top: -2px"
+            >
             ${qty}
           </span>
           <span class="text-black">${classId}</span>
@@ -352,6 +389,26 @@ export class ViewActivityPopup extends BasePopup {
           <span class="font-medium">${displayNames.render(recp.userId)}</span>
         </div>
       </a>
+    `
+  }
+  
+  renderUpdateItemClassMethod () {
+    const {classId} = this.activity.call.args
+    return html`
+      <div class="flex rounded p-2 bg-white border border-gray-300 mt-1">
+        <div class="block w-8 mr-2 text-center">
+          {<span class="far fa-fw fa-gem"></span>}
+        </div>
+        <div class="flex-1">
+          updated the item class
+          <img
+            src=${ITEM_CLASS_ICON_URL(this.activity.call.database.userId, classId)}
+            class="relative inline-block w-4 h-4 object-cover"
+            style="top: -2px"
+          >
+          <span class="text-black">${classId}</span>
+        </div>
+      </div>
     `
   }
 

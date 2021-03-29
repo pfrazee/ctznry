@@ -169,10 +169,12 @@ class CtznMainView extends LitElement {
               dataview="ctzn.network/dbmethod-feed-view"
               .methodsFilter=${[
                 'ctzn.network/create-item-method',
+                'ctzn.network/create-item-class-method',
                 'ctzn.network/delete-item-class-method',
                 'ctzn.network/destroy-item-method',
                 'ctzn.network/put-item-class-method',
-                'ctzn.network/transfer-item-method'
+                'ctzn.network/transfer-item-method',
+                'ctzn.network/update-item-class-method'
               ]}
             ></ctzn-activity-feed>
           ` : ''}

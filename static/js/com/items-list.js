@@ -5,7 +5,7 @@ import { ViewItemPopup } from './popups/view-item.js'
 import { ManageItemClasses } from './popups/manage-item-classes.js'
 import * as session from '../lib/session.js'
 import * as displayNames from '../lib/display-names.js'
-import { AVATAR_URL } from '../lib/const.js'
+import { AVATAR_URL, ITEM_CLASS_ICON_URL } from '../lib/const.js'
 
 export class ItemsList extends LitElement {
   static get properties () {
@@ -62,6 +62,7 @@ export class ItemsList extends LitElement {
 
   render () {
     if (this.currentItemClass) {
+      const cls = this.currentItemClass
       return html`
         <div
           class="relative bg-white mb-1 py-5 px-2 sm:rounded text-center"
@@ -73,19 +74,14 @@ export class ItemsList extends LitElement {
             ></span>
           </div>
           <div class="text-center">
-            ${this.currentItemClass.value.id === 'paulbucks' ? html`
-              <span class="fas fa-fw fa-money-bill text-2xl mb-1 text-green-500"></span>
-            ` : this.currentItemClass.value.id === 'ratings' ? html`
-              <span class="fas fa-fw fa-chart-line text-2xl mb-1 text-red-500"></span>
-            ` : html`
-              <span class="fas fa-fw fa-crown text-2xl mb-1 text-yellow-500"></span>
-            `}
+            <img
+              src=${ITEM_CLASS_ICON_URL(this.userId, cls.value.id)}
+              class="inline-block object-cover h-8 w-8"
+            >
           </div>
-          <div class="text-xl font-medium">${this.currentItemClass.value.id}</div>
+          <div class="text-xl font-medium">${cls.displayName || cls.value.id}</div>
           <div class="text-gray-700">
-            ${this.currentItemClass.value.id === 'paulbucks' ? 'The most valuable fake currency in the world.' : ''}
-            ${this.currentItemClass.value.id === 'ctznpocalypse-survivor' ? 'The mark of a survivor.' : ''}
-            ${this.currentItemClass.value.id === 'ratings' ? 'Only go up.' : ''}
+            ${cls.value.description}
           </div>
           ${this.canCreateItem ? html`
             <div class="mt-1">
@@ -122,26 +118,21 @@ export class ItemsList extends LitElement {
         </div>
       ` : html`
         <div class="grid grid-2col gap-1 mb-16">
-          ${repeat(this.itemClasses, itemClass => {
+          ${repeat(this.itemClasses, cls => {
             return html`
               <div
                 class="bg-white flex flex-col justify-center px-6 py-4 sm:cursor-pointer sm:hover:bg-gray-50 sm:rounded sm:text-center"
-                @click=${e => this.onClickViewItemClass(e, itemClass)}
+                @click=${e => this.onClickViewItemClass(e, cls)}
               >
                 <div class="sm:text-center">
-                  ${itemClass.value.id === 'paulbucks' ? html`
-                    <span class="fas fa-fw fa-money-bill text-2xl mb-1 text-green-500"></span>
-                  ` : itemClass.value.id === 'ratings' ? html`
-                    <span class="fas fa-fw fa-chart-line text-2xl mb-1 text-red-500"></span>
-                  ` : html`
-                    <span class="fas fa-fw fa-crown text-2xl mb-1 text-yellow-500"></span>
-                  `}
+                  <img
+                    src=${ITEM_CLASS_ICON_URL(this.userId, cls.value.id)}
+                    class="inline-block object-cover h-8 w-8"
+                  >
                 </div>
-                <div class="text-xl font-medium">${itemClass.value.id}</div>
+                <div class="text-xl font-medium">${cls.value.displayName || cls.value.id}</div>
                 <div class="text-gray-700">
-                  ${itemClass.value.id === 'paulbucks' ? 'The most valuable fake currency in the world.' : ''}
-                  ${itemClass.value.id === 'ctznpocalypse-survivor' ? 'The mark of a survivor.' : ''}
-                  ${itemClass.value.id === 'ratings' ? 'Only go up.' : ''}
+                  ${cls.value.description}
                 </div>
               </div>
             `
@@ -164,11 +155,12 @@ export class ItemsList extends LitElement {
     if (!this.items) {
       return html`<span class="spinner"></span>`
     }
+    const cls = this.currentItemClass
     return html`
       ${this.currentItems.length === 0 ? html`
         <div class="bg-gray-100 text-gray-500 py-44 text-center">
           <div class="far fa-gem text-6xl text-gray-300 mb-8"></div>
-          <div>This community has not issued any ${this.currentItemClass.value.id}!</div>
+          <div>This community has not issued any ${cls.value.displayName || cls.value.id}!</div>
         </div>
       ` : html`
         <div class="mb-16">
@@ -184,13 +176,10 @@ export class ItemsList extends LitElement {
                   <span class="hidden text-gray-500 sm:inline">${item.value.owner.userId}</span>
                 </span>
                 <span class="pr-1">
-                  ${item.value.classId === 'paulbucks' ? html`
-                    <span class="fas fa-fw fa-money-bill mr-1 text-sm text-green-500"></span>
-                  ` : item.value.classId === 'ratings' ? html`
-                    <span class="fas fa-fw fa-chart-line mr-1 text-sm text-red-500"></span>
-                  ` : html`
-                    <span class="fas fa-fw fa-crown mr-1 text-sm text-yellow-500"></span>
-                  `}
+                  <img
+                    src=${ITEM_CLASS_ICON_URL(this.userId, cls.value.id)}
+                    class="inline-block object-cover h-4 w-4"
+                  >
                   ${item.value.qty}
                 </span>
               </div>

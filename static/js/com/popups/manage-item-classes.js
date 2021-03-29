@@ -3,7 +3,8 @@ import { html } from '../../../vendor/lit-element/lit-element.js'
 import { repeat } from '../../../vendor/lit-element/lit-html/directives/repeat.js'
 import { BasePopup } from './base.js'
 import * as session from '../../lib/session.js'
-import * as toast from '../toast.js'
+import * as images from '../../lib/images.js'
+import { ITEM_CLASS_ICON_URL } from '../../lib/const.js'
 import '../button.js'
 
 // exported api
@@ -130,12 +131,20 @@ export class ManageItemClasses extends BasePopup {
     }
     if (this.itemClassBeingEdited) {
       const cls = this.itemClassBeingEdited
+      console.log(cls)
+      let iconUrl = this.uploadedIcon
+      if (!iconUrl && cls.value.iconBlobName) {
+        iconUrl = ITEM_CLASS_ICON_URL(this.communityId, cls.value.id)
+      }
+      if (!iconUrl) {
+        iconUrl = '/img/default-item-icon.svg'
+      }
       return html`
         <div class="px-2">
           <h2 class="text-3xl py-4">Item classes</h2>
   
           <form class="border border-gray-200 rounded p-3 mb-2" @submit=${this.onSubmitEdit}>
-            <label class="block font-semibold p-1" for="id-input">Item class ID</label>
+            <label class="block font-semibold p-1" for="id-input">Class ID</label>
             <input
               required
               type="text"
@@ -144,7 +153,34 @@ export class ManageItemClasses extends BasePopup {
               value="${cls.value.id}"
               class="block box-border w-full border border-gray-300 rounded p-3 mb-2"
               placeholder="E.g. moneybucks, cat, award"
+              ?disabled=${!cls.isNew}
             />
+            <label class="block font-semibold p-1" for="displayName-input">Display Name</label>
+            <input
+              type="text"
+              id="displayName-input"
+              name="displayName"
+              value="${cls.value.displayName || ''}"
+              class="block box-border w-full border border-gray-300 rounded p-3 mb-2"
+              placeholder="Optional"
+            />
+            <label class="block font-semibold p-1">Icon</label>
+            <div class="border border-gray-300 flex items-center px-2 py-2 mb-2 rounded cursor-pointer hover:bg-gray-50" @click=${this.onClickIcon}>
+              <img
+                class="block rounded w-10 h-10 mr-2 object-cover"
+                src=${iconUrl} 
+              >
+              <div class="text-sm text-gray-500">Should target 16x16 and 32x32, SVG is recommended.</div>
+            </div>
+            <input id="icon-file-input" class="hidden" type="file" accept=".svg,.jpg,.jpeg,.png" @change=${this.onChooseIconFile}>
+            <label class="block font-semibold p-1" for="description-input">Description</label>
+            <textarea
+              type="text"
+              id="description-input"
+              name="description"
+              class="block box-border w-full border border-gray-300 rounded p-3 mb-2"
+              placeholder="Optional"
+            >${cls.value.description || ''}</textarea>
             <label class="block font-semibold p-1" for="keyTemplate-input">Key template</label>
             <input
               required
@@ -154,6 +190,7 @@ export class ManageItemClasses extends BasePopup {
               value="${JSON.stringify(cls.value.keyTemplate)}"
               class="block box-border w-full border border-gray-300 rounded p-3 mb-2"
               placeholder=${`[{"type": "auto"}]`}
+              ?disabled=${!cls.isNew}
             />
             <label class="block font-semibold p-1" for="definition-input">Properties schema</label>
             <textarea
@@ -304,10 +341,27 @@ export class ManageItemClasses extends BasePopup {
     this.isCreatingNew = false
   }
 
+  onClickIcon (e) {
+    e.preventDefault()
+    this.querySelector('#icon-file-input').click()
+  }
+
+  onChooseIconFile (e) {
+    var file = e.currentTarget.files[0]
+    if (!file) return
+    var fr = new FileReader()
+    fr.onload = () => {
+      this.uploadedIcon = fr.result
+      this.requestUpdate()
+    }
+    fr.readAsDataURL(file)
+  }
+
   async onSubmitEdit (e) {
     e.preventDefault()
     e.stopPropagation()
 
+    const isNew = this.itemClassBeingEdited.isNew
     this.isProcessing = true
     this.currentError = undefined
 
@@ -320,12 +374,14 @@ export class ManageItemClasses extends BasePopup {
       return
     }
 
-    try {
-      value.keyTemplate = JSON.parse(value.keyTemplate)
-    } catch (e) {
-      this.currentError = `Invalid key template: ${e.toString()}`
-      this.isProcessing = false
-      return
+    if (isNew) {
+      try {
+        value.keyTemplate = JSON.parse(value.keyTemplate)
+      } catch (e) {
+        this.currentError = `Invalid key template: ${e.toString()}`
+        this.isProcessing = false
+        return
+      }
     }
 
     if (value.definition) {
@@ -341,11 +397,56 @@ export class ManageItemClasses extends BasePopup {
     }
     
     try {
-      await session.ctzn.db(this.communityId).method('ctzn.network/put-item-class-method', {
-        classId: value.id,
-        keyTemplate: value.keyTemplate,
-        definition: value.definition
-      })
+      let iconSource
+      if (this.uploadedIcon) {
+        let {base64buf} = images.parseDataUrl(this.uploadedIcon)
+        let blobRes
+        try {
+          blobRes = await session.ctzn.blob.create(base64buf)
+        } catch (err) {
+          this.currentError = err.toString()
+          this.isProcessing = false
+          return
+        }
+        iconSource = {
+          userId: session.info.userId,
+          dbUrl: session.info.dbUrl,
+          blobName: blobRes.name
+        }
+      }
+
+      if (isNew) {
+        console.log('create:', {classId: value.id,
+          keyTemplate: value.keyTemplate,
+          iconSource,
+          displayName: value.displayName,
+          description: value.description,
+          definition: value.definition
+        })
+        await session.ctzn.db(this.communityId).method('ctzn.network/create-item-class-method', {
+          classId: value.id,
+          keyTemplate: value.keyTemplate,
+          iconSource,
+          displayName: value.displayName,
+          description: value.description,
+          definition: value.definition
+        })
+      } else {
+        let updates = {}
+        for (let k of ['displayName', 'description', 'definition']) {
+          if (value[k] !== this.itemClassBeingEdited.value[k]) {
+            updates[k] = value[k]
+          }
+        }
+        if (iconSource) updates.iconSource = iconSource
+        if (Object.keys(iconSource).length) {
+          console.log('Update:', updates)
+          await session.ctzn.db(this.communityId).method('ctzn.network/update-item-class-method', {
+            classId: this.itemClassBeingEdited.value.id,
+            ...updates
+          })
+        }
+      }
     } catch (e) {
       this.currentError = e.message || e.data || e.toString()
       this.isProcessing = false

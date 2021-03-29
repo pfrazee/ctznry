@@ -3,8 +3,7 @@ import { html } from '../../../vendor/lit-element/lit-element.js'
 import { repeat } from '../../../vendor/lit-element/lit-html/directives/repeat.js'
 import { BasePopup } from './base.js'
 import * as session from '../../lib/session.js'
-import * as toast from '../toast.js'
-import { AVATAR_URL } from '../../lib/const.js'
+import { AVATAR_URL, ITEM_CLASS_ICON_URL } from '../../lib/const.js'
 import * as displayNames from '../../lib/display-names.js'
 import '../button.js'
 
@@ -16,6 +15,7 @@ export class ViewItemPopup extends BasePopup {
     return {
       databaseId: {type: String},
       item: {type: Object},
+      itemClass: {type: Object},
       members: {type: Array},
       canTransferUnownedItem: {type: Boolean},
       isTransferFormOpen: {type: Boolean},
@@ -29,6 +29,7 @@ export class ViewItemPopup extends BasePopup {
     super()
     this.databaseId = opts.databaseId || opts.communityId
     this.item = opts.item
+    this.itemClass = undefined
     this.members = opts.members
     this.canTransferUnownedItem = false
     this.isTransferFormOpen = false
@@ -39,6 +40,9 @@ export class ViewItemPopup extends BasePopup {
   }
 
   async load () {
+    if (!this.itemClass) {
+      this.itemClass = await session.ctzn.db(this.databaseId).table('ctzn.network/item-class').get(this.item.value.classId)
+    }
     if (session.isActive()) {
       let res = await session.ctzn.getCommunityUserPermission(
         this.databaseId,
@@ -94,29 +98,49 @@ export class ViewItemPopup extends BasePopup {
     return html`
       <div class="flex mb-2">
         <div class="pt-1 pl-2 pr-4">
-          <span class="fas fa-fw fa-money-bill mr-1 text-xl text-green-500"></span>
+          <img
+            src=${ITEM_CLASS_ICON_URL(this.databaseId, this.item.value.classId)}
+            class="block w-8 h-8 object-cover"
+          >
         </div>
         <div class="mr-2 flex-1 truncate">
-          <div class="text-2xl">${this.item.value.classId}</div>
-          <div><a href="/${this.databaseId}" class="sm:hover:underline">${displayNames.render(this.databaseId)}</a></div>
-          <div class="flex items-center">
-            <span class="mr-2">Owner:</span>
-            <a class="w-5 mr-1" href="/${this.item.value.owner.userId}" style="flex: 0 0 20px;">
-              <img
-                src=${AVATAR_URL(this.item.value.owner.userId)}
-                class="rounded w-5 h-5"
-              >
-            </a>
-            <a href="/${this.item.value.owner.userId}" class="truncate sm:hover:underline">
-              <span class="font-medium">${displayNames.render(this.item.value.owner.userId)}</span>
-              <span class="text-gray-500">${this.item.value.owner.userId}</span>
-            </a>
+          <div class="text-2xl">
+            ${this.itemClass?.value.displayName || this.item.value.classId}
           </div>
+          ${this.itemClass?.value.description ? html`
+            <div class="">${this.itemClass.value.description}</div>
+          ` : ''}
         </div>
-        <div>
-          <div class="bg-gray-100 font-semibold px-4 py-2.5 rounded">
-            <div>${this.item.value.qty}</div>
-          </div>
+        <div class="bg-gray-100 font-semibold px-4 py-1.5 rounded self-start">
+          <div>${this.item.value.qty}</div>
+        </div>
+      </div>
+      <div class="rounded border border-gray-300">
+        <div class="flex items-center border-b border-gray-200  p-2">
+          <span class="border-r border-gray-200 mr-2" style="flex: 0 0 100px">Owner:</span>
+          <a class="w-5 mr-1" href="/${this.item.value.owner.userId}" style="flex: 0 0 20px;">
+            <img
+              src=${AVATAR_URL(this.item.value.owner.userId)}
+              class="rounded w-5 h-5"
+            >
+          </a>
+          <a href="/${this.item.value.owner.userId}" class="truncate sm:hover:underline">
+            <span class="font-medium">${displayNames.render(this.item.value.owner.userId)}</span>
+            <span class="text-gray-500">${this.item.value.owner.userId}</span>
+          </a>
+        </div>
+        <div class="flex items-center p-2">
+          <span class="border-r border-gray-200 mr-2" style="flex: 0 0 100px">Community:</span>
+          <a class="w-5 mr-1" href="/${this.databaseId}" style="flex: 0 0 20px;">
+            <img
+              src=${AVATAR_URL(this.databaseId)}
+              class="rounded w-5 h-5"
+            >
+          </a>
+          <a href="/${this.databaseId}" class="truncate sm:hover:underline">
+            <span class="font-medium">${displayNames.render(this.databaseId)}</span>
+            <span class="text-gray-500">${this.databaseId}</span>
+          </a>
         </div>
       </div>
 

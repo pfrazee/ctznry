@@ -1,10 +1,9 @@
 import { LitElement, html } from '../../vendor/lit-element/lit-element.js'
 import { repeat } from '../../vendor/lit-element/lit-html/directives/repeat.js'
 import { ViewItemPopup } from './popups/view-item.js'
-import { ManageItemClasses } from './popups/manage-item-classes.js'
 import * as session from '../lib/session.js'
 import * as displayNames from '../lib/display-names.js'
-import { AVATAR_URL } from '../lib/const.js'
+import { ITEM_CLASS_ICON_URL } from '../lib/const.js'
 
 export class OwnedItemsList extends LitElement {
   static get properties () {
@@ -49,6 +48,10 @@ export class OwnedItemsList extends LitElement {
     }
   }
 
+  getItemClassName (item) {
+    return item.itemClass?.value.displayName || item.value.classId
+  }
+
   // rendering
   // =
 
@@ -64,7 +67,7 @@ export class OwnedItemsList extends LitElement {
         </div>
       ` : html`
         <div class="mb-16">
-          ${repeat(this.databaseItems, community => community.databaseId, database => html`
+          ${repeat(this.databaseItems, database => database.databaseId, database => html`
             <div class="px-2 pt-3 pb-1">
               <a href="/${database.databaseId}" class="sm:hover:underline">
                 <span class="font-medium">${displayNames.render(database.databaseId)}</span>
@@ -76,17 +79,15 @@ export class OwnedItemsList extends LitElement {
                 class="flex items-center px-3 py-3 bg-white mb-0.5 cursor-pointer sm:rounded sm:hover:bg-gray-50"
                 @click=${e => this.onClickViewItem(e, item)}
               >
-                <span class="mr-1">
-                  ${item.value.classId === 'paulbucks' ? html`
-                    <span class="fas fa-fw fa-money-bill mr-1 text-sm text-green-500"></span>
-                  ` : item.value.classId === 'ratings' ? html`
-                    <span class="fas fa-fw fa-chart-line mr-1 text-sm text-red-500"></span>
-                  ` : html`
-                    <span class="fas fa-fw fa-crown mr-1 text-sm text-yellow-500"></span>
-                  `}
+                <span class="mr-2">
+                  <img
+                    src=${ITEM_CLASS_ICON_URL(database.databaseId, item.value.classId)}
+                    class="block w-4 h-4 object-cover"
+                  >
                 </span>
                 <span class="flex-1 truncate">
-                  ${item.value.classId}
+                  ${this.getItemClassName(item)}
+                  <span class="text-sm text-gray-600">${item.itemClass?.value.description}</span>
                 </span>
                 <span class="px-1">
                   ${item.value.qty}

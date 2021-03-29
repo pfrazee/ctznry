@@ -3,6 +3,7 @@ import { repeat } from '../../vendor/lit-element/lit-html/directives/repeat.js'
 import PullToRefresh from '../../vendor/pulltorefreshjs/index.js'
 import { ViewActivityPopup } from './popups/view-activity.js'
 import * as displayNames from '../lib/display-names.js'
+import { ITEM_CLASS_ICON_URL } from '../lib/const.js'
 import * as session from '../lib/session.js'
 import { emit } from '../lib/dom.js'
 
@@ -10,6 +11,7 @@ const CHECK_NEW_ITEMS_INTERVAL = 15e3
 
 const METHOD_COLORS = {
   'ctzn.network/create-item-method': 'green-900',
+  'ctzn.network/create-item-class-method': 'green-900',
   'ctzn.network/transfer-item-method': 'blue-900',
   'ctzn.network/community-remove-member-method': 'red-900',
   'ctzn.network/community-put-ban-method': 'red-900',
@@ -18,6 +20,7 @@ const METHOD_COLORS = {
 }
 const METHOD_BGS = {
   'ctzn.network/create-item-method': 'green-400',
+  'ctzn.network/create-item-class-method': 'green-400',
   'ctzn.network/transfer-item-method': 'blue-400',
   'ctzn.network/community-remove-member-method': 'red-400',
   'ctzn.network/community-put-ban-method': 'red-400',
@@ -40,6 +43,11 @@ const METHOD_ICONS = {
   'ctzn.network/create-item-method': html`
     <span class="far fa-gem absolute" style="left: 9px; top: 6px; font-size: 13px;"></span>
     <span class="fas fa-plus absolute" style="right: 9px; bottom: 0px; font-size: 11px"></span>
+  `,
+  'ctzn.network/create-item-class-method': html`
+    <span class="absolute" style="left: 8px; top: 0px; font-size: 16px;">
+      {<span class="far fa-gem" style="font-size: 12px"></span>}
+    </span>
   `,
   'ctzn.network/delete-item-class-method': html`
     <span class="absolute" style="left: 8px; top: 0x; font-size: 16px;">
@@ -70,7 +78,12 @@ const METHOD_ICONS = {
   'ctzn.network/transfer-item-method': html`
     <span class="far fa-gem absolute" style="left: 9px; top: 6px; font-size: 13px;"></span>
     <span class="fas fa-arrow-right absolute" style="right: 9px; bottom: 0px; font-size: 11px"></span>
-  `
+  `,
+  'ctzn.network/update-item-class-method': html`
+    <span class="absolute" style="left: 8px; top: 0px; font-size: 16px;">
+      {<span class="far fa-gem" style="font-size: 12px"></span>}
+    </span>
+  `,
 }
 
 export class ActivityFeed extends LitElement {
@@ -349,8 +362,12 @@ export class ActivityFeed extends LitElement {
     const {classId, qty, owner} = entry.call.args
     return html`
       created
-      <span class="bg-gray-100 font-semibold inline-block px-1 rounded text-gray-800 text-sm">
-        <span class="fas fa-fw fa-money-bill text-sm text-green-500"></span>
+      <span class="font-semibold text-gray-800 text-sm">
+        <img
+          src=${ITEM_CLASS_ICON_URL(entry.call.database.userId, classId)}
+          class="relative inline-block w-4 h-4 object-cover"
+          style="top: -2px"
+        >
         ${qty}
       </span>
       for
@@ -358,11 +375,28 @@ export class ActivityFeed extends LitElement {
     `
   }
   
+  renderCreateItemClassMethod (entry) {
+    const {classId} = entry.call.args
+    return html`
+      created the item class
+      <img
+        src=${ITEM_CLASS_ICON_URL(entry.call.database.userId, classId)}
+        class="relative inline-block w-4 h-4 object-cover"
+        style="top: -2px"
+      >
+      <span class="text-black">${classId}</span>
+    `
+  }
+  
   renderDeleteItemClassMethod (entry) {
     const {classId} = entry.call.args
     return html`
       deleted the item class
-      <span class="fas fa-fw fa-money-bill text-sm text-green-500"></span>
+      <img
+        src=${ITEM_CLASS_ICON_URL(entry.call.database.userId, classId)}
+        class="relative inline-block w-4 h-4 object-cover"
+        style="top: -2px"
+      >
       <span class="text-black">${classId}</span>
     `
   }
@@ -372,8 +406,12 @@ export class ActivityFeed extends LitElement {
     const [classId] = itemKey.split(':')
     return html`
       destroyed
-      <span class="bg-gray-100 font-semibold inline-block px-1 rounded text-gray-800 text-sm">
-        <span class="fas fa-fw fa-money-bill text-sm text-green-500"></span>
+      <span class="font-semibold text-gray-800 text-sm">
+        <img
+          src=${ITEM_CLASS_ICON_URL(entry.call.database.userId, classId)}
+          class="relative inline-block w-4 h-4 object-cover"
+          style="top: -2px"
+        >
         ${qty}
       </span>
     `
@@ -395,8 +433,12 @@ export class ActivityFeed extends LitElement {
   renderPutItemClassMethod (entry) {
     const {classId} = entry.call.args
     return html`
-      set up the item class 
-      <span class="fas fa-fw fa-money-bill text-sm text-green-500"></span>
+      set up the item class
+      <img
+        src=${ITEM_CLASS_ICON_URL(entry.call.database.userId, classId)}
+        class="relative inline-block w-4 h-4 object-cover"
+        style="top: -2px"
+      >
       <span class="text-black">${classId}</span>
     `
   }
@@ -412,11 +454,28 @@ export class ActivityFeed extends LitElement {
     const [classId] = itemKey.split(':')
     return html`
       gave
-      <span class="bg-gray-100 font-semibold inline-block px-1 rounded text-gray-800 text-sm">
-        <span class="fas fa-fw fa-money-bill text-sm text-green-500"></span>
+      <span class="font-semibold text-gray-800 text-sm">
+        <img
+          src=${ITEM_CLASS_ICON_URL(entry.call.database.userId, classId)}
+          class="relative inline-block w-4 h-4 object-cover"
+          style="top: -2px"
+        >
         ${qty}
       </span>
       to <span class="font-medium text-black">${displayNames.render(recp.userId)}</span>
+    `
+  }
+  
+  renderUpdateItemClassMethod (entry) {
+    const {classId} = entry.call.args
+    return html`
+      updated the item class
+      <img
+        src=${ITEM_CLASS_ICON_URL(entry.call.database.userId, classId)}
+        class="relative inline-block w-4 h-4 object-cover"
+        style="top: -2px"
+      >
+      <span class="text-black">${classId}</span>
     `
   }
 

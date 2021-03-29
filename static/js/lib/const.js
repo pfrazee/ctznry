@@ -16,6 +16,11 @@ export function AVATAR_URL (userId) {
   return joinPath(HTTP_ENDPOINT(domain), '.view/ctzn.network/avatar-view', username)
 }
 
+export function ITEM_CLASS_ICON_URL (userId, classId) {
+  const {domain, username} = parseUserId(userId)
+  return joinPath(HTTP_ENDPOINT(domain), '.view/ctzn.network/item-class-icon-view', username, classId)
+}
+
 export function POST_URL (post) {
   return '/' + joinPath(post.author.userId, 'ctzn.network/post', post.key)
 }
