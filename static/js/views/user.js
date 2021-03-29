@@ -848,6 +848,15 @@ class CtznUser extends LitElement {
   }
 
   async onClickEditProfile (e) {
+    const hasChanges = (newProfile, oldProfile) => {
+      for (let k in newProfile) {
+        if (oldProfile[k] !== newProfile[k]) {
+          return true
+        }
+      }
+      return false
+    }
+
     const uploadBlob = async (blobName, dataUrl) => {
       let {base64buf, mimeType} = images.parseDataUrl(dataUrl)
       let res, lastError
@@ -875,16 +884,22 @@ class CtznUser extends LitElement {
     
     try {
       let isPending = false
-      if (this.isCitizen) {
-        await session.ctzn.user.table('ctzn.network/profile').create(newProfile.profile)
-      } else if (this.isCommunity) {
-        let res = await session.ctzn.db(this.userId).method(
-          'ctzn.network/put-profile-method',
-          newProfile.profile
-        )
-        isPending = isPending || res.pending()
+
+      // update profile data
+      if (hasChanges(newProfile.profile, this.userProfile.value)) {
+        if (this.isCitizen) {
+          await session.ctzn.user.table('ctzn.network/profile').create(newProfile.profile)
+        } else if (this.isCommunity) {
+          let res = await session.ctzn.db(this.userId).method(
+            'ctzn.network/put-profile-method',
+            newProfile.profile
+          )
+          isPending = isPending || res.pending()
+        }
+        this.userProfile.value = newProfile.profile
       }
-      this.userProfile.value = newProfile.profile
+
+      // update avatar
       if (newProfile.uploadedAvatar) {
         toast.create('Uploading avatar...')
         if (this.isCitizen) {
@@ -901,6 +916,8 @@ class CtznUser extends LitElement {
           isPending = isPending || res.pending()
         }
       }
+
+      // update banner
       if (newProfile.uploadedBanner) {
         toast.create('Uploading banner image...')
         if (this.isCitizen) {
