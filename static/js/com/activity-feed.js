@@ -1,7 +1,7 @@
 import { LitElement, html } from '../../vendor/lit-element/lit-element.js'
 import { repeat } from '../../vendor/lit-element/lit-html/directives/repeat.js'
 import PullToRefresh from '../../vendor/pulltorefreshjs/index.js'
-import { AVATAR_URL } from '../lib/const.js'
+import { ViewActivityPopup } from './popups/view-activity.js'
 import * as displayNames from '../lib/display-names.js'
 import * as session from '../lib/session.js'
 import { emit } from '../lib/dom.js'
@@ -299,7 +299,10 @@ export class ActivityFeed extends LitElement {
     const renderMethod = this[`render${methodName}`]
     if (!renderMethod) return ''
     return html`
-      <div class="flex items-center bg-white px-2 py-3 sm:py-2 sm:rounded mb-0.5 sm:hover:bg-gray-50 cursor-pointer">
+      <div
+        class="flex items-center bg-white px-2 py-3 sm:py-2 sm:rounded mb-0.5 sm:hover:bg-gray-50 cursor-pointer"
+        @click=${e => this.onClickActivity(e, entry)}
+      >
         <span class="block rounded bg-${METHOD_BGS[entry.call.method] || 'gray-200'} w-10 h-10 pt-1.5 mr-2">
           <span class="block relative rounded w-10 h-6 text-${METHOD_COLORS[entry.call.method] || 'gray-700'}">
             ${METHOD_ICONS[entry.call.method]}
@@ -424,6 +427,10 @@ export class ActivityFeed extends LitElement {
     this.hasNewEntries = false
     this.load()
     window.scrollTo(0, 0)
+  }
+
+  onClickActivity (e, entry) {
+    ViewActivityPopup.create({activity: entry})
   }
 }
 

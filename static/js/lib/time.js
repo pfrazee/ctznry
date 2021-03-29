@@ -1,4 +1,4 @@
-import {pluralize} from './lib/strings.js'
+import {pluralize} from './strings.js'
 
 const shortFormatter = new Intl.DateTimeFormat('en-US', {
   month: 'short',
@@ -51,4 +51,22 @@ export function timeDifference (ts, short = false, postfix = 'ago') {
     let n = Math.round(elapsed/msPerYear)
     return `${n}${short ? 'yr' : pluralize(n, ' year')} ${postfix}`
   }
+}
+
+const MINUTE = 1e3 * 60
+const HOUR = 1e3 * 60 * 60
+const DAY = HOUR * 24
+const rtf = new Intl.RelativeTimeFormat('en', {numeric: 'auto'})
+export function relativeDate (d) {
+  const nowMs = Date.now()
+  const endOfTodayMs = +((new Date).setHours(23,59,59,999))
+  const dMs = +(new Date(d))
+  let diff = nowMs - dMs
+  let dayDiff = Math.floor((endOfTodayMs - dMs) / DAY)
+  if (diff < (MINUTE * 5)) return 'just now'
+  if (diff < HOUR) return rtf.format(Math.ceil(diff / MINUTE * -1), 'minute')
+  if (dayDiff < 1) return rtf.format(Math.ceil(diff / HOUR * -1), 'hour')
+  if (dayDiff <= 30) return rtf.format(dayDiff * -1, 'day')
+  if (dayDiff <= 365) return rtf.format(Math.floor(dayDiff / 30) * -1, 'month')
+  return rtf.format(Math.floor(dayDiff / 365) * -1, 'year')
 }
