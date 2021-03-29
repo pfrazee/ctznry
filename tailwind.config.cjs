@@ -10,12 +10,12 @@ module.exports = {
         'bg-pink-600',
         'hover:bg-pink-700',
         'border-pink-800',
-        'text-green-700',
-        'text-blue-700',
-        'text-red-700',
-        'bg-green-50',
-        'bg-blue-50',
-        'bg-red-50'
+        'text-green-900',
+        'text-blue-900',
+        'text-red-900',
+        'bg-green-400',
+        'bg-blue-400',
+        'bg-red-400'
       ]
     }
   },
