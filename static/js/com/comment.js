@@ -2,14 +2,16 @@ import { LitElement, html } from '../../vendor/lit-element/lit-element.js'
 import { unsafeHTML } from '../../vendor/lit-element/lit-html/directives/unsafe-html.js'
 import { ifDefined } from '../../vendor/lit-element/lit-html/directives/if-defined.js'
 import { repeat } from '../../vendor/lit-element/lit-html/directives/repeat.js'
-import { AVATAR_URL, COMMENT_URL, FULL_COMMENT_URL, SUGGESTED_REACTIONS } from '../lib/const.js'
+import { AVATAR_URL, ITEM_CLASS_ICON_URL, COMMENT_URL, FULL_COMMENT_URL, SUGGESTED_REACTIONS } from '../lib/const.js'
 import { writeToClipboard } from '../lib/clipboard.js'
 import { CommentComposerPopup } from './popups/comment-composer.js'
+import { TransferItemRelatedPopup } from './popups/transfer-item-related.js'
 import * as session from '../lib/session.js'
 import { emit } from '../lib/dom.js'
 import { makeSafe, linkify, pluralize } from '../lib/strings.js'
 import { emojify } from '../lib/emojify.js'
 import { ReactionsListPopup } from './popups/reactions-list.js'
+import { RelatedItemTransfersListPopup } from './popups/related-item-transfers-list.js'
 import * as displayNames from '../lib/display-names.js'
 import * as contextMenu from './context-menu.js'
 import * as toast from './toast.js'
@@ -78,8 +80,22 @@ export class Comment extends LitElement {
     })
   }
 
+  get hasReactionsOrGifts () {
+    return (
+      this.comment.relatedItemTransfers?.length > 0
+      || (this.comment.reactions && Object.keys(this.comment.reactions).length > 0)
+    )
+  }
+
   async reloadSignals () {
     this.comment.reactions = (await session.ctzn.view('ctzn.network/reactions-to-view', this.comment.url))?.reactions
+    if (this.communityUserId) {
+      this.comment.relatedItemTransfers = (
+        await session.ctzn.db(`server@${this.communityUserId.split('@')[1]}`)
+          .table('ctzn.network/item-tfx-relation-idx')
+          .get(this.comment.url)
+      )?.value.transfers
+    }
     this.requestUpdate()
   }
 
@@ -129,7 +145,12 @@ export class Comment extends LitElement {
             </a>
           </div>
           <div class="whitespace-pre-wrap break-words text-base leading-snug text-gray-700 pt-2 pb-1.5 pl-5 pr-2.5">${this.renderCommentText()}</div>
-          ${this.renderReactions()}
+          ${this.hasReactionsOrGifts ? html`
+            <div class="pb-1 pl-5">
+              ${this.renderGiftedItems()}
+              ${this.renderReactions()}
+            </div>
+          ` : ''}
           <div class="pl-4">
             <a
               class="cursor-pointer tooltip-right hover:bg-gray-100 px-2 py-1 text-xs text-gray-500 font-bold"
@@ -145,9 +166,10 @@ export class Comment extends LitElement {
             >
               <span class="fas fa-fw fa-${this.isReactionsOpen ? 'minus' : 'plus'}"></span>
             </a>
-            ${this.renderReactionsSummary()}
+            ${this.renderGiftItemBtn()}
+            ${this.renderActionsSummary()}
             <a
-              class="cursor-pointer tooltip-right hover:bg-gray-100 px-2 py-1 text-xs text-gray-500 font-bold"
+              class="cursor-pointer tooltip-right hover:bg-gray-100 px-2 py-1 ml-2 text-xs text-gray-500 font-bold"
               @click=${this.onClickMenu}
             >
               <span class="fas fa-fw fa-ellipsis-h"></span>
@@ -210,30 +232,76 @@ export class Comment extends LitElement {
       return ''
     }
     return html`
-      <div class="pb-1 pl-5 text-gray-500 text-sm">
-        ${repeat(Object.entries(this.comment.reactions), ([reaction, userIds]) => {
-          const colors = this.haveIReacted(reaction) ? 'bg-blue-50 sm:hover:bg-blue-100 text-blue-600' : 'bg-gray-100 sm:hover:bg-gray-200'
-          return html`
-            <a
-              class="inline-block mr-1.5 px-1.5 py-0.5 rounded cursor-pointer ${colors}"
-              @click=${e => this.onClickReaction(e, reaction)}
-            >
-              ${unsafeHTML(emojify(makeSafe(reaction)))}
-              <sup class="font-medium">${userIds.length}</sup>
-            </a>
-          `
-        })}
-      </div>
+      ${repeat(Object.entries(this.comment.reactions), ([reaction, userIds]) => {
+        const colors = this.haveIReacted(reaction) ? 'bg-blue-50 sm:hover:bg-blue-100 text-blue-600' : 'bg-gray-100 text-gray-500 sm:hover:bg-gray-200'
+        return html`
+          <a
+            class="inline-block mr-1 px-1.5 py-0.5 mt-1 text-sm rounded cursor-pointer ${colors}"
+            @click=${e => this.onClickReaction(e, reaction)}
+          >
+            ${unsafeHTML(emojify(makeSafe(reaction)))}
+            <sup class="font-medium">${userIds.length}</sup>
+          </a>
+        `
+      })}
     `
   }
 
-  renderReactionsSummary () {
-    const count = this.comment.reactions ? Object.values(this.comment.reactions).reduce((acc, v) => acc + v.length, 0) : 0
-    let aCls = `inline-block ml-1 mr-6 rounded text-sm text-gray-500 ${count ? 'cursor-pointer hover:underline' : ''}`
+  renderGiftedItems () {
+    if (!this.comment.relatedItemTransfers?.length) {
+      return ''
+    }
     return html`
-      <a class=${aCls} @click=${count ? this.onClickViewReactions : undefined}>
-        ${count} ${pluralize(count, 'reaction')}
+      ${repeat(this.comment.relatedItemTransfers, item => html`
+        <span
+          class="inline-block border border-gray-300 px-1 py-0.5 rounded mt-1 mr-1 text-sm font-semibold"
+        >
+          <img
+            class="inline relative w-4 h-4 object-cover mr-1"
+            src=${ITEM_CLASS_ICON_URL(this.communityUserId, item.itemClassId)}
+            style="top: -1px"
+          >
+          ${item.qty}
+        </span>
+      `)}
+    `
+  }
+
+  renderGiftItemBtn () {
+    let aCls = `inline-block px-1 rounded px-2 py-1 text-xs`
+    if (this.communityUserId && this.canInteract && !this.isMyComment) {
+      return html`
+        <a class="${aCls} text-gray-500 cursor-pointer hover:bg-gray-100" @click=${this.onClickGiftItem}>
+          <span class="fas fa-fw fa-gift"></span>
+        </a>
+      `
+    } else {
+      const tooltip = this.isMyComment
+        ? `Can't gift to yourself`
+        : this.communityUserId
+          ? `Must be a member of the community`
+          : `Must be a community post`
+      return html`
+        <a class="${aCls} text-gray-300 tooltip-top" data-tooltip=${tooltip}>
+          <span class="fas fa-fw fa-gift"></span>
+        </a>
+      `
+    }
+  }
+
+  renderActionsSummary () {
+    const reactionsCount = this.comment.reactions ? Object.values(this.comment.reactions).reduce((acc, v) => acc + v.length, 0) : 0
+    const giftsCount = this.comment.relatedItemTransfers?.length || 0
+    let reactionsCls = `inline-block ml-1 text-sm text-gray-500 ${reactionsCount ? 'cursor-pointer hover:underline' : ''}`
+    return html`
+      <a class=${reactionsCls} @click=${reactionsCount ? this.onClickViewReactions : undefined}>
+        ${reactionsCount} ${pluralize(reactionsCount, 'reaction')}${giftsCount > 0 ? ', ' : ''}
       </a>
+      ${giftsCount > 0 ? html`
+        <a class="inline-block ml-1 text-sm rounded text-gray-500 cursor-pointer hover:underline" @click=${this.onClickViewGifts}>
+          ${giftsCount} ${pluralize(giftsCount, 'gift')}
+        </a>
+      ` : ''}
     `
   }
 
@@ -317,6 +385,14 @@ export class Comment extends LitElement {
     this.reloadSignals()
   }
 
+  async onClickGiftItem () {
+    await TransferItemRelatedPopup.create({
+      communityId: this.communityUserId,
+      subject: this.comment
+    })
+    this.reloadSignals()
+  }
+
   onClickMenu (e) {
     e.preventDefault()
     e.stopPropagation()
@@ -385,6 +461,13 @@ export class Comment extends LitElement {
   onClickViewReactions (e) {
     ReactionsListPopup.create({
       reactions: this.comment.reactions
+    })
+  }
+
+  onClickViewGifts (e) {
+    RelatedItemTransfersListPopup.create({
+      communityId: this.communityUserId,
+      relatedItemTransfers: this.comment.relatedItemTransfers
     })
   }
 }
