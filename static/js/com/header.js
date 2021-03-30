@@ -95,8 +95,17 @@ export class Header extends LitElement {
                 Profile
               </a>
             </div>
-          ` : ''}
-          ${session.hasOneSaved() ? html`
+
+            <h3 class="font-bold pl-4 mb-1 text-gray-500 text-xs">
+              My Items
+            </h3>
+            <div class="px-2 pb-3 mb-3 flex flex-col">
+              <a href="/${info.userId}/inventory" class=${this.getMenuNavClass()}>
+                <span class="fas mr-1.5 fa-fw navicon fa-shopping-bag"></span>
+                My Inventory
+              </a>
+            </div>
+
             <h3 class="font-bold pl-4 mb-1 text-gray-500 text-xs">
               My Communities
             </h3>

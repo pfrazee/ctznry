@@ -68,32 +68,34 @@ export class OwnedItemsList extends LitElement {
       ` : html`
         <div class="mb-16">
           ${repeat(this.databaseItems, database => database.databaseId, database => html`
-            <div class="px-2 pt-3 pb-1">
+            <div class="px-2 pb-1">
               <a href="/${database.databaseId}" class="sm:hover:underline">
                 <span class="font-medium">${displayNames.render(database.databaseId)}</span>
                 <span class="text-sm text-gray-600">${database.databaseId}</span>
               </a>
             </div>
-            ${repeat(database.items, item => item.key, item => html`
-              <div
-                class="flex items-center px-3 py-3 bg-white mb-0.5 cursor-pointer sm:rounded sm:hover:bg-gray-50"
-                @click=${e => this.onClickViewItem(e, item)}
-              >
-                <span class="mr-2">
-                  <img
-                    src=${ITEM_CLASS_ICON_URL(database.databaseId, item.value.classId)}
-                    class="block w-4 h-4 object-cover"
-                  >
-                </span>
-                <span class="flex-1 truncate">
-                  ${this.getItemClassName(item)}
-                  <span class="text-sm text-gray-600">${item.itemClass?.value.description}</span>
-                </span>
-                <span class="px-1">
-                  ${item.value.qty}
-                </span>
-              </div>
-            `)}
+            <div class="mb-3">
+              ${repeat(database.items, item => item.key, item => html`
+                <div
+                  class="flex items-center px-3 py-3 bg-white mb-0.5 cursor-pointer sm:rounded sm:hover:bg-gray-50"
+                  @click=${e => this.onClickViewItem(e, item)}
+                >
+                  <span class="mr-2">
+                    <img
+                      src=${ITEM_CLASS_ICON_URL(database.databaseId, item.value.classId)}
+                      class="block w-4 h-4 object-cover"
+                    >
+                  </span>
+                  <span class="flex-1 truncate">
+                    ${this.getItemClassName(item)}
+                    <span class="text-sm text-gray-600">${item.itemClass?.value.description}</span>
+                  </span>
+                  <span class="px-1">
+                    ${item.value.qty}
+                  </span>
+                </div>
+              `)}
+            </div>
           `)}
         </div>
       `}

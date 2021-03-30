@@ -3,18 +3,19 @@ import { html } from '../../../vendor/lit-element/lit-element.js'
 import { repeat } from '../../../vendor/lit-element/lit-html/directives/repeat.js'
 import { BasePopup } from './base.js'
 import * as session from '../../lib/session.js'
+import * as displayNames from '../../lib/display-names.js'
 import '../button.js'
 import '../post.js'
 
 // exported api
 // =
 
-export class TransferItemRelatedPopup extends BasePopup {
+export class TransferItemPopup extends BasePopup {
   static get properties () {
     return {
-      communityId: {type: String},
-      subject: {type: Object},
+      recpUserId: {type: String},
       availableItems: {type: Array},
+      sharedCommunities: {type: Array},
       selectedItem: {type: Object},
       isProcessing: {type: Boolean},
       currentError: {type: String}
@@ -23,9 +24,9 @@ export class TransferItemRelatedPopup extends BasePopup {
 
   constructor (opts) {
     super()
-    this.communityId = opts.communityId
-    this.subject = opts.subject
+    this.recpUserId = opts.recpUserId
     this.availableItems = undefined
+    this.sharedCommunities = undefined
     this.selectedItem = undefined
     this.isProcessing = false
     this.currentError = undefined
@@ -34,7 +35,9 @@ export class TransferItemRelatedPopup extends BasePopup {
 
   async load () {
     const ownedItems = await session.ctzn.listOwnedItems(session.info.userId)
-    this.availableItems = ownedItems.filter(item => item.databaseId === this.communityId)
+    const recpMemberships = await session.ctzn.db(this.recpUserId).table('ctzn.network/community-membership').list()
+    this.sharedCommunities = session.myCommunities.filter(c => recpMemberships.find(m => m.value.community.userId === c.userId))
+    this.availableItems = ownedItems.filter(item => this.sharedCommunities.find(c => c.userId === item.databaseId))
     this.selectedItem = this.availableItems[0]
   }
 
@@ -58,11 +61,11 @@ export class TransferItemRelatedPopup extends BasePopup {
   //
 
   static async create (opts) {
-    return BasePopup.create(TransferItemRelatedPopup, opts)
+    return BasePopup.create(TransferItemPopup, opts)
   }
 
   static destroy () {
-    return BasePopup.destroy('transfer-item-related-popup')
+    return BasePopup.destroy('transfer-item-popup')
   }
 
   // rendering
@@ -71,14 +74,7 @@ export class TransferItemRelatedPopup extends BasePopup {
   renderBody () {
     return html`
       <form class="" @submit=${this.onSubmit}>
-        <h2 class="font-medium pb-2 text-2xl">Gift item for:</h2>
-
-        <ctzn-post
-          class="block border border-gray-300 mb-1 px-2 rounded"
-          .post=${this.subject}
-          noctrls
-          noclick
-        ></ctzn-post>
+        <h2 class="font-medium pb-2 text-2xl">Give item to ${displayNames.render(this.recpUserId)}</h2>
 
         <label class="block font-semibold p-1" for="item-input">Item</label>
         <div class="relative">
@@ -97,7 +93,20 @@ export class TransferItemRelatedPopup extends BasePopup {
             ` : html`
               <div class="bg-gray-100 px-4 py-3 rounded">
                 <span class="far fa-fw fa-frown"></span>
-                You don't own any items in this community.
+                ${this.sharedCommunities.length === 0 ? html`
+                  You aren't in any communities with ${displayNames.render(this.recpUserId)}.
+                ` : html`
+                  You don't own any items in the communities you share with ${displayNames.render(this.recpUserId)}.
+                `}
+              </div>
+              <div class="flex pl-2 pt-2">
+                <span class="mr-1.5 text-gray-600">
+                  <span class="fas fa-info-circle fa-fw"></span>
+                </span>
+                <span class="flex-1 text-gray-500 text-sm">
+                  Items are a communities feature.
+                  Each item is specific to a community and can only be given to other members of that community.
+                </span>
               </div>
             `}
           ` : html`
@@ -178,7 +187,7 @@ export class TransferItemRelatedPopup extends BasePopup {
 
     let recp
     try {
-      recp = await session.ctzn.lookupUser(this.subject.author.userId)
+      recp = await session.ctzn.lookupUser(this.recpUserId)
       if (!recp.userId || !recp.dbUrl) throw new Error('webfinger lookup failed')
     } catch (e) {
       this.currentError = `Failed to lookup recp details: ${e.toString()}`
@@ -187,11 +196,10 @@ export class TransferItemRelatedPopup extends BasePopup {
     }
     
     try {
-      await session.ctzn.db(this.communityId).method('ctzn.network/transfer-item-method', {
+      await session.ctzn.db(this.selectedItem.databaseId).method('ctzn.network/transfer-item-method', {
         itemKey: this.selectedItem.key,
         qty,
-        recp,
-        relatedTo: {dbUrl: this.subject.url}
+        recp
       })
     } catch (e) {
       this.currentError = e.message || e.data || e.toString()
@@ -202,4 +210,4 @@ export class TransferItemRelatedPopup extends BasePopup {
   }
 }
 
-customElements.define('transfer-item-related-popup', TransferItemRelatedPopup)
+customElements.define('transfer-item-popup', TransferItemPopup)

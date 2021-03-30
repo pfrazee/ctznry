@@ -7,6 +7,7 @@ import { EditRolePopup } from '../com/popups/edit-role.js'
 import { ViewMediaPopup } from '../com/popups/view-media.js'
 import { BanPopup } from '../com/popups/ban.js'
 import { ManageBansPopup } from '../com/popups/manage-bans.js'
+import { TransferItemPopup } from '../com/popups/transfer-item.js'
 import * as contextMenu from '../com/context-menu.js'
 import * as toast from '../com/toast.js'
 import { AVATAR_URL, BLOB_URL, PERM_DESCRIPTIONS } from '../lib/const.js'
@@ -710,6 +711,16 @@ class CtznUser extends LitElement {
 
   renderCitizenInventory () {
     return html`
+      ${!this.isMe ? html`
+        <div class="mx-2 sm:mx-0 mt-3 mb-2 rounded-full border border-gray-300 px-2 py-2">
+          <ctzn-button
+            btn-class="rounded-full py-1"
+            icon="fas fa-fw fa-exchange-alt"
+            label="Give Item"
+            @click=${this.onClickGiveItem}
+          ></ctzn-button>
+        </div>
+      ` : html`<div class="mb-3"></div>`}
       <ctzn-owned-items-list
         user-id=${this.userId}
       ></ctzn-owned-items-list>
@@ -1103,6 +1114,12 @@ class CtznUser extends LitElement {
       console.log(e)
       toast.create(e.toString(), 'error')
     }
+  }
+
+  async onClickGiveItem (e) {
+    TransferItemPopup.create({
+      recpUserId: this.userId
+    })
   }
 
   onClickControlsMenu (e) {
