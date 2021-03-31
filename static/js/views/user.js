@@ -384,7 +384,7 @@ class CtznUser extends LitElement {
             href="/${this.userId}"
             title=${this.userProfile?.value.displayName}
           >
-            ${unsafeHTML(emojify(makeSafe(this.userProfile?.value.displayName)))}
+            ${unsafeHTML(emojify(makeSafe(this.userProfile?.value.displayName), 'w-10', '0'))}
           </a>
         </h2>
         <h2

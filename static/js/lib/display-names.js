@@ -26,7 +26,7 @@ export async function* fetcher (userId) {
     })()
   }
   displayName = await _activeFetches[userId]
-  yield html`${unsafeHTML(emojify(makeSafe(displayName)))}`
+  yield html`${unsafeHTML(emojify(makeSafe(displayName), 'w-4', '0'))}`
   set(userId, displayName)
 }
 

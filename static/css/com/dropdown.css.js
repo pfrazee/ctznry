@@ -223,7 +223,7 @@ const cssStr = css`
   margin-right: 3px;
 }
 
-.dropdown-item img {
+.dropdown-item img:not(.emoji) {
   display: inline-block;
   width: 16px;
   position: relative;
@@ -279,7 +279,7 @@ const cssStr = css`
   align-items: center;
 }
 
-.dropdown-item .img-wrapper img {
+.dropdown-item .img-wrapper img:not(.emoji) {
   display: block;
   top: 0;
   height: 40px;
@@ -291,5 +291,9 @@ const cssStr = css`
   margin-left: 0;
 }
 
+.emoji {
+  display: inline-block;
+  width: 1rem;
+}
 `
 export default cssStr
