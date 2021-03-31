@@ -53,6 +53,7 @@ class CtznUser extends LitElement {
   constructor () {
     super()
     this.reset()
+    this.currentView = 'feed'
     this.isJoiningOrLeaving = false
     this.expandedSections = {}
 
@@ -70,7 +71,6 @@ class CtznUser extends LitElement {
   reset () {
     this.isProfileLoading = false
     this.userProfile = undefined
-    this.currentView = 'feed'
     this.followers = undefined
     this.following = undefined
     this.members = undefined
