@@ -600,7 +600,7 @@ class CtznUser extends LitElement {
         ${this.isEmpty ? this.renderEmptyMessage() : ''}
         <ctzn-feed
           .source=${this.userId}
-          limit="50"
+          limit="15"
           @load-state-updated=${this.onFeedLoadStateUpdated}
           @publish-reply=${this.onPublishReply}
           @delete-post=${this.onDeletePost}

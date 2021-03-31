@@ -158,7 +158,7 @@ class CtznMainView extends LitElement {
             ${this.renderMockComposer()}
             ${this.isEmpty ? this.renderEmptyMessage() : ''}
             <ctzn-feed
-              limit="50"
+              limit="15"
               @load-state-updated=${this.onFeedLoadStateUpdated}
               @publish-reply=${this.onPublishReply}
               @delete-post=${this.onDeletePost}

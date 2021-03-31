@@ -140,7 +140,7 @@ export class Feed extends LitElement {
     } else {
       results = results.concat((await session.ctzn.view('ctzn.network/feed-view', {limit: this.limit, reverse: true, lt}))?.feed)
     }
-    console.log(results)
+    console.log(this.limit, results)
 
     if (!more && _cache?.path === window.location.pathname && _cache?.results?.[0]?.url === results[0]?.url) {
       // stick with the cache but update the signal metrics

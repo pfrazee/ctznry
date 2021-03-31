@@ -81,7 +81,7 @@ class CtznNotifications extends LitElement {
           </div>
           <ctzn-notifications-feed
             cleared-at=${this.notificationsClearedAt}
-            limit="50"
+            limit="15"
             @load-state-updated=${this.onFeedLoadStateUpdated}
             @publish-reply=${this.onPublishReply}
           ></ctzn-notifications-feed>
