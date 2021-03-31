@@ -137,7 +137,7 @@ export class EditRolePopup extends BasePopup {
   // =
 
   onKeyupRoleId (e) {
-    this.roleId = e.currentTarget.value.trim().replace(/[^A-z0-9]/gi, '').slice(0, 64)
+    this.roleId = e.currentTarget.value.trim().replace(/[^A-z0-9-]/gi, '').slice(0, 64)
     e.currentTarget.value = this.roleId
     this.requestUpdate()
   }
