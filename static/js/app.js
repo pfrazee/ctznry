@@ -2,6 +2,7 @@ import { LitElement, html } from '../vendor/lit-element/lit-element.js'
 import * as session from './lib/session.js'
 import { emit } from './lib/dom.js'
 import { DRIVE_KEY_REGEX } from './lib/strings.js'
+import { BasePopup } from './com/popups/base.js'
 import './com/header.js'
 import './views/account.js'
 import './views/communities.js'
@@ -54,9 +55,9 @@ class CtznApp extends LitElement {
     this.isLoading = true
     this.currentPath = window.location.pathname
     this.scrollPositionCache = undefined
-    this.addEventListener('click', this.onGlobalClick.bind(this))
-    this.addEventListener('view-thread', this.onViewThread.bind(this))
-    this.addEventListener('navigate-to', this.onNavigateTo.bind(this))
+    document.body.addEventListener('click', this.onGlobalClick.bind(this))
+    document.body.addEventListener('view-thread', this.onViewThread.bind(this))
+    document.body.addEventListener('navigate-to', this.onNavigateTo.bind(this))
     window.addEventListener('popstate', this.onHistoryPopstate.bind(this))
 
     this.load()
@@ -71,6 +72,8 @@ class CtznApp extends LitElement {
   }
 
   navigateTo (pathname) {
+    BasePopup.destroy()
+    
     if (history.scrollRestoration) {
       history.scrollRestoration = 'manual'
     }

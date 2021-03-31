@@ -6,6 +6,7 @@ import { LitElement, html } from '../../../vendor/lit-element/lit-element.js'
 export class BasePopup extends LitElement {
   constructor () {
     super()
+    this.classList.add('active-popup')
 
     const onGlobalKeyUp = e => {
       // listen for the escape key
@@ -82,7 +83,7 @@ export class BasePopup extends LitElement {
     return BasePopup.coreCreate(document.body, Class, ...args)
   }
 
-  static destroy (tagName) {
+  static destroy (tagName = '.active-popup') {
     var popup = document.querySelector(tagName)
     if (popup) popup.onReject()
   }

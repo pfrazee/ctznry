@@ -1,10 +1,16 @@
 /* globals beaker */
 import { html } from '../../../vendor/lit-element/lit-element.js'
+import { asyncReplace } from '../../../vendor/lit-element/lit-html/directives/async-replace.js'
 import { BasePopup } from './base.js'
 import { AVATAR_URL, ITEM_CLASS_ICON_URL } from '../../lib/const.js'
 import * as displayNames from '../../lib/display-names.js'
 import { relativeDate } from '../../lib/time.js'
+import { extractSchemaId } from '../../lib/strings.js'
+import * as session from '../../lib/session.js'
 import '../button.js'
+import '../post.js'
+
+const _itemCache = {}
 
 // exported api
 // =
@@ -389,6 +395,12 @@ export class ViewActivityPopup extends BasePopup {
           <span class="font-medium">${displayNames.render(recp.userId)}</span>
         </div>
       </a>
+      ${this.activity.call.args.relatedTo ? html`
+        <div class="font-medium px-2 py-1 text-gray-700 text-sm">For:</div>
+        <div class="bg-white border border-gray-300 px-2 reply rounded sm:hover:bg-gray-50">
+          ${asyncReplace(this.renderSubject(this.activity.call.args.recp.userId, this.activity.call.args.relatedTo.dbUrl))}
+        </div>
+      ` : ''}
     `
   }
   
@@ -410,6 +422,34 @@ export class ViewActivityPopup extends BasePopup {
         </div>
       </div>
     `
+  }
+
+  async *renderSubject (authorId, dbUrl) {
+    if (!_itemCache[dbUrl]) {
+      yield html`Loading...`
+    }
+
+    const schemaId = extractSchemaId(dbUrl)
+    let record
+    if (schemaId === 'ctzn.network/post') {
+      record = _itemCache[dbUrl] ? _itemCache[dbUrl] : await session.ctzn.getPost(authorId, dbUrl)
+      _itemCache[dbUrl] = record
+      yield html`
+        <ctzn-post
+          .post=${record}
+          noctrls
+        ></ctzn-post>
+      `
+    } else if (schemaId === 'ctzn.network/comment') {
+      record = _itemCache[dbUrl] ? _itemCache[dbUrl] : await session.ctzn.getComment(authorId, dbUrl)
+      _itemCache[dbUrl] = record
+      yield html`
+        <ctzn-post
+          .post=${record}
+          noctrls
+        ></ctzn-post>
+      `
+    }
   }
 
   // events

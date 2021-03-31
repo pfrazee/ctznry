@@ -1,13 +1,17 @@
 import { LitElement, html } from '../../vendor/lit-element/lit-element.js'
 import { repeat } from '../../vendor/lit-element/lit-html/directives/repeat.js'
+import { asyncReplace } from '../../vendor/lit-element/lit-html/directives/async-replace.js'
 import PullToRefresh from '../../vendor/pulltorefreshjs/index.js'
 import { ViewActivityPopup } from './popups/view-activity.js'
 import * as displayNames from '../lib/display-names.js'
 import { ITEM_CLASS_ICON_URL } from '../lib/const.js'
 import * as session from '../lib/session.js'
 import { emit } from '../lib/dom.js'
+import { extractSchemaId } from '../lib/strings.js'
+import './post.js'
 
 const CHECK_NEW_ITEMS_INTERVAL = 15e3
+const _itemCache = {}
 
 const METHOD_COLORS = {
   'ctzn.network/create-item-method': 'green-900',
@@ -189,8 +193,8 @@ export class ActivityFeed extends LitElement {
     let lt = more ? entries[entries?.length - 1]?.key : undefined
     
     const viewRes = (this.dataview === 'ctzn.network/dbmethod-feed-view')
-      ? await session.ctzn.view(this.dataview, {limit: this.limit, lt})
-      : await session.ctzn.view(this.dataview, this.userId, {limit: this.limit, reverse: true, lt})
+      ? await session.ctzn.view(this.dataview, {limit: 25, lt})
+      : await session.ctzn.view(this.dataview, this.userId, {limit: 25, reverse: true, lt})
     let newEntries
     if (viewRes.results) {
       newEntries = viewRes.results.map(resultToGeneric)
@@ -311,9 +315,10 @@ export class ActivityFeed extends LitElement {
     methodName = methodName.replace(/(^(.)|[\-](.))/g, (match, _, char1, char2) => (char1 || char2).toUpperCase())
     const renderMethod = this[`render${methodName}`]
     if (!renderMethod) return ''
+    const hasSubject = methodName === 'TransferItemMethod' && entry.call.args.relatedTo
     return html`
       <div
-        class="flex items-center bg-white px-2 py-3 sm:py-2 sm:rounded mb-0.5 sm:hover:bg-gray-50 cursor-pointer"
+        class="flex bg-white px-2 py-3 sm:py-2 sm:rounded mb-0.5 sm:hover:bg-gray-50 cursor-pointer"
         @click=${e => this.onClickActivity(e, entry)}
       >
         <span class="block rounded bg-${METHOD_BGS[entry.call.method] || 'gray-200'} w-10 h-10 pt-1.5 mr-2">
@@ -321,15 +326,22 @@ export class ActivityFeed extends LitElement {
             ${METHOD_ICONS[entry.call.method]}
           </span>
         </span>
-        <div class="flex-1 leading-tight pt-0.5">
-          <span class="font-medium">${displayNames.render(entry.authorId)}</span>
-          <span class="text-gray-800">
-            ${renderMethod.call(this, entry)}
-          </span>
-          <span class="text-sm text-gray-600">${relativeDate(entry.result.createdAt)}</span>
+        <div class="flex-1">
+          <div class="${hasSubject ? 'pt-2.5' : 'py-2.5'} leading-tight">
+            <span class="font-medium">${displayNames.render(entry.authorId)}</span>
+            <span class="text-gray-800">
+              ${renderMethod.call(this, entry)}
+            </span>
+            <span class="text-sm text-gray-600">${relativeDate(entry.result.createdAt)}</span>
+            ${hasSubject ? html`<span class="text-sm">for:</span>` : ''}
+          </div>
+          ${hasSubject ? html`
+            <div class="border border-gray-300 mt-2 px-3 reply rounded bg-white sm:hover:bg-gray-50">
+              ${asyncReplace(this.renderSubject(entry.call.args.recp.userId, entry.call.args.relatedTo.dbUrl))}
+            </div>
+          ` : ''}
         </div>
-      </div>
-    `
+      </div>    `
   }
 
   renderCommunityDeleteBanMethod (entry) {
@@ -477,6 +489,34 @@ export class ActivityFeed extends LitElement {
       >
       <span class="text-black">${classId}</span>
     `
+  }
+
+  async *renderSubject (authorId, dbUrl) {
+    if (!_itemCache[dbUrl]) {
+      yield html`Loading...`
+    }
+
+    const schemaId = extractSchemaId(dbUrl)
+    let record
+    if (schemaId === 'ctzn.network/post') {
+      record = _itemCache[dbUrl] ? _itemCache[dbUrl] : await session.ctzn.getPost(authorId, dbUrl)
+      _itemCache[dbUrl] = record
+      yield html`
+        <ctzn-post
+          .post=${record}
+          noctrls
+        ></ctzn-post>
+      `
+    } else if (schemaId === 'ctzn.network/comment') {
+      record = _itemCache[dbUrl] ? _itemCache[dbUrl] : await session.ctzn.getComment(authorId, dbUrl)
+      _itemCache[dbUrl] = record
+      yield html`
+        <ctzn-post
+          .post=${record}
+          noctrls
+        ></ctzn-post>
+      `
+    }
   }
 
   // events

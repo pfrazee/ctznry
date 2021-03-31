@@ -155,7 +155,6 @@ export class Notification extends LitElement {
     `
   }
 
-
   async *renderSubject () {
     const {authorId, dbUrl} = this.notification.item.subject
     
