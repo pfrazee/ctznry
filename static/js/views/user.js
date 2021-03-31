@@ -285,9 +285,6 @@ class CtznUser extends LitElement {
           </div>
           ${this.renderCurrentView()}
         </div>
-        <div>
-          ${this.renderRightSidebar()}
-        </div>
       </main>
     `
   }
@@ -510,57 +507,6 @@ class CtznUser extends LitElement {
         </div>
       `
     }
-  }
-
-  renderRightSidebar () {
-    if (this.isCitizen) {
-      return this.renderCitizenRightSidebar()
-    }
-    if (this.isCommunity) {
-      return this.renderCommunityRightSidebar()
-    }
-  }
-
-  renderCitizenRightSidebar () {
-    return '' // TODO
-    const nSharedFollowers = 0 // TODOthis.followers?.myFollowed?.length || 0
-    const nMemberships = this.memberships?.length
-    return html`
-      <nav>
-        <section class="mb-2">
-          ${nSharedFollowers ? html`
-            <div class="font-medium mb-1">Followed by</div>
-            ${repeat(this.followers?.myFollowed, userId => html`
-              <a class="inline-block bg-gray-100 rounded p-1 mr-.5 mb-.5 text-xs hover:bg-gray-200" href="/${userId}">${displayNames.render(userId)}</a>
-            `)}
-          ` : ''}
-        </section>
-        <section class="mb-2">
-          ${nMemberships ? html`
-            <div class="font-medium mb-1">Member of</div>
-            ${repeat(this.memberships, membership => html`
-              <a class="inline-block bg-gray-100 rounded p-1 mr-.5 mb-.5 text-xs hover:bg-gray-200" href="/${membership.value.community.userId}">${displayNames.render(membership.value.community.userId)}</a>
-            `)}
-          ` : html`
-            <div class="py-2 px-3 text-sm text-gray-600 bg-gray-100">
-              Not a member of any communities
-            </div>
-          `}
-        </section>
-      </nav>
-    `
-  }
-
-  renderCommunityRightSidebar () {
-    return html`
-      <nav>
-        ${!this.amIAMember ? html`
-          <div class="p-1 text-gray-500 text-sm">
-            Join ${this.userProfile?.value.displayName} to participate and see the latest updates in your feed.
-          </div>
-        ` : ''}
-      </nav>
-    `
   }
 
   renderCurrentView () {
