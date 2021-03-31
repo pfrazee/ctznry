@@ -16,6 +16,7 @@ import * as displayNames from '../lib/display-names.js'
 import * as contextMenu from './context-menu.js'
 import * as toast from './toast.js'
 import './comment-composer.js'
+import './reaction-input.js'
 
 export class Comment extends LitElement {
   static get properties () {
@@ -203,27 +204,10 @@ export class Comment extends LitElement {
       return ''
     }
     return html`
-      <div class="pl-5">
-        <div class="overflow-x-auto px-1 sm:whitespace-normal whitespace-nowrap">
-          <a
-            class="inline-block text-sm px-2 py-0.5 mt-1 text-gray-500 rounded cursor-pointer bg-gray-100 sm:hover:bg-gray-200"
-            @click=${this.onClickCustomReaction}
-          >
-            Custom...
-          </a>
-          ${repeat(SUGGESTED_REACTIONS, reaction => {
-            const colors = this.haveIReacted(reaction) ? 'bg-green-500 sm:hover:bg-green-400 text-white' : 'bg-gray-100 sm:hover:bg-gray-200'
-            return html`
-              <a
-                class="inline-block rounded text-sm px-2 py-0.5 mt-1 mr-1 ${colors} cursor-pointer"
-                @click=${e => this.onClickReaction(e, reaction)}
-              >
-                ${reaction}
-              </a>
-            `
-          })}
-        </div>
-      </div>
+      <ctzn-reaction-input
+        .reactions=${this.comment.reactions}
+        @toggle-reaction=${this.onToggleReaction}
+      ></ctzn-reaction-input>
     `
   }
 
@@ -337,6 +321,10 @@ export class Comment extends LitElement {
       e.stopPropagation()
       emit(this, 'view-thread', {detail: {subject: {dbUrl: this.comment.url, authorId: this.comment.author.userId}}})
     }
+  }
+
+  onToggleReaction (e) {
+    this.onClickReaction(e, e.detail.reaction)
   }
 
   async onClickReaction (e, reaction) {

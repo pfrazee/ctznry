@@ -1,7 +1,7 @@
 import { LitElement, html } from '../../vendor/lit-element/lit-element.js'
 import { unsafeHTML } from '../../vendor/lit-element/lit-html/directives/unsafe-html.js'
 import { repeat } from '../../vendor/lit-element/lit-html/directives/repeat.js'
-import { POST_URL, ITEM_CLASS_ICON_URL, FULL_POST_URL, BLOB_URL, SUGGESTED_REACTIONS } from '../lib/const.js'
+import { POST_URL, ITEM_CLASS_ICON_URL, FULL_POST_URL, BLOB_URL } from '../lib/const.js'
 import * as session from '../lib/session.js'
 import { TransferItemRelatedPopup } from './popups/transfer-item-related.js'
 import { emit } from '../lib/dom.js'
@@ -11,6 +11,7 @@ import { writeToClipboard } from '../lib/clipboard.js'
 import * as displayNames from '../lib/display-names.js'
 import * as contextMenu from './context-menu.js'
 import * as toast from './toast.js'
+import './reaction-input.js'
 
 export class Post extends LitElement {
   static get properties () {
@@ -322,30 +323,10 @@ export class Post extends LitElement {
       return ''
     }
     return html`
-      <div>
-        <div class="font-semibold pt-2 px-1 text-gray-500 text-xs">
-          Add a reaction
-        </div>
-        <div class="overflow-x-auto px-1 sm:whitespace-normal whitespace-nowrap">
-          <a
-            class="inline-block text-sm px-2 py-0.5 mt-1 text-gray-500 rounded cursor-pointer bg-gray-100 sm:hover:bg-gray-200"
-            @click=${this.onClickCustomReaction}
-          >
-            Custom...
-          </a>
-          ${repeat(SUGGESTED_REACTIONS, reaction => {
-            const colors = this.haveIReacted(reaction) ? 'bg-green-500 sm:hover:bg-green-400 text-white' : 'bg-gray-100 sm:hover:bg-gray-200'
-            return html`
-              <a
-                class="inline-block rounded text-sm px-2 py-0.5 mt-1 mr-1 cursor-pointer ${colors}"
-                @click=${e => this.onClickReaction(e, reaction)}
-              >
-                ${reaction}
-              </a>
-            `
-          })}
-        </div>
-      </div>
+      <ctzn-reaction-input
+        .reactions=${this.post.reactions}
+        @toggle-reaction=${this.onToggleReaction}
+      ></ctzn-reaction-input>
     `
   }
 
@@ -443,7 +424,7 @@ export class Post extends LitElement {
   onClickCard (e) {
     if (this.noclick) return
     for (let el of e.composedPath()) {
-      if (el.tagName === 'A' || el.tagName === 'CTZN-COMPOSER') return
+      if (el.tagName === 'A' || el.tagName === 'CTZN-COMPOSER' || el.tagName === 'CTZN-REACTION-INPUT') return
     }
     e.preventDefault()
     e.stopPropagation()
@@ -452,7 +433,7 @@ export class Post extends LitElement {
   onMousedownCard (e) {
     if (this.noclick) return
     for (let el of e.composedPath()) {
-      if (el.tagName === 'A' || el.tagName === 'CTZN-COMPOSER') return
+      if (el.tagName === 'A' || el.tagName === 'CTZN-COMPOSER' || el.tagName === 'CTZN-REACTION-INPUT') return
     }
     this.isMouseDown = true
     this.isMouseDragging = false
@@ -475,6 +456,10 @@ export class Post extends LitElement {
     }
     this.isMouseDown = false
     this.isMouseDragging = false
+  }
+
+  onToggleReaction (e) {
+    this.onClickReaction(e, e.detail.reaction)
   }
 
   async onClickReaction (e, reaction) {

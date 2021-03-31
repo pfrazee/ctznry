@@ -10,6 +10,7 @@ import { emojify } from '../lib/emojify.js'
 import { ReactionsListPopup } from './popups/reactions-list.js'
 import { RelatedItemTransfersListPopup } from './popups/related-item-transfers-list.js'
 import * as displayNames from '../lib/display-names.js'
+import './reaction-input.js'
 
 export class PostExpanded extends LitElement {
   static get properties () {
@@ -286,30 +287,10 @@ export class PostExpanded extends LitElement {
       return ''
     }
     return html`
-      <div>
-        <div class="font-semibold pt-2 px-1 text-gray-500 text-xs">
-          Add a reaction
-        </div>
-        <div class="overflow-x-auto px-1 sm:whitespace-normal whitespace-nowrap">
-          <a
-            class="inline-block text-sm px-2 py-0.5 mt-1 text-gray-500 rounded cursor-pointer bg-gray-100 sm:hover:bg-gray-200"
-            @click=${this.onClickCustomReaction}
-          >
-            Custom...
-          </a>
-          ${repeat(SUGGESTED_REACTIONS, reaction => {
-            const colors = this.haveIReacted(reaction) ? 'bg-green-500 sm:hover:bg-green-400 text-white' : 'bg-gray-100 sm:hover:bg-gray-200'
-            return html`
-              <a
-                class="inline-block rounded text-sm px-2 py-0.5 mt-1 mr-1 ${colors} cursor-pointer"
-                @click=${e => this.onClickReaction(e, reaction)}
-              >
-                ${reaction}
-              </a>
-            `
-          })}
-        </div>
-      </div>
+      <ctzn-reaction-input
+        .reactions=${this.post.reactions}
+        @toggle-reaction=${this.onToggleReaction}
+      ></ctzn-reaction-input>
     `
   }
 
@@ -372,6 +353,10 @@ export class PostExpanded extends LitElement {
 
   // events
   // =
+
+  onToggleReaction (e) {
+    this.onClickReaction(e, e.detail.reaction)
+  }
 
   async onClickReaction (e, reaction) {
     e.preventDefault()
