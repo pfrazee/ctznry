@@ -29,7 +29,8 @@ export class Feed extends LitElement {
       results: {type: Array},
       emptyMessage: {type: String, attribute: 'empty-message'},
       noMerge: {type: Boolean, attribute: 'no-merge'},
-      hasNewItems: {type: Boolean}
+      hasNewItems: {type: Boolean},
+      isLoadingMore: {type: Boolean}
     }
   }
 
@@ -52,6 +53,7 @@ export class Feed extends LitElement {
     this.emptyMessage = undefined
     this.noMerge = false
     this.hasNewItems = false
+    this.isLoadingMore = false
 
     // ui state
     this.loadMoreObserver = undefined
@@ -133,6 +135,8 @@ export class Feed extends LitElement {
   async query ({more} = {more: false}) {
     emit(this, 'load-state-updated')
     this.abortController = new AbortController()
+    this.isLoadingMore = more
+
     let results = more ? (this.results || []) : []
     let lt = more ? results[results?.length - 1]?.key : undefined
     if (this.source) {
@@ -156,6 +160,7 @@ export class Feed extends LitElement {
 
     this.activeQuery = undefined
     this.hasNewItems = false
+    this.isLoadingMore = false
     emit(this, 'load-state-updated', {detail: {isEmpty: this.results.length === 0}})
   }
 
@@ -234,7 +239,11 @@ export class Feed extends LitElement {
       ${this.title ? html`<h2  class="results-header"><span>${this.title}</span></h2>` : ''}
       ${this.renderHasNewItems()}
       ${this.renderResults()}
-      ${this.results?.length ? html`<div class="bottom-of-feed mb-10"></div>` : ''}
+      ${this.results?.length ? html`
+        <div class="bottom-of-feed ${this.isLoadingMore ? 'bg-white' : ''} mb-10 py-4 sm:rounded text-center">
+          ${this.isLoadingMore ? html`<span class="spinner w-6 h-6 text-gray-500"></span>` : ''}
+        </div>
+      ` : ''}
     `
   }
 

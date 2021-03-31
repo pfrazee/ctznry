@@ -17,7 +17,8 @@ export class NotificationsFeed extends LitElement {
       title: {type: String},
       sort: {type: String},
       limit: {type: Number},
-      results: {type: Array}
+      results: {type: Array},
+      isLoadingMore: {type: Boolean}
     }
   }
 
@@ -34,6 +35,7 @@ export class NotificationsFeed extends LitElement {
     this.sort = 'ctime'
     this.limit = undefined
     this.results = undefined
+    this.isLoadingMore = false
 
     // ui state
     this.loadMoreObserver = undefined
@@ -108,6 +110,7 @@ export class NotificationsFeed extends LitElement {
   async query ({more} = {more: false}) {
     emit(this, 'load-state-updated')
     let results = more ? (this.results || []) : []
+    this.isLoadingMore = more
 
     // because we collapse results, we need to run the query until the limit is fulfilled
     // let lt = more ? results[results?.length - 1]?.key : undefined
@@ -143,6 +146,7 @@ export class NotificationsFeed extends LitElement {
     if (!results?.length && !this.results) {
       this.results = []
     }
+    this.isLoadingMore = false
     this.activeQuery = undefined
     emit(this, 'load-state-updated', {detail: {isEmpty: this.results.length === 0}})
   }
@@ -216,7 +220,11 @@ export class NotificationsFeed extends LitElement {
       <link rel="stylesheet" href="/css/fontawesome.css">
       ${this.title ? html`<h2  class="results-header"><span>${this.title}</span></h2>` : ''}
       ${this.renderResults()}
-      ${this.results?.length ? html`<div class="bottom-of-feed mb-10"></div>` : ''}
+      ${this.results?.length ? html`
+        <div class="bottom-of-feed ${this.isLoadingMore ? 'bg-white' : ''} mb-10 py-4 sm:rounded text-center">
+          ${this.isLoadingMore ? html`<span class="spinner w-6 h-6 text-gray-500"></span>` : ''}
+        </div>
+      ` : ''}
     `
   }
 

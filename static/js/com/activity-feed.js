@@ -98,7 +98,8 @@ export class ActivityFeed extends LitElement {
       methodsFilter: {type: Array},
       entries: {type: Array},
       emptyMessage: {type: String, attribute: 'empty-message'},
-      hasNewEntries: {type: Boolean}
+      hasNewEntries: {type: Boolean},
+      isLoadingMore: {type: Boolean}
     }
   }
 
@@ -114,6 +115,7 @@ export class ActivityFeed extends LitElement {
     this.entries = undefined
     this.emptyMessage = undefined
     this.hasNewEntries = false
+    this.isLoadingMore = false
 
     // ui state
     this.loadMoreObserver = undefined
@@ -186,6 +188,7 @@ export class ActivityFeed extends LitElement {
     if ((!this.userId || !this.dataview) && this.dataview !== 'ctzn.network/dbmethod-feed-view') {
       return
     }
+    this.isLoadingMore = more
 
     emit(this, 'load-state-updated')
     this.abortController = new AbortController()
@@ -213,6 +216,7 @@ export class ActivityFeed extends LitElement {
     this.entries = entries
     this.activeQuery = undefined
     this.hasNewEntries = false
+    this.isLoadingMore = false
     emit(this, 'load-state-updated', {detail: {isEmpty: this.entries.length === 0}})
   }
 
@@ -282,7 +286,11 @@ export class ActivityFeed extends LitElement {
     return html`
       ${this.renderHasNewEntries()}
       ${this.renderEntries()}
-      ${this.entries?.length ? html`<div class="bottom-of-feed mb-10"></div>` : ''}
+      ${this.entries?.length ? html`
+        <div class="bottom-of-feed ${this.isLoadingMore ? 'bg-white' : ''} mb-10 py-4 sm:rounded text-center">
+          ${this.isLoadingMore ? html`<span class="spinner w-6 h-6 text-gray-500"></span>` : ''}
+        </div>
+      ` : ''}
     `
   }
 
