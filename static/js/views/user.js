@@ -64,6 +64,9 @@ class CtznUser extends LitElement {
     this.isJoiningOrLeaving = false
     this.expandedSections = {}
 
+    // ui helper state
+    this.lastScrolledToUserId = undefined
+
     const pathParts = (new URL(location)).pathname.split('/')
     this.userId = pathParts[1]
     this.currentView = pathParts[2] || 'feed'
@@ -135,6 +138,21 @@ class CtznUser extends LitElement {
   }
 
   async load () {
+    // 1. If opening a profile for the first time (change of lastScrolledToUserId) go to top
+    // 2. If we're scrolled beneath the header, jump to just below the header
+    if (this.lastScrolledToUserId && this.lastScrolledToUserId === this.userId) {
+      const el = this.querySelector(`#scroll-target`)
+      if (el) {
+        let top = el.getBoundingClientRect().top
+        if (top < 0) {
+          document.body.scrollTo({top: document.body.scrollTop + top})
+        }
+      }
+    } else {
+      document.body.scrollTo({top: 0})
+    }
+    this.lastScrolledToUserId = this.userId
+
     this.userProfile = await session.ctzn.getProfile(this.userId).catch(e => ({error: true, message: e.toString()}))
     if (this.userProfile.error) {
       document.title = `Not Found | CTZN`
@@ -187,8 +205,6 @@ class CtznUser extends LitElement {
         top: el.getBoundingClientRect().top - 40,
         behavior: 'smooth'
       })
-    } else {
-      window.scrollTo({top: 0})
     }
   }
 
@@ -277,13 +293,16 @@ class CtznUser extends LitElement {
               ></ctzn-button>
             </div>
           ` : ''}
+          <div id="scroll-target"></div>
           <div class="flex bg-white text-gray-400 sticky top-0 z-10 overflow-x-auto mb-1 sm:rounded-b">
             <a class="${navCls('feed')}" href="/${this.userId}">Feed</a>
             <a class="${navCls('activity')}" href="/${this.userId}/activity">Activity</a>
             <a class="${navCls('inventory')}" href="/${this.userId}/inventory">${this.isCommunity ? 'Items' : 'Inventory'}</a>
             <a class="${navCls('about')}" href="/${this.userId}/about">About</a>
           </div>
-          ${this.renderCurrentView()}
+          <div class="min-h-screen">
+            ${this.renderCurrentView()}
+          </div>
         </div>
       </main>
     `
