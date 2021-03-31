@@ -18,11 +18,18 @@ const COMMENT_PATH_REGEX = new RegExp('/([^/]+@[^/]+)/ctzn.network/comment/([^/]
 const USER_PATH_REGEX = new RegExp('/([^/]+@[^/]+)')
 
 if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () =>
+  window.addEventListener('load', async () => {
+    /*
+    TODO - disabled until we can get caching to work correctly
     navigator.serviceWorker
       .register('/service-worker.js')
       .catch(console.error)
-  )
+    */
+    const registration = await navigator.serviceWorker.getRegistration('/')
+    if (registration) {
+      await registration.unregister()
+    }
+  })
 }
 
 /**
