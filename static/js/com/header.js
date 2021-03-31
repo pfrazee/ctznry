@@ -69,20 +69,8 @@ export class Header extends LitElement {
             </div>
           </div>
           ${session.hasOneSaved() ? html`
-            <div class="my-3 px-4">
-              <ctzn-button
-                primary
-                btn-class="text-sm font-semibold w-full mb-2 rounded-3xl"
-                label="Create Post"
-                @click=${this.onClickCreatePost}
-              ></ctzn-button>
-              <ctzn-button
-                btn-class="text-gray-600 text-sm font-semibold w-full rounded-3xl"
-                label="Create Community"
-                @click=${this.onClickCreateCommunity}
-              ></ctzn-button>
-            </div>
-            <div class="flex flex-col px-2 mb-auto">
+            <div class="flex flex-col px-2">
+              <hr class="my-3 mx-3">
               <a href="/" class=${this.getMenuNavClass('/')}>
                 <span class="fas mr-1.5 fa-fw navicon fa-home"></span>
                 Home
@@ -113,6 +101,20 @@ export class Header extends LitElement {
                 My Inventory
               </a>
               <hr class="my-3 mx-3">
+            </div>
+            <div class="mt-3 mb-auto px-4">
+              <ctzn-button
+                primary
+                btn-class="text-sm font-semibold w-full mb-2 rounded-3xl"
+                label="Create Post"
+                @click=${this.onClickCreatePost}
+              ></ctzn-button>
+              <ctzn-button
+                btn-class="text-gray-600 text-sm font-semibold w-full rounded-3xl"
+                label="Create Community"
+                @click=${this.onClickCreateCommunity}
+              ></ctzn-button>
+              <hr class="mt-5 mb-auto">
             </div>
           ` : ''}
           <div class="py-3 px-2">
@@ -224,7 +226,7 @@ export class Header extends LitElement {
   renderSessionCtrls () {
     if (session.hasOneSaved()) {
       return html`
-        <div class="lg:pb-6 flex flex-col">
+        <div class="pb-6 flex flex-col">
           <a class=${this.getMenuNavClass('/account')} href="/account"><span class="fas fa-fw fa-cog mr-1.5"></span> Account</a>
           <a class=${this.getMenuNavClass()} href="#" @click=${this.onLogOut}>
             <span class="fas fa-fw fa-sign-out-alt mr-1.5"></span> Log out
