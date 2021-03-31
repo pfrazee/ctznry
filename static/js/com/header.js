@@ -102,7 +102,7 @@ export class Header extends LitElement {
               </a>
               <hr class="my-3 mx-3">
             </div>
-            <div class="mt-3 mb-auto px-4">
+            <div class="mt-3 sm:mb-auto px-4">
               <ctzn-button
                 primary
                 btn-class="text-sm font-semibold w-full mb-2 rounded-3xl"
@@ -114,7 +114,7 @@ export class Header extends LitElement {
                 label="Create Community"
                 @click=${this.onClickCreateCommunity}
               ></ctzn-button>
-              <hr class="mt-5 mb-auto">
+              <hr class="mt-5">
             </div>
           ` : ''}
           <div class="py-3 px-2">
