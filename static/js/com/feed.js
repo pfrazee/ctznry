@@ -286,7 +286,10 @@ export class Feed extends LitElement {
       >
         <div class="pl-2 pt-2">
           <a class="block" href="/${post.author.userId}" title=${post.author.displayName}>
-            <img class="block object-cover rounded-full mt-1 w-10 h-10" src=${AVATAR_URL(post.author.userId)}>
+            <img
+              class="lazyload block object-cover rounded-full mt-1 w-10 h-10"
+              data-src=${AVATAR_URL(post.author.userId)}
+            >
           </a>
         </div>
         <ctzn-post

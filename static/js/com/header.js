@@ -139,8 +139,8 @@ export class Header extends LitElement {
                   href="/${community.userId}"
                 >
                   <img
-                    class="w-8 h-8 object-cover rounded-md mr-2"
-                    src=${AVATAR_URL(community.userId)}
+                    class="lazyload w-8 h-8 object-cover rounded-md mr-2"
+                    data-src=${AVATAR_URL(community.userId)}
                   >
                   <span class="truncate font-medium">${displayNames.render(community.userId)}</span>
                 </a>
@@ -178,8 +178,8 @@ export class Header extends LitElement {
               href="/${f}"
             >
               <img
-                class="w-8 h-8 object-cover rounded-md mr-2"
-                src=${AVATAR_URL(f)}
+                class="lazyload w-8 h-8 object-cover rounded-md mr-2"
+                data-src=${AVATAR_URL(f)}
               >
               <span class="truncate font-medium">${displayNames.render(f)}</span>
             </a>
