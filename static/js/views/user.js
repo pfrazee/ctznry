@@ -32,7 +32,7 @@ class CtznUser extends LitElement {
   static get properties () {
     return {
       currentPath: {type: String, attribute: 'current-path'},
-      isLoading: {type: Boolean},
+      isProfileLoading: {type: Boolean},
       userProfile: {type: Object},
       currentView: {type: String},
       followers: {type: Array},
@@ -201,9 +201,9 @@ class CtznUser extends LitElement {
           )
         }
         this.roles = roles
-        this.isProfileLoading = false
         console.log({userProfile: this.userProfile, members, roles})
       }
+      this.isProfileLoading = false
     }
 
     let expanded = Object.keys(this.expandedSections)
@@ -461,7 +461,7 @@ class CtznUser extends LitElement {
   }
 
   renderProfileControls () {
-    if (this.isProfileLoading) return ''
+    if (this.isProfileLoading) return html``
     const btnStyle = `background: rgba(0,0,0,.5); backdrop-filter: blur(5px) contrast(0.9); -webkit-backdrop-filter: blur(5px) contrast(0.9);`
     if (this.isCitizen) {
       return html`
