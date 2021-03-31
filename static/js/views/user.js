@@ -1217,6 +1217,12 @@ async function listAllMembers (userId) {
     if (m.length < 100) break
     gt = m[m.length - 1].key
   }
+  members = members.sort((a, b) => {
+    let ad = a?.value?.joinDate
+    let bd = b?.value?.joinDate
+    return ad > bd ? 1 : ad < bd ? -1 : 0
+  })
+ 
   return members
 }
 
