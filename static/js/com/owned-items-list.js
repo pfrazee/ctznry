@@ -61,8 +61,7 @@ export class OwnedItemsList extends LitElement {
     }
     return html`
       ${this.databaseItems.length === 0 ? html`
-        <div class="bg-gray-50 text-gray-500 py-24 text-center">
-          <div class="far fa-gem text-6xl text-gray-300 mb-8"></div>
+        <div class="bg-gray-50 text-gray-500 py-12 text-center">
           <div>${displayNames.render(this.userId)}'s inventory is empty.</div>
         </div>
       ` : html`

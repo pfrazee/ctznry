@@ -206,10 +206,6 @@ class CtznUser extends LitElement {
       }
     }
 
-    if (this.querySelector('ctzn-feed')) {
-      this.querySelector('ctzn-feed').load()
-    }
-
     let expanded = Object.keys(this.expandedSections)
     if (expanded.length > 0 && this.querySelector(`#expandable-section-${expanded[0]}`)) {
       const el = this.querySelector(`#expandable-section-${expanded[0]}`)
@@ -553,9 +549,11 @@ class CtznUser extends LitElement {
       }
     } else if (this.currentView === 'activity') {
       return html`
+        ${this.isEmpty ? this.renderEmptyMessage() : ''}
         <ctzn-activity-feed
           user-id=${this.userId}
           dataview=${this.isCommunity ? 'ctzn.network/dbmethod-results-view' : 'ctzn.network/dbmethod-calls-view'}
+          @load-state-updated=${this.onFeedLoadStateUpdated}
         ></ctzn-activity-feed>
       `
     } else if (this.currentView === 'audit-log') {
@@ -574,17 +572,15 @@ class CtznUser extends LitElement {
       }
     }
     return html`
-      <div>
-        ${this.isEmpty ? this.renderEmptyMessage() : ''}
-        <ctzn-feed
-          .source=${this.userId}
-          limit="15"
-          @load-state-updated=${this.onFeedLoadStateUpdated}
-          @publish-reply=${this.onPublishReply}
-          @delete-post=${this.onDeletePost}
-          @moderator-remove-post=${this.onModeratorRemovePost}
-        ></ctzn-feed>
-      </div>
+      ${this.isEmpty ? this.renderEmptyMessage() : ''}
+      <ctzn-feed
+        .source=${this.userId}
+        limit="15"
+        @load-state-updated=${this.onFeedLoadStateUpdated}
+        @publish-reply=${this.onPublishReply}
+        @delete-post=${this.onDeletePost}
+        @moderator-remove-post=${this.onModeratorRemovePost}
+      ></ctzn-feed>
     `
   }
 
@@ -804,8 +800,19 @@ class CtznUser extends LitElement {
   }
 
   renderEmptyMessage () {
+    if (this.currentView === 'activity') {
+      return html`
+        <div class="bg-gray-50 text-gray-500 py-12 text-center">
+          ${this.isCitizen ? html`
+            <div>${this.userProfile?.value?.displayName} hasn't created any actions yet.</div>
+          ` : this.isCommunity ? html`
+            <div>No items activity has occurred in ${this.userProfile?.value?.displayName} yet.</div>
+          ` : ''}
+        </div>
+      `
+    }
     return html`
-      <div class="bg-gray-100 text-gray-500 py-44 text-center">
+      <div class="bg-gray-50 text-gray-500 py-12 text-center">
         ${this.isCitizen ? html`
           <div>${this.userProfile?.value?.displayName} hasn't posted anything yet.</div>
         ` : this.isCommunity ? html`

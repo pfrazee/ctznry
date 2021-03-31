@@ -105,9 +105,8 @@ export class ItemsList extends LitElement {
     }
     return html`
       ${this.itemClasses.length === 0 ? html`
-        <div class="bg-gray-50 py-24 sm:py-44 text-center">
-          <div class="far fa-gem text-6xl text-gray-300 mb-6"></div>
-          <div class="mb-6 text-gray-500">This community has no virtual items!</div>
+        <div class="bg-gray-50 py-12 text-center">
+          <div class="mb-6 text-gray-500">This community has no virtual items.</div>
           ${this.canManageItemClasses ? html`
             <ctzn-button
               btn-class="rounded-full"
