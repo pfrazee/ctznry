@@ -326,7 +326,7 @@ export class ActivityFeed extends LitElement {
             ${METHOD_ICONS[entry.call.method]}
           </span>
         </span>
-        <div class="flex-1">
+        <div class="flex-1 min-w-0">
           <div class="${hasSubject ? 'pt-2.5' : 'py-2.5'} leading-tight">
             <span class="font-medium">${displayNames.render(entry.authorId)}</span>
             <span class="text-gray-800">
