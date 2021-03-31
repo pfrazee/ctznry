@@ -20,7 +20,7 @@ const cssStr = css`
 .toast {
   position: relative;
   min-width: min(calc(100% - 40px), var(--toast-min-width));
-  max-width: 450px;
+  max-width: min(450px, calc(100vw - 70px));
   background: #ddd;
   margin: 0;
   padding: var(--toast-padding);

@@ -35,9 +35,14 @@ class BeakerToast extends LitElement {
   }
 
   render () {
-    const onButtonClick = this.button ? (e) => { destroy(); this.button.click(e) } : undefined
+    const onButtonClick = this.button ? (e) => {
+      e.preventDefault()
+      e.stopPropagation()
+      destroy()
+      this.button.click(e)
+    } : undefined
     return html`
-    <div id="toast-wrapper" class="toast-wrapper ${this.button ? '' : 'nomouse'}">
+    <div id="toast-wrapper" class="toast-wrapper ${this.button ? '' : 'nomouse'}" @click=${destroy}>
       <p class="toast ${this.type}">${this.message} ${this.button ? html`<a class="toast-btn" @click=${onButtonClick}>${this.button.label}</a>` : ''}</p>
     </div>
     `
