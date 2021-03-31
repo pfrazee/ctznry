@@ -69,7 +69,20 @@ export class Header extends LitElement {
             </div>
           </div>
           ${session.hasOneSaved() ? html`
-            <div class="px-2 pb-3 mb-3 flex flex-col">
+            <div class="my-3 px-4">
+              <ctzn-button
+                primary
+                btn-class="text-sm font-semibold w-full mb-2 rounded-3xl"
+                label="Create Post"
+                @click=${this.onClickCreatePost}
+              ></ctzn-button>
+              <ctzn-button
+                btn-class="text-gray-600 text-sm font-semibold w-full rounded-3xl"
+                label="Create Community"
+                @click=${this.onClickCreateCommunity}
+              ></ctzn-button>
+            </div>
+            <div class="flex flex-col px-2 mb-auto">
               <a href="/" class=${this.getMenuNavClass('/')}>
                 <span class="fas mr-1.5 fa-fw navicon fa-home"></span>
                 Home
@@ -81,10 +94,11 @@ export class Header extends LitElement {
                 <span class="fas mr-1.5 fa-fw navicon fa-bell"></span>
                 Notifications
               </a>
-              ${''/*<a href="/communities" class="${this.getMenuNavClass('/communities')}">
+              <a href="/communities" class="${this.getMenuNavClass('/communities')}">
                 <span class="fas mr-1.5 fa-fw navicon fa-users"></span>
                 Communities
-              </a>*/}
+              </a>
+              <hr class="my-3 mx-3">
               <a
                 class="relative ${this.getMenuNavClass()} mt-1"
                 href="/${info.userId}"
@@ -92,62 +106,13 @@ export class Header extends LitElement {
               >
                 <img class="absolute inline-block w-7 h-7 object-cover rounded" src=${AVATAR_URL(info.userId)} style="left: 10px; top: 6px">
                 <span class="inline-block" style="width: 29px"></span>
-                Profile
+                My Profile
               </a>
-            </div>
-
-            <h3 class="font-bold pl-4 mb-1 text-gray-500 text-xs">
-              My Items
-            </h3>
-            <div class="px-2 pb-3 mb-3 flex flex-col">
               <a href="/${info.userId}/inventory" class=${this.getMenuNavClass()}>
                 <span class="fas mr-1.5 fa-fw navicon fa-shopping-bag"></span>
                 My Inventory
               </a>
-            </div>
-
-            <h3 class="font-bold pl-4 mb-1 text-gray-500 text-xs">
-              My Communities
-            </h3>
-            <div class="flex-grow px-2 mb-1 overflow-y-auto">
-              <div class="mt-2">
-                ${session.myCommunities?.length ? html`
-                  ${repeat(session.myCommunities.slice(0, 7), community => html`
-                    <a
-                      class="flex items-center pl-2 pr-4 py-1 text-sm rounded hover:bg-gray-100"
-                      href="/${community.userId}"
-                    >
-                      <img
-                        class="w-8 h-8 object-cover rounded-md mr-2"
-                        src=${AVATAR_URL(community.userId)}
-                      >
-                      <span class="truncate font-medium">${displayNames.render(community.userId)}</span>
-                    </a>
-                  `)}
-                ` : html`
-                  <div class="pl-2 pr-5 text-base text-gray-700">
-                    Join a community to get connected to more people!
-                  </div>
-                `}
-                <a
-                  class="flex items-center pl-2 pr-4 py-1 text-sm rounded cursor-pointer hover:bg-gray-100"
-                  @click=${this.onClickCreateCommunity}
-                >
-                  <span
-                    class="w-8 py-1.5 text-center object-cover rounded-md mr-2 bg-gray-300 text-gray-600"
-                  ><span class="fas fa-plus"></span></span>
-                  <span class="truncate font-semibold text-gray-600">Create community</span>
-                </a>
-                <a
-                  class="flex items-center pl-2 pr-4 py-1 text-sm rounded cursor-pointer hover:bg-gray-100"
-                  href="/communities"
-                >
-                  <span
-                    class="w-8 py-1.5 text-center object-cover rounded-md mr-2 bg-gray-300 text-gray-600"
-                  ><span class="fas fa-users"></span></span>
-                  <span class="truncate font-semibold text-gray-600">Browse</span>
-                </a>
-              </div>
+              <hr class="my-3 mx-3">
             </div>
           ` : ''}
           <div class="py-3 px-2">
@@ -155,6 +120,58 @@ export class Header extends LitElement {
           </div>
         </div>
         <div class="secondary-menu bg-white overflow-y-auto px-2 py-2">
+          <a
+            class="flex items-center pl-2 pr-4 py-1 text-sm rounded hover:bg-gray-100"
+            href="/${info.userId}"
+            title=${info.userId}
+          >
+            <img class="w-8 h-8 object-cover rounded-md mr-2" src=${AVATAR_URL(info.userId)} style="left: 10px; top: 6px">
+            ${displayNames.render(info.userId)}
+          </a>
+          <h3 class="font-bold pl-2 mt-4 mb-2 text-gray-500 text-xs">
+            My Communities
+          </h3>
+          <div class="mb-4">
+            ${session.myCommunities?.length ? html`
+              ${repeat(session.myCommunities, community => html`
+                <a
+                  class="flex items-center pl-2 pr-4 py-1 text-sm rounded hover:bg-gray-100"
+                  href="/${community.userId}"
+                >
+                  <img
+                    class="w-8 h-8 object-cover rounded-md mr-2"
+                    src=${AVATAR_URL(community.userId)}
+                  >
+                  <span class="truncate font-medium">${displayNames.render(community.userId)}</span>
+                </a>
+              `)}
+            ` : html`
+              <div class="pl-2 pr-5 mb-1 text-base text-gray-700">
+                Join a community to get connected to more people!
+              </div>
+            `}
+            <a
+              class="flex items-center pl-2 pr-4 py-1 text-sm rounded cursor-pointer hover:bg-gray-100"
+              @click=${this.onClickCreateCommunity}
+            >
+              <span
+                class="w-8 py-1.5 text-center object-cover rounded-md mr-2 bg-gray-300 text-gray-600"
+              ><span class="fas fa-plus"></span></span>
+              <span class="truncate font-semibold text-gray-600">Create community</span>
+            </a>
+            <a
+              class="flex items-center pl-2 pr-4 py-1 text-sm rounded cursor-pointer hover:bg-gray-100"
+              href="/communities"
+            >
+              <span
+                class="w-8 py-1.5 text-center object-cover rounded-md mr-2 bg-gray-300 text-gray-600"
+              ><span class="fas fa-users"></span></span>
+              <span class="truncate font-semibold text-gray-600">Browse</span>
+            </a>
+          </div>
+          <h3 class="font-bold pl-2 mb-2 text-gray-500 text-xs">
+            My Follows
+          </h3>
           ${repeat(session.myFollowing || [], f => f, f => html`
             <a
               class="flex items-center pl-2 pr-4 py-1 text-sm rounded hover:bg-gray-100"
