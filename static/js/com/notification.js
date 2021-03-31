@@ -113,7 +113,7 @@ export class Notification extends LitElement {
         <div class="w-12 text-center pt-4 rounded-l leading-9 ${this.isUnread ? 'bg-blue-50' : ''}">
           <span class="${icon} text-2xl ${this.isUnread ? 'text-blue-600' : 'text-gray-400'}"></span>
         </div>
-        <div class="flex-1">
+        <div class="flex-1 min-w-0">
           <div class="flex items-center text-sm pt-4 px-3 pb-2">
             <a href="/${note.author.userId}" title=${note.author.userId}>
               <img class="w-8 h-8 rounded-full object-cover mr-2" src=${AVATAR_URL(note.author.userId)}>
