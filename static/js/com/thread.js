@@ -174,7 +174,7 @@ export class Thread extends LitElement {
     if (this.post?.value?.community) {
       if (!session.isInCommunity(this.post.value.community.userId)) {
         return html`
-          <div class="bg-white py-2 px-3 mb-1 sm:rounded">
+          <div class="bg-white p-3 mb-1 sm:rounded">
             <div class="italic text-gray-500 text-sm">
               Join <a href="/${this.post.value.community.userId}" class="hover:underline">${displayNames.render(this.post.value.community.userId)}</a> to reply.
             </div>
@@ -184,7 +184,7 @@ export class Thread extends LitElement {
     } else {
       if (!session.isFollowingMe(this.post?.author?.userId)) {
         return html`
-          <div class="bg-white py-2 px-3 mb-1 sm:rounded">
+          <div class="bg-white p-3 mb-1 sm:rounded">
             <div class="italic text-gray-500 text-sm">
               Only people followed by <a href="/${this.post.author.userId}" class="hover:underline">${this.post.author.displayName}</a> can reply.
             </div>

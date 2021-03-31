@@ -153,16 +153,16 @@ export class Comment extends LitElement {
           ` : ''}
           <div class="pl-4">
             <a
-              class="cursor-pointer tooltip-right hover:bg-gray-100 px-2 py-1 text-xs text-gray-500 font-bold"
+              class="tooltip-right px-2 py-1 text-xs font-bold ${this.canInteract ? 'cursor-pointer text-gray-500 hover:bg-gray-100' : 'text-gray-400'}"
               data-tooltip=${ifDefined(this.ctrlTooltip)}
-              @click=${this.onClickReply}
+              @click=${this.canInteract ? this.onClickReply : undefined}
             >
               <span class="fas fa-fw fa-reply"></span> Reply
             </a>
             <a
-              class="cursor-pointer tooltip-right hover:bg-gray-100 px-2 py-1 text-xs text-gray-500 font-bold"
+              class="tooltip-right px-2 py-1 text-xs font-bold ${this.canInteract ? 'cursor-pointer text-gray-500 hover:bg-gray-100' : 'text-gray-400'}"
               data-tooltip=${ifDefined(this.ctrlTooltip)}
-              @click=${e => {this.isReactionsOpen = !this.isReactionsOpen}}
+              @click=${this.canInteract ? (e => {this.isReactionsOpen = !this.isReactionsOpen}) : undefined}
             >
               <span class="fas fa-fw fa-${this.isReactionsOpen ? 'minus' : 'plus'}"></span>
             </a>
