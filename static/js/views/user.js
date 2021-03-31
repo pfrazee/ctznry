@@ -32,6 +32,7 @@ class CtznUser extends LitElement {
   static get properties () {
     return {
       currentPath: {type: String, attribute: 'current-path'},
+      isLoading: {type: Boolean},
       userProfile: {type: Object},
       currentView: {type: String},
       followers: {type: Array},
@@ -51,16 +52,7 @@ class CtznUser extends LitElement {
 
   constructor () {
     super()
-    this.userProfile = undefined
-    this.currentView = 'feed'
-    this.followers = undefined
-    this.following = undefined
-    this.members = undefined
-    this.sharedFollowers = []
-    this.sharedCommunities = []
-    this.followedMembers = []
-    this.roles = undefined
-    this.isEmpty = false
+    this.reset()
     this.isJoiningOrLeaving = false
     this.expandedSections = {}
 
@@ -73,6 +65,20 @@ class CtznUser extends LitElement {
     document.title = `Loading... | CTZN`
 
     this.load()
+  }
+
+  reset () {
+    this.isProfileLoading = false
+    this.userProfile = undefined
+    this.currentView = 'feed'
+    this.followers = undefined
+    this.following = undefined
+    this.members = undefined
+    this.sharedFollowers = []
+    this.sharedCommunities = []
+    this.followedMembers = []
+    this.roles = undefined
+    this.isEmpty = false
   }
 
   updated (changedProperties) {
@@ -153,45 +159,51 @@ class CtznUser extends LitElement {
     }
     this.lastScrolledToUserId = this.userId
 
-    this.userProfile = await session.ctzn.getProfile(this.userId).catch(e => ({error: true, message: e.toString()}))
-    if (this.userProfile.error) {
-      document.title = `Not Found | CTZN`
-      return this.requestUpdate()
-    }
-    document.title = `${this.userProfile?.value.displayName || this.userId} | CTZN`
-    if (this.isCitizen) {
-      const [followers, following, memberships] = await Promise.all([
-        session.ctzn.listFollowers(this.userId),
-        session.ctzn.db(this.userId).table('ctzn.network/follow').list(),
-        session.ctzn.db(this.userId).table('ctzn.network/community-membership').list()
-      ])
-      this.followers = followers
-      if (session.isActive() && !this.isMe) {
-        this.sharedFollowers = intersect(session.myFollowing, followers)
+    // profile change?
+    if (this.userId !== this.userProfile?.userId) {
+      this.reset()
+      this.isProfileLoading = true
+      this.userProfile = await session.ctzn.getProfile(this.userId).catch(e => ({error: true, message: e.toString()}))
+      if (this.userProfile.error) {
+        document.title = `Not Found | CTZN`
+        return this.requestUpdate()
       }
-      this.following = following
-      this.memberships = memberships
-      if (session.isActive() && !this.isMe) {
-        this.sharedCommunities = intersect(
-          session.myCommunities.map(c => c.userId),
-          memberships.map(m => m.value.community.userId)
-        )
+      document.title = `${this.userProfile?.value.displayName || this.userId} | CTZN`
+      if (this.isCitizen) {
+        const [followers, following, memberships] = await Promise.all([
+          session.ctzn.listFollowers(this.userId),
+          session.ctzn.db(this.userId).table('ctzn.network/follow').list(),
+          session.ctzn.db(this.userId).table('ctzn.network/community-membership').list()
+        ])
+        this.followers = followers
+        if (session.isActive() && !this.isMe) {
+          this.sharedFollowers = intersect(session.myFollowing, followers)
+        }
+        this.following = following
+        this.memberships = memberships
+        if (session.isActive() && !this.isMe) {
+          this.sharedCommunities = intersect(
+            session.myCommunities.map(c => c.userId),
+            memberships.map(m => m.value.community.userId)
+          )
+        }
+        console.log({userProfile: this.userProfile, followers, following, memberships})
+      } else if (this.isCommunity) {
+        const [members, roles] = await Promise.all([
+          listAllMembers(this.userId),
+          session.ctzn.db(this.userId).table('ctzn.network/community-role').list().catch(e => [])
+        ])
+        this.members = members
+        if (session.isActive() && !this.isMe) {
+          this.followedMembers = intersect(
+            session.myFollowing,
+            members.map(m => m.value.user.userId)
+          )
+        }
+        this.roles = roles
+        this.isProfileLoading = false
+        console.log({userProfile: this.userProfile, members, roles})
       }
-      console.log({userProfile: this.userProfile, followers, following, memberships})
-    } else if (this.isCommunity) {
-      const [members, roles] = await Promise.all([
-        listAllMembers(this.userId),
-        session.ctzn.db(this.userId).table('ctzn.network/community-role').list().catch(e => [])
-      ])
-      this.members = members
-      if (session.isActive() && !this.isMe) {
-        this.followedMembers = intersect(
-          session.myFollowing,
-          members.map(m => m.value.user.userId)
-        )
-      }
-      this.roles = roles
-      console.log({userProfile: this.userProfile, members, roles})
     }
 
     if (this.querySelector('ctzn-feed')) {
@@ -210,7 +222,7 @@ class CtznUser extends LitElement {
 
   get isLoading () {
     let queryViewEls = Array.from(this.querySelectorAll('ctzn-feed'))
-    return !!queryViewEls.find(el => el.isLoading)
+    return this.isProfileLoading || !!queryViewEls.find(el => el.isLoading)
   }
 
   async pageLoadScrollTo (y) {
@@ -272,7 +284,7 @@ class CtznUser extends LitElement {
           ${this.userProfile?.value.description ? html`
             <div class="text-center pb-4 px-4 sm:px-7 bg-white">${unsafeHTML(linkify(emojify(makeSafe(this.userProfile?.value.description))))}</div>
           ` : ''}
-          ${!this.isMe && this.isCitizen && this.amIFollowing === false ? html`
+          ${!this.isProfileLoading && !this.isMe && this.isCitizen && this.amIFollowing === false ? html`
             <div class="bg-white text-center pb-4 px-4">
               <ctzn-button
                 btn-class="font-semibold py-1 text-base block w-full rounded-lg sm:px-10 sm:inline sm:w-auto sm:rounded-full"
@@ -282,7 +294,7 @@ class CtznUser extends LitElement {
               ></ctzn-button>
             </div>
           ` : ''}
-          ${this.isCommunity && this.amIAMember === false ? html`
+          ${!this.isProfileLoading && this.isCommunity && this.amIAMember === false ? html`
             <div class="bg-white text-center pb-4 px-4">
               <ctzn-button
                 btn-class="font-semibold py-1 text-base block w-full rounded-lg sm:px-10 sm:inline sm:w-auto sm:rounded-full"
@@ -453,6 +465,7 @@ class CtznUser extends LitElement {
   }
 
   renderProfileControls () {
+    if (this.isProfileLoading) return ''
     const btnStyle = `background: rgba(0,0,0,.5); backdrop-filter: blur(5px) contrast(0.9); -webkit-backdrop-filter: blur(5px) contrast(0.9);`
     if (this.isCitizen) {
       return html`
