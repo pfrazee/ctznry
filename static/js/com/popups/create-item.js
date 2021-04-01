@@ -3,7 +3,6 @@ import { html } from '../../../vendor/lit-element/lit-element.js'
 import { repeat } from '../../../vendor/lit-element/lit-html/directives/repeat.js'
 import { BasePopup } from './base.js'
 import * as session from '../../lib/session.js'
-import * as toast from '../toast.js'
 import '../button.js'
 
 // exported api

@@ -43,7 +43,9 @@ export function BLOB_URL (userId, blobName) {
 }
 
 export const PERM_DESCRIPTIONS = {
-  'ctzn.network/perm-community-ban': `Can remove, ban, and unban members from a community.`,
+  'ctzn.network/perm-community-update-config': `Can update the community settings.`,
+  'ctzn.network/perm-community-invite': `Can invite users to join the community.`,
+  'ctzn.network/perm-community-ban': `Can remove, ban, and unban members from the community.`,
   'ctzn.network/perm-community-remove-post': `Can remove posts from the community.`,
   'ctzn.network/perm-community-remove-comment': `Can remove comments from the community.`,
   'ctzn.network/perm-community-edit-profile': `Can edit the profile of the community.`,
@@ -54,7 +56,6 @@ export const PERM_DESCRIPTIONS = {
   'ctzn.network/perm-transfer-unowned-item': 'Can transfer ownership of items they do not own.',
   'ctzn.network/perm-destroy-unowned-item': 'Can destroy items they do not own.'
 }
-
 
 export const SUGGESTED_REACTIONS = [
   'like',

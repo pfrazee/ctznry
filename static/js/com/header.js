@@ -97,7 +97,7 @@ export class Header extends LitElement {
                 My Profile
               </a>
               <a href="/${info.userId}/inventory" class=${this.getMenuNavClass()}>
-                <span class="fas mr-1.5 fa-fw navicon fa-shopping-bag"></span>
+                <span class="fas mr-1.5 fa-fw navicon fa-suitcase"></span>
                 My Inventory
               </a>
               <hr class="my-3 mx-3">

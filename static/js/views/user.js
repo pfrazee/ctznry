@@ -4,7 +4,9 @@ import { unsafeHTML } from '../../vendor/lit-element/lit-html/directives/unsafe-
 import { EditProfilePopup } from '../com/popups/edit-profile.js'
 import { ComposerPopup } from '../com/popups/composer.js'
 import { EditRolePopup } from '../com/popups/edit-role.js'
+import { EditCommunityConfigPopup } from '../com/popups/edit-community-config.js'
 import { ViewMediaPopup } from '../com/popups/view-media.js'
+import { InvitePopup } from '../com/popups/invite.js'
 import { BanPopup } from '../com/popups/ban.js'
 import { ManageBansPopup } from '../com/popups/manage-bans.js'
 import { TransferItemPopup } from '../com/popups/transfer-item.js'
@@ -39,7 +41,9 @@ class CtznUser extends LitElement {
       following: {type: Array},
       memberships: {type: Array},
       members: {type: Array},
+      communityConfig: {type: Object},
       roles: {type: Array},
+      isUserInvited: {type: Boolean},
       isEmpty: {type: Boolean},
       isJoiningOrLeaving: {type: Boolean},
       expandedSections: {type: Object}
@@ -77,7 +81,9 @@ class CtznUser extends LitElement {
     this.sharedFollowers = []
     this.sharedCommunities = []
     this.followedMembers = []
+    this.communityConfig = undefined
     this.roles = undefined
+    this.isUserInvited = undefined
     this.isEmpty = false
   }
 
@@ -117,6 +123,10 @@ class CtznUser extends LitElement {
 
   get amIAMember () {
     return !!this.members?.find?.(m => m.value.user.userId === session.info?.userId)
+  }
+
+  get isMembershipClosed () {
+    return this.communityConfig?.joinMode === 'closed'
   }
 
   get userUrl () {
@@ -189,10 +199,12 @@ class CtznUser extends LitElement {
         }
         console.log({userProfile: this.userProfile, followers, following, memberships})
       } else if (this.isCommunity) {
-        const [members, roles] = await Promise.all([
+        const [communityConfigEntry, members, roles] = await Promise.all([
+          session.ctzn.db(this.userId).table('ctzn.network/community-config').get('self').catch(e => undefined),
           listAllMembers(this.userId),
           session.ctzn.db(this.userId).table('ctzn.network/community-role').list().catch(e => [])
         ])
+        this.communityConfig = communityConfigEntry?.value
         this.members = members
         if (session.isActive() && !this.isMe) {
           this.followedMembers = intersect(
@@ -202,6 +214,14 @@ class CtznUser extends LitElement {
         }
         this.roles = roles
         console.log({userProfile: this.userProfile, members, roles})
+
+        if (session.isActive() && !this.amIFollowing && this.isMembershipClosed) {
+          let inviteEntry = await session.ctzn.db(this.userId)
+            .table('ctzn.network/community-invite')
+            .get(session.info.userId)
+            .catch(e => undefined)
+          this.isUserInvited = !!inviteEntry?.value
+        }
       }
       this.isProfileLoading = false
     }
@@ -247,6 +267,7 @@ class CtznUser extends LitElement {
       block text-center pt-2 pb-2.5 px-5 sm:px-7 font-semibold cursor-pointer hover:bg-gray-50 hover:text-blue-600
       ${id === this.currentView ? 'border-b-2 border-blue-600 text-blue-600' : ''}
     `.replace('\n', '')
+    const canJoin = !this.isMembershipClosed || (this.isMembershipClosed && this.isUserInvited)
 
     return html`
       <ctzn-header
@@ -275,6 +296,9 @@ class CtznUser extends LitElement {
                 <span class="fas fa-users"></span>
                 ${nMembers} ${pluralize(nMembers, 'Member')}
               </a>
+              ${this.isMembershipClosed ? html`
+                <span class="font-semibold ml-3 py-1 rounded text-gray-600">Invite only</span>
+              ` : ''}
             </div>
           ` : ''}
           ${this.userProfile?.value.description ? html`
@@ -290,7 +314,7 @@ class CtznUser extends LitElement {
               ></ctzn-button>
             </div>
           ` : ''}
-          ${!this.isProfileLoading && this.isCommunity && this.amIAMember === false ? html`
+          ${!this.isProfileLoading && this.isCommunity && this.amIAMember === false && canJoin ? html`
             <div class="bg-white text-center pb-4 px-4">
               <ctzn-button
                 btn-class="font-semibold py-1 text-base block w-full rounded-lg sm:px-10 sm:inline sm:w-auto sm:rounded-full"
@@ -494,13 +518,12 @@ class CtznUser extends LitElement {
                 ></ctzn-button>
               ` : ``}
             `}
-          ` : html`
-            ${''/*TODO logged out UI*/}
-          `}
+          ` : ''}
         </div>
       `
     }
     if (this.isCommunity) {
+      const canJoin = !this.isMembershipClosed || (this.isMembershipClosed && this.isUserInvited)
       return html`
         <div>
           ${session.isActive() ? html`
@@ -512,14 +535,7 @@ class CtznUser extends LitElement {
                 transparent
                 btn-style=${btnStyle}
               ></ctzn-button>
-              <ctzn-button
-                btn-class="font-semibold px-3 py-1 rounded-full text-base text-white"
-                @click=${(e) => this.onClickControlsMenu(e)}
-                icon="fas fa-fw fa-ellipsis-h"
-                transparent
-                btn-style=${btnStyle}
-              ></ctzn-button>
-            ` : this.amIAMember === false ? html`
+            ` : this.amIAMember === false && canJoin ? html`
               <ctzn-button
                 btn-class="font-semibold px-5 py-1 rounded-full text-base text-white"
                 @click=${this.onClickJoin}
@@ -529,9 +545,14 @@ class CtznUser extends LitElement {
                 btn-style=${btnStyle}
               ></ctzn-button>
             ` : ``}
-          ` : html`
-            ${''/*TODO logged out UI*/}
-          `}
+            <ctzn-button
+              btn-class="font-semibold px-3 py-1 rounded-full text-base text-white"
+              @click=${(e) => this.onClickControlsMenu(e)}
+              icon="fas fa-fw fa-ellipsis-h"
+              transparent
+              btn-style=${btnStyle}
+            ></ctzn-button>
+          ` : ''}
         </div>
       `
     }
@@ -702,8 +723,10 @@ class CtznUser extends LitElement {
   }
 
   renderCommunityAbout () {
+    const canInvite = this.hasPermission('ctzn.network/perm-community-invite')
     const canManageRoles = this.hasPermission('ctzn.network/perm-community-manage-roles')
     const canBan = this.hasPermission('ctzn.network/perm-community-ban')
+    const canEditConfig = this.hasPermission('ctzn.network/perm-community-update-config')
     const onToggleExpandSection = id => {
       this.expandedSections = Object.assign(this.expandedSections, {[id]: !this.expandedSections[id]})
       this.requestUpdate()
@@ -733,10 +756,10 @@ class CtznUser extends LitElement {
           <div class="flex items-center">
             <span class="font-semibold text-lg flex-1"><span class="text-sm far fa-fw fa-user"></span> ${roleId}</span>
             ${roleId !== 'admin' && this.hasPermission('ctzn.network/perm-community-manage-roles') ? html`
-              <ctzn-button btn-class="text-sm px-3 py-0 rounded-3xl" label="Remove" @click=${e => this.onRemoveRole(e, roleId)}></ctzn-button>
+              <button class="text-sm ml-1 px-2 py-0 border border-gray-200 rounded cursor-pointer sm:hover:bg-gray-50" @click=${e => this.onRemoveRole(e, roleId)}>Remove</button>
             ` : ''}
             ${this.hasPermission('ctzn.network/perm-community-manage-roles') ? html`
-              <ctzn-button btn-class="text-sm px-3 py-0 ml-1 rounded-3xl" label="Edit" @click=${e => this.onEditRole(e, roleId, permissions)}></ctzn-button>
+              <button class="text-sm ml-1 px-2 py-0 border border-gray-200 rounded cursor-pointer sm:hover:bg-gray-50" @click=${e => this.onEditRole(e, roleId, permissions)}>Edit</button>
             ` : ''}
           </div>
           <div class="text-gray-500">
@@ -763,13 +786,31 @@ class CtznUser extends LitElement {
       `
     }
     return html`
-      ${canManageRoles || canBan ? html`
+      ${canInvite || canManageRoles || canBan || canEditConfig ? html`
         <div class="px-3 py-2 sm:rounded bg-white mb-1">
+          ${canInvite ? html`
+            <button
+              class="block w-full text-center mb-1 px-3 py-2 border border-gray-200 rounded cursor-pointer sm:text-sm sm:inline-block sm:w-auto sm:hover:bg-gray-50 sm:py-1 sm:mb-0"
+              @click=${this.onCreateInvite}
+            >Invite New Member</button>
+          ` : ''}
           ${canManageRoles ? html`
-            <ctzn-button btn-class="text-sm px-4 py-1 ml-1 rounded-3xl" label="Create Role" @click=${this.onCreateRole}></ctzn-button>
+            <button
+              class="block w-full text-center mb-1 px-3 py-2 border border-gray-200 rounded cursor-pointer sm:text-sm sm:inline-block sm:w-auto sm:hover:bg-gray-50 sm:py-1 sm:mb-0"
+              @click=${this.onCreateRole}
+            >Create Role</button>
           ` : ''}
           ${canBan ? html`
-            <ctzn-button btn-class="text-sm px-4 py-1 ml-1 rounded-3xl" label="Manage Banned Users" @click=${this.onClickManageBans}></ctzn-button>
+            <button
+              class="block w-full text-center mb-1 px-3 py-2 border border-gray-200 rounded cursor-pointer sm:text-sm sm:inline-block sm:w-auto sm:hover:bg-gray-50 sm:py-1 sm:mb-0"
+              @click=${this.onClickManageBans}
+            >Manage Banned Users</button>
+          ` : ''}
+          ${canEditConfig ? html`
+            <button
+              class="block w-full text-center mb-1 px-3 py-2 border border-gray-200 rounded cursor-pointer sm:text-sm sm:inline-block sm:w-auto sm:hover:bg-gray-50 sm:py-1 sm:mb-0"
+              @click=${this.onClickEditSettings}
+            >Edit Settings</button>
           ` : ''}
         </div>
       ` : ''}
@@ -777,7 +818,7 @@ class CtznUser extends LitElement {
       ${repeat(this.roles || [], r => r.value.roleId, r => renderRole(r.value.roleId, r.value.permissions))}
       <div class="bg-white sm:rounded my-1 ${this.expandedSections.communities ? 'pb-1' : ''}">
       ${expandableSectionHeader('members', 'Members', this.members?.length, this.followedMembers?.length ? html`
-        <div class="pt-1 flex items-center text-gray-500">
+        <div class="py-1 flex items-center text-gray-500">
           <span class="mr-2">Followed:</span>
           ${repeat(this.followedMembers.slice(0, 7), (userId, i) => html`
             <span data-tooltip=${userId}>
@@ -1052,6 +1093,21 @@ class CtznUser extends LitElement {
     }
   }
 
+  async onCreateInvite (e) {
+    try {
+      await InvitePopup.create({
+        communityId: this.userId
+      })
+      toast.create('Invite created', 'success')
+      this.load()
+    } catch (e) {
+      if (e) {
+        console.log(e)
+        toast.create(e.toString(), 'error')
+      }
+    }
+  }
+
   async onBan (e) {
     try {
       await BanPopup.create({
@@ -1073,6 +1129,21 @@ class CtznUser extends LitElement {
       this.load()
     } catch (e) {
       // ignore
+    }
+  }
+
+  async onClickEditSettings (e) {
+    try {
+      await EditCommunityConfigPopup.create({
+        communityId: this.userId
+      })
+      toast.create('Settings updated', 'success')
+      this.load()
+    } catch (e) {
+      if (e) {
+        console.log(e)
+        toast.create(e.toString(), 'error')
+      }
     }
   }
 
@@ -1125,8 +1196,10 @@ class CtznUser extends LitElement {
         items.push('-')
       }
       items.push({label: 'Audit log', click: () => setView('audit-log')})
-      items.push('-')
-      items.push({label: 'Leave community', click: () => this.onClickLeave()})
+      if (this.amIAMember) {
+        items.push('-')
+        items.push({label: 'Leave community', click: () => this.onClickLeave()})
+      }
     }
     let rect = e.currentTarget.getClientRects()[0]
     contextMenu.create({

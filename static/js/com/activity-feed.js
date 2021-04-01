@@ -36,6 +36,10 @@ const METHOD_ICONS = {
     <span class="fas fa-user absolute" style="left: 11px; top: 3px; font-size: 13px;"></span>
     <span class="fas fa-check absolute" style="right: 6px; bottom: 0px; font-size: 11px;"></span>
   `,
+  'ctzn.network/community-invite-member-method': html`
+    <span class="fas fa-user absolute" style="left: 11px; top: 3px; font-size: 13px;"></span>
+    <span class="fas fa-check absolute" style="right: 7px; bottom: 1px; font-size: 11px;"></span>
+  `,
   'ctzn.network/community-remove-member-method': html`
     <span class="fas fa-user absolute" style="left: 11px; top: 3px; font-size: 13px;"></span>
     <span class="fas fa-ban absolute" style="right: 7px; bottom: 1px; font-size: 11px;"></span>
@@ -43,6 +47,10 @@ const METHOD_ICONS = {
   'ctzn.network/community-put-ban-method': html`
     <span class="fas fa-user absolute" style="left: 11px; top: 3px; font-size: 13px;"></span>
     <span class="fas fa-ban absolute" style="right: 7px; bottom: 1px; font-size: 11px;"></span>
+  `,
+  'ctzn.network/community-update-config-method': html`
+    <span class="fas fa-list absolute" style="left: 11px; top: 3px; font-size: 13px;"></span>
+    <span class="fas fa-pen absolute" style="right: 7px; bottom: 1px; font-size: 11px;"></span>
   `,
   'ctzn.network/create-item-method': html`
     <span class="far fa-gem absolute" style="left: 9px; top: 6px; font-size: 13px;"></span>
@@ -358,6 +366,16 @@ export class ActivityFeed extends LitElement {
       lifted the ban on <span class="text-black">${displayNames.render(bannedUser.userId)}</span>
     `
   }
+
+  renderCommunityInviteMemberMethod (entry) {
+    const {invitedUser} = entry.call.args
+    return html`
+      invited
+      <a href="/${invitedUser.userId}" class="text-blue-600 sm:hover:underline">${displayNames.render(invitedUser.userId)}</a>
+      to join
+      <a href="/${entry.call.database.userId}" class="text-blue-600 sm:hover:underline">${displayNames.render(entry.call.database.userId)}</a>
+    `
+  }
   
   renderCommunityRemoveMemberMethod (entry) {
     const {ban, banReason, member} = entry.call.args
@@ -377,7 +395,14 @@ export class ActivityFeed extends LitElement {
       banned ${bannedUser.userId} from <span class="text-black">${displayNames.render(entry.call.database.userId)}</span>
     `
   }
-    
+
+  renderCommunityUpdateConfigMethod (entry) {
+    return html`
+      updated the settings for
+      <a href="/${entry.call.database.userId}" class="text-blue-600 sm:hover:underline">${displayNames.render(entry.call.database.userId)}</a>
+    `
+  }
+
   renderCreateItemMethod (entry) {
     const {classId, qty, owner} = entry.call.args
     return html`

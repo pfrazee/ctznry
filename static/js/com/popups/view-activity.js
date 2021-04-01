@@ -1,5 +1,6 @@
 /* globals beaker */
 import { html } from '../../../vendor/lit-element/lit-element.js'
+import { repeat } from '../../../vendor/lit-element/lit-html/directives/repeat.js'
 import { asyncReplace } from '../../../vendor/lit-element/lit-html/directives/async-replace.js'
 import { BasePopup } from './base.js'
 import { AVATAR_URL, ITEM_CLASS_ICON_URL } from '../../lib/const.js'
@@ -137,6 +138,26 @@ export class ViewActivityPopup extends BasePopup {
       </a>
     `
   }
+
+  renderCommunityInviteMemberMethod () {
+    const {invitedUser} = this.activity.call.args
+    return html`
+      <div class="flex rounded p-2 bg-white border border-gray-300 mt-1">
+        <div class="block w-8 mr-2 text-center">
+          <span class="fas fa-check"></span>
+        </div>
+        <div class="flex-1">
+          invited to the community:
+        </div>
+      </div>
+      <a class="flex items-center rounded p-2 bg-white border border-gray-300 mt-1 sm:hover:bg-gray-50" href="/${invitedUser.userId}">
+        <img class="block h-8 object-fit rounded w-8 mr-2" src=${AVATAR_URL(invitedUser.userId)}>
+        <div class="flex-1 truncate">
+          <span class="font-medium">${displayNames.render(invitedUser.userId)}</span>
+        </div>
+      </a>
+    `
+  }
   
   renderCommunityRemoveMemberMethod () {
     const {ban, banReason, member} = this.activity.call.args
@@ -185,6 +206,31 @@ export class ViewActivityPopup extends BasePopup {
           Reason: ${reason}
         </div>
       ` : ''}
+    `
+  }
+  
+  renderCommunityUpdateConfigMethod () {
+    return html`
+      <div class="flex rounded p-2 bg-white border border-gray-300 mt-1">
+        <div class="block w-8 mr-2 text-center">
+          <span class="fas fa-list"></span>
+        </div>
+        <div class="flex-1">
+          updated the settings for:
+        </div>
+      </div>
+      <a class="flex items-center rounded p-2 bg-white border border-gray-300 mt-1 sm:hover:bg-gray-50" href="/${this.activity.call.database.userId}">
+        <img class="block h-8 object-fit rounded w-8 mr-2" src=${AVATAR_URL(this.activity.call.database.userId)}>
+        <div class="flex-1 truncate">
+          <span class="font-medium">${displayNames.render(this.activity.call.database.userId)}</span>
+        </div>
+      </a>
+      <div class="border border-gray-300 mt-1 px-3 py-2 rounded text-gray-600 text-sm">
+        ${repeat(Object.entries(this.activity.call.args), ([key, value]) => html`
+          <div class="font-semibold">${key}:</div>
+          <div class="text-black text-base">${value}</div>
+        `)}
+      </div>
     `
   }
     

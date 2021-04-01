@@ -30,6 +30,7 @@ const cssStr = css`
   background: rgba(0, 0, 0, 0.75);
   -webkit-font-smoothing: antialiased;
   font-weight: 600;
+  box-sizing: border-box;
 }
 .toast.error {
   padding-left: 38px;
