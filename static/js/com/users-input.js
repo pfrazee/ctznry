@@ -33,7 +33,7 @@ export class UsersInput extends LitElement {
 
   setValue (value) {
     this.value = value
-    emit(this, 'change', {detail: {value}})
+    emit(this, 'change-user', {detail: {value}})
   }
 
   // rendering

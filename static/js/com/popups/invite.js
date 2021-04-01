@@ -53,7 +53,7 @@ export class InvitePopup extends BasePopup {
         <h2 class="text-3xl py-4">Invite user</h2>
 
         <section class="mb-2">
-          <ctzn-users-input .users=${session.myFollowing} @change=${this.onChangeUser}></ctzn-users-input>
+          <ctzn-users-input .users=${session.myFollowing} @change-user=${this.onChangeUser}></ctzn-users-input>
         </section>
 
         ${this.currentError ? html`
@@ -84,6 +84,9 @@ export class InvitePopup extends BasePopup {
   }
 
   async onSubmit (e) {
+    e.preventDefault()
+    e.stopPropagation()
+    
     if (this.isProcessing) return
     this.isProcessing = true
     this.currentError = undefined
