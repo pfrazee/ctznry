@@ -47,8 +47,14 @@ export function setCurrentNav (nav) {
 function moveNav (dir) {
   if (!currentNav) return
   const url = currentNav[getCurrentNavPosition() + dir]
-  if (url) {
-    document.body.dispatchEvent(new CustomEvent('navigate-to', {detail: {url}}))
+  if (url?.back) {
+    if (window.history.length > 1) {
+      window.history.back()
+    } else {
+      document.body.dispatchEvent(new CustomEvent('navigate-to', {detail: {url: '/', replace: true}}))
+    }
+  } else if (url) {
+    document.body.dispatchEvent(new CustomEvent('navigate-to', {detail: {url, replace: true}}))
   } else if (dir === -1) {
     document.body.dispatchEvent(new CustomEvent('open-main-menu'))
   }

@@ -70,9 +70,6 @@ class CtznApp extends LitElement {
     document.body.addEventListener('navigate-to', this.onNavigateTo.bind(this))
     window.addEventListener('popstate', this.onHistoryPopstate.bind(this))
 
-    gestures.events.addEventListener('swipe-left', e => console.log('shwipe left'))
-    gestures.events.addEventListener('swipe-right', e => console.log('shwipe right'))
-
     this.load()
   }
 
@@ -84,7 +81,7 @@ class CtznApp extends LitElement {
     }
   }
 
-  navigateTo (pathname) {
+  navigateTo (pathname, replace = false) {
     BasePopup.destroy()
     
     if (history.scrollRestoration) {
@@ -101,8 +98,12 @@ class CtznApp extends LitElement {
         scrollY: window.scrollY
       }
     }
-    window.history.replaceState({scrollY: window.scrollY}, null)
-    window.history.pushState({}, null, pathname)
+    if (replace) {
+      window.history.replaceState({}, null, pathname)
+    } else {
+      window.history.replaceState({scrollY: window.scrollY}, null)
+      window.history.pushState({}, null, pathname)
+    }
     this.currentPath = pathname
     this.setGestureNav()
 
@@ -119,10 +120,28 @@ class CtznApp extends LitElement {
       case '/activity':
       case '/notifications':
         gestures.setCurrentNav(['/', '/notifications', '/activity'])
-        break
+        return
       default:
         gestures.setCurrentNav(undefined)
-        break
+    }
+    if (POST_PATH_REGEX.test(this.currentPath)) {
+      gestures.setCurrentNav([{back: true}, this.currentPath])
+      return
+    }
+    if (COMMENT_PATH_REGEX.test(this.currentPath)) {
+      gestures.setCurrentNav([{back: true}, this.currentPath])
+      return
+    }
+    if (USER_PATH_REGEX.test(this.currentPath)) {
+      const userId = USER_PATH_REGEX.exec(this.currentPath)[1]
+      gestures.setCurrentNav([
+        {back: true},
+        `/${userId}`,
+        `/${userId}/activity`,
+        `/${userId}/inventory`,
+        `/${userId}/about`,
+      ])
+      return
     }
   }
 
@@ -225,12 +244,13 @@ class CtznApp extends LitElement {
   }
 
   onNavigateTo (e) {
-    this.navigateTo(e.detail.url)
+    this.navigateTo(e.detail.url, e.detail.replace)
   }
 
   onHistoryPopstate (e) {
     emit(document, 'close-all-popups')
     this.currentPath = window.location.pathname
+    this.setGestureNav()
     if (e.state.scrollY) {
       this.scrollToAfterLoad(e.state.scrollY)
     }
