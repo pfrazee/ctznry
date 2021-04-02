@@ -63,11 +63,15 @@ class CtznNotifications extends LitElement {
     if (!session.isActive()) {
       return ''
     }
+    const navCls = (id) => `
+      block text-center pt-2 pb-2.5 px-5 sm:px-7 font-semibold cursor-pointer hover:bg-gray-50 hover:text-blue-600
+      ${id === 'notifications' ? 'border-b-2 border-blue-600 text-blue-600' : ''}
+    `.replace('\n', '')
     return html`
       <main class="col2">
         <div>
           <div
-            class="sticky top-0 z-10 mb-0.5 px-4 py-3 sm:rounded"
+            class="hidden sm:block sticky top-0 z-10 mb-0.5 px-4 py-3 sm:rounded"
             style="
               backdrop-filter: blur(4px);
               -webkit-backdrop-filter: blur(4px);
@@ -78,6 +82,20 @@ class CtznNotifications extends LitElement {
               <span class="fas fa-angle-left fa-fw cursor-pointer sm:hover:text-gray-700 text-xl text-gray-600"></span>
             </a>
             <span class="ml-2 font-medium text-lg">Notifications</span>
+          </div>
+          <div
+            class="sm:hidden sticky top-0 z-10 flex mb-0.5 sm:mt-0.5 sm:rounded"
+            style="
+              backdrop-filter: blur(4px);
+              -webkit-backdrop-filter: blur(4px);
+              background: rgba(255, 255, 255, 0.9);
+            "
+          >
+            <a class="${navCls('feed')}" href="/">Feed</a>
+            <a class="${navCls('notifications')}" href="/notifications">
+              <span class="fas fa-bell"></span>
+            </a>
+            <a class="${navCls('activity')}" href="/activity">Activity</a>
           </div>
           <ctzn-notifications-feed
             cleared-at=${this.notificationsClearedAt}

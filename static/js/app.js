@@ -1,6 +1,7 @@
 import { LitElement, html } from '../vendor/lit-element/lit-element.js'
 import * as session from './lib/session.js'
 import { emit } from './lib/dom.js'
+import * as gestures from './lib/gestures.js'
 import { DRIVE_KEY_REGEX } from './lib/strings.js'
 import { BasePopup } from './com/popups/base.js'
 import './com/header.js'
@@ -62,10 +63,15 @@ class CtznApp extends LitElement {
     this.isLoading = true
     this.currentPath = window.location.pathname
     this.scrollPositionCache = undefined
+    gestures.setup()
+    this.setGestureNav()
     document.body.addEventListener('click', this.onGlobalClick.bind(this))
     document.body.addEventListener('view-thread', this.onViewThread.bind(this))
     document.body.addEventListener('navigate-to', this.onNavigateTo.bind(this))
     window.addEventListener('popstate', this.onHistoryPopstate.bind(this))
+
+    gestures.events.addEventListener('swipe-left', e => console.log('shwipe left'))
+    gestures.events.addEventListener('swipe-right', e => console.log('shwipe right'))
 
     this.load()
   }
@@ -98,9 +104,25 @@ class CtznApp extends LitElement {
     window.history.replaceState({scrollY: window.scrollY}, null)
     window.history.pushState({}, null, pathname)
     this.currentPath = pathname
+    this.setGestureNav()
 
     if (prevScrollPositionCache?.pathname === pathname) {
       this.scrollToAfterLoad(prevScrollPositionCache.scrollY)
+    }
+  }
+
+  setGestureNav () {
+    switch (this.currentPath) {
+      case '/':
+      case '/index':
+      case '/index.html':
+      case '/activity':
+      case '/notifications':
+        gestures.setCurrentNav(['/', '/notifications', '/activity'])
+        break
+      default:
+        gestures.setCurrentNav(undefined)
+        break
     }
   }
 

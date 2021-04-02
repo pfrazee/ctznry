@@ -1,5 +1,4 @@
 import { LitElement, html } from '../../vendor/lit-element/lit-element.js'
-import { repeat } from '../../vendor/lit-element/lit-html/directives/repeat.js'
 import * as toast from '../com/toast.js'
 import * as session from '../lib/session.js'
 import { ComposerPopup } from '../com/popups/composer.js'
@@ -152,6 +151,9 @@ class CtznMainView extends LitElement {
             "
           >
             <a class="${navCls('feed')}" href="/">Feed</a>
+            <a class="${navCls('notifications')} sm:hidden" href="/notifications">
+              <span class="fas fa-bell"></span>
+            </a>
             <a class="${navCls('activity')}" href="/activity">Activity</a>
           </div>
           ${this.currentView === 'feed' ? html`

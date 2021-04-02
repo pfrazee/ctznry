@@ -29,6 +29,9 @@ export class Header extends LitElement {
     this.isMenuOpen = false
     this.unreadNotificationsCount = 0
     this.community = undefined
+    document.body.addEventListener('open-main-menu', e => {
+      this.isMenuOpen = true
+    })
     setInterval(this.checkNotifications.bind(this), CHECK_NOTIFICATIONS_INTERVAL)
     session.onChange(() => this.requestUpdate())
   }
