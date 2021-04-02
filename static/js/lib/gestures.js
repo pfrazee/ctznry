@@ -1,3 +1,5 @@
+import { BasePopup } from '../com/popups/base.js'
+
 // we put the constants on window so that mobile debuggers can tweak the values
 window.SWIPE_X_THRESH = 60
 window.SWIPE_XN_THRESH = 2
@@ -85,6 +87,13 @@ export function setOnSwiping (fn) {
 // =
 
 function moveNav (dir) {
+  if (BasePopup.getActive()) {
+    if (BasePopup.getActive().shouldCloseOnOuterClick) {
+      BasePopup.destroy()
+    }
+    return
+  }
+
   if (!currentNav) return
   const url = currentNav[getCurrentNavPosition() + dir]
   if (url?.back) {

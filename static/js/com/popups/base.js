@@ -88,6 +88,10 @@ export class BasePopup extends LitElement {
     if (popup) popup.onReject()
   }
 
+  static getActive () {
+    return document.querySelector('.active-popup')
+  }
+
   // rendering
   // =
 
