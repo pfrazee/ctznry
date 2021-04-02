@@ -19,6 +19,7 @@ import { pluralize, makeSafe, linkify } from '../lib/strings.js'
 import * as images from '../lib/images.js'
 import { emit } from '../lib/dom.js'
 import { emojify } from '../lib/emojify.js'
+import PullToRefresh from '../../vendor/pulltorefreshjs/index.js'
 import '../com/header.js'
 import '../com/button.js'
 import '../com/img-fallbacks.js'
@@ -235,6 +236,14 @@ class CtznUser extends LitElement {
         behavior: 'smooth'
       })
     }
+
+    if (this.querySelector('ctzn-feed')) {
+      this.querySelector('ctzn-feed').load()
+    } else if (this.querySelector('ctzn-dbresults-feed-feed')) {
+      this.querySelector('ctzn-dbresults-feed-feed').load()
+    } else if (this.querySelector('ctzn-activity-feed')) {
+      this.querySelector('ctzn-activity-feed').load()
+    }
   }
 
   get isLoading () {
@@ -250,6 +259,21 @@ class CtznUser extends LitElement {
     } else {
       window.scrollTo(0, y)
     }
+  }
+
+  connectedCallback () {
+    super.connectedCallback(
+    this.ptr = PullToRefresh.init({
+      mainElement: 'body',
+      onRefresh: () => {
+        this.load()
+      }
+    }))
+  }
+
+  disconnectedCallback (...args) {
+    super.disconnectedCallback(...args)
+    PullToRefresh.destroyAll()
   }
 
   // rendering

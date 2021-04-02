@@ -2,6 +2,7 @@ import { LitElement, html } from '../../vendor/lit-element/lit-element.js'
 import * as toast from '../com/toast.js'
 import * as session from '../lib/session.js'
 import { ComposerPopup } from '../com/popups/composer.js'
+import PullToRefresh from '../../vendor/pulltorefreshjs/index.js'
 import '../com/header.js'
 import '../com/button.js'
 import '../com/login.js'
@@ -79,6 +80,27 @@ class CtznMainView extends LitElement {
     await this.requestUpdate()
     const feed = this.querySelector('ctzn-feed') || this.querySelector('ctzn-notifications-feed')
     feed.pageLoadScrollTo(y)
+  }
+
+  connectedCallback () {
+    super.connectedCallback(
+    this.ptr = PullToRefresh.init({
+      mainElement: 'body',
+      onRefresh: () => {
+        if (this.querySelector('ctzn-feed')) {
+          this.querySelector('ctzn-feed').load()
+        } else if (this.querySelector('ctzn-notifications-feed')) {
+          this.querySelector('ctzn-notifications-feed').load()
+        } else if (this.querySelector('ctzn-activity-feed')) {
+          this.querySelector('ctzn-activity-feed').load()
+        }
+      }
+    }))
+  }
+
+  disconnectedCallback (...args) {
+    super.disconnectedCallback(...args)
+    PullToRefresh.destroyAll()
   }
 
   // rendering

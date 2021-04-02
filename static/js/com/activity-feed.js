@@ -1,7 +1,6 @@
 import { LitElement, html } from '../../vendor/lit-element/lit-element.js'
 import { repeat } from '../../vendor/lit-element/lit-html/directives/repeat.js'
 import { asyncReplace } from '../../vendor/lit-element/lit-html/directives/async-replace.js'
-import PullToRefresh from '../../vendor/pulltorefreshjs/index.js'
 import { ViewActivityPopup } from './popups/view-activity.js'
 import * as displayNames from '../lib/display-names.js'
 import { ITEM_CLASS_ICON_URL } from '../lib/const.js'
@@ -128,12 +127,6 @@ export class ActivityFeed extends LitElement {
     // ui state
     this.loadMoreObserver = undefined
     setInterval(() => this.checkNewItems(), CHECK_NEW_ITEMS_INTERVAL)
-    this.ptr = PullToRefresh.init({
-      mainElement: 'body',
-      onRefresh: () => {
-        return this.load()
-      }
-    })
 
     // query state
     this.activeQuery = undefined
@@ -151,11 +144,6 @@ export class ActivityFeed extends LitElement {
       this.entries = undefined
     }
     return this.queueQuery()
-  }
-
-  disconnectedCallback (...args) {
-    super.disconnectedCallback(...args)
-    PullToRefresh.destroyAll()
   }
 
   updated (changedProperties) {

@@ -1,6 +1,5 @@
 import { LitElement, html } from '../../vendor/lit-element/lit-element.js'
 import { repeat } from '../../vendor/lit-element/lit-html/directives/repeat.js'
-import PullToRefresh from '../../vendor/pulltorefreshjs/index.js'
 import * as displayNames from '../lib/display-names.js'
 import * as session from '../lib/session.js'
 import { emit } from '../lib/dom.js'
@@ -31,12 +30,6 @@ export class DbmethodResultFeed extends LitElement {
     // ui state
     this.loadMoreObserver = undefined
     setInterval(() => this.checkNewItems(), CHECK_NEW_ITEMS_INTERVAL)
-    this.ptr = PullToRefresh.init({
-      mainElement: 'body',
-      onRefresh: () => {
-        return this.load()
-      }
-    })
 
     // query state
     this.activeQuery = undefined
@@ -54,11 +47,6 @@ export class DbmethodResultFeed extends LitElement {
       this.results = undefined
     }
     return this.queueQuery()
-  }
-
-  disconnectedCallback (...args) {
-    super.disconnectedCallback(...args)
-    PullToRefresh.destroyAll()
   }
 
   updated (changedProperties) {
