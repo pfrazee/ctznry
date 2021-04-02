@@ -15,17 +15,6 @@ textarea {
   appearance: none;
 }
 
-/* ios safari hack - force the browser footer controls to always show */
-/* we have to do this because safari hijacks the bottom 50ish pixels of */
-/* presses when the browser footer controls are hidden, causing clicks */
-/* not to register. */
-html,
-body {
-  height: 100%;
-  overflow-y: scroll;
-   -webkit-overflow-scrolling: touch;
-}
-
 header .menu {
   position: fixed;
   top: 0px;
@@ -47,6 +36,7 @@ header .mobile-bot {
   left: 0;
   width: 100vw;
   height: 56px;
+  height: calc(56px + env(safe-area-inset-bottom));
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
   background: rgba(255, 255, 255, 0.9);
