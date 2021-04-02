@@ -225,8 +225,8 @@ export class Post extends LitElement {
     const img = (item, size) => html`
       <div class="bg-gray-100 rounded img-sizing-${size} img-placeholder">
         <img
-          class="lazyload box-border object-cover rounded border border-gray-300 w-full img-sizing-${size}"
-          data-src="${BLOB_URL(this.post.author.userId, (item.blobs.thumb || item.blobs.original).blobName)}"
+          class="box-border object-cover rounded border border-gray-300 w-full img-sizing-${size}"
+          src="${BLOB_URL(this.post.author.userId, (item.blobs.thumb || item.blobs.original).blobName)}"
           alt=${item.caption || 'Image'}
         >
       </div>
