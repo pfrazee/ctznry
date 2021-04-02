@@ -1,4 +1,9 @@
-import * as toast from '../com/toast.js'
+// we put the constants on window so that mobile debuggers can tweak the values
+window.SWIPE_X_THRESH = 60
+window.SWIPE_XN_THRESH = 2
+window.SWIPE_Y_MAX = 500
+window.SWIPE_TS_MAX = 1000
+window.SWIPE_LOG = false
 
 // globals
 // =
@@ -8,13 +13,10 @@ let currentNav = undefined
 // exported api
 // =
 
-window.X_THRESH = 60
-window.XN_THRESH = 2
-window.Y_MAX = 500
-
 export const events = new EventTarget()
 
 export function setup () {
+  let touchstartTs = undefined
   let touchstartX = 0
   let touchstartY = 0
   document.body.addEventListener('touchstart', e => {
@@ -26,6 +28,7 @@ export function setup () {
     
     touchstartX = e.changedTouches[0].screenX
     touchstartY = e.changedTouches[0].screenY
+    touchstartTs = Date.now()
   }, false)
   document.body.addEventListener('touchend', e => {
     let touchendX = e.changedTouches[0].screenX
@@ -33,14 +36,18 @@ export function setup () {
     let diffX = touchendX - touchstartX
     let diffY = touchendY - touchstartY
     let diffXNormalized = diffX / Math.abs(diffY + 1)
-    console.log(diffX, diffY, diffXNormalized)
-    if (Math.abs(diffY) < window.Y_MAX) {
-      if (diffX > (window.X_THRESH) && diffXNormalized > (window.XN_THRESH)) {
-        toast.create(`${diffX}, ${diffY}, ${diffXNormalized}`)
+    let diffTs = Date.now() - touchstartTs
+    if (window.SWIPE_LOG) {
+      console.log({diffX, diffY, diffXNormalized, diffTs})
+    }
+    if (diffTs > window.SWIPE_TS_MAX) {
+      return
+    }
+    if (Math.abs(diffY) < window.SWIPE_Y_MAX) {
+      if (diffX > (window.SWIPE_X_THRESH) && diffXNormalized > (window.SWIPE_XN_THRESH)) {
         events.dispatchEvent(new Event('swipe-right'))
         moveNav(-1)
-      } else if (diffX < -1 * (window.X_THRESH) && diffXNormalized < -1 * (window.XN_THRESH)) {
-        toast.create(`${diffX}, ${diffY}, ${diffXNormalized}`)
+      } else if (diffX < -1 * (window.SWIPE_X_THRESH) && diffXNormalized < -1 * (window.SWIPE_XN_THRESH)) {
         events.dispatchEvent(new Event('swipe-left'))
         moveNav(1)
       }
