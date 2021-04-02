@@ -27,10 +27,10 @@ export function setup () {
     let diffX = touchendX - touchstartX
     let diffY = touchendY - touchstartY
     let diffXNormalized = diffX / Math.abs(diffY + 1)
-    if (diffX > 100 && diffXNormalized > 10) {
+    if (diffX > 60 && diffXNormalized > 2) {
       events.dispatchEvent(new Event('swipe-right'))
       moveNav(-1)
-    } else if (diffX < -100 && diffXNormalized < -10) {
+    } else if (diffX < -60 && diffXNormalized < -2) {
       events.dispatchEvent(new Event('swipe-left'))
       moveNav(1)
     }
