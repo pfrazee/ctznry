@@ -8,6 +8,10 @@ let currentNav = undefined
 // exported api
 // =
 
+window.X_THRESH = 60
+window.XN_THRESH = 2
+window.Y_MAX = 500
+
 export const events = new EventTarget()
 
 export function setup () {
@@ -29,14 +33,17 @@ export function setup () {
     let diffX = touchendX - touchstartX
     let diffY = touchendY - touchstartY
     let diffXNormalized = diffX / Math.abs(diffY + 1)
-    if (diffX > 60 && diffXNormalized > 2) {
-      toast.create(`${diffX}, ${diffXNormalized}`)
-      events.dispatchEvent(new Event('swipe-right'))
-      moveNav(-1)
-    } else if (diffX < -60 && diffXNormalized < -2) {
-      toast.create(`${diffX}, ${diffXNormalized}`)
-      events.dispatchEvent(new Event('swipe-left'))
-      moveNav(1)
+    console.log(diffX, diffY, diffXNormalized)
+    if (Math.abs(diffY) < window.Y_MAX) {
+      if (diffX > (window.X_THRESH) && diffXNormalized > (window.XN_THRESH)) {
+        toast.create(`${diffX}, ${diffY}, ${diffXNormalized}`)
+        events.dispatchEvent(new Event('swipe-right'))
+        moveNav(-1)
+      } else if (diffX < -1 * (window.X_THRESH) && diffXNormalized < -1 * (window.XN_THRESH)) {
+        toast.create(`${diffX}, ${diffY}, ${diffXNormalized}`)
+        events.dispatchEvent(new Event('swipe-left'))
+        moveNav(1)
+      }
     }
   }, false)
 }
