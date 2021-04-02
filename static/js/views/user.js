@@ -265,6 +265,7 @@ class CtznUser extends LitElement {
     }
 
     const SUBNAV_ITEMS = [
+      {back: true, label: html`<span class="fas fa-angle-left"></span>`, mobileOnly: true},
       {path: `/${this.userId}`, label: 'Feed'},
       {path: `/${this.userId}/activity`, label: 'Activity'},
       {path: `/${this.userId}/inventory`, label: this.isCommunity ? 'Items' : 'Inventory'},
