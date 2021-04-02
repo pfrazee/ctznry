@@ -51,6 +51,14 @@ export class Subnav extends LitElement {
     gestures.setOnSwiping((dx, dxN) => {
       this.borderEl.style.left = `${this.borderLeft + -dxN * this.borderWidth * 0.15}px`
     })
+    this.className = `
+      sticky top-0 z-10 flex overflow-x-auto bg-white sm:rounded ${this.navClass}
+    `
+    this.style = `
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      background: rgba(255, 255, 255, 0.9);
+    `
   }
 
   disconnectedCallback () {
@@ -68,26 +76,17 @@ export class Subnav extends LitElement {
   render () {
     return html`
       <div
-        class="sticky top-0 z-10 flex overflow-x-auto bg-white sm:rounded ${this.navClass}"
+        class="absolute bg-blue-600"
         style="
-          backdrop-filter: blur(4px);
-          -webkit-backdrop-filter: blur(4px);
-          background: rgba(255, 255, 255, 0.9);
-        "
-      >
-        <div
-          class="absolute bg-blue-600"
-          style="
-            left: ${this.borderLeft}px;
-            bottom: 0;
-            width: ${this.borderWidth}px;
-            height: 2px;
-            transition: left 0.1s;
-          "></div>
-        ${repeat(this.items, item => item.path, ({path, mobileOnly, label}) => html`
-          <a class="${this.getNavCls(path, mobileOnly)}" href=${path}>${label}</a>
-        `)}
-      </div>
+          left: ${this.borderLeft}px;
+          bottom: 0;
+          width: ${this.borderWidth}px;
+          height: 2px;
+          transition: left 0.1s;
+        "></div>
+      ${repeat(this.items, item => item.path, ({path, mobileOnly, label}) => html`
+        <a class="${this.getNavCls(path, mobileOnly)}" href=${path}>${label}</a>
+      `)}
     `
   }
 
