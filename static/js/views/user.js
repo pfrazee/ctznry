@@ -29,6 +29,7 @@ import '../com/items-list.js'
 import '../com/owned-items-list.js'
 import '../com/activity-feed.js'
 import '../com/dbmethod-result-feed.js'
+import '../com/subnav.js'
 
 class CtznUser extends LitElement {
   static get properties () {
@@ -263,10 +264,12 @@ class CtznUser extends LitElement {
       return this.renderError()
     }
 
-    const navCls = (id) => `
-      block text-center pt-2 pb-2.5 px-5 sm:px-7 font-semibold cursor-pointer hover:bg-gray-50 hover:text-blue-600
-      ${id === this.currentView ? 'border-b-2 border-blue-600 text-blue-600' : ''}
-    `.replace('\n', '')
+    const SUBNAV_ITEMS = [
+      {path: `/${this.userId}`, label: 'Feed'},
+      {path: `/${this.userId}/activity`, label: 'Activity'},
+      {path: `/${this.userId}/inventory`, label: this.isCommunity ? 'Items' : 'Inventory'},
+      {path: `/${this.userId}/about`, label: 'About'},
+    ]
     const canJoin = !this.isMembershipClosed || (this.isMembershipClosed && this.isUserInvited)
 
     return html`
@@ -326,12 +329,11 @@ class CtznUser extends LitElement {
             </div>
           ` : ''}
           <div id="scroll-target"></div>
-          <div class="flex bg-white text-gray-400 sticky top-0 z-10 overflow-x-auto mb-1 sm:rounded-b">
-            <a class="${navCls('feed')}" href="/${this.userId}">Feed</a>
-            <a class="${navCls('activity')}" href="/${this.userId}/activity">Activity</a>
-            <a class="${navCls('inventory')}" href="/${this.userId}/inventory">${this.isCommunity ? 'Items' : 'Inventory'}</a>
-            <a class="${navCls('about')}" href="/${this.userId}/about">About</a>
-          </div>
+          <ctzn-subnav
+            nav-cls="mb-1"
+            .items=${SUBNAV_ITEMS}
+            current-path=${this.currentPath}
+          ></ctzn-subnav>
           <div class="min-h-screen">
             ${this.renderCurrentView()}
           </div>

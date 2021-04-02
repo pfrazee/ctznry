@@ -119,7 +119,7 @@ class CtznApp extends LitElement {
       case '/index.html':
       case '/activity':
       case '/notifications':
-        gestures.setCurrentNav(['/', '/notifications', '/activity'])
+        gestures.setCurrentNav(['/', '/activity', '/notifications'])
         return
       default:
         gestures.setCurrentNav(undefined)
@@ -173,19 +173,19 @@ class CtznApp extends LitElement {
       case '/index':
       case '/index.html':
       case '/activity':
-        return html`<ctzn-main-view id="view" current-path=${this.currentPath}></ctzn-main-view>`
+        return html`<ctzn-main-view id="view" current-path=${this.currentPath} current-path=${this.currentPath}></ctzn-main-view>`
       case '/forgot-password':
-        return html`<ctzn-forgot-password-view id="view"></ctzn-forgot-password-view>`
+        return html`<ctzn-forgot-password-view id="view" current-path=${this.currentPath}></ctzn-forgot-password-view>`
       case '/notifications':
-        return html`<ctzn-notifications-view id="view"></ctzn-notifications-view>`
+        return html`<ctzn-notifications-view id="view" current-path=${this.currentPath}></ctzn-notifications-view>`
       case '/communities':
-        return html`<ctzn-communities-view id="view"></ctzn-communities-view>`
+        return html`<ctzn-communities-view id="view" current-path=${this.currentPath}></ctzn-communities-view>`
       case '/account':
-        return html`<ctzn-account-view id="view"></ctzn-account-view>`
+        return html`<ctzn-account-view id="view" current-path=${this.currentPath}></ctzn-account-view>`
       case '/search':
-        return html`<ctzn-search-view id="view"></ctzn-search-view>`
+        return html`<ctzn-search-view id="view" current-path=${this.currentPath}></ctzn-search-view>`
       case '/signup':
-        return html`<ctzn-signup-view id="view"></ctzn-signup-view>`
+        return html`<ctzn-signup-view id="view" current-path=${this.currentPath}></ctzn-signup-view>`
     }
     if (POST_PATH_REGEX.test(this.currentPath)) {
       return html`<ctzn-post-view id="view" current-path=${this.currentPath}></ctzn-post-view>`

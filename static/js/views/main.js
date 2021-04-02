@@ -10,6 +10,7 @@ import '../com/post-composer.js'
 import '../com/activity-feed.js'
 import '../com/img-fallbacks.js'
 import '../com/suggestions-sidebar.js'
+import '../com/subnav.js'
 
 class CtznMainView extends LitElement {
   static get properties () {
@@ -133,29 +134,20 @@ class CtznMainView extends LitElement {
   }
 
   renderWithSession () {
-    const navCls = (id) => `
-      block text-center pt-2 pb-2.5 px-5 sm:px-7 font-semibold cursor-pointer hover:bg-gray-50 hover:text-blue-600
-      ${id === this.currentView ? 'border-b-2 border-blue-600 text-blue-600' : ''}
-    `.replace('\n', '')
-
+    const SUBNAV_ITEMS = [
+      {path: '/', label: 'Feed'},
+      {path: '/activity', label: 'Activity'},
+      {path: '/notifications', mobileOnly: true, label: html`<span class="fas fa-bell"></span>`},
+    ]
     return html`
       <ctzn-header @post-created=${e => this.load()}></ctzn-header>
       <main class="col2">
         <div>
-          <div
-            class="sticky top-0 z-10 flex mb-0.5 sm:mt-0.5 sm:rounded"
-            style="
-              backdrop-filter: blur(4px);
-              -webkit-backdrop-filter: blur(4px);
-              background: rgba(255, 255, 255, 0.9);
-            "
-          >
-            <a class="${navCls('feed')}" href="/">Feed</a>
-            <a class="${navCls('notifications')} sm:hidden" href="/notifications">
-              <span class="fas fa-bell"></span>
-            </a>
-            <a class="${navCls('activity')}" href="/activity">Activity</a>
-          </div>
+          <ctzn-subnav
+            nav-cls="mb-0.5 sm:mt-0.5"
+            .items=${SUBNAV_ITEMS}
+            current-path=${this.currentPath}
+          ></ctzn-subnav>
           ${this.currentView === 'feed' ? html`
             ${this.renderMockComposer()}
             ${this.isEmpty ? this.renderEmptyMessage() : ''}
