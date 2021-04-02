@@ -62,7 +62,7 @@ export class Header extends LitElement {
     let info = session.getSavedInfo()
     return html`
       <header>
-        <div class="menu ${this.isMenuOpen ? 'open transition-enabled' : 'closed'} flex flex-col leading-none text-lg bg-white">
+        <div class="menu ${this.isMenuOpen ? 'open transition-enabled' : 'closed'} flex flex-col leading-none text-2xl sm:leading-none sm:text-lg bg-white">
           <div class="hidden lg:block px-3 pt-2.5 pb-1">
             <div class="font-bold text-3xl text-gray-800">
               CTZN
@@ -70,8 +70,14 @@ export class Header extends LitElement {
             </div>
           </div>
           ${session.hasOneSaved() ? html`
-            <div class="flex flex-col px-2">
-              <hr class="my-3 mx-3">
+            <div class="flex flex-col px-2 h-full sm:h-auto">
+              <div class="sm:hidden bg-gray-100 flex flex-1 items-center justify-center my-2 rounded">
+                <div class="font-black text-4xl text-gray-700">
+                  CTZN
+                  <span class="text-2xl text-gray-500">alpha</span>
+                </div>
+              </div>
+              <hr class="my-3 mx-3 hidden sm:block">
               <a href="/" class=${this.getMenuNavClass('/')}>
                 <span class="fas mr-1.5 fa-fw navicon fa-home"></span>
                 Home
@@ -89,12 +95,16 @@ export class Header extends LitElement {
               </a>
               <hr class="my-3 mx-3">
               <a
-                class="relative ${this.getMenuNavClass()} mt-1"
+                class="flex items-center ${this.getMenuNavClass()} mt-1"
                 href="/${info.userId}"
                 title=${info.userId}
               >
-                <img class="absolute inline-block w-7 h-7 object-cover rounded" src=${AVATAR_URL(info.userId)} style="left: 10px; top: 6px">
-                <span class="inline-block" style="width: 29px"></span>
+                <span class="inline-block mr-2" style="margin-left: -3px">
+                  <img
+                    class="inline-block w-9 h-9 sm:w-7 sm:h-7 object-cover rounded"
+                    src=${AVATAR_URL(info.userId)}
+                  >
+                </span>
                 My Profile
               </a>
               <a href="/${info.userId}/inventory" class=${this.getMenuNavClass()}>
@@ -106,12 +116,12 @@ export class Header extends LitElement {
             <div class="mt-3 sm:mb-auto px-4">
               <ctzn-button
                 primary
-                btn-class="text-sm font-semibold w-full mb-2 rounded-3xl"
+                btn-class="text-lg sm:text-sm font-semibold w-full mb-2 rounded-3xl"
                 label="Create Post"
                 @click=${this.onClickCreatePost}
               ></ctzn-button>
               <ctzn-button
-                btn-class="text-gray-600 text-sm font-semibold w-full rounded-3xl"
+                btn-class="text-gray-600 text-lg sm:text-sm font-semibold w-full rounded-3xl"
                 label="Create Community"
                 @click=${this.onClickCreateCommunity}
               ></ctzn-button>

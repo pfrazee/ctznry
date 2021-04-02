@@ -21,7 +21,6 @@ header .menu {
   left: 0;
   height: 100vh;
   width: 250px;
-  padding-left: 5px;
 }
 
 header .menu.open {
@@ -76,7 +75,8 @@ main.col2 > :last-child {
 
   header .menu {
     left: 0;
-    width: 220px;
+    width: 280px;
+    max-width: 90vw;
     transform: translateX(-100%);
     z-index: 41;
   }
