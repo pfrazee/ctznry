@@ -71,25 +71,28 @@ export class Header extends LitElement {
           </div>
           ${session.hasOneSaved() ? html`
             <div class="flex flex-col px-2 h-full sm:h-auto">
-              <div class="sm:hidden bg-gray-100 flex flex-1 items-center justify-center my-2 rounded">
-                <div class="font-black text-4xl text-gray-700">
+              <div
+                class="sm:hidden flex flex-1 items-center justify-center mt-2 mb-3 rounded"
+                style="background: linear-gradient(45deg, #d800ff, #008cff)"
+              >
+                <div class="font-black text-4xl text-white">
                   CTZN
-                  <span class="text-2xl text-gray-500">alpha</span>
+                  <span class="font-bold opacity-80 text-2xl">alpha</span>
                 </div>
               </div>
               <hr class="my-3 mx-3 hidden sm:block">
-              <a href="/" class=${this.getMenuNavClass('/')}>
+              <a href="/" class=${this.getMenuNavClass('/')} @click=${this.onClickLink}>
                 <span class="fas mr-1.5 fa-fw navicon fa-home"></span>
                 Home
               </a>
-              <a href="/notifications" class="relative ${this.getMenuNavClass('/notifications')}">
+              <a href="/notifications" class="relative ${this.getMenuNavClass('/notifications')}" @click=${this.onClickLink}>
                 ${this.unreadNotificationsCount > 0 ? html`
                   <span class="absolute bg-blue-500 font-medium leading-none px-1.5 py-0.5 rounded-2xl text-white text-xs" style="top: 5px; left: 22px">${this.unreadNotificationsCount}</span>
                 ` : ''}
                 <span class="fas mr-1.5 fa-fw navicon fa-bell"></span>
                 Notifications
               </a>
-              <a href="/communities" class="${this.getMenuNavClass('/communities')}">
+              <a href="/communities" class="${this.getMenuNavClass('/communities')}" @click=${this.onClickLink}>
                 <span class="fas mr-1.5 fa-fw navicon fa-users"></span>
                 Communities
               </a>
@@ -98,6 +101,7 @@ export class Header extends LitElement {
                 class="flex items-center ${this.getMenuNavClass()} mt-1"
                 href="/${info.userId}"
                 title=${info.userId}
+                @click=${this.onClickLink}
               >
                 <span class="inline-block mr-2" style="margin-left: -3px">
                   <img
@@ -107,7 +111,7 @@ export class Header extends LitElement {
                 </span>
                 My Profile
               </a>
-              <a href="/${info.userId}/inventory" class=${this.getMenuNavClass()}>
+              <a href="/${info.userId}/inventory" class=${this.getMenuNavClass()} @click=${this.onClickLink}>
                 <span class="fas mr-1.5 fa-fw navicon fa-suitcase"></span>
                 My Inventory
               </a>
@@ -211,8 +215,8 @@ export class Header extends LitElement {
   renderSessionCtrls () {
     if (session.hasOneSaved()) {
       return html`
-        <div class="pb-6 flex flex-col">
-          <a class=${this.getMenuNavClass('/account')} href="/account"><span class="fas fa-fw fa-cog mr-1.5"></span> Account</a>
+        <div class="pb-16 sm:pb-6 flex flex-col">
+          <a class=${this.getMenuNavClass('/account')} href="/account" @click=${this.onClickLink}><span class="fas fa-fw fa-cog mr-1.5"></span> Account</a>
           <a class=${this.getMenuNavClass()} href="#" @click=${this.onLogOut}>
             <span class="fas fa-fw fa-sign-out-alt mr-1.5"></span> Log out
           </a>
@@ -221,8 +225,8 @@ export class Header extends LitElement {
     } else {
       return html`
         <div class="flex flex-col">
-          <a class=${this.getMenuNavClass()} href="/"><span class="fas fa-fw fa-sign-in-alt mr-1.5"></span> Log in</a>
-          <a class=${this.getMenuNavClass()} href="/signup"><span class="fas fa-fw fa-user-plus mr-1.5"></span> <strong>Sign up</strong></a>
+          <a class=${this.getMenuNavClass()} href="/" @click=${this.onClickLink}><span class="fas fa-fw fa-sign-in-alt mr-1.5"></span> Log in</a>
+          <a class=${this.getMenuNavClass()} href="/signup" @click=${this.onClickLink}><span class="fas fa-fw fa-user-plus mr-1.5"></span> <strong>Sign up</strong></a>
         </div>
       `
     }
@@ -230,6 +234,10 @@ export class Header extends LitElement {
 
   // events
   // =
+
+  onClickLink (e) {
+    this.isMenuOpen = false
+  }
 
   onClickMenuOverlay (e) {
     this.isMenuOpen = false
