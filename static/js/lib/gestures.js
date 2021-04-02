@@ -1,3 +1,5 @@
+import * as toast from '../com/toast.js'
+
 // globals
 // =
 
@@ -28,9 +30,11 @@ export function setup () {
     let diffY = touchendY - touchstartY
     let diffXNormalized = diffX / Math.abs(diffY + 1)
     if (diffX > 60 && diffXNormalized > 2) {
+      toast.create(`${diffX}, ${diffXNormalized}`)
       events.dispatchEvent(new Event('swipe-right'))
       moveNav(-1)
     } else if (diffX < -60 && diffXNormalized < -2) {
+      toast.create(`${diffX}, ${diffXNormalized}`)
       events.dispatchEvent(new Event('swipe-left'))
       moveNav(1)
     }
