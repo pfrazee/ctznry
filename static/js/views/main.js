@@ -6,6 +6,7 @@ import '../com/header.js'
 import '../com/button.js'
 import '../com/login.js'
 import '../com/feed.js'
+import '../com/notifications-feed.js'
 import '../com/post-composer.js'
 import '../com/activity-feed.js'
 import '../com/img-fallbacks.js'
@@ -18,7 +19,8 @@ class CtznMainView extends LitElement {
       currentPath: {type: String, attribute: 'current-path'},
       currentView: {type: String},
       searchQuery: {type: String},
-      isEmpty: {type: Boolean}
+      isEmpty: {type: Boolean},
+      numUnreadNotifications: {type: Number}
     }
   }
 
@@ -30,6 +32,8 @@ class CtznMainView extends LitElement {
     super()
     this.searchQuery = ''
     this.isEmpty = false
+    this.notificationsClearedAt = undefined
+    this.numUnreadNotifications = 0
 
     const pathParts = (new URL(location)).pathname.split('/')
     this.currentView = pathParts[1] || 'feed'
@@ -48,24 +52,32 @@ class CtznMainView extends LitElement {
   async load () {
     document.title = `CTZN`
     if (!session.isActive()) {
-      document.body.classList.add('no-pad')
+      if (location.pathname !== '/') {
+        window.location = '/'
+      } else {
+        document.body.classList.add('no-pad')
+      }
       return this.requestUpdate()
+    }
+
+    if (this.currentView === 'notifications') {
+      document.title = `Notifications | CTZN`
+      const res = await session.ctzn.view('ctzn.network/notifications-cleared-at-view')
+      this.notificationsClearedAt = res?.notificationsClearedAt ? Number(new Date(res?.notificationsClearedAt)) : 0
+
+      if (document.hasFocus) {
+        await session.api.notifications.updateNotificationsClearedAt()
+      }
     }
 
     if (this.querySelector('ctzn-feed')) {
       this.querySelector('ctzn-feed').load()
     }
-
-    if ((new URL(window.location)).searchParams.has('composer')) {
-      await this.requestUpdate()
-      document.querySelector('ctzn-composer').focus()
-      window.history.replaceState({}, null, '/')
-    }
   }
 
   async pageLoadScrollTo (y) {
     await this.requestUpdate()
-    const feed = this.querySelector('ctzn-feed')
+    const feed = this.querySelector('ctzn-feed') || this.querySelector('ctzn-notifications-feed')
     feed.pageLoadScrollTo(y)
   }
 
@@ -135,12 +147,26 @@ class CtznMainView extends LitElement {
 
   renderWithSession () {
     const SUBNAV_ITEMS = [
+      {menu: true, mobileOnly: true, label: html`<span class="fas fa-bars"></span>`},
       {path: '/', label: 'Feed'},
+      {
+        path: '/notifications',
+        mobileOnly: true,
+        label: html`
+          ${this.numUnreadNotifications > 0 ? html`
+            <span class="inline-block text-sm px-2 bg-blue-600 text-white rounded-full">${this.numUnreadNotifications}</span>
+          ` : ''}
+          Notifications
+        `
+      },
       {path: '/activity', label: 'Activity'},
-      {path: '/notifications', mobileOnly: true, label: html`<span class="fas fa-bell"></span>`},
     ]
     return html`
-      <ctzn-header @post-created=${e => this.load()}></ctzn-header>
+      <ctzn-header
+        current-path=${this.currentPath}
+        @post-created=${e => this.load()}
+        @unread-notifications-changed=${this.onUnreadNotificationsChanged}
+      ></ctzn-header>
       <main class="col2">
         <div>
           <ctzn-subnav
@@ -158,6 +184,14 @@ class CtznMainView extends LitElement {
               @delete-post=${this.onDeletePost}
               @moderator-remove-post=${this.onModeratorRemovePost}
             ></ctzn-feed>
+          ` : this.currentView === 'notifications' ? html`
+            ${this.isEmpty ? this.renderEmptyMessage() : ''}
+            <ctzn-notifications-feed
+              cleared-at=${this.notificationsClearedAt}
+              limit="15"
+              @load-state-updated=${this.onFeedLoadStateUpdated}
+              @publish-reply=${this.onPublishReply}
+            ></ctzn-notifications-feed>
           ` : this.currentView === 'activity' ? html`
             <ctzn-activity-feed
               dataview="ctzn.network/dbmethod-feed-view"
@@ -207,6 +241,13 @@ class CtznMainView extends LitElement {
         </div>
       `
     }
+    if (this.currentView === 'notifications') {
+      return html`
+        <div class="bg-gray-100 text-gray-500 py-44 text-center border border-t-0 border-gray-200">
+          <div class="fas fa-bell text-6xl text-gray-300 mb-8"></div>
+          <div>You have no notifications!</div>
+        </div>
+      `}
     return html`
       <div class="bg-gray-100 text-gray-500 py-44 text-center my-4">
         <div class="fas fa-stream text-6xl text-gray-300 mb-8"></div>
@@ -286,6 +327,18 @@ class CtznMainView extends LitElement {
     } catch (e) {
       console.log(e)
       toast.create(e.toString(), 'error')
+    }
+  }
+
+  onUnreadNotificationsChanged (e) {
+    this.numUnreadNotifications = e.detail.count
+    if (this.currentView === 'notifications') {
+      document.title = e.detail.count ? `(${e.detail.count}) Notifications | CTZN` : `Notifications | CTZN`
+      this.querySelector('ctzn-notifications-feed').loadNew(e.detail.count)
+
+      if (document.hasFocus()) {
+        session.api.notifications.updateNotificationsClearedAt()
+      }
     }
   }
 }

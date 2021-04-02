@@ -14,6 +14,7 @@ const CHECK_NOTIFICATIONS_INTERVAL = 10e3
 export class Header extends LitElement {
   static get properties () {
     return {
+      currentPath: {type: String, attribute: 'current-path'},
       isMenuOpen: {type: Boolean},
       unreadNotificationsCount: {type: Number},
       community: {type: Object}
@@ -26,6 +27,7 @@ export class Header extends LitElement {
 
   constructor () {
     super()
+    this.currentPath = location.pathname
     this.isMenuOpen = false
     this.unreadNotificationsCount = 0
     this.community = undefined
@@ -46,12 +48,13 @@ export class Header extends LitElement {
     let oldCount = this.unreadNotificationsCount
     this.unreadNotificationsCount = (await session.ctzn.view('ctzn.network/notifications-count-view', {after: clearedAt})).count
     if (oldCount !== this.unreadNotificationsCount) {
+      console.log('here', this.unreadNotificationsCount)
       emit(this, 'unread-notifications-changed', {detail: {count: this.unreadNotificationsCount}})
     }
   }
 
   getMenuNavClass (str) {
-    const additions = str === location.pathname ? 'text-blue-600' : ''
+    const additions = str === this.currentPath ? 'text-blue-600' : ''
     return `pl-3 pr-4 py-3 font-semibold rounded hover:bg-gray-100 ${additions}`
   }
 

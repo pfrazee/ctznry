@@ -30,7 +30,7 @@ export class Subnav extends LitElement {
   
   getNavCls (path, mobileOnly) {
     return `
-      block text-center pt-2 pb-2.5 px-5 sm:px-7 font-semibold cursor-pointer hover:bg-gray-50 hover:text-blue-600
+      block text-center pt-2 pb-2.5 px-5 whitespace-nowrap sm:px-7 font-semibold cursor-pointer hover:bg-gray-50 hover:text-blue-600
       ${mobileOnly ? 'sm:hidden' : ''}
       ${path === this.currentPath ? 'text-blue-600' : ''}
     `.replace('\n', '')
@@ -42,7 +42,7 @@ export class Subnav extends LitElement {
       if (!el) return
       const rect = el.getClientRects()[0]
       this.borderLeft = el.offsetLeft
-      this.borderWidth = rect.width
+      this.borderWidth = rect?.width
     }
   }
 
@@ -84,8 +84,12 @@ export class Subnav extends LitElement {
           height: 2px;
           transition: left 0.1s;
         "></div>
-      ${repeat(this.items, item => item.path, ({path, mobileOnly, label}) => html`
-        <a class="${this.getNavCls(path, mobileOnly)}" href=${path}>${label}</a>
+      ${repeat(this.items, item => item.path, item => html`
+        <a
+          class="${this.getNavCls(item.path, item.mobileOnly)}"
+          href=${item.path}
+          @click=${e => this.onClickItem(e, item)}
+        >${item.label}</a>
       `)}
     `
   }
@@ -93,6 +97,14 @@ export class Subnav extends LitElement {
   // events
   // =
 
+  onClickItem (e, item) {
+    e.preventDefault()
+    if (item.menu) {
+      emit(this, 'open-main-menu')
+    } else {
+      emit(this, 'navigate-to', {detail: {url: item.path, replace: true}})
+    }
+  }
 }
 
 customElements.define('ctzn-subnav', Subnav)

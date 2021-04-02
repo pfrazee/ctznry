@@ -117,7 +117,7 @@ class CtznCommunities extends LitElement {
 
   renderCurrentView () {
     return html`
-      <ctzn-header></ctzn-header>
+      <ctzn-header current-path=${'/communities'}></ctzn-header>
       <main class="pb-16">
         ${session.isActive() ? html`
           <div>

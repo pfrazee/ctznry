@@ -9,7 +9,6 @@ import './views/account.js'
 import './views/communities.js'
 import './views/forgot-password.js'
 import './views/main.js'
-import './views/notifications.js'
 import './views/post.js'
 import './views/signup.js'
 import './views/user.js'
@@ -119,7 +118,10 @@ class CtznApp extends LitElement {
       case '/index.html':
       case '/activity':
       case '/notifications':
-        gestures.setCurrentNav(['/', '/activity', '/notifications'])
+        gestures.setCurrentNav(['/', '/notifications', '/activity'])
+        return
+      case '/communities':
+        gestures.setCurrentNav([{back: true}])
         return
       default:
         gestures.setCurrentNav(undefined)
@@ -172,12 +174,11 @@ class CtznApp extends LitElement {
       case '/':
       case '/index':
       case '/index.html':
+      case '/notifications':
       case '/activity':
-        return html`<ctzn-main-view id="view" current-path=${this.currentPath} current-path=${this.currentPath}></ctzn-main-view>`
+        return html`<ctzn-main-view id="view" current-path=${this.currentPath}></ctzn-main-view>`
       case '/forgot-password':
         return html`<ctzn-forgot-password-view id="view" current-path=${this.currentPath}></ctzn-forgot-password-view>`
-      case '/notifications':
-        return html`<ctzn-notifications-view id="view" current-path=${this.currentPath}></ctzn-notifications-view>`
       case '/communities':
         return html`<ctzn-communities-view id="view" current-path=${this.currentPath}></ctzn-communities-view>`
       case '/account':
