@@ -55,11 +55,6 @@ export class Header extends LitElement {
     return `pl-3 pr-4 py-3 font-semibold rounded hover:bg-gray-100 ${additions}`
   }
 
-  getMobileNavClass (str) {
-    const additions = str === location.pathname ? 'text-blue-600' : 'text-gray-500'
-    return `px-6 py-2 text-xl font-semibold ${additions}`
-  }
-
   render () {
     let info = session.getSavedInfo()
     return html`
@@ -190,32 +185,6 @@ export class Header extends LitElement {
             </a>
           `)}
         </div>
-        <div class="mobile-bot box-border flex">
-          <a href="/" class="flex-1 text-center ${this.getMobileNavClass('/')}" @click=${this.onClickBotNavHome}>
-            <span class="fas fa-fw navicon fa-home"></span>
-          </a>
-          <a href="/communities" class="flex-1 text-center ${this.getMobileNavClass('/communities')}">
-            <span class="fas fa-fw navicon fa-users"></span>
-          </a>
-          ${session.hasOneSaved() ? html`
-            <span class="flex-1 px-4 py-2">
-              <span
-                class="bg-blue-500 flex h-12 items-center justify-center relative rounded-full shadow-md text-white w-12"
-                @click=${this.onClickCreatePost}
-                style="top: -20px;"
-              ><span class="fas fa-plus"></span></span>
-            </span>
-            <a href="/notifications" class="relative flex-1 text-center ${this.getMobileNavClass('/notifications')}">
-              ${this.unreadNotificationsCount > 0 ? html`
-                <span class="absolute bg-blue-500 font-medium leading-none px-1.5 py-0.5 rounded-2xl text-white text-xs" style="top: 8px; right: calc(50% - 24px);">${this.unreadNotificationsCount}</span>
-              ` : ''}
-              <span class="fas fa-fw navicon fa-bell"></span>
-            </a>
-          ` : html`<span class="flex-1"></span>`}
-          <a class="flex-1 text-center ${this.getMobileNavClass()}" @click=${this.onToggleMenu}>
-            <span class="fas fa-fw fa-bars"></span>
-          </a>
-        </div>
       </header>
       ${this.isMenuOpen ? html`
         <div
@@ -249,10 +218,6 @@ export class Header extends LitElement {
   // events
   // =
 
-  onToggleMenu (e) {
-    this.isMenuOpen = !this.isMenuOpen
-  }
-
   onClickMenuOverlay (e) {
     this.isMenuOpen = false
   }
@@ -260,14 +225,6 @@ export class Header extends LitElement {
   async onLogOut () {
     await session.doLogout()
     location.reload()
-  }
-
-  onClickBotNavHome (e) {
-    if (window.location.pathname === '/') {
-      e.preventDefault()
-      window.scrollTo(0, 0)
-      window.closePopup?.()
-    }
   }
 
   async onClickCreatePost (e) {

@@ -28,20 +28,6 @@ header .menu.open {
   transform: translateX(0%);
 }
 
-header .mobile-bot {
-  display: none;
-  position: fixed;
-  z-index: 40;
-  bottom: 0;
-  left: 0;
-  width: 100vw;
-  height: 56px;
-  height: calc(56px + env(safe-area-inset-bottom));
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
-  background: rgba(255, 255, 255, 0.9);
-}
-
 header .secondary-menu {
   position: fixed;
   z-index: 29;
@@ -102,10 +88,6 @@ main.col2 > :last-child {
   header .menu.open {
     transform: translateX(0%);
     border-right: 1px solid #ccc;
-  }
-
-  header .mobile-bot {
-    display: flex;
   }
 }
 
