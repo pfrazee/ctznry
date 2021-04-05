@@ -17,7 +17,6 @@ export class ManageItemClasses extends BasePopup {
       itemClasses: {type: Array},
       isProcessing: {type: Boolean},
       currentError: {type: String},
-      isCreatingNew: {type: Boolean},
       itemClassBeingEdited: {type: String}
     }
   }
@@ -28,7 +27,6 @@ export class ManageItemClasses extends BasePopup {
     this.itemClasses = opts.itemClasses
     this.isProcessing = false
     this.currentError = undefined
-    this.isCreatingNew = false
     this.itemClassBeingEdited = undefined
   }
 
@@ -68,67 +66,6 @@ export class ManageItemClasses extends BasePopup {
   // =
 
   renderBody () {
-    if (this.isCreatingNew) {
-      return html`
-      <div class="px-2">
-        <h2 class="text-3xl py-4">Item classes</h2>
-
-        <section class="border border-gray-200 rounded p-3 mb-2">
-          <div class="font-bold mb-2 text-lg">New Item Class</div>
-          <div class="mb-3 text-gray-600">What kind of item will this be?</div>
-          <div class="flex items-baseline mb-2">
-            <input
-              id="item-type-unique"
-              type="radio"
-              name="item-type"
-              value="unique"
-              class="mx-2"
-              checked
-            >
-            <label for="item-type-unique" class="text-gray-600">
-              <strong class="font-semibold text-black">Unique.</strong>
-              Each item is distinct from others.
-              Examples of unique items: a virtual pet, a user award, or a license to some piece of art.
-            </label>
-          </div>
-          <div class="flex items-baseline mb-4">
-            <input
-              id="item-type-fungible"
-              type="radio"
-              name="item-type"
-              value="fungible"
-              class="mx-2"
-            >
-            <label for="item-type-fungible" class="text-gray-600">
-              <strong class="font-semibold text-black">Fungible.</strong>
-              The items are basically interchangeable.
-              Examples of fungible items: points in a game, currency, or a stock of similar items (sodas, chairs).
-            </label>
-          </div>
-          <div class="flex">
-            <ctzn-button
-              btn-class="px-3 py-1"
-              @click=${this.onCancelEdit}
-              label="Cancel"
-            ></ctzn-button>
-            <span class="flex-1"></span>
-            <ctzn-button
-              primary
-              btn-class="px-3 py-1"
-              @click=${this.onSelectNewTemplate}
-              label="Next"
-            ></ctzn-button>
-          </div>
-        </section>
-
-        <div class="flex border-t border-gray-200 mt-4 pt-4">
-          <ctzn-button disabled label="+ New Item Class"></ctzn-button>
-          <span class="flex-1"></span>
-          <ctzn-button disabled label="Close"></ctzn-button>
-        </div>
-      </div>
-      `
-    }
     if (this.itemClassBeingEdited) {
       const cls = this.itemClassBeingEdited
       console.log(cls)
@@ -156,25 +93,37 @@ export class ManageItemClasses extends BasePopup {
               ?disabled=${!cls.isNew}
             />
             <label class="block font-semibold p-1">Grouping</label>
-            <div class="flex items-center rounded border border-gray-300 px-4 py-2 mb-2">
-              <input
-                type="radio"
-                id="grouping-radio-unique"
-                name="grouping"
-                value="unique"
-                ?checked=${cls.value.grouping === 'unique'}
-                ?disabled=${!cls.isNew}
-              />
-              <label class="block p-1 mr-3" for="grouping-radio-unique">Unique</label>
-              <input
-                type="radio"
-                id="grouping-radio-fungible"
-                name="grouping"
-                value="fungible"
-                ?checked=${cls.value.grouping === 'fungible'}
-                ?disabled=${!cls.isNew}
-              />
-              <label class="block p-1" for="grouping-radio-fungible">Fungible</label>
+            <div class="rounded border border-gray-300 pl-4 pr-6 py-3 mb-2">
+              <div class="flex items-baseline mb-2">
+                <input
+                  type="radio"
+                  id="grouping-radio-unique"
+                  name="grouping"
+                  value="unique"
+                  ?checked=${cls.value.grouping === 'unique'}
+                  ?disabled=${!cls.isNew}
+                >
+                <label for="grouping-radio-unique" class="ml-3 text-gray-600">
+                  <strong class="font-semibold text-black">Unique.</strong>
+                  Each item is distinct from others.
+                  Examples of unique items: a virtual pet, a user award, or a license to some piece of art.
+                </label>
+              </div>
+              <div class="flex items-baseline">
+                <input
+                  type="radio"
+                  id="grouping-radio-fungible"
+                  name="grouping"
+                  value="fungible"
+                  ?checked=${cls.value.grouping === 'fungible'}
+                  ?disabled=${!cls.isNew}
+                >
+                <label for="grouping-radio-fungible" class="ml-3 text-gray-600">
+                  <strong class="font-semibold text-black">Fungible.</strong>
+                  The items are basically interchangeable.
+                  Examples of fungible items: points in a game, currency, or a stock of similar items (sodas, chairs).
+                </label>
+              </div>
             </div>
             <label class="block font-semibold p-1" for="displayName-input">Display Name</label>
             <input
@@ -297,12 +246,20 @@ export class ManageItemClasses extends BasePopup {
   // =
 
   onCancelEdit (e) {
-    this.isCreatingNew = false
     this.itemClassBeingEdited = false
   }
 
   onClickNew (e) {
-    this.isCreatingNew = true
+    this.itemClassBeingEdited = {
+      isNew: true,
+      key: undefined,
+      value: {
+        id: '',
+        grouping: 'unique',
+        definition: undefined,
+        createdAt: undefined
+      }
+    }
   }
 
   onClickEdit (e, index) {
@@ -332,24 +289,6 @@ export class ManageItemClasses extends BasePopup {
 
     await this.reload()
     this.isProcessing = false
-  }
-
-  onSelectNewTemplate (e) {
-    let grouping = 'unique'
-    if (this.querySelector('input[name="item-type"]:checked').value === 'fungible') {
-      grouping = 'fungible'
-    }
-    this.itemClassBeingEdited = {
-      isNew: true,
-      key: undefined,
-      value: {
-        id: '',
-        grouping,
-        definition: undefined,
-        createdAt: undefined
-      }
-    }
-    this.isCreatingNew = false
   }
 
   onClickIcon (e) {
@@ -450,7 +389,6 @@ export class ManageItemClasses extends BasePopup {
 
     this.isProcessing = false
     this.itemClassBeingEdited = false
-    this.isCreatingNew = false
   }
 }
 
