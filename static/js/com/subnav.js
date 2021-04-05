@@ -39,7 +39,7 @@ export class Subnav extends LitElement {
   }
 
   updated (changedProperties) {
-    if (changedProperties.has('currentPath')) {
+    if (changedProperties.has('currentPath') || changedProperties.has('items')) {
       const el = this.querySelector(`a[href="${this.currentPath}"]`)
       if (!el) return
       const rect = el.getClientRects()[0]
