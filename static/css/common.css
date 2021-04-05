@@ -245,6 +245,13 @@ main.col2 > :last-child {
   border-top: 6px solid rgba(17, 17, 17, 0.95);
 }
 
+@media (max-width: 1150px) {
+  *[data-tooltip]:before,
+  *[data-tooltip]:after {
+    display: none !important;
+  }
+}
+
 .grid-post {
   grid-template-columns: 60px 1fr;
 }
