@@ -28,11 +28,12 @@ export class Subnav extends LitElement {
     this.borderWidth = 0
   }
   
-  getNavCls (path, mobileOnly) {
+  getNavCls (path, mobileOnly, rightAlign) {
     return `
       block text-center pt-2 pb-2.5 px-4 sm:px-7 whitespace-nowrap font-semibold cursor-pointer
       hover:bg-gray-50 hover:text-blue-600
       ${mobileOnly ? 'sm:hidden' : ''}
+      ${rightAlign ? 'ml-auto' : ''}
       ${path === this.currentPath ? 'text-blue-600' : ''}
     `.replace('\n', '')
   }
@@ -90,7 +91,7 @@ export class Subnav extends LitElement {
       ` : ''}
       ${repeat(this.items, item => item.path, item => html`
         <a
-          class="${this.getNavCls(item.path, item.mobileOnly)}"
+          class="${this.getNavCls(item.path, item.mobileOnly, item.rightAlign)}"
           href=${item.path}
           @click=${e => this.onClickItem(e, item)}
         >${item.label}</a>
@@ -103,7 +104,9 @@ export class Subnav extends LitElement {
 
   onClickItem (e, item) {
     e.preventDefault()
-    if (item.menu) {
+    if (item.click) {
+      item.click(e)
+    } else if (item.menu) {
       emit(this, 'open-main-menu')
     } else if (item.back) {
       if (window.history.length > 1) {

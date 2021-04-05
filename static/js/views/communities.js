@@ -5,6 +5,7 @@ import * as session from '../lib/session.js'
 import { AVATAR_URL } from '../lib/const.js'
 import * as displayNames from '../lib/display-names.js'
 import '../com/header.js'
+import '../com/subnav.js'
 
 const SUGGESTED_COMMUNITIES = [
   {
@@ -72,6 +73,7 @@ const SUGGESTED_COMMUNITIES = [
 class CtznCommunities extends LitElement {
   static get properties () {
     return {
+      currentPath: {type: String, attribute: 'current-path'},
       searchQuery: {type: String},
       isEmpty: {type: Boolean},
       memberships: {type: Array}
@@ -116,24 +118,20 @@ class CtznCommunities extends LitElement {
   }
 
   renderCurrentView () {
+    const SUBNAV_ITEMS = [
+      {back: true, label: html`<span class="fas fa-angle-left"></span>`},
+      {path: '/communities', label: 'My Communities'}
+    ]
     return html`
       <ctzn-header current-path=${'/communities'}></ctzn-header>
       <main class="pb-16">
         ${session.isActive() ? html`
           <div>
-            <div
-              class="sticky top-0 z-10 mb-0.5 px-4 py-3 sm:rounded"
-              style="
-                backdrop-filter: blur(4px);
-                -webkit-backdrop-filter: blur(4px);
-                background: rgba(255, 255, 255, 0.9);
-              "
-            >
-              <a @click=${this.onClickBack}>
-                <span class="fas fa-angle-left fa-fw cursor-pointer sm:hover:text-gray-700 text-xl text-gray-600"></span>
-              </a>
-              <span class="ml-2 font-medium text-lg">My Communities</span>
-            </div>
+            <ctzn-subnav
+              nav-cls="mb-0.5 sm:mt-0.5"
+              .items=${SUBNAV_ITEMS}
+              current-path=${this.currentPath}
+            ></ctzn-subnav>
             <div class="mb-4">
               ${this.memberships?.length ? html`
                 ${repeat(this.memberships, membership => html`
@@ -164,9 +162,6 @@ class CtznCommunities extends LitElement {
                 background: rgba(255, 255, 255, 0.9);
               "
             >
-              <a @click=${this.onClickBack}>
-                <span class="fas fa-angle-left fa-fw cursor-pointer sm:hover:text-gray-700 text-xl text-gray-600"></span>
-              </a>
               <span class="ml-2 font-medium text-lg">Suggested Communities</span>
             </div>
             ${repeat(this.suggestedCommunities, community => community.userId, community => {

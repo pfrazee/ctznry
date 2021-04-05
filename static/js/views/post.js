@@ -10,6 +10,7 @@ import '../com/header.js'
 import '../com/button.js'
 import '../com/thread.js'
 import '../com/user-list.js'
+import '../com/subnav.js'
 
 class CtznPostView extends LitElement {
   static get properties () {
@@ -91,35 +92,17 @@ class CtznPostView extends LitElement {
 
   renderHeader () {
     const spaceUserId = this.communityUserId || this.authorProfile?.userId
+    const SUBNAV_ITEMS = [
+      {back: true, label: html`<span class="fas fa-angle-left"></span>`},
+      {path: location.pathname, label: 'View thread'},
+      {rightAlign: true, click: this.onClickMenu.bind(this), label: html`<span class="fas fa-ellipsis-h cursor-pointer sm:hover:text-gray-700 text-xl text-gray-600"></span>`} 
+    ]
     return html`
-      <div
-        class="flex items-center justify-between sticky top-0 z-10 mb-0.5 px-4 py-3"
-        style="
-          backdrop-filter: blur(4px);
-          -webkit-backdrop-filter: blur(4px);
-          background: rgba(255, 255, 255, 0.9);
-        "
-      >
-        <span>
-          <a @click=${this.onClickBack}>
-            <span class="fas fa-angle-left cursor-pointer sm:hover:text-gray-700 text-xl text-gray-600"></span>
-          </a>
-        </span>
-        <a class="flex items-center font-medium truncate mx-3" href="/${spaceUserId}" title=${spaceUserId}>
-          ${this.post ? html`
-            <img
-              class="w-6 h-6 rounded object-cover mr-2"
-              src=${AVATAR_URL(spaceUserId)}
-            >
-            ${displayNames.render(spaceUserId)}
-          ` : ''}
-        </a>
-        <span>
-          <a @click=${this.onClickMenu}>
-            <span class="fas fa-ellipsis-h cursor-pointer sm:hover:text-gray-700 text-xl text-gray-600"></span>
-          </a>
-        </span>
-      </div>
+      <ctzn-subnav
+        nav-cls="mb-0.5 sm:mt-0.5"
+        .items=${SUBNAV_ITEMS}
+        current-path=${location.pathname}
+      ></ctzn-subnav>
     `
   }
 
