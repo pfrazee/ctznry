@@ -307,7 +307,7 @@ export class PostExpanded extends LitElement {
         const colors = this.haveIReacted(reaction) ? 'bg-blue-50 sm:hover:bg-blue-100 text-blue-600' : 'bg-gray-100 text-gray-500 sm:hover:bg-gray-200'
         return html`
           <a
-            class="inline-block mt-1 px-1.5 py-0.5 rounded text-sm cursor-pointer ${colors}"
+            class="inline-block mt-1 mr-1 px-1.5 py-0.5 rounded text-sm cursor-pointer ${colors}"
             @click=${e => this.onClickReaction(e, reaction)}
           >
             ${unsafeHTML(emojify(makeSafe(reaction)))}

@@ -60,11 +60,11 @@ export const PERM_DESCRIPTIONS = {
 export const SUGGESTED_REACTIONS = [
   'like',
   'haha',
-  'woah',
-  'cool',
-  'oh no!',
-  'aww',
-  'yes',
-  'no',
-  'ok!'
+  'interesting!',
+  '❤️',
+  '👍',
+  '😂',
+  '🤔',
+  '🔥',
+  '😢'
 ]

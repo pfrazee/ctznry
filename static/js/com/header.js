@@ -48,7 +48,6 @@ export class Header extends LitElement {
     let oldCount = this.unreadNotificationsCount
     this.unreadNotificationsCount = (await session.ctzn.view('ctzn.network/notifications-count-view', {after: clearedAt})).count
     if (oldCount !== this.unreadNotificationsCount) {
-      console.log('here', this.unreadNotificationsCount)
       emit(this, 'unread-notifications-changed', {detail: {count: this.unreadNotificationsCount}})
     }
   }

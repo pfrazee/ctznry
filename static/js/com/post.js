@@ -358,7 +358,7 @@ export class Post extends LitElement {
         const colors = this.haveIReacted(reaction) ? 'bg-blue-50 sm:hover:bg-blue-100 text-blue-600' : 'bg-gray-100 text-gray-500 sm:hover:bg-gray-200'
         return html`
           <a
-            class="inline-block mr-1.5 px-1.5 py-0.5 rounded text-sm flex-shrink-0 ${colors}"
+            class="inline-block mr-2 px-1.5 py-0.5 rounded text-sm flex-shrink-0 ${colors}"
             @click=${e => this.onClickReaction(e, reaction)}
           >${unsafeHTML(emojify(makeSafe(reaction)))} <sup class="font-medium">${userIds.length}</sup></a>
         `

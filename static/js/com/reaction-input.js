@@ -1,7 +1,10 @@
 import { LitElement, html } from '../../vendor/lit-element/lit-element.js'
 import { repeat } from '../../vendor/lit-element/lit-html/directives/repeat.js'
+import { unsafeHTML } from '../../vendor/lit-element/lit-html/directives/unsafe-html.js'
 import { SUGGESTED_REACTIONS } from '../lib/const.js'
 import * as session from '../lib/session.js'
+import { makeSafe } from '../lib/strings.js'
+import { emojify } from '../lib/emojify.js'
 import { emit } from '../lib/dom.js'
 import './button.js'
 
@@ -46,9 +49,7 @@ export class ReactionInput extends LitElement {
               <a
                 class="inline-block rounded text-sm px-2 py-0.5 mt-1 mr-1 cursor-pointer ${colors}"
                 @click=${e => this.onClickReaction(e, reaction)}
-              >
-                ${reaction}
-              </a>
+              >${unsafeHTML(emojify(makeSafe(reaction)))}</a>
             `
           })}
         </div>
@@ -80,7 +81,11 @@ export class ReactionInput extends LitElement {
     e.preventDefault()
     e.stopPropagation()
     if (e.currentTarget.custom.value) {
-      emit(this, 'toggle-reaction', {detail: {reaction: e.currentTarget.custom.value}})
+      let reaction = e.currentTarget.custom.value
+      reaction = reaction.trim().toLowerCase()
+      if (reaction) {
+        emit(this, 'toggle-reaction', {detail: {reaction}})
+      }
     }
   }
 }
