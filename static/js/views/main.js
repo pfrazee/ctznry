@@ -9,7 +9,6 @@ import '../com/login.js'
 import '../com/feed.js'
 import '../com/notifications-feed.js'
 import '../com/post-composer.js'
-import '../com/activity-feed.js'
 import '../com/img-fallbacks.js'
 import '../com/suggestions-sidebar.js'
 import '../com/subnav.js'
@@ -91,8 +90,6 @@ class CtznMainView extends LitElement {
           this.querySelector('ctzn-feed').load()
         } else if (this.querySelector('ctzn-notifications-feed')) {
           this.querySelector('ctzn-notifications-feed').load()
-        } else if (this.querySelector('ctzn-activity-feed')) {
-          this.querySelector('ctzn-activity-feed').load()
         }
       }
     }))
@@ -180,8 +177,7 @@ class CtznMainView extends LitElement {
           ` : ''}
           Notifications
         `
-      },
-      {path: '/activity', label: 'Activity'},
+      }
     ]
     return html`
       <ctzn-header
@@ -214,19 +210,6 @@ class CtznMainView extends LitElement {
               @load-state-updated=${this.onFeedLoadStateUpdated}
               @publish-reply=${this.onPublishReply}
             ></ctzn-notifications-feed>
-          ` : this.currentView === 'activity' ? html`
-            <ctzn-activity-feed
-              dataview="ctzn.network/dbmethod-feed-view"
-              .methodsFilter=${[
-                'ctzn.network/create-item-method',
-                'ctzn.network/create-item-class-method',
-                'ctzn.network/delete-item-class-method',
-                'ctzn.network/destroy-item-method',
-                'ctzn.network/put-item-class-method',
-                'ctzn.network/transfer-item-method',
-                'ctzn.network/update-item-class-method'
-              ]}
-            ></ctzn-activity-feed>
           ` : ''}
         </div>
         ${this.renderRightSidebar()}

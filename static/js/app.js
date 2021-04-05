@@ -116,9 +116,8 @@ class CtznApp extends LitElement {
       case '/':
       case '/index':
       case '/index.html':
-      case '/activity':
       case '/notifications':
-        gestures.setCurrentNav(['/', '/notifications', '/activity'])
+        gestures.setCurrentNav(['/', '/notifications'])
         return
       case '/communities':
         gestures.setCurrentNav([{back: true}, '/communities'])
