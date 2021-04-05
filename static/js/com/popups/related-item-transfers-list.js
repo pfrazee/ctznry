@@ -52,7 +52,7 @@ export class RelatedItemTransfersListPopup extends BasePopup {
             <img class="block mr-3 rounded-full shadow w-12 h-12" src=${AVATAR_URL(tfx.dbmethodCall.authorId)}>
           </a>
           <div>
-            <div><a class="cursor-pointer font-semibold hover:underline leading-tight text-lg" href="/${tfx.dbmethodCall.authorId}" title=${tfx.dbmethodCall.authorId}>${displayNames.render(tfx.dbmethodCall.authorId)}</a></div>
+            <div><a class="cursor-pointer font-semibold hov:hover:underline leading-tight text-lg" href="/${tfx.dbmethodCall.authorId}" title=${tfx.dbmethodCall.authorId}>${displayNames.render(tfx.dbmethodCall.authorId)}</a></div>
             <div>
               Gifted
               <span

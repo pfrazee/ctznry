@@ -296,7 +296,7 @@ export class ActivityFeed extends LitElement {
     }
     return html`
       <div
-        class="new-items-indicator bg-blue-50 border border-blue-500 cursor-pointer fixed font-semibold hover:bg-blue-100 inline-block px-4 py-2 rounded-3xl shadow-md text-blue-800 text-sm z-30"
+        class="new-items-indicator bg-blue-50 border border-blue-500 cursor-pointer fixed font-semibold hov:hover:bg-blue-100 inline-block px-4 py-2 rounded-3xl shadow-md text-blue-800 text-sm z-30"
         @click=${this.onClickViewNewEntries}
       >
         New Activity <span class="fas fa-fw fa-angle-up"></span>
@@ -322,7 +322,7 @@ export class ActivityFeed extends LitElement {
     const hasSubject = methodName === 'TransferItemMethod' && entry.call.args.relatedTo
     return html`
       <div
-        class="flex bg-white px-2 py-3 sm:py-2 sm:rounded mb-0.5 sm:hover:bg-gray-50 cursor-pointer"
+        class="flex bg-white px-2 py-3 sm:py-2 sm:rounded mb-0.5 hov:hover:bg-gray-50 cursor-pointer"
         @click=${e => this.onClickActivity(e, entry)}
       >
         <span class="block rounded bg-${METHOD_BGS[entry.call.method] || 'gray-200'} w-10 h-10 pt-1.5 mr-2">
@@ -340,7 +340,7 @@ export class ActivityFeed extends LitElement {
             ${hasSubject ? html`<span class="text-sm">for:</span>` : ''}
           </div>
           ${hasSubject ? html`
-            <div class="border border-gray-300 mt-2 px-3 reply rounded bg-white sm:hover:bg-gray-50">
+            <div class="border border-gray-300 mt-2 px-3 reply rounded bg-white hov:hover:bg-gray-50">
               ${asyncReplace(this.renderSubject(entry.call.args.recp.userId, entry.call.args.relatedTo.dbUrl))}
             </div>
           ` : ''}
@@ -359,9 +359,9 @@ export class ActivityFeed extends LitElement {
     const {invitedUser} = entry.call.args
     return html`
       invited
-      <a href="/${invitedUser.userId}" class="text-blue-600 sm:hover:underline">${displayNames.render(invitedUser.userId)}</a>
+      <a href="/${invitedUser.userId}" class="text-blue-600 hov:hover:underline">${displayNames.render(invitedUser.userId)}</a>
       to join
-      <a href="/${entry.call.database.userId}" class="text-blue-600 sm:hover:underline">${displayNames.render(entry.call.database.userId)}</a>
+      <a href="/${entry.call.database.userId}" class="text-blue-600 hov:hover:underline">${displayNames.render(entry.call.database.userId)}</a>
     `
   }
   
@@ -387,7 +387,7 @@ export class ActivityFeed extends LitElement {
   renderCommunityUpdateConfigMethod (entry) {
     return html`
       updated the settings for
-      <a href="/${entry.call.database.userId}" class="text-blue-600 sm:hover:underline">${displayNames.render(entry.call.database.userId)}</a>
+      <a href="/${entry.call.database.userId}" class="text-blue-600 hov:hover:underline">${displayNames.render(entry.call.database.userId)}</a>
     `
   }
 

@@ -241,7 +241,7 @@ export class Feed extends LitElement {
     }
     return html`
       <div
-        class="new-items-indicator bg-blue-50 border border-blue-500 cursor-pointer fixed font-semibold hover:bg-blue-100 inline-block px-4 py-2 rounded-3xl shadow-md text-blue-800 text-sm z-30"
+        class="new-items-indicator bg-blue-50 border border-blue-500 cursor-pointer fixed font-semibold hov:hover:bg-blue-100 inline-block px-4 py-2 rounded-3xl shadow-md text-blue-800 text-sm z-30"
         @click=${this.onClickViewNewPosts}
       >
         New Posts <span class="fas fa-fw fa-angle-up"></span>

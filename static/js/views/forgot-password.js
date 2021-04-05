@@ -56,7 +56,7 @@ class CtznForgotPassword extends LitElement {
               <span>Your password has been updated.</span>
             </div>
             <div class="text-center text-lg">
-              You can now <a href="/" class="text-blue-600 hover:underline">Log in</a> with your new password.
+              You can now <a href="/" class="text-blue-600 hov:hover:underline">Log in</a> with your new password.
             </div>
           ` : this.userHasPasswordChangeCode ? html`
             <div class="bg-white border px-6 py-4 rounded-2xl shadow-md mb-6 text-center">

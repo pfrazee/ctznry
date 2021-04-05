@@ -54,7 +54,7 @@ export class UsersInput extends LitElement {
             <div
               class="
                 truncate border-t border-gray-200 px-2 py-1.5 cursor-pointer
-                ${this.value === userId ? 'bg-blue-600 text-white' : c === i ? 'bg-gray-100' : 'sm:hover:bg-gray-100'}
+                ${this.value === userId ? 'bg-blue-600 text-white' : c === i ? 'bg-gray-100' : 'hov:hover:bg-gray-100'}
               "
               @click=${e => {this.setValue(userId)}}
             >

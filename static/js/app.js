@@ -203,7 +203,7 @@ class CtznApp extends LitElement {
           <h2 class="text-5xl text-gray-600 font-semibold mb-4">404 Not Found</h2>
           <div class="text-lg text-gray-600 mb-4">No page exists at this URL.</div>
           <div class="text-lg text-gray-600">
-            <a class="text-blue-600 hover:underline" href="/" title="Back to home">
+            <a class="text-blue-600 hov:hover:underline" href="/" title="Back to home">
               <span class="fas fa-angle-left fa-fw"></span> Home</div>
             </a>
           </div>

@@ -140,9 +140,9 @@ export class UserList extends LitElement {
       ` : html`
         <div class="text-center">
           ${profile.amIFollowing ? html`
-            <ctzn-button transparent btn-class="rounded-full border border-gray-400 text-sm mb-2 py-1 shadow-none hover:bg-gray-200" @click=${e => this.onClickUnfollow(e, profile)} label="Unfollow"></ctzn-button>
+            <ctzn-button transparent btn-class="rounded-full border border-gray-400 text-sm mb-2 py-1 shadow-none hov:hover:bg-gray-200" @click=${e => this.onClickUnfollow(e, profile)} label="Unfollow"></ctzn-button>
           ` : html`
-            <ctzn-button transparent btn-class="rounded-full border border-blue-500 text-blue-600 text-sm mb-2 py-1 shadow-none hover:bg-gray-200" @click=${e => this.onClickFollow(e, profile)} label="Follow"></ctzn-button>
+            <ctzn-button transparent btn-class="rounded-full border border-blue-500 text-blue-600 text-sm mb-2 py-1 shadow-none hov:hover:bg-gray-200" @click=${e => this.onClickFollow(e, profile)} label="Follow"></ctzn-button>
           `}
           ${profile.isFollowingMe ? html`
             <span class="text-sm text-gray-500 py-0.5 px-2">Follows you</span>

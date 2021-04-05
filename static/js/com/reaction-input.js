@@ -44,7 +44,7 @@ export class ReactionInput extends LitElement {
         </div>
         <div class="overflow-x-auto px-1 sm:whitespace-normal whitespace-nowrap">
           ${repeat(SUGGESTED_REACTIONS, reaction => {
-            const colors = this.haveIReacted(reaction) ? 'bg-green-500 sm:hover:bg-green-400 text-white' : 'bg-gray-100 sm:hover:bg-gray-200'
+            const colors = this.haveIReacted(reaction) ? 'bg-green-500 hov:hover:bg-green-400 text-white' : 'bg-gray-100 hov:hover:bg-gray-200'
             return html`
               <a
                 class="inline-block rounded text-sm px-2 py-0.5 mt-1 mr-1 cursor-pointer ${colors}"

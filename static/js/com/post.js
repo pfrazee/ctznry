@@ -174,17 +174,17 @@ export class Post extends LitElement {
           ${this.nometa ? '' : html`
             <div class="pl-1 pr-2.5 text-gray-600 truncate">
               <span class="sm:mr-1 whitespace-nowrap">
-                <a class="hover:underline" href="/${this.post.author.userId}" title=${this.post.author.displayName}>
+                <a class="hov:hover:underline" href="/${this.post.author.userId}" title=${this.post.author.displayName}>
                   <span class="text-gray-800 font-semibold">${displayNames.render(this.post.author.userId)}</span>
                 </a>
               </span>
               <span class="mr-2 text-sm">
-                <a class="hover:underline" href="${POST_URL(this.post)}" data-tooltip=${(new Date(this.post.value.createdAt)).toLocaleString()}>
+                <a class="hov:hover:underline" href="${POST_URL(this.post)}" data-tooltip=${(new Date(this.post.value.createdAt)).toLocaleString()}>
                   ${relativeDate(this.post.value.createdAt)}
                 </a>
                 ${this.post.value.community ? html`
                   in
-                  <a href="/${this.communityUserId}" class="whitespace-nowrap font-semibold text-gray-700 hover:underline">
+                  <a href="/${this.communityUserId}" class="whitespace-nowrap font-semibold text-gray-700 hov:hover:underline">
                     ${displayNames.render(this.communityUserId)}
                   </a>
                 ` : ''}
@@ -205,7 +205,7 @@ export class Post extends LitElement {
               ${this.renderReactionsBtn()}
               ${this.renderGiftItemBtn()}
               <div>
-                <a class="hover:bg-gray-200 px-1 rounded" @click=${this.onClickMenu}>
+                <a class="hov:hover:bg-gray-200 px-1 rounded" @click=${this.onClickMenu}>
                   <span class="fas fa-fw fa-ellipsis-h"></span>
                 </a>
               </div>
@@ -285,7 +285,7 @@ export class Post extends LitElement {
   renderReactionsBtn () {
     let aCls = `inline-block ml-1 mr-6 rounded`
     if (this.canInteract) {
-      aCls += ` text-gray-500 hover:bg-gray-200`
+      aCls += ` text-gray-500 hov:hover:bg-gray-200`
     } else {
       aCls += ` text-gray-400`
     }
@@ -300,7 +300,7 @@ export class Post extends LitElement {
     let aCls = `inline-block ml-1 mr-6 px-1 rounded`
     if (this.communityUserId && this.canInteract && !this.isMyPost) {
       return html`
-        <a class="${aCls} text-gray-500 hover:bg-gray-200" @click=${this.onClickGiftItem}>
+        <a class="${aCls} text-gray-500 hov:hover:bg-gray-200" @click=${this.onClickGiftItem}>
           <span class="fas fa-fw fa-gift"></span>
         </a>
       `
@@ -355,7 +355,7 @@ export class Post extends LitElement {
     }
     return html`
       ${repeat(Object.entries(this.post.reactions), ([reaction, userIds]) => {
-        const colors = this.haveIReacted(reaction) ? 'bg-blue-50 sm:hover:bg-blue-100 text-blue-600' : 'bg-gray-100 text-gray-500 sm:hover:bg-gray-200'
+        const colors = this.haveIReacted(reaction) ? 'bg-blue-50 hov:hover:bg-blue-100 text-blue-600' : 'bg-gray-100 text-gray-500 hov:hover:bg-gray-200'
         return html`
           <a
             class="inline-block mr-2 px-1.5 py-0.5 rounded text-sm flex-shrink-0 ${colors}"

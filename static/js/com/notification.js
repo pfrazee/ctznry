@@ -109,7 +109,7 @@ export class Notification extends LitElement {
     }
     
     return html`
-      <div class="flex cursor-pointer bg-white hover:bg-gray-50 ${this.isUnread ? 'rounded border border-blue-200' : ''}" @click=${this.onClickWrapper}>
+      <div class="flex cursor-pointer bg-white hov:hover:bg-gray-50 ${this.isUnread ? 'rounded border border-blue-200' : ''}" @click=${this.onClickWrapper}>
         <div class="w-12 text-center pt-4 rounded-l leading-9 ${this.isUnread ? 'bg-blue-50' : ''}">
           <span class="${icon} text-2xl ${this.isUnread ? 'text-blue-600' : 'text-gray-400'}"></span>
         </div>

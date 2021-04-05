@@ -136,12 +136,12 @@ export class Comment extends LitElement {
               <img class="block w-4 h-4 object-cover rounded-full mr-1" src=${AVATAR_URL(this.comment.author.userId)}>
             </a>
             <div class="whitespace-nowrap">
-              <a class="hover:underline" href="/${this.comment.author.userId}" title=${this.comment.author.displayName}>
+              <a class="hov:hover:underline" href="/${this.comment.author.userId}" title=${this.comment.author.displayName}>
                 <span class="text-gray-700 font-medium">${displayNames.render(this.comment.author.userId)}</span>
               </a>
             </div>
             <span class="mx-1">&middot;</span>
-            <a class="text-gray-500 hover:underline" href="${COMMENT_URL(this.comment)}" data-tooltip=${(new Date(this.comment.value.createdAt)).toLocaleString()}>
+            <a class="text-gray-500 hov:hover:underline" href="${COMMENT_URL(this.comment)}" data-tooltip=${(new Date(this.comment.value.createdAt)).toLocaleString()}>
               ${relativeDate(this.comment.value.createdAt)}
             </a>
           </div>
@@ -154,14 +154,14 @@ export class Comment extends LitElement {
           ` : ''}
           <div class="pl-4">
             <a
-              class="tooltip-right px-2 py-1 text-xs font-bold ${this.canInteract ? 'cursor-pointer text-gray-500 hover:bg-gray-100' : 'text-gray-400'}"
+              class="tooltip-right px-2 py-1 text-xs font-bold ${this.canInteract ? 'cursor-pointer text-gray-500 hov:hover:bg-gray-100' : 'text-gray-400'}"
               data-tooltip=${ifDefined(this.ctrlTooltip)}
               @click=${this.canInteract ? this.onClickReply : undefined}
             >
               <span class="fas fa-fw fa-reply"></span> Reply
             </a>
             <a
-              class="tooltip-right px-2 py-1 text-xs font-bold ${this.canInteract ? 'cursor-pointer text-gray-500 hover:bg-gray-100' : 'text-gray-400'}"
+              class="tooltip-right px-2 py-1 text-xs font-bold ${this.canInteract ? 'cursor-pointer text-gray-500 hov:hover:bg-gray-100' : 'text-gray-400'}"
               data-tooltip=${ifDefined(this.ctrlTooltip)}
               @click=${this.canInteract ? (e => {this.isReactionsOpen = !this.isReactionsOpen}) : undefined}
             >
@@ -170,7 +170,7 @@ export class Comment extends LitElement {
             ${this.renderGiftItemBtn()}
             ${this.renderActionsSummary()}
             <a
-              class="cursor-pointer tooltip-right hover:bg-gray-100 px-2 py-1 ml-2 text-xs text-gray-500 font-bold"
+              class="cursor-pointer tooltip-right hov:hover:bg-gray-100 px-2 py-1 ml-2 text-xs text-gray-500 font-bold"
               @click=${this.onClickMenu}
             >
               <span class="fas fa-fw fa-ellipsis-h"></span>
@@ -217,7 +217,7 @@ export class Comment extends LitElement {
     }
     return html`
       ${repeat(Object.entries(this.comment.reactions), ([reaction, userIds]) => {
-        const colors = this.haveIReacted(reaction) ? 'bg-blue-50 sm:hover:bg-blue-100 text-blue-600' : 'bg-gray-100 text-gray-500 sm:hover:bg-gray-200'
+        const colors = this.haveIReacted(reaction) ? 'bg-blue-50 hov:hover:bg-blue-100 text-blue-600' : 'bg-gray-100 text-gray-500 hov:hover:bg-gray-200'
         return html`
           <a
             class="inline-block mr-1 px-1.5 py-0.5 mt-1 text-sm rounded cursor-pointer ${colors}"
@@ -255,7 +255,7 @@ export class Comment extends LitElement {
     let aCls = `inline-block px-1 rounded px-2 py-1 text-xs`
     if (this.communityUserId && this.canInteract && !this.isMyComment) {
       return html`
-        <a class="${aCls} text-gray-500 cursor-pointer hover:bg-gray-100" @click=${this.onClickGiftItem}>
+        <a class="${aCls} text-gray-500 cursor-pointer hov:hover:bg-gray-100" @click=${this.onClickGiftItem}>
           <span class="fas fa-fw fa-gift"></span>
         </a>
       `
@@ -276,13 +276,13 @@ export class Comment extends LitElement {
   renderActionsSummary () {
     const reactionsCount = this.comment.reactions ? Object.values(this.comment.reactions).reduce((acc, v) => acc + v.length, 0) : 0
     const giftsCount = this.comment.relatedItemTransfers?.length || 0
-    let reactionsCls = `inline-block ml-1 text-sm text-gray-500 ${reactionsCount ? 'cursor-pointer hover:underline' : ''}`
+    let reactionsCls = `inline-block ml-1 text-sm text-gray-500 ${reactionsCount ? 'cursor-pointer hov:hover:underline' : ''}`
     return html`
       <a class=${reactionsCls} @click=${reactionsCount ? this.onClickViewReactions : undefined}>
         ${reactionsCount} ${pluralize(reactionsCount, 'reaction')}${giftsCount > 0 ? ', ' : ''}
       </a>
       ${giftsCount > 0 ? html`
-        <a class="inline-block ml-1 text-sm rounded text-gray-500 cursor-pointer hover:underline" @click=${this.onClickViewGifts}>
+        <a class="inline-block ml-1 text-sm rounded text-gray-500 cursor-pointer hov:hover:underline" @click=${this.onClickViewGifts}>
           ${giftsCount} ${pluralize(giftsCount, 'gift')}
         </a>
       ` : ''}

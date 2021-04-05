@@ -176,7 +176,7 @@ export class Thread extends LitElement {
         return html`
           <div class="bg-white p-3 mb-1 sm:rounded">
             <div class="italic text-gray-500 text-sm">
-              Join <a href="/${this.post.value.community.userId}" class="hover:underline">${displayNames.render(this.post.value.community.userId)}</a> to reply.
+              Join <a href="/${this.post.value.community.userId}" class="hov:hover:underline">${displayNames.render(this.post.value.community.userId)}</a> to reply.
             </div>
           </div>
         `
@@ -186,7 +186,7 @@ export class Thread extends LitElement {
         return html`
           <div class="bg-white p-3 mb-1 sm:rounded">
             <div class="italic text-gray-500 text-sm">
-              Only people followed by <a href="/${this.post.author.userId}" class="hover:underline">${this.post.author.displayName}</a> can reply.
+              Only people followed by <a href="/${this.post.author.userId}" class="hov:hover:underline">${this.post.author.displayName}</a> can reply.
             </div>
           </div>
         `

@@ -44,21 +44,21 @@ export class EditProfilePopup extends BasePopup {
               <ctzn-img-fallbacks>
                 <img
                   slot="img1"
-                  class="block rounded w-full object-cover cursor-pointer hover:opacity-50"
+                  class="block rounded w-full object-cover cursor-pointer hov:hover:opacity-50"
                   style="height: 130px"
                   src=${BLOB_URL(this.userId, 'profile-banner')} 
                   @click=${this.onClickBanner}
                 >
                 <div
                   slot="img2"
-                  class="block rounded cursor-pointer hover:opacity-50"
+                  class="block rounded cursor-pointer hov:hover:opacity-50"
                   style="height: 130px; background: linear-gradient(0deg, #3c4af6, #2663eb);"
                   @click=${this.onClickBanner}
                 ></div>
               </ctzn-img-fallbacks>
             ` : html`
               <img
-                class="block rounded w-full object-cover cursor-pointer hover:opacity-50"
+                class="block rounded w-full object-cover cursor-pointer hov:hover:opacity-50"
                 style="height: 130px"
                 src=${this.uploadedBanner} 
                 @click=${this.onClickBanner}
@@ -76,7 +76,7 @@ export class EditProfilePopup extends BasePopup {
             "
           >
             <img 
-              class="block mx-auto border-4 border-white rounded-3xl object-cover cursor-pointer hover:opacity-50"
+              class="block mx-auto border-4 border-white rounded-3xl object-cover cursor-pointer hov:hover:opacity-50"
               style="width: 150px; height: 150px;"
               src=${this.uploadedAvatar || AVATAR_URL(this.userId)}
               @click=${this.onClickAvatar}

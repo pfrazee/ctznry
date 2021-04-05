@@ -76,11 +76,11 @@ export class ManageBansPopup extends BasePopup {
           <section class="border border-gray-200 rounded p-3 mb-2">
             <div class="">
               <span class="font-semibold">Banned user:</span>
-              <a class="text-blue-600 hover:underline" href="/${ban.value.bannedUser.userId}" target="_blank" title=${ban.value.bannedUser.userId}>${ban.value.bannedUser.userId}</a>
+              <a class="text-blue-600 hov:hover:underline" href="/${ban.value.bannedUser.userId}" target="_blank" title=${ban.value.bannedUser.userId}>${ban.value.bannedUser.userId}</a>
             </div>
             <div class="">
               <span class="font-semibold">Banned by:</span>
-              <a class="text-blue-600 hover:underline" href="/${ban.value.createdBy.userId}" target="_blank" title=${ban.value.createdBy.userId}>${ban.value.createdBy.userId}</a>
+              <a class="text-blue-600 hov:hover:underline" href="/${ban.value.createdBy.userId}" target="_blank" title=${ban.value.createdBy.userId}>${ban.value.createdBy.userId}</a>
             </div>
             <div class="">
               <span class="font-semibold">Date:</span>

@@ -117,7 +117,7 @@ export function linkify (str = '') {
       match = match.slice(0, match.length - 1)
       trailingChars += char
     }
-    return `<a class="text-blue-600 hover:underline" href="${match}">${match}</a>${trailingChars}`
+    return `<a class="text-blue-600 hov:hover:underline" href="${match}">${match}</a>${trailingChars}`
   })
 }
 

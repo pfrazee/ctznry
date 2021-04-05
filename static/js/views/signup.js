@@ -104,7 +104,7 @@ class CtznSignup extends LitElement {
         </div>
         <div class="bg-gray-100 mb-4 px-4 py-4 rounded text-gray-700 text-sm">
           CTZN's development is live-streamed every day, so
-          <a class="text-blue-600 hover:underline" href="https://www.youtube.com/channel/UCSkcL4my2wgDRFvjQOJzrlg">join us there</a>
+          <a class="text-blue-600 hov:hover:underline" href="https://www.youtube.com/channel/UCSkcL4my2wgDRFvjQOJzrlg">join us there</a>
           to share your thoughts and see what's going on!
         </div>
         <div class="flex justify-between items-center border-t border-gray-300 pt-6">
@@ -134,20 +134,20 @@ class CtznSignup extends LitElement {
           ${this.isServersExpanded ? html`
             <div class="border border-gray-400 rounded w-full overflow-hidden" @click=${e => this.isServersExpanded = !this.isServersExpanded}>
               ${repeat(SERVERS, server => html`
-                <button class="w-full border-b border-gray-300 hover:bg-gray-50" @click=${e => this.onSelectServer(server)}>
+                <button class="w-full border-b border-gray-300 hov:hover:bg-gray-50" @click=${e => this.onSelectServer(server)}>
                   <span class="flex items-center justify-between pb-4 pt-4 px-4 w-full">
                     <span>${server}</span>
                   </span>
                 </button>
               `)}
-              <button class="w-full hover:bg-gray-50" @click=${e => this.onSelectServer('custom')}>
+              <button class="w-full hov:hover:bg-gray-50" @click=${e => this.onSelectServer('custom')}>
                 <span class="flex items-center justify-between pb-4 pt-4 px-4 w-full">
                   <span>Custom server</span>
                 </span>
               </button>
             </div>
           ` : html`
-            <button class="block border border-gray-300 rounded w-full overflow-hidden hover:border-gray-400" @click=${e => this.isServersExpanded = !this.isServersExpanded}>
+            <button class="block border border-gray-300 rounded w-full overflow-hidden hov:hover:border-gray-400" @click=${e => this.isServersExpanded = !this.isServersExpanded}>
               <span class="flex items-center justify-between pb-4 pt-4 px-4 w-full">
                 <span>${this.isCustomServer ? 'Custom server' : this.values.domain}</span> <span class="fas fa-fw fa-caret-down"></span>
               </span>
@@ -305,7 +305,7 @@ class CtznSignup extends LitElement {
         </div>
         ${this.isAvatarSet ? html`
           <canvas
-            class="block mx-auto my-4 w-48 h48 rounded-full cursor-pointer hover:opacity-50"
+            class="block mx-auto my-4 w-48 h48 rounded-full cursor-pointer hov:hover:opacity-50"
             id="avatar-canvas"
             width=${CANVAS_SIZE}
             height=${CANVAS_SIZE}
@@ -313,7 +313,7 @@ class CtznSignup extends LitElement {
           ></canvas>
         ` : html`
           <img
-            class="block mx-auto my-4 w-48 h48 rounded-full cursor-pointer hover:opacity-50"
+            class="block mx-auto my-4 w-48 h48 rounded-full cursor-pointer hov:hover:opacity-50"
             src="/img/default-user-thumb.jpg"
             @click=${this.onClickAvatar}
           >

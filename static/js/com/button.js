@@ -26,20 +26,20 @@ export class Button extends LitElement {
 
   getClass () {
     let parentClass = this.btnClass || this.className || ''
-    let colors = 'bg-white hover:bg-gray-100'
+    let colors = 'bg-white hov:hover:bg-gray-100'
     if (this.hasAttribute('primary')) {
-      colors = 'bg-blue-600 text-white hover:bg-blue-700'
+      colors = 'bg-blue-600 text-white hov:hover:bg-blue-700'
       if (this.disabled) {
         colors = 'bg-blue-400 text-blue-50'
       }
     } else if (this.hasAttribute('transparent')) {
-      colors = 'hover:bg-gray-100'
+      colors = 'hov:hover:bg-gray-100'
       if (this.disabled) {
         colors = 'bg-gray-100'
       }
     } else if (this.hasAttribute('color')) {
       const color = this.getAttribute('color')
-      colors = `bg-${color}-600 text-white hover:bg-${color}-700`
+      colors = `bg-${color}-600 text-white hov:hover:bg-${color}-700`
       if (this.disabled) {
         colors = `bg-${color}-400 text-${color}-50`
       }

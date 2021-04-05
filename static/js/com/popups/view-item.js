@@ -124,7 +124,7 @@ export class ViewItemPopup extends BasePopup {
               class="rounded w-5 h-5"
             >
           </a>
-          <a href="/${this.item.value.owner.userId}" class="truncate sm:hover:underline">
+          <a href="/${this.item.value.owner.userId}" class="truncate hov:hover:underline">
             <span class="font-medium">${displayNames.render(this.item.value.owner.userId)}</span>
             <span class="text-gray-500">${this.item.value.owner.userId}</span>
           </a>
@@ -137,7 +137,7 @@ export class ViewItemPopup extends BasePopup {
               class="rounded w-5 h-5"
             >
           </a>
-          <a href="/${this.databaseId}" class="truncate sm:hover:underline">
+          <a href="/${this.databaseId}" class="truncate hov:hover:underline">
             <span class="font-medium">${displayNames.render(this.databaseId)}</span>
             <span class="text-gray-500">${this.databaseId}</span>
           </a>

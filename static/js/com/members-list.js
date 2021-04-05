@@ -56,7 +56,7 @@ export class MembersList extends LitElement {
             </a>
             <div class="flex-1 min-w-0">
               <div class="truncate">
-                <a class="font-medium sm:hover:underline" href="/${userId}" title=${userId}>
+                <a class="font-medium hov:hover:underline" href="/${userId}" title=${userId}>
                   ${displayNames.render(userId)}
                 </a>
                 <span class="hidden sm:inline text-sm text-gray-500">${domain}</span>
@@ -88,7 +88,7 @@ export class MembersList extends LitElement {
     if (session.isActive()) {
       return html`
         ${this.canban ? html`
-          <button class="text-sm rounded py-1 px-2 hover:bg-gray-50" @click=${e => this.onClickBan(e, member)}>
+          <button class="text-sm rounded py-1 px-2 hov:hover:bg-gray-50" @click=${e => this.onClickBan(e, member)}>
             <span class="fas fa-fw fa-ban"></span>
             Ban
           </button>

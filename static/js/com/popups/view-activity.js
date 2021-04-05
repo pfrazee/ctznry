@@ -74,7 +74,7 @@ export class ViewActivityPopup extends BasePopup {
         <div class="flex items-center mb-2 px-1">
           <div class="flex-1 truncate">
             In
-            <a class="text-blue-600 hover:underline" href="/${this.activity.call.database.userId}" title=${this.activity.call.database.userId}>
+            <a class="text-blue-600 hov:hover:underline" href="/${this.activity.call.database.userId}" title=${this.activity.call.database.userId}>
               ${displayNames.render(this.activity.call.database.userId)}
             </a>
           </div>
@@ -83,7 +83,7 @@ export class ViewActivityPopup extends BasePopup {
           </div>
         </div>
         <div class="bg-gray-50 p-2 rounded">
-          <a class="flex items-center bg-white rounded p-2 bg-white border border-gray-300 sm:hover:bg-gray-50" href="/${this.activity.authorId}">
+          <a class="flex items-center bg-white rounded p-2 bg-white border border-gray-300 hov:hover:bg-gray-50" href="/${this.activity.authorId}">
             <img class="block h-8 object-fit rounded w-8 mr-2" src=${AVATAR_URL(this.activity.authorId)}>
             <div class="flex-1 truncate">
               <span class="font-medium">${displayNames.render(this.activity.authorId)}</span>
@@ -130,7 +130,7 @@ export class ViewActivityPopup extends BasePopup {
           lifted the ban on
         </div>
       </div>
-      <a class="flex items-center rounded p-2 bg-white border border-gray-300 mt-1 sm:hover:bg-gray-50" href="/${bannedUser.userId}">
+      <a class="flex items-center rounded p-2 bg-white border border-gray-300 mt-1 hov:hover:bg-gray-50" href="/${bannedUser.userId}">
         <img class="block h-8 object-fit rounded w-8 mr-2" src=${AVATAR_URL(bannedUser.userId)}>
         <div class="flex-1 truncate">
           <span class="font-medium">${displayNames.render(bannedUser.userId)}</span>
@@ -150,7 +150,7 @@ export class ViewActivityPopup extends BasePopup {
           invited to the community:
         </div>
       </div>
-      <a class="flex items-center rounded p-2 bg-white border border-gray-300 mt-1 sm:hover:bg-gray-50" href="/${invitedUser.userId}">
+      <a class="flex items-center rounded p-2 bg-white border border-gray-300 mt-1 hov:hover:bg-gray-50" href="/${invitedUser.userId}">
         <img class="block h-8 object-fit rounded w-8 mr-2" src=${AVATAR_URL(invitedUser.userId)}>
         <div class="flex-1 truncate">
           <span class="font-medium">${displayNames.render(invitedUser.userId)}</span>
@@ -170,7 +170,7 @@ export class ViewActivityPopup extends BasePopup {
           ${ban ? 'banned' : 'removed'} from the community:
         </div>
       </div>
-      <a class="flex items-center rounded p-2 bg-white border border-gray-300 mt-1 sm:hover:bg-gray-50" href="/${member.userId}">
+      <a class="flex items-center rounded p-2 bg-white border border-gray-300 mt-1 hov:hover:bg-gray-50" href="/${member.userId}">
         <img class="block h-8 object-fit rounded w-8 mr-2" src=${AVATAR_URL(member.userId)}>
         <div class="flex-1 truncate">
           <span class="font-medium">${displayNames.render(member.userId)}</span>
@@ -195,7 +195,7 @@ export class ViewActivityPopup extends BasePopup {
           banned from the community:
         </div>
       </div>
-      <a class="flex items-center rounded p-2 bg-white border border-gray-300 mt-1 sm:hover:bg-gray-50" href="/${bannedUser.userId}">
+      <a class="flex items-center rounded p-2 bg-white border border-gray-300 mt-1 hov:hover:bg-gray-50" href="/${bannedUser.userId}">
         <img class="block h-8 object-fit rounded w-8 mr-2" src=${AVATAR_URL(bannedUser.userId)}>
         <div class="flex-1 truncate">
           <span class="font-medium">${displayNames.render(bannedUser.userId)}</span>
@@ -219,7 +219,7 @@ export class ViewActivityPopup extends BasePopup {
           updated the settings for:
         </div>
       </div>
-      <a class="flex items-center rounded p-2 bg-white border border-gray-300 mt-1 sm:hover:bg-gray-50" href="/${this.activity.call.database.userId}">
+      <a class="flex items-center rounded p-2 bg-white border border-gray-300 mt-1 hov:hover:bg-gray-50" href="/${this.activity.call.database.userId}">
         <img class="block h-8 object-fit rounded w-8 mr-2" src=${AVATAR_URL(this.activity.call.database.userId)}>
         <div class="flex-1 truncate">
           <span class="font-medium">${displayNames.render(this.activity.call.database.userId)}</span>
@@ -255,7 +255,7 @@ export class ViewActivityPopup extends BasePopup {
           for
         </div>
       </div>
-      <a class="flex items-center rounded p-2 bg-white border border-gray-300 mt-1 sm:hover:bg-gray-50" href="/${owner.userId}">
+      <a class="flex items-center rounded p-2 bg-white border border-gray-300 mt-1 hov:hover:bg-gray-50" href="/${owner.userId}">
         <img class="block h-8 object-fit rounded w-8 mr-2" src=${AVATAR_URL(owner.userId)}>
         <div class="flex-1 truncate">
           <span class="font-medium">${displayNames.render(owner.userId)}</span>
@@ -338,7 +338,7 @@ export class ViewActivityPopup extends BasePopup {
           updated the avatar for
         </div>
       </div>
-      <a class="flex items-center rounded p-2 bg-white border border-gray-300 mt-1 sm:hover:bg-gray-50" href="/${this.activity.call.database.userId}">
+      <a class="flex items-center rounded p-2 bg-white border border-gray-300 mt-1 hov:hover:bg-gray-50" href="/${this.activity.call.database.userId}">
         <img class="block h-8 object-fit rounded w-8 mr-2" src=${AVATAR_URL(this.activity.call.database.userId)}>
         <div class="flex-1 truncate">
           <span class="font-medium">${displayNames.render(this.activity.call.database.userId)}</span>
@@ -358,7 +358,7 @@ export class ViewActivityPopup extends BasePopup {
           updated the ${blobName} blob for
         </div>
       </div>
-      <a class="flex items-center rounded p-2 bg-white border border-gray-300 mt-1 sm:hover:bg-gray-50" href="/${this.activity.call.database.userId}">
+      <a class="flex items-center rounded p-2 bg-white border border-gray-300 mt-1 hov:hover:bg-gray-50" href="/${this.activity.call.database.userId}">
         <img class="block h-8 object-fit rounded w-8 mr-2" src=${AVATAR_URL(this.activity.call.database.userId)}>
         <div class="flex-1 truncate">
           <span class="font-medium">${displayNames.render(this.activity.call.database.userId)}</span>
@@ -398,7 +398,7 @@ export class ViewActivityPopup extends BasePopup {
           updated the profile for:
         </div>
       </div>
-      <a class="flex items-center rounded p-2 bg-white border border-gray-300 mt-1 sm:hover:bg-gray-50" href="/${this.activity.call.database.userId}">
+      <a class="flex items-center rounded p-2 bg-white border border-gray-300 mt-1 hov:hover:bg-gray-50" href="/${this.activity.call.database.userId}">
         <img class="block h-8 object-fit rounded w-8 mr-2" src=${AVATAR_URL(this.activity.call.database.userId)}>
         <div class="flex-1 truncate">
           <span class="font-medium">${displayNames.render(this.activity.call.database.userId)}</span>
@@ -435,7 +435,7 @@ export class ViewActivityPopup extends BasePopup {
           to
         </div>
       </div>
-      <a class="flex items-center rounded p-2 bg-white border border-gray-300 mt-1 sm:hover:bg-gray-50" href="/${recp.userId}">
+      <a class="flex items-center rounded p-2 bg-white border border-gray-300 mt-1 hov:hover:bg-gray-50" href="/${recp.userId}">
         <img class="block h-8 object-fit rounded w-8 mr-2" src=${AVATAR_URL(recp.userId)}>
         <div class="flex-1 truncate">
           <span class="font-medium">${displayNames.render(recp.userId)}</span>
@@ -443,7 +443,7 @@ export class ViewActivityPopup extends BasePopup {
       </a>
       ${this.activity.call.args.relatedTo ? html`
         <div class="font-medium px-2 py-1 text-gray-700 text-sm">For:</div>
-        <div class="bg-white border border-gray-300 px-2 reply rounded sm:hover:bg-gray-50">
+        <div class="bg-white border border-gray-300 px-2 reply rounded hov:hover:bg-gray-50">
           ${asyncReplace(this.renderSubject(this.activity.call.args.recp.userId, this.activity.call.args.relatedTo.dbUrl))}
         </div>
       ` : ''}

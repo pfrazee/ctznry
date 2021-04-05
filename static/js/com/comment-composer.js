@@ -63,13 +63,13 @@ class CommentComposer extends LitElement {
 
         <div class="flex justify-between">
           <button
-            class="inline-block rounded px-3 py-1 text-gray-500 bg-white hover:bg-gray-100"
+            class="inline-block rounded px-3 py-1 text-gray-500 bg-white hov:hover:bg-gray-100"
             @click=${this.onCancel}
             tabindex="4"
           >Cancel</button>
           <button
             type="submit"
-            class="inline-block rounded px-3 py-1 shadow-sm text-white ${this.canPost ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-300 cursor-default'}"
+            class="inline-block rounded px-3 py-1 shadow-sm text-white ${this.canPost ? 'bg-blue-600 hov:hover:bg-blue-700' : 'bg-blue-300 cursor-default'}"
             tabindex="3"
             ?disabled=${!this.canPost}
           >${this.isProcessing ? html`<span class="spinner"></span>` : 'Post comment'}</button>

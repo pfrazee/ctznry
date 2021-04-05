@@ -308,11 +308,11 @@ class CtznUser extends LitElement {
         <div>
           ${this.isCitizen ? html`
             <div class="bg-white text-center pb-4">
-              <a class="bg-gray-50 font-semibold px-2 py-1 rounded sm:hover:bg-gray-100 text-gray-500" href="/${this.userId}/about" @click=${e => this.onGotoExpandedView(e, 'followers')}>
+              <a class="bg-gray-50 font-semibold px-2 py-1 rounded hov:hover:bg-gray-100 text-gray-500" href="/${this.userId}/about" @click=${e => this.onGotoExpandedView(e, 'followers')}>
                 <span class="fas fa-fw fa-user"></span>
                 ${nFollowers} ${pluralize(nFollowers, 'Follower')}
               </a>
-              <a class="ml-1 bg-gray-50 font-semibold px-2 py-1 rounded sm:hover:bg-gray-100 text-gray-500" href="/${this.userId}/about" @click=${e => this.onGotoExpandedView(e, 'communities')}>
+              <a class="ml-1 bg-gray-50 font-semibold px-2 py-1 rounded hov:hover:bg-gray-100 text-gray-500" href="/${this.userId}/about" @click=${e => this.onGotoExpandedView(e, 'communities')}>
                 <span class="fas fa-fw fa-users"></span>
                 ${nCommunities} ${nCommunities === 1 ? 'Community' : 'Communities'}
               </a>
@@ -320,7 +320,7 @@ class CtznUser extends LitElement {
           ` : ''}
           ${this.isCommunity ? html`
             <div class="bg-white text-center pb-4">
-              <a class="bg-gray-50 font-bold px-2 py-1 rounded sm:hover:bg-gray-100 text-gray-500" href="/${this.userId}/about" @click=${e => this.onGotoExpandedView(e, 'members')}>
+              <a class="bg-gray-50 font-bold px-2 py-1 rounded hov:hover:bg-gray-100 text-gray-500" href="/${this.userId}/about" @click=${e => this.onGotoExpandedView(e, 'members')}>
                 <span class="fas fa-users"></span>
                 ${nMembers} ${pluralize(nMembers, 'Member')}
               </a>
@@ -375,7 +375,7 @@ class CtznUser extends LitElement {
           <h2 class="text-5xl text-gray-600 font-semibold mb-4">404 Not Found</h2>
           <div class="text-lg text-gray-600 mb-4">We couldn't find ${this.userId}</div>
           <div class="text-lg text-gray-600">
-            <a class="text-blue-600 hover:underline" href="/" title="Back to home">
+            <a class="text-blue-600 hov:hover:underline" href="/" title="Back to home">
               <span class="fas fa-angle-left fa-fw"></span> Home</div>
             </a>
           </div>
@@ -640,7 +640,7 @@ class CtznUser extends LitElement {
     const expandableSectionHeader = (id, label, count, extra = '') => html`
       <div
         id="expandable-section-${id}"
-        class="px-5 py-3 sm:rounded ${count ? 'cursor-pointer sm:hover:text-blue-600' : ''}"
+        class="px-5 py-3 sm:rounded ${count ? 'cursor-pointer hov:hover:text-blue-600' : ''}"
         @click=${count ? e => onToggleExpandSection(id) : undefined}
       >
         <div class="flex items-center justify-between">
@@ -705,7 +705,7 @@ class CtznUser extends LitElement {
                     <img class="block rounded-md w-10 h-10 object-cover shadow-sm" src=${AVATAR_URL(userId)}>
                   </a>
                   <div class="flex-1 min-w-0 truncate">
-                    <a class="hover:underline" href="/${userId}" title=${userId}>
+                    <a class="hov:hover:underline" href="/${userId}" title=${userId}>
                       <span class="font-medium">${displayNames.render(userId)}</span>
                     </a>
                     <span class="hidden sm:inline text-sm text-gray-500">${domain}</span>
@@ -761,7 +761,7 @@ class CtznUser extends LitElement {
     const expandableSectionHeader = (id, label, count, extra = '') => html`
       <div
         id="expandable-section-${id}"
-        class="px-5 py-3 sm:rounded ${count ? 'cursor-pointer sm:hover:text-blue-600' : ''}"
+        class="px-5 py-3 sm:rounded ${count ? 'cursor-pointer hov:hover:text-blue-600' : ''}"
         @click=${count ? e => onToggleExpandSection(id) : undefined}
       >
         <div class="flex items-center justify-between">
@@ -783,10 +783,10 @@ class CtznUser extends LitElement {
           <div class="flex items-center">
             <span class="font-semibold text-lg flex-1"><span class="text-sm far fa-fw fa-user"></span> ${roleId}</span>
             ${roleId !== 'admin' && this.hasPermission('ctzn.network/perm-community-manage-roles') ? html`
-              <button class="text-sm ml-1 px-2 py-0 border border-gray-200 rounded cursor-pointer sm:hover:bg-gray-50" @click=${e => this.onRemoveRole(e, roleId)}>Remove</button>
+              <button class="text-sm ml-1 px-2 py-0 border border-gray-200 rounded cursor-pointer hov:hover:bg-gray-50" @click=${e => this.onRemoveRole(e, roleId)}>Remove</button>
             ` : ''}
             ${this.hasPermission('ctzn.network/perm-community-manage-roles') ? html`
-              <button class="text-sm ml-1 px-2 py-0 border border-gray-200 rounded cursor-pointer sm:hover:bg-gray-50" @click=${e => this.onEditRole(e, roleId, permissions)}>Edit</button>
+              <button class="text-sm ml-1 px-2 py-0 border border-gray-200 rounded cursor-pointer hov:hover:bg-gray-50" @click=${e => this.onEditRole(e, roleId, permissions)}>Edit</button>
             ` : ''}
           </div>
           <div class="text-gray-500">
@@ -817,25 +817,25 @@ class CtznUser extends LitElement {
         <div class="px-3 py-2 sm:rounded bg-white mb-1">
           ${canInvite ? html`
             <button
-              class="block w-full text-center mb-1 px-3 py-2 border border-gray-200 rounded cursor-pointer sm:text-sm sm:inline-block sm:w-auto sm:hover:bg-gray-50 sm:py-1 sm:mb-0"
+              class="block w-full text-center mb-1 px-3 py-2 border border-gray-200 rounded cursor-pointer sm:text-sm sm:inline-block sm:w-auto hov:hover:bg-gray-50 sm:py-1 sm:mb-0"
               @click=${this.onCreateInvite}
             >Invite New Member</button>
           ` : ''}
           ${canManageRoles ? html`
             <button
-              class="block w-full text-center mb-1 px-3 py-2 border border-gray-200 rounded cursor-pointer sm:text-sm sm:inline-block sm:w-auto sm:hover:bg-gray-50 sm:py-1 sm:mb-0"
+              class="block w-full text-center mb-1 px-3 py-2 border border-gray-200 rounded cursor-pointer sm:text-sm sm:inline-block sm:w-auto hov:hover:bg-gray-50 sm:py-1 sm:mb-0"
               @click=${this.onCreateRole}
             >Create Role</button>
           ` : ''}
           ${canBan ? html`
             <button
-              class="block w-full text-center mb-1 px-3 py-2 border border-gray-200 rounded cursor-pointer sm:text-sm sm:inline-block sm:w-auto sm:hover:bg-gray-50 sm:py-1 sm:mb-0"
+              class="block w-full text-center mb-1 px-3 py-2 border border-gray-200 rounded cursor-pointer sm:text-sm sm:inline-block sm:w-auto hov:hover:bg-gray-50 sm:py-1 sm:mb-0"
               @click=${this.onClickManageBans}
             >Manage Banned Users</button>
           ` : ''}
           ${canEditConfig ? html`
             <button
-              class="block w-full text-center mb-1 px-3 py-2 border border-gray-200 rounded cursor-pointer sm:text-sm sm:inline-block sm:w-auto sm:hover:bg-gray-50 sm:py-1 sm:mb-0"
+              class="block w-full text-center mb-1 px-3 py-2 border border-gray-200 rounded cursor-pointer sm:text-sm sm:inline-block sm:w-auto hov:hover:bg-gray-50 sm:py-1 sm:mb-0"
               @click=${this.onClickEditSettings}
             >Edit Settings</button>
           ` : ''}

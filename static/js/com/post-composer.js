@@ -93,7 +93,7 @@ class PostComposer extends LitElement {
         <section class="mb-2">
           <div>
             <button
-              class="inline-flex items-center rounded px-3 py-1 bg-white border border-gray-300 hover:bg-gray-100"
+              class="inline-flex items-center rounded px-3 py-1 bg-white border border-gray-300 hov:hover:bg-gray-100"
               @click=${this.onClickSelectCommunity}
             >
               Post to: ${this.communityIcon} ${this.communityName} <span class="fas fa-fw fa-caret-down"></span>
@@ -121,7 +121,7 @@ class PostComposer extends LitElement {
 
         <section class="mb-2">
           <label
-            class="block border border-gray-300 p-2 cursor-pointer hover:bg-gray-100 ${this.isExtendedOpen ? 'rounded-0 rounded-t border-b-0' : 'rounded'}"
+            class="block border border-gray-300 p-2 cursor-pointer hov:hover:bg-gray-100 ${this.isExtendedOpen ? 'rounded-0 rounded-t border-b-0' : 'rounded'}"
             @click=${this.onToggleExtendedText}
           >
             <span class="fas fa-fw fa-caret-${this.isExtendedOpen ? 'down' : 'right'}"></span>
@@ -151,7 +151,7 @@ class PostComposer extends LitElement {
                   placeholder="Optional"
                 >
                 <div class="text-sm px-0.5">
-                  <a class="text-blue-600 cursor-pointer hover:underline" @click=${e => this.onClickRemoveMedia(e, index)}>Remove</a>
+                  <a class="text-blue-600 cursor-pointer hov:hover:underline" @click=${e => this.onClickRemoveMedia(e, index)}>Remove</a>
                 </div>
               </div>
             </div>

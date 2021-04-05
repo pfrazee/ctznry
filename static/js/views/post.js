@@ -95,7 +95,7 @@ class CtznPostView extends LitElement {
     const SUBNAV_ITEMS = [
       {back: true, label: html`<span class="fas fa-angle-left"></span>`},
       {path: location.pathname, label: 'View thread'},
-      {rightAlign: true, click: this.onClickMenu.bind(this), label: html`<span class="fas fa-ellipsis-h cursor-pointer sm:hover:text-gray-700 text-xl text-gray-600"></span>`} 
+      {rightAlign: true, click: this.onClickMenu.bind(this), label: html`<span class="fas fa-ellipsis-h cursor-pointer hov:hover:text-gray-700 text-xl text-gray-600"></span>`} 
     ]
     return html`
       <ctzn-subnav

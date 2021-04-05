@@ -163,7 +163,7 @@ export class DbmethodResultFeed extends LitElement {
     }
     return html`
       <div
-        class="new-items-indicator bg-blue-50 border border-blue-500 cursor-pointer fixed font-semibold hover:bg-blue-100 inline-block px-4 py-2 rounded-3xl shadow-md text-blue-800 text-sm z-30"
+        class="new-items-indicator bg-blue-50 border border-blue-500 cursor-pointer fixed font-semibold hov:hover:bg-blue-100 inline-block px-4 py-2 rounded-3xl shadow-md text-blue-800 text-sm z-30"
         @click=${this.onClickViewNewCalls}
       >
         New Activity <span class="fas fa-fw fa-angle-up"></span>
@@ -194,14 +194,14 @@ export class DbmethodResultFeed extends LitElement {
               <span class="absolute fas fa-fw fa-times-circle text-red-500" style="top: 21px; left: 11px"></span>
             `}
             <a
-              class="text-${isSuccess ? 'gray' : 'red'}-800 bg-${isSuccess ? 'gray' : 'red'}-50 font-mono px-2 py-1 rounded sm:hover:underline text-sm"
+              class="text-${isSuccess ? 'gray' : 'red'}-800 bg-${isSuccess ? 'gray' : 'red'}-50 font-mono px-2 py-1 rounded hov:hover:underline text-sm"
               href="https://${call.method}"
               target="_blank"
             >${call.method}</a>
             <a
               href="/${authorId}"
               title=${authorId}
-              class="text-sm text-blue-600 sm:hover:underline"
+              class="text-sm text-blue-600 hov:hover:underline"
             >${displayNames.render(authorId)}</a>
             <span class="text-sm">${relativeDate(result.value.createdAt)}</span>
           </summary>

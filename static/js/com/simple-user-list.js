@@ -58,7 +58,7 @@ export class SimpleUserList extends LitElement {
               <img class="block rounded-md w-10 h-10 object-cover" src=${AVATAR_URL(userId)}>
             </a>
             <div class="flex-1 min-w-0 truncate">
-              <a class="font-medium sm:hover:underline" href="/${userId}" title=${userId}>
+              <a class="font-medium hov:hover:underline" href="/${userId}" title=${userId}>
                 ${displayNames.render(userId)}
               </a>
               <span class="hidden sm:inline text-sm text-gray-500">${domain}</span>

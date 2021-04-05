@@ -61,7 +61,7 @@ export class ReactionsListPopup extends BasePopup {
             <img class="block mr-3 rounded-full shadow w-12 h-12" src=${AVATAR_URL(userId)}>
           </a>
           <div>
-            <div><a class="cursor-pointer font-semibold hover:underline leading-tight text-lg" href="/${userId}" title=${userId}>${displayNames.render(userId)}</a></div>
+            <div><a class="cursor-pointer font-semibold hov:hover:underline leading-tight text-lg" href="/${userId}" title=${userId}>${displayNames.render(userId)}</a></div>
             <div class="text-gray-500">Reacted ${repeat(this.users[userId].reactions, reaction => html`
               <span class="mr-0.5 text-gray-600 px-1 py-0.5 bg-gray-100 rounded">${unsafeHTML(emojify(makeSafe(reaction)))}</span>
             `)}</div>

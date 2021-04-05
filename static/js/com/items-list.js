@@ -120,7 +120,7 @@ export class ItemsList extends LitElement {
           ${repeat(this.itemClasses, cls => {
             return html`
               <div
-                class="bg-white flex flex-col justify-center px-6 py-4 sm:cursor-pointer sm:hover:bg-gray-50 sm:rounded sm:text-center"
+                class="bg-white flex flex-col justify-center px-6 py-4 sm:cursor-pointer hov:hover:bg-gray-50 sm:rounded sm:text-center"
                 @click=${e => this.onClickViewItemClass(e, cls)}
               >
                 <div class="sm:text-center">
@@ -138,7 +138,7 @@ export class ItemsList extends LitElement {
           })}
           ${this.canManageItemClasses ? html`
             <div
-              class="bg-white flex flex-col justify-center px-6 py-4 sm:cursor-pointer sm:hover:bg-gray-50 sm:rounded sm:text-center"
+              class="bg-white flex flex-col justify-center px-6 py-4 sm:cursor-pointer hov:hover:bg-gray-50 sm:rounded sm:text-center"
               @click=${this.onClickManageItemClasses}
             >
               <div class="text-xl font-medium">Manage</div>
@@ -166,7 +166,7 @@ export class ItemsList extends LitElement {
           ${repeat(this.currentItems, item => item.key, item => {
             return html`
               <div
-                class="flex items-center px-3 py-3 bg-white mb-0.5 cursor-pointer sm:rounded sm:hover:bg-gray-50"
+                class="flex items-center px-3 py-3 bg-white mb-0.5 cursor-pointer sm:rounded hov:hover:bg-gray-50"
                 @click=${e => this.onClickViewItem(e, item)}
               >
                 <img src=${AVATAR_URL(item.value.owner.userId)} class="block rounded w-8 h-8 mr-2">

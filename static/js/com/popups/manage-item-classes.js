@@ -187,7 +187,7 @@ export class ManageItemClasses extends BasePopup {
               placeholder="e.g. Money Bucks, Cat, Award"
             />
             <label class="block font-semibold p-1">Icon</label>
-            <div class="border border-gray-300 flex items-center px-2 py-2 mb-2 rounded cursor-pointer hover:bg-gray-50" @click=${this.onClickIcon}>
+            <div class="border border-gray-300 flex items-center px-2 py-2 mb-2 rounded cursor-pointer hov:hover:bg-gray-50" @click=${this.onClickIcon}>
               <img
                 class="block rounded w-10 h-10 mr-2 object-cover"
                 src=${iconUrl} 

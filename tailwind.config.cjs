@@ -27,6 +27,9 @@ module.exports = {
         post: '50px 1fr',
         'post-tight': '30px 65px 1fr',
         composer: '42px 1fr',
+      },
+      screens: {
+        hov: {raw: '(hover: hover)'},
       }
     }
   },

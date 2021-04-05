@@ -54,7 +54,7 @@ export class Header extends LitElement {
 
   getMenuNavClass (str) {
     const additions = str === this.currentPath ? 'text-blue-600' : ''
-    return `pl-3 pr-4 py-3 font-semibold rounded hover:bg-gray-100 ${additions}`
+    return `pl-3 pr-4 py-3 font-semibold rounded hov:hover:bg-gray-100 ${additions}`
   }
 
   render () {
@@ -137,7 +137,7 @@ export class Header extends LitElement {
         </div>
         <div class="secondary-menu bg-white overflow-y-auto px-2 py-2">
           <a
-            class="flex items-center pl-2 pr-4 py-1 text-sm rounded hover:bg-gray-100"
+            class="flex items-center pl-2 pr-4 py-1 text-sm rounded hov:hover:bg-gray-100"
             href="/${info.userId}"
             title=${info.userId}
           >
@@ -151,7 +151,7 @@ export class Header extends LitElement {
             ${session.myCommunities?.length ? html`
               ${repeat(session.myCommunities, community => html`
                 <a
-                  class="flex items-center pl-2 pr-4 py-1 text-sm rounded hover:bg-gray-100"
+                  class="flex items-center pl-2 pr-4 py-1 text-sm rounded hov:hover:bg-gray-100"
                   href="/${community.userId}"
                 >
                   <img
@@ -167,7 +167,7 @@ export class Header extends LitElement {
               </div>
             `}
             <a
-              class="flex items-center pl-2 pr-4 py-1 text-sm rounded cursor-pointer hover:bg-gray-100"
+              class="flex items-center pl-2 pr-4 py-1 text-sm rounded cursor-pointer hov:hover:bg-gray-100"
               @click=${this.onClickCreateCommunity}
             >
               <span
@@ -176,7 +176,7 @@ export class Header extends LitElement {
               <span class="truncate font-semibold text-gray-600">Create community</span>
             </a>
             <a
-              class="flex items-center pl-2 pr-4 py-1 text-sm rounded cursor-pointer hover:bg-gray-100"
+              class="flex items-center pl-2 pr-4 py-1 text-sm rounded cursor-pointer hov:hover:bg-gray-100"
               href="/communities"
             >
               <span
@@ -190,7 +190,7 @@ export class Header extends LitElement {
           </h3>
           ${repeat(session.myFollowing || [], f => f, f => html`
             <a
-              class="flex items-center pl-2 pr-4 py-1 text-sm rounded hover:bg-gray-100"
+              class="flex items-center pl-2 pr-4 py-1 text-sm rounded hov:hover:bg-gray-100"
               href="/${f}"
             >
               <img

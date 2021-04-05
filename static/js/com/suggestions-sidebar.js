@@ -108,7 +108,7 @@ export class SuggestionsSidebar extends LitElement {
             return html`
               <div class="text-sm bg-white mb-2 px-2 py-2 rounded-lg">
                 <div>
-                  <a class="text-sm hover:pointer hover:underline" href="/${community.userId}" title=${community.displayName}>
+                  <a class="text-sm hov:hover:pointer hov:hover:underline" href="/${community.userId}" title=${community.displayName}>
                   ${community.displayName}
                   </a>
                 </div>
@@ -121,7 +121,7 @@ export class SuggestionsSidebar extends LitElement {
                     >Joined!</button>
                   ` : html`
                     <button
-                      class="border border-blue-400 hover:bg-gray-100 hover:pointer px-4 py-0.5 rounded-2xl text-blue-600 text-sm"
+                      class="border border-blue-400 hov:hover:bg-gray-100 hov:hover:pointer px-4 py-0.5 rounded-2xl text-blue-600 text-sm"
                       @click=${e => this.onClickJoinSuggestedCommunity(e, community)}
                       ?disabled=${hasJoined}
                     >${community.isJoining ? html`<span class="spinner"></span>` : 'Join'}</button>
@@ -140,7 +140,7 @@ export class SuggestionsSidebar extends LitElement {
           <div>
             CTZN is donation-driven software. Help us develop this network by joining our patreon.
             <a
-              class="block text-center py-1 mt-2 rounded border border-blue-500 text-blue-600 hover:bg-gray-50"
+              class="block text-center py-1 mt-2 rounded border border-blue-500 text-blue-600 hov:hover:bg-gray-50"
               href="https://patreon.com/paul_maf_and_andrew"
               target="_blank"
             >Join our Patreon</a>            
@@ -153,12 +153,12 @@ export class SuggestionsSidebar extends LitElement {
           <div>
             Follow CTZN's development by joining the daily livestream by the core team every weekday.
             <a
-              class="block text-center py-1 mt-2 rounded border border-blue-500 text-blue-600 hover:bg-gray-50"
+              class="block text-center py-1 mt-2 rounded border border-blue-500 text-blue-600 hov:hover:bg-gray-50"
               href="https://www.youtube.com/channel/UCSkcL4my2wgDRFvjQOJzrlg"
               target="_blank"
             >Subscribe on YouTube</a>
             <a 
-              class="block text-center py-1 mt-2 rounded border border-blue-500 text-blue-600 hover:bg-gray-50"
+              class="block text-center py-1 mt-2 rounded border border-blue-500 text-blue-600 hov:hover:bg-gray-50"
               href="https://ctzn.network/dev-vlog"
               target="_blank"
             >Watch the archives</a>

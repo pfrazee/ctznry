@@ -130,7 +130,7 @@ class CtznMainView extends LitElement {
             <div class="mb-8 text-2xl">
               Build your community in a decentralized<br>social network.
             </div>
-            <div class="mb-6 text-blue-600 hover:underline">
+            <div class="mb-6 text-blue-600 hov:hover:underline">
               <a href="https://github.com/pfrazee/ctzn" title="Learn more about CTZN" target="_blank">
                 <span class="fas fa-external-link-alt fa-fw"></span>
                 Learn more about CTZN
@@ -150,7 +150,7 @@ class CtznMainView extends LitElement {
             <div class="mb-6 text-xl px-4">
               Build your community in a decentralized social network.
             </div>
-            <div class="mb-6 text-blue-600 hover:underline">
+            <div class="mb-6 text-blue-600 hov:hover:underline">
               <a href="https://github.com/pfrazee/ctzn" title="Learn more about CTZN" target="_blank">
                 Learn more about CTZN
               </a>

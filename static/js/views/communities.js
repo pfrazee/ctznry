@@ -136,7 +136,7 @@ class CtznCommunities extends LitElement {
               ${this.memberships?.length ? html`
                 ${repeat(this.memberships, membership => html`
                   <a
-                    class="flex items-center bg-white mb-0.5 px-4 py-2 sm:rounded sm:hover:pointer sm:hover:bg-gray-50"
+                    class="flex items-center bg-white mb-0.5 px-4 py-2 sm:rounded hov:hover:pointer hov:hover:bg-gray-50"
                     href="/${membership.value.community.userId}"
                     title="${membership.value.community.userId}"
                   >
@@ -171,7 +171,7 @@ class CtznCommunities extends LitElement {
                   <img class="block rounded-lg w-10 h-10 mr-4" src=${AVATAR_URL(community.userId)}>
                   <div class="flex-1 min-w-0">
                     <div>
-                      <a class="font-medium hover:pointer hover:underline" href="/${community.userId}" title=${community.displayName}>
+                      <a class="font-medium hov:hover:pointer hov:hover:underline" href="/${community.userId}" title=${community.displayName}>
                         ${community.displayName}
                       </a>
                     </div>
@@ -184,7 +184,7 @@ class CtznCommunities extends LitElement {
                         >Joined!</button>
                       ` : html`
                         <button
-                          class="border border-blue-400 hover:bg-gray-100 hover:pointer px-6 py-1 rounded-2xl text-blue-600 text-sm"
+                          class="border border-blue-400 hov:hover:bg-gray-100 hov:hover:pointer px-6 py-1 rounded-2xl text-blue-600 text-sm"
                           @click=${e => this.onClickJoinSuggestedCommunity(e, community)}
                           ?disabled=${hasJoined}
                         >${community.isJoining ? html`<span class="spinner"></span>` : 'Join'}</button>
