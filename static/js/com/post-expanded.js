@@ -275,7 +275,7 @@ export class PostExpanded extends LitElement {
         ${reactionsCount} ${pluralize(reactionsCount, 'reaction')}${giftsCount > 0 ? ', ' : ''}
       </a>
       ${giftsCount > 0 ? html`
-        <a class="inline-block ml-1 rounded text-gray-500 cursor-pointer hover:underline" @click=${this.onClickViewGifts}>
+        <a class="inline-block rounded text-gray-500 cursor-pointer hover:underline" @click=${this.onClickViewGifts}>
           ${giftsCount} ${pluralize(giftsCount, 'gift')}
         </a>
       ` : ''}
