@@ -108,7 +108,7 @@ export class ViewItemPopup extends BasePopup {
             ${this.itemClass?.value.displayName || this.item.value.classId}
           </div>
           ${this.itemClass?.value.description ? html`
-            <div class="">${this.itemClass.value.description}</div>
+            <div class="whitespace-normal">${this.itemClass.value.description}</div>
           ` : ''}
         </div>
         <div class="bg-gray-100 font-semibold px-4 py-1.5 rounded self-start">
