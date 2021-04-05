@@ -1,6 +1,7 @@
 import { BasePopup } from '../com/popups/base.js'
 
 // we put the constants on window so that mobile debuggers can tweak the values
+window.SWIPE_VEL_THRESH = 0.3
 window.SWIPE_X_THRESH = 60
 window.SWIPE_XN_THRESH = 2
 window.SWIPE_Y_MAX = 500
@@ -19,6 +20,7 @@ let onSwiping = undefined
 export const events = new EventTarget()
 
 export function setup () {
+  let handling = false
   let touchstartTs = undefined
   let touchstartX = 0
   let touchstartY = 0
@@ -38,9 +40,10 @@ export function setup () {
       }
     }
     
-    if (e.changedTouches.length === 1) {
+    if (e.changedTouches.length !== 1) {
       return // multiple fingers, probably a pinch, abort abort abort
     }
+    handling = true
     touchstartX = e.changedTouches[0].screenX
     touchstartY = e.changedTouches[0].screenY
     touchstartTs = Date.now()
@@ -51,16 +54,38 @@ export function setup () {
   }, false)
   document.body.addEventListener('touchend', e => {
     document.body.removeEventListener('touchmove', onTouchMove)
+    if (!handling) return
+    handling = false
+
     let touchendX = e.changedTouches[0].screenX
     let touchendY = e.changedTouches[0].screenY
     let diffX = touchendX - touchstartX
     let diffY = touchendY - touchstartY
     let diffXNormalized = diffX / Math.abs(diffY + 1)
     let diffTs = Date.now() - touchstartTs
+    let velX = diffX / diffTs
+    let velY = diffY / diffTs
     if (window.SWIPE_LOG) {
       console.log({diffX, diffY, diffXNormalized, diffTs})
+      console.log({velX, velY})
     }
-    if (diffTs > window.SWIPE_TS_MAX) {
+    if (Math.abs(velY) > window.SWIPE_VEL_THRESH) {
+      return onCancel()
+    }
+    if (Math.abs(velX) > window.SWIPE_VEL_THRESH) {
+      if (diffX > 0) {
+        events.dispatchEvent(new Event('swipe-right'))
+        moveNav(-1)
+        return
+      } else if (diffX < 0) {
+        events.dispatchEvent(new Event('swipe-left'))
+        moveNav(1)
+        return
+      }
+    }
+    onCancel()
+
+    /*if (diffTs > window.SWIPE_TS_MAX) {
       return onCancel()
     }
     if (Math.abs(diffY) < window.SWIPE_Y_MAX) {
@@ -74,7 +99,7 @@ export function setup () {
         return
       }
     }
-    onCancel()
+    onCancel()*/
   }, false)
 }
 
