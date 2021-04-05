@@ -55,6 +55,7 @@ export class ReactionInput extends LitElement {
         <form class="flex items-center mt-2 mx-1" @submit=${this.onSubmitCustom}>
           <input
             name="custom"
+            type="text"
             class="flex-1 bg-white border border-gray-200 rounded px-2 py-1 text-sm"
             placeholder="Enter a custom reaction"
           >

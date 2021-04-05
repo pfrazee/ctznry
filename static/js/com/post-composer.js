@@ -119,14 +119,17 @@ class PostComposer extends LitElement {
           </div>
         </section>
 
-        <section class="mb-2 border border-gray-300 rounded">
-          <label class="block p-2 cursor-pointer hover:bg-gray-100" @click=${this.onToggleExtendedText}>
+        <section class="mb-2">
+          <label
+            class="block border border-gray-300 p-2 cursor-pointer hover:bg-gray-100 ${this.isExtendedOpen ? 'rounded-0 rounded-t border-b-0' : 'rounded'}"
+            @click=${this.onToggleExtendedText}
+          >
             <span class="fas fa-fw fa-caret-${this.isExtendedOpen ? 'down' : 'right'}"></span>
             Extended post text
           </label>
           <textarea
             id="extendedText"
-            class="${this.isExtendedOpen ? '' : 'hidden'} block py-2 px-3 w-full h-48 box-border resize-y text-base border-t border-gray-300"
+            class="${this.isExtendedOpen ? '' : 'hidden'} block py-2 px-3 w-full h-48 box-border resize-y text-base border border-gray-300 rounded-b"
             placeholder="Add more to your post! This is optional, and there's no character limit."
           ></textarea>
         </section>
