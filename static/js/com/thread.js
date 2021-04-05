@@ -95,8 +95,13 @@ export class Thread extends LitElement {
   scrollHighlightedPostIntoView () {
     try {
       const el = this.querySelector('.highlight')
-      let top = el.getBoundingClientRect().top
-      window.scrollTo({top: window.scrollY + top})
+      const y = el.getBoundingClientRect().top - 50
+      window.scrollTo(0, y)
+      setTimeout(() => {
+        if (Math.abs(window.scrollY - y) > 10) {
+          window.scrollTo(0, y)
+        }
+      }, 500)
     } catch (e) { /* ignore */ }
   }
 
