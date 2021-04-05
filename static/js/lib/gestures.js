@@ -38,6 +38,9 @@ export function setup () {
       }
     }
     
+    if (e.changedTouches.length === 1) {
+      return // multiple fingers, probably a pinch, abort abort abort
+    }
     touchstartX = e.changedTouches[0].screenX
     touchstartY = e.changedTouches[0].screenY
     touchstartTs = Date.now()
