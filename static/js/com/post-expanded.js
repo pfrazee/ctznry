@@ -238,7 +238,11 @@ export class PostExpanded extends LitElement {
       aCls += ` text-gray-400`
     }
     return html`
-      <a class=${aCls} @click=${e => {this.isReactionsOpen = !this.isReactionsOpen}} data-tooltip=${ifDefined(this.ctrlTooltip)}>
+      <a
+        class=${aCls}
+        @click=${this.canInteract ? e => {this.isReactionsOpen = !this.isReactionsOpen} : undefined}
+        data-tooltip=${ifDefined(this.ctrlTooltip)}
+      >
         <span class="fas fa-fw fa-${this.isReactionsOpen ? 'minus' : 'plus'}"></span>
       </a>
     `
