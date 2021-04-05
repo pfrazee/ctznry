@@ -32,18 +32,6 @@ if ('serviceWorker' in navigator) {
   })
 }
 
-/**
- * NOTES
- * 
- * This is the top level router
- * 
- * Two behaviors are applied for restoring scroll positions:
- * 1. On back/forward. This uses the history API's state to retain the scroll position.
- * 2. On navigation to certain pages (home, notifications), which enables you to press
- *    the home/notifications button and go back to where you were. This uses the
- *    scrollPositionCache to retain the scroll position.
- */
-
 class CtznApp extends LitElement {
   static get properties () {
     return {
@@ -61,7 +49,6 @@ class CtznApp extends LitElement {
 
     this.isLoading = true
     this.currentPath = window.location.pathname
-    this.scrollPositionCache = undefined
     gestures.setup()
     this.setGestureNav()
     document.body.addEventListener('click', this.onGlobalClick.bind(this))
@@ -87,16 +74,6 @@ class CtznApp extends LitElement {
       history.scrollRestoration = 'manual'
     }
 
-    let prevScrollPositionCache = this.scrollPositionCache
-    if (this.currentPath === '/' || this.currentPath === '/notifications') {
-      // capture the scroll position for the home and notification views
-      // this will be used to apply the scroll-to behavior on link navigations
-      // as opposed to on popstate (back/forward)
-      this.scrollPositionCache = {
-        pathname: this.currentPath,
-        scrollY: window.scrollY
-      }
-    }
     if (replace) {
       window.history.replaceState({}, null, pathname)
     } else {
@@ -105,10 +82,6 @@ class CtznApp extends LitElement {
     }
     this.currentPath = pathname
     this.setGestureNav()
-
-    if (prevScrollPositionCache?.pathname === pathname) {
-      this.scrollToAfterLoad(prevScrollPositionCache.scrollY)
-    }
   }
 
   setGestureNav () {

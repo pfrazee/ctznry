@@ -94,7 +94,9 @@ export class Thread extends LitElement {
 
   scrollHighlightedPostIntoView () {
     try {
-      this.querySelector('.highlight').scrollIntoView()
+      const el = this.querySelector('.highlight')
+      let top = el.getBoundingClientRect().top
+      window.scrollTo({top: window.scrollY + top})
     } catch (e) { /* ignore */ }
   }
 

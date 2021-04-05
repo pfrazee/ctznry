@@ -163,11 +163,11 @@ class CtznUser extends LitElement {
       if (el) {
         let top = el.getBoundingClientRect().top
         if (top < 0) {
-          document.body.scrollTo({top: document.body.scrollTop + top})
+          window.scrollTo({top: window.scrollY + top})
         }
       }
     } else {
-      document.body.scrollTo({top: 0})
+      window.scrollTo({top: 0})
     }
     this.lastScrolledToUserId = this.userId
 
