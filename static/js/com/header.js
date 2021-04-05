@@ -62,7 +62,7 @@ export class Header extends LitElement {
     let info = session.getSavedInfo()
     return html`
       <header>
-        <div class="menu ${this.isMenuOpen ? 'open transition-enabled' : 'closed'} flex flex-col leading-none text-2xl sm:leading-none sm:text-lg bg-white">
+        <div class="menu ${this.isMenuOpen ? 'open transition-enabled' : 'closed'} flex flex-col leading-none text-xl sm:leading-none sm:text-lg bg-white">
           <div class="hidden lg:block px-3 pt-2.5 pb-1">
             <div class="font-bold text-3xl text-gray-800">
               CTZN
@@ -105,7 +105,7 @@ export class Header extends LitElement {
               >
                 <span class="inline-block mr-2" style="margin-left: -3px">
                   <img
-                    class="inline-block w-9 h-9 sm:w-7 sm:h-7 object-cover rounded"
+                    class="inline-block w-8 h-8 sm:w-7 sm:h-7 object-cover rounded"
                     src=${AVATAR_URL(info.userId)}
                   >
                 </span>
@@ -120,12 +120,12 @@ export class Header extends LitElement {
             <div class="mt-3 sm:mb-auto px-4">
               <ctzn-button
                 primary
-                btn-class="text-lg sm:text-sm font-semibold w-full mb-2 rounded-3xl"
+                btn-class="text-base sm:text-sm font-semibold w-full mb-2 rounded-3xl"
                 label="Create Post"
                 @click=${this.onClickCreatePost}
               ></ctzn-button>
               <ctzn-button
-                btn-class="text-gray-600 text-lg sm:text-sm font-semibold w-full rounded-3xl"
+                btn-class="text-gray-600 text-base sm:text-sm font-semibold w-full rounded-3xl"
                 label="Create Community"
                 @click=${this.onClickCreateCommunity}
               ></ctzn-button>
