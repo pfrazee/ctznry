@@ -179,7 +179,7 @@ export class PostExpanded extends LitElement {
               ${this.renderReactions()}
             </div>
           ` : ''}
-          <div class="text-sm text-gray-600 px-1 pt-1">
+          <div class="flex items-center justify-around text-sm text-gray-600 px-1 pt-1 pr-8 sm:pr-80">
             ${this.renderRepliesCtrl()}
             ${this.renderReactionsBtn()}
             ${this.renderGiftItemBtn()}

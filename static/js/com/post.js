@@ -200,7 +200,7 @@ export class Post extends LitElement {
                 ${this.renderReactions()}
               </div>
             ` : ''}
-            <div class="flex pl-1 mt-1.5 text-gray-500 text-sm items-center">
+            <div class="flex pl-1 mt-1.5 text-gray-500 text-sm items-center justify-between pr-12 sm:pr-80">
               ${this.renderRepliesCtrl()}
               ${this.renderReactionsBtn()}
               ${this.renderGiftItemBtn()}
