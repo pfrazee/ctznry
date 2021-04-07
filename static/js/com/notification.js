@@ -8,7 +8,7 @@ import { emit } from '../lib/dom.js'
 import { extractSchemaId, makeSafe, pluralize } from '../lib/strings.js'
 import { emojify } from '../lib/emojify.js'
 import * as displayNames from '../lib/display-names.js'
-import './post.js'
+import '../ctzn-tags/post-view.js'
 
 const _itemCache = {}
 
@@ -168,23 +168,21 @@ export class Notification extends LitElement {
       record = _itemCache[dbUrl] ? _itemCache[dbUrl] : await session.ctzn.getPost(authorId, dbUrl)
       _itemCache[dbUrl] = record
       yield html`
-        <ctzn-post
+        <ctzn-post-view
           .post=${record}
-          nometa
-          noclick
-          light
-        ></ctzn-post>
+          mode="content-only"
+          .renderOpts=${{noclick: true}}
+        ></ctzn-post-view>
       `
     } else if (schemaId === 'ctzn.network/comment') {
       record = _itemCache[dbUrl] ? _itemCache[dbUrl] : await session.ctzn.getComment(authorId, dbUrl)
       _itemCache[dbUrl] = record
       yield html`
-        <ctzn-post
+        <ctzn-post-view
           .post=${record}
-          nometa
-          noclick
-          light
-        ></ctzn-post>
+          mode="content-only"
+          .renderOpts=${{noclick: true}}
+        ></ctzn-post-view>
       `
     }
   }
@@ -197,11 +195,11 @@ export class Notification extends LitElement {
     let record = _itemCache[commentInfo.dbUrl] ? _itemCache[commentInfo.dbUrl] : await session.ctzn.getComment(commentInfo.userId, commentInfo.dbUrl)
     _itemCache[commentInfo.dbUrl] = record
     yield html`
-      <ctzn-post
+      <ctzn-post-view
         .post=${record}
-        nometa
-        noclick
-      ></ctzn-post>
+        mode="content-only"
+        .renderOpts=${{noclick: true}}
+      ></ctzn-post-view>
     `
   }
 
@@ -261,7 +259,7 @@ export class Notification extends LitElement {
   }
 }
 
-customElements.define('ctzn-notification', Notification)
+customElements.define('app-notification', Notification)
 
 const MINUTE = 1e3 * 60
 const HOUR = 1e3 * 60 * 60

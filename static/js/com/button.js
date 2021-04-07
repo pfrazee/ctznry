@@ -95,4 +95,4 @@ export class Button extends LitElement {
   }
 }
 
-customElements.define('ctzn-button', Button)
+customElements.define('app-button', Button)

@@ -82,6 +82,20 @@ export function toNiceUrl (str) {
   return str
 }
 
+const PARSE_SRC_ATTR_RE = /([^\/@]+@[^\/]+)\/([^\/]+\/[^\/]+)\/([^\/]+)/i
+export function parseSrcAttr (str = '') {
+  if (str.startsWith('hyper://')) {
+    throw new Error('Unable to handle hyper:// URLs at this time')
+  }
+  try {
+    const [_, userId, schemaId, key] = PARSE_SRC_ATTR_RE.exec(str)
+    return {userId, schemaId, key}
+  } catch (e) {
+    console.log(e)
+    throw new Error('Invalid "src" attribute')
+  }
+}
+
 const MAKE_SAFE_MAP = {
   '"': '&quot;',
   "'": '&#39;',

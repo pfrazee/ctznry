@@ -100,15 +100,15 @@ export class CreateCommunityPopup extends BasePopup {
         ` : ''}
 
         <div class="flex justify-between border-t border-gray-200 mt-4 pt-4">
-          <ctzn-button @click=${this.onReject} tabindex="2" label="Cancel"></ctzn-button>
-          <ctzn-button
+          <app-button @click=${this.onReject} tabindex="2" label="Cancel"></app-button>
+          <app-button
             primary
             btn-type="submit"
             tabindex="1"
             ?disabled=${this.isCreating || !this.username || !this.displayName}
             ?spinner=${this.isCreating}
             label="Create Community"
-          ></ctzn-button>
+          ></app-button>
         </div>
       </form>
     `

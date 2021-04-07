@@ -91,18 +91,18 @@ export class ManageBansPopup extends BasePopup {
               ${ban.value.reason || ''}
             </div>
             <div class="mt-1">
-              <ctzn-button
+              <app-button
                 btn-class="px-3 py-1"
                 @click=${e => this.onLiftBan(e, ban)}
                 label="Lift ban"
-              ></ctzn-button>
+              ></app-button>
             </div>
           </section>
         `)}
 
         <div class="flex border-t border-gray-200 mt-4 pt-4">
           <span class="flex-1"></span>
-          <ctzn-button @click=${this.onReject} tabindex="3" label="Close"></ctzn-button>
+          <app-button @click=${this.onReject} tabindex="3" label="Close"></app-button>
         </div>
       </form>
     `

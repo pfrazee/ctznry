@@ -179,7 +179,7 @@ export class Comment extends LitElement {
           ${this.renderReactionsCtrl()}
           ${this.isReplyOpen ? html`
             <div class="border border-gray-300 rounded py-2 px-3 my-2 mx-1 bg-white">
-              <ctzn-comment-composer
+              <app-comment-composer
                 autofocus
                 .community=${this.comment.value.community}
                 .subject=${this.comment.value.reply.root}
@@ -187,7 +187,7 @@ export class Comment extends LitElement {
                 placeholder="Write your reply"
                 @publish=${this.onPublishReply}
                 @cancel=${this.onCancelReply}
-              ></ctzn-comment-composer>
+              ></app-comment-composer>
             </div>
           ` : ''}
         </div>
@@ -204,10 +204,10 @@ export class Comment extends LitElement {
       return ''
     }
     return html`
-      <ctzn-reaction-input
+      <app-reaction-input
         .reactions=${this.comment.reactions}
         @toggle-reaction=${this.onToggleReaction}
-      ></ctzn-reaction-input>
+      ></app-reaction-input>
     `
   }
 
@@ -460,7 +460,7 @@ export class Comment extends LitElement {
   }
 }
 
-customElements.define('ctzn-comment', Comment)
+customElements.define('app-comment', Comment)
 
 const MINUTE = 1e3 * 60
 const HOUR = 1e3 * 60 * 60

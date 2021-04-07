@@ -1,7 +1,6 @@
 import { LitElement, html } from '../../vendor/lit-element/lit-element.js'
 import { repeat } from '../../vendor/lit-element/lit-html/directives/repeat.js'
 import { unsafeHTML } from '../../vendor/lit-element/lit-html/directives/unsafe-html.js'
-import { EditProfilePopup } from '../com/popups/edit-profile.js'
 import { ComposerPopup } from '../com/popups/composer.js'
 import { EditRolePopup } from '../com/popups/edit-role.js'
 import { EditCommunityConfigPopup } from '../com/popups/edit-community-config.js'
@@ -12,25 +11,30 @@ import { ManageBansPopup } from '../com/popups/manage-bans.js'
 import { TransferItemPopup } from '../com/popups/transfer-item.js'
 import * as contextMenu from '../com/context-menu.js'
 import * as toast from '../com/toast.js'
-import { AVATAR_URL, BLOB_URL, PERM_DESCRIPTIONS } from '../lib/const.js'
+import {
+  AVATAR_URL,
+  BLOB_URL,
+  PERM_DESCRIPTIONS,
+  DEFAULT_COMMUNITY_PROFILE_SECTIONS,
+  DEFAULT_CITIZEN_PROFILE_SECTIONS
+} from '../lib/const.js'
 import * as session from '../lib/session.js'
+import * as gestures from '../lib/gestures.js'
 import * as displayNames from '../lib/display-names.js'
 import { pluralize, makeSafe, linkify } from '../lib/strings.js'
-import * as images from '../lib/images.js'
 import { emit } from '../lib/dom.js'
 import { emojify } from '../lib/emojify.js'
 import PullToRefresh from '../../vendor/pulltorefreshjs/index.js'
 import '../com/header.js'
 import '../com/button.js'
 import '../com/img-fallbacks.js'
-import '../com/feed.js'
+import '../ctzn-tags/posts-feed.js'
 import '../com/simple-user-list.js'
 import '../com/members-list.js'
-import '../com/items-list.js'
-import '../com/owned-items-list.js'
-import '../com/activity-feed.js'
 import '../com/dbmethod-result-feed.js'
 import '../com/subnav.js'
+import '../com/custom-html.js'
+import '../com/edit-profile.js'
 
 class CtznUser extends LitElement {
   static get properties () {
@@ -59,7 +63,7 @@ class CtznUser extends LitElement {
   constructor () {
     super()
     this.reset()
-    this.currentView = 'feed'
+    this.currentView = undefined
     this.isJoiningOrLeaving = false
     this.expandedSections = {}
 
@@ -68,7 +72,7 @@ class CtznUser extends LitElement {
 
     const pathParts = (new URL(location)).pathname.split('/')
     this.userId = pathParts[1]
-    this.currentView = pathParts[2] || 'feed'
+    this.currentView = pathParts[2] || undefined
     document.title = `Loading... | CTZN`
 
     this.load()
@@ -77,6 +81,7 @@ class CtznUser extends LitElement {
   reset () {
     this.isProfileLoading = false
     this.userProfile = undefined
+    this._sections = []
     this.followers = undefined
     this.following = undefined
     this.members = undefined
@@ -94,7 +99,7 @@ class CtznUser extends LitElement {
       const urlp = new URL(location)
       const pathParts = urlp.pathname.split('/')
       this.userId = pathParts[1]
-      this.currentView = pathParts[2] || 'feed'
+      this.currentView = pathParts[2]
       this.expandedSections = {}
       if (urlp.hash.length > 1) {
         this.expandedSections[urlp.hash.slice(1)] = true
@@ -135,6 +140,41 @@ class CtznUser extends LitElement {
     return `${(new URL(location)).origin}/${this.userId}`
   }
 
+  get sections () {
+    return this._sections
+  }
+
+  set sections (v) {
+    this._sections = v
+    gestures.setCurrentNav([
+      {back: true},
+      ...v.map(s => `/${this.userId}/${s.id}`),
+      ...(this.canEditSettings ? [`/${this.userId}/settings`] : [])
+    ])
+  }
+
+  get currentSection () {
+    return this.sections.find(section => section.id === this.currentView)
+  }
+
+  get subnavItems () {
+    let items = [
+      {back: true, label: html`<span class="fas fa-angle-left"></span>`, mobileOnly: true}
+    ].concat(this.sections.map(section => ({
+        label: section.label || section.id,
+        path: `/${this.userId}/${section.id}`
+    })))
+    if (this.canEditSettings) {
+      items.push({
+        path: `/${this.userId}/settings`,
+        label: html`<span class="fas fa-cog"></span>`,
+        thin: true,
+        rightAlign: true
+      })
+    }
+    return items
+  }
+
   getMembersWithRole (roleId) {
     return this.members?.filter(m => m.value.roles?.includes(roleId)) || []
   }
@@ -155,7 +195,11 @@ class CtznUser extends LitElement {
     return false
   }
 
-  async load () {
+  get canEditSettings () {
+    return session.info.userId === this.userId || this.hasPermission('ctzn.network/perm-community-edit-profile')
+  }
+
+  async load ({force} = {force: false}) {
     // 1. If opening a profile for the first time (change of lastScrolledToUserId) go to top
     // 2. If we're scrolled beneath the header, jump to just below the header
     if (this.lastScrolledToUserId && this.lastScrolledToUserId === this.userId) {
@@ -172,7 +216,7 @@ class CtznUser extends LitElement {
     this.lastScrolledToUserId = this.userId
 
     // profile change?
-    if (this.userId !== this.userProfile?.userId) {
+    if (force || this.userId !== this.userProfile?.userId) {
       this.reset()
       this.isProfileLoading = true
       this.userProfile = await session.ctzn.getProfile(this.userId).catch(e => ({error: true, message: e.toString()}))
@@ -182,6 +226,9 @@ class CtznUser extends LitElement {
       }
       document.title = `${this.userProfile?.value.displayName || this.userId} | CTZN`
       if (this.isCitizen) {
+        this.sections = this.userProfile?.value?.sections?.length
+          ? this.userProfile.value.sections
+          : DEFAULT_CITIZEN_PROFILE_SECTIONS
         const [followers, following, memberships] = await Promise.all([
           session.ctzn.listFollowers(this.userId),
           session.ctzn.db(this.userId).table('ctzn.network/follow').list(),
@@ -201,6 +248,9 @@ class CtznUser extends LitElement {
         }
         console.log({userProfile: this.userProfile, followers, following, memberships})
       } else if (this.isCommunity) {
+        this.sections = this.userProfile?.value?.sections?.length
+          ? this.userProfile.value.sections
+          : DEFAULT_COMMUNITY_PROFILE_SECTIONS
         const [communityConfigEntry, members, roles] = await Promise.all([
           session.ctzn.db(this.userId).table('ctzn.network/community-config').get('self').catch(e => undefined),
           listAllMembers(this.userId),
@@ -228,6 +278,10 @@ class CtznUser extends LitElement {
       this.isProfileLoading = false
     }
 
+    if (!this.currentView) {
+      emit(this, 'navigate-to', {detail: {url: `/${this.userId}/${this.sections[0].id}`, replace: true}})
+    }
+
     let expanded = Object.keys(this.expandedSections)
     if (expanded.length > 0 && this.querySelector(`#expandable-section-${expanded[0]}`)) {
       const el = this.querySelector(`#expandable-section-${expanded[0]}`)
@@ -237,12 +291,12 @@ class CtznUser extends LitElement {
       })
     }
 
-    if (this.querySelector('ctzn-feed')) {
-      this.querySelector('ctzn-feed').load()
+    if (this.querySelector('ctzn-posts-feed')) {
+      this.querySelector('ctzn-posts-feed').load()
     } else if (this.querySelector('ctzn-dbresults-feed-feed')) {
       this.querySelector('ctzn-dbresults-feed-feed').load()
-    } else if (this.querySelector('ctzn-activity-feed')) {
-      this.querySelector('ctzn-activity-feed').load()
+    } else if (this.querySelector('ctzn-dbmethods-feed')) {
+      this.querySelector('ctzn-dbmethods-feed').load()
     }
   }
 
@@ -288,42 +342,35 @@ class CtznUser extends LitElement {
       return this.renderError()
     }
 
-    const SUBNAV_ITEMS = [
-      {back: true, label: html`<span class="fas fa-angle-left"></span>`, mobileOnly: true},
-      {path: `/${this.userId}`, label: 'Feed'},
-      {path: `/${this.userId}/activity`, label: 'Activity'},
-      {path: `/${this.userId}/inventory`, label: this.isCommunity ? 'Items' : 'Inventory'},
-      {path: `/${this.userId}/about`, label: 'About'},
-    ]
     const canJoin = !this.isMembershipClosed || (this.isMembershipClosed && this.isUserInvited)
 
     return html`
-      <ctzn-header
+      <app-header
         @post-created=${e => this.load()}
         .community=${this.isCommunity && this.amIAMember ? ({userId: this.userId, dbUrl: this.userProfile?.dbUrl}) : undefined}
-      ></ctzn-header>
+      ></app-header>
       ${this.renderDesktopHeader()}
       ${this.renderMobileHeader()}
       <main>
         <div>
           ${this.isCitizen ? html`
             <div class="bg-white text-center pb-4">
-              <a class="bg-gray-50 font-semibold px-2 py-1 rounded hov:hover:bg-gray-100 text-gray-500" href="/${this.userId}/about" @click=${e => this.onGotoExpandedView(e, 'followers')}>
+              <span class="bg-gray-50 font-semibold px-2 py-1 rounded text-gray-500">
                 <span class="fas fa-fw fa-user"></span>
                 ${nFollowers} ${pluralize(nFollowers, 'Follower')}
-              </a>
-              <a class="ml-1 bg-gray-50 font-semibold px-2 py-1 rounded hov:hover:bg-gray-100 text-gray-500" href="/${this.userId}/about" @click=${e => this.onGotoExpandedView(e, 'communities')}>
+              </span>
+              <span class="ml-1 bg-gray-50 font-semibold px-2 py-1 rounded text-gray-500">
                 <span class="fas fa-fw fa-users"></span>
                 ${nCommunities} ${nCommunities === 1 ? 'Community' : 'Communities'}
-              </a>
+              </span>
             </div>
           ` : ''}
           ${this.isCommunity ? html`
             <div class="bg-white text-center pb-4">
-              <a class="bg-gray-50 font-bold px-2 py-1 rounded hov:hover:bg-gray-100 text-gray-500" href="/${this.userId}/about" @click=${e => this.onGotoExpandedView(e, 'members')}>
+              <span class="bg-gray-50 font-bold px-2 py-1 rounded text-gray-500">
                 <span class="fas fa-users"></span>
                 ${nMembers} ${pluralize(nMembers, 'Member')}
-              </a>
+              </span>
               ${this.isMembershipClosed ? html`
                 <span class="font-semibold ml-3 py-1 rounded text-gray-600">Invite only</span>
               ` : ''}
@@ -334,31 +381,31 @@ class CtznUser extends LitElement {
           ` : ''}
           ${!this.isProfileLoading && !this.isMe && this.isCitizen && this.amIFollowing === false ? html`
             <div class="bg-white text-center pb-4 px-4">
-              <ctzn-button
+              <app-button
                 btn-class="font-semibold py-1 text-base block w-full rounded-lg sm:px-10 sm:inline sm:w-auto sm:rounded-full"
                 @click=${this.onClickFollow}
                 label="Follow ${this.userProfile?.value.displayName || this.userId}"
                 primary
-              ></ctzn-button>
+              ></app-button>
             </div>
           ` : ''}
           ${!this.isProfileLoading && this.isCommunity && this.amIAMember === false && canJoin ? html`
             <div class="bg-white text-center pb-4 px-4">
-              <ctzn-button
+              <app-button
                 btn-class="font-semibold py-1 text-base block w-full rounded-lg sm:px-10 sm:inline sm:w-auto sm:rounded-full"
                 @click=${this.onClickJoin}
                 label="Join community"
                 ?spinner=${this.isJoiningOrLeaving}
                 primary
-              ></ctzn-button>
+              ></app-button>
             </div>
           ` : ''}
           <div id="scroll-target"></div>
-          <ctzn-subnav
+          <app-subnav
             nav-cls="mb-1"
-            .items=${SUBNAV_ITEMS}
+            .items=${this.subnavItems}
             current-path=${this.currentPath}
-          ></ctzn-subnav>
+          ></app-subnav>
           <div class="min-h-screen">
             ${this.renderCurrentView()}
           </div>
@@ -370,7 +417,7 @@ class CtznUser extends LitElement {
   renderError () {
     return html`
       <main class="bg-gray-100 min-h-screen">
-        <ctzn-header></ctzn-header>
+        <app-header></app-header>
         <div class="text-center py-48">
           <h2 class="text-5xl text-gray-600 font-semibold mb-4">404 Not Found</h2>
           <div class="text-lg text-gray-600 mb-4">We couldn't find ${this.userId}</div>
@@ -389,22 +436,22 @@ class CtznUser extends LitElement {
       <main class="hidden sm:block" style="padding: 0">
         <div class="relative">
           <div class="absolute" style="top: 8px; left: 10px">
-            <ctzn-button
+            <app-button
               btn-class="px-3 py-1 rounded-full text-base text-white"
               href="/"
               icon="fas fa-angle-left"
               transparent
               btn-style="background: rgba(0,0,0,.5); backdrop-filter: blur(5px) contrast(0.9); -webkit-backdrop-filter: blur(5px) contrast(0.9); "
-            ></ctzn-button>
+            ></app-button>
           </div>
           <div class="absolute" style="top: 8px; right: 10px">
             ${this.renderProfileControls()}
           </div>
           <div
-            class="mt-1 rounded-2xl bg-blue-600"
+            class="mt-2 rounded-2xl bg-blue-600"
             style="height: 300px"
           >
-            <ctzn-img-fallbacks id=${this.userId}>
+            <app-img-fallbacks id=${this.userId}>
               <img
                 slot="img1"
                 class="rounded-2xl"
@@ -412,7 +459,7 @@ class CtznUser extends LitElement {
                 src=${BLOB_URL(this.userId, 'profile-banner')}
               >
               <div slot="img2"></div>
-            </ctzn-img-fallbacks>
+            </app-img-fallbacks>
           </div>
           <div class="absolute" style="top: 150px; left: 20px">
             <a href="/${this.userId}" title=${this.userProfile?.value.displayName}>
@@ -454,13 +501,13 @@ class CtznUser extends LitElement {
       <main class="block sm:hidden" style="padding: 0">
         <div class="relative">
           <div class="absolute" style="top: 8px; left: 10px">
-            <ctzn-button
+            <app-button
               btn-class="px-3 py-1 rounded-full text-base text-white"
               href="/"
               icon="fas fa-angle-left"
               transparent
               btn-style="background: rgba(0,0,0,.5); backdrop-filter: blur(5px) contrast(0.9); -webkit-backdrop-filter: blur(5px) contrast(0.9); "
-            ></ctzn-button>
+            ></app-button>
           </div>
           <div class="absolute" style="top: 8px; right: 10px">
             ${this.renderProfileControls()}
@@ -469,7 +516,7 @@ class CtznUser extends LitElement {
             class="sm:mt-1 sm:rounded-t"
             style="height: 200px; background: linear-gradient(0deg, #3c4af6, #2663eb);"
           >
-            <ctzn-img-fallbacks>
+            <app-img-fallbacks>
               <img
                 slot="img1"
                 class="sm:rounded-t"
@@ -477,7 +524,7 @@ class CtznUser extends LitElement {
                 src=${BLOB_URL(this.userId, 'profile-banner')}
               >
               <div slot="img2"></div>
-            </ctzn-img-fallbacks>
+            </app-img-fallbacks>
           </div>
           <div class="absolute text-center w-full" style="top: 130px">
             <a href="/${this.userId}" title=${this.userProfile?.value.displayName}>
@@ -519,30 +566,30 @@ class CtznUser extends LitElement {
         <div>
           ${session.isActive() ? html`
             ${session.info.userId === this.userId ? html`
-              <ctzn-button
+              <app-button
                 btn-class="font-medium px-5 py-1 rounded-full text-base text-white"
-                @click=${this.onClickEditProfile}
+                href="/${this.userId}/settings"
                 label="Edit profile"
                 transparent
                 btn-style=${btnStyle}
-              ></ctzn-button>
+              ></app-button>
             ` : html`
               ${this.amIFollowing === true ? html`
-                <ctzn-button
+                <app-button
                   btn-class="font-medium px-5 py-1 rounded-full text-base text-white"
                   @click=${this.onClickUnfollow}
                   label="Unfollow"
                   transparent
                   btn-style=${btnStyle}
-                ></ctzn-button>
+                ></app-button>
               ` : this.amIFollowing === false ? html`
-                <ctzn-button
+                <app-button
                   btn-class="font-medium px-6 py-1 rounded-full text-base text-white"
                   @click=${this.onClickFollow}
                   label="Follow"
                   transparent
                   btn-style=${btnStyle}
-                ></ctzn-button>
+                ></app-button>
               ` : ``}
             `}
           ` : ''}
@@ -555,30 +602,30 @@ class CtznUser extends LitElement {
         <div>
           ${session.isActive() ? html`
             ${this.amIAMember === true ? html`
-              <ctzn-button
+              <app-button
                 btn-class="font-medium px-5 py-1 rounded-full text-base text-white"
                 @click=${this.onClickCreatePost}
                 label="Create Post"
                 transparent
                 btn-style=${btnStyle}
-              ></ctzn-button>
+              ></app-button>
             ` : this.amIAMember === false && canJoin ? html`
-              <ctzn-button
+              <app-button
                 btn-class="font-semibold px-5 py-1 rounded-full text-base text-white"
                 @click=${this.onClickJoin}
                 label="Join"
                 ?spinner=${this.isJoiningOrLeaving}
                 transparent
                 btn-style=${btnStyle}
-              ></ctzn-button>
+              ></app-button>
             ` : ``}
-            <ctzn-button
+            <app-button
               btn-class="font-semibold px-3 py-1 rounded-full text-base text-white"
               @click=${(e) => this.onClickControlsMenu(e)}
               icon="fas fa-fw fa-ellipsis-h"
               transparent
               btn-style=${btnStyle}
-            ></ctzn-button>
+            ></app-button>
           ` : ''}
         </div>
       `
@@ -586,53 +633,76 @@ class CtznUser extends LitElement {
   }
 
   renderCurrentView () {
-    if (!this.userProfile) {
-      return ''
-    }
-    if (this.currentView === 'inventory') {
-      if (this.isCitizen) {
-        return this.renderCitizenInventory()
-      } else if (this.isCommunity) {
-        return this.renderCommunityInventory()
-      }
-    } else if (this.currentView === 'activity') {
-      return html`
-        ${this.isEmpty ? this.renderEmptyMessage() : ''}
-        <ctzn-activity-feed
-          user-id=${this.userId}
-          dataview=${this.isCommunity ? 'ctzn.network/dbmethod-results-view' : 'ctzn.network/dbmethod-calls-view'}
-          @load-state-updated=${this.onFeedLoadStateUpdated}
-        ></ctzn-activity-feed>
-      `
-    } else if (this.currentView === 'audit-log') {
-      return html`
-        <div class="bg-white">
-          <ctzn-dbmethod-result-feed
+    if (this.currentView === 'settings') {
+      if (this.canEditSettings) {
+        return html`
+          <app-edit-profile
             user-id=${this.userId}
-          ></ctzn-dbmethod-result-feed>
+            .profile=${this.userProfile}
+            @profile-updated=${this.onProfileUpdated}
+          ></app-edit-profile>
+        `
+      }
+      return html`
+        <div class="bg-white px-8 py-5 text-gray-600 sm:rounded mb-0.5">
+          You don't have access to this user's settings.
         </div>
       `
-    } else if (this.currentView === 'about') {
-      if (this.isCitizen) {
-        return this.renderCitizenAbout()
-      } else if (this.isCommunity) {
-        return this.renderCommunityAbout()
-      }
+    } else if (this.currentSection) {
+      return html`
+        <app-custom-html
+          context="profile"
+          .contextState=${{page: {userId: this.userId}}}
+          .userId=${this.userId}
+          .blobName="ui:profile:${this.currentSection.id}"
+          .html=${this.currentSection.html}
+        ></app-custom-html>
+      `
     }
-    return html`
-      ${this.isEmpty ? this.renderEmptyMessage() : ''}
-      <ctzn-feed
-        .source=${this.userId}
-        limit="15"
-        @load-state-updated=${this.onFeedLoadStateUpdated}
-        @publish-reply=${this.onPublishReply}
-        @delete-post=${this.onDeletePost}
-        @moderator-remove-post=${this.onModeratorRemovePost}
-      ></ctzn-feed>
-    `
+    // } else if (this.currentView === 'inventory') {
+    //   if (this.isCitizen) {
+    //     return this.renderCitizenInventory()
+    //   } else if (this.isCommunity) {
+    //     return this.renderCommunityInventory()
+    //   }
+    // } else if (this.currentView === 'activity') {
+    //   return html`
+    //     ${this.isEmpty ? this.renderEmptyMessage() : ''}
+    //     <app-activity-feed
+    //       user-id=${this.userId}
+    //       dataview=${this.isCommunity ? 'ctzn.network/dbmethod-results-view' : 'ctzn.network/dbmethod-calls-view'}
+    //       @load-state-updated=${this.onFeedLoadStateUpdated}
+    //     ></app-activity-feed>
+    //   `
+    // } else if (this.currentView === 'audit-log') {
+    //   return html`
+    //     <div class="bg-white">
+    //       <app-dbmethod-result-feed
+    //         user-id=${this.userId}
+    //       ></app-dbmethod-result-feed>
+    //     </div>
+    //   `
+    // } else if (this.currentView === 'about') {
+    //   if (this.isCitizen) {
+    //     return this.renderCitizenAbout()
+    //   } else if (this.isCommunity) {
+    //     return this.renderCommunityAbout()
+    //   }
+    // }
+    // return html`
+    //   ${this.isEmpty ? this.renderEmptyMessage() : ''}
+    //   <app-feed
+    //     .source=${this.userId}
+    //     limit="15"
+    //     @load-state-updated=${this.onFeedLoadStateUpdated}
+    //     @publish-reply=${this.onPublishReply}
+    //     @delete-post=${this.onDeletePost}
+    //     @moderator-remove-post=${this.onModeratorRemovePost}
+    //   ></app-feed>
+    // `
   }
 
-  renderCitizenAbout () {
+  /*renderCitizenAbout () {
     const onToggleExpandSection = id => {
       this.expandedSections = Object.assign(this.expandedSections, {[id]: !this.expandedSections[id]})
       this.requestUpdate()
@@ -670,7 +740,7 @@ class CtznUser extends LitElement {
         ` : '')}
         ${this.expandedSections.followers ? html`
           <div class="sm:mx-2 mb-1 sm:rounded px-1 py-1 bg-gray-100">
-            <ctzn-simple-user-list .ids=${this.followers} empty-message="${this.userProfile.value.displayName} has no followers."></ctzn-simple-user-list>
+            <app-simple-user-list .ids=${this.followers} empty-message="${this.userProfile.value.displayName} has no followers."></app-simple-user-list>
           </div>
         ` : ''}
       </div>
@@ -678,7 +748,7 @@ class CtznUser extends LitElement {
         ${expandableSectionHeader('following', 'Following', this.following?.length)}
         ${this.expandedSections.following ? html`
           <div class="sm:mx-2 mb-1 sm:rounded px-1 py-1 bg-gray-100">
-            <ctzn-simple-user-list .ids=${this.following?.map(f => f.value.subject.userId)} empty-message="${this.userProfile.value.displayName} is not following anybody."></ctzn-simple-user-list>
+            <app-simple-user-list .ids=${this.following?.map(f => f.value.subject.userId)} empty-message="${this.userProfile.value.displayName} is not following anybody."></app-simple-user-list>
           </div>
         ` : ''}
       </div>
@@ -721,13 +791,13 @@ class CtznUser extends LitElement {
 
   renderCommunityInventory () {
     return html`
-      <ctzn-items-list
+      <app-items-list
         user-id=${this.userId}
         .members=${this.members}
         ?canManageItemClasses=${this.hasPermission('ctzn.network/perm-manage-item-classes')}
         ?canCreateItem=${this.hasPermission('ctzn.network/perm-create-item')}
         ?canTransferUnownedItem=${this.hasPermission('ctzn.network/perm-transfer-unowned-item')}
-      ></ctzn-items-list>
+      ></app-items-list>
     `
   }
 
@@ -735,17 +805,17 @@ class CtznUser extends LitElement {
     return html`
       ${!this.isMe ? html`
         <div class="mx-2 sm:mx-0 mt-3 mb-2 rounded-full border border-gray-300 px-2 py-2">
-          <ctzn-button
+          <app-button
             btn-class="rounded-full py-1"
             icon="fas fa-fw fa-exchange-alt"
             label="Give Item"
             @click=${this.onClickGiveItem}
-          ></ctzn-button>
+          ></app-button>
         </div>
       ` : html`<div class="mb-3"></div>`}
-      <ctzn-owned-items-list
+      <app-owned-items-list
         user-id=${this.userId}
-      ></ctzn-owned-items-list>
+      ></app-owned-items-list>
     `
   }
 
@@ -857,11 +927,11 @@ class CtznUser extends LitElement {
       ` : '')}
       ${this.expandedSections.members ? html`
         <div class="sm:mx-2 mb-1 sm:rounded px-1 py-1 bg-gray-100">
-          <ctzn-members-list
+          <app-members-list
             .members=${this.members}
             ?canban=${canBan}
             @ban=${this.onBan}
-          ></ctzn-members-list>
+          ></app-members-list>
         </div>
       ` : ''}
     `
@@ -888,10 +958,14 @@ class CtznUser extends LitElement {
         ` : ''}
       </div>
     `
-  }
+  }*/
 
   // events
   // =
+
+  onProfileUpdated (e) {
+    this.load({force: true})
+  }
 
   onFeedLoadStateUpdated (e) {
     if (typeof e.detail?.isEmpty !== 'undefined') {
@@ -909,115 +983,6 @@ class CtznUser extends LitElement {
   onClickAvatar (e) {
     e.preventDefault()
     ViewMediaPopup.create({url: AVATAR_URL(this.userId)})
-  }
-
-  async onClickEditProfile (e) {
-    const hasChanges = (newProfile, oldProfile) => {
-      for (let k in newProfile) {
-        if (oldProfile[k] !== newProfile[k]) {
-          return true
-        }
-      }
-      return false
-    }
-
-    const uploadBlob = async (blobName, dataUrl) => {
-      let {base64buf, mimeType} = images.parseDataUrl(dataUrl)
-      let res, lastError
-      for (let i = 1; i < 6; i++) {
-        try {
-          if (blobName) {
-            res = await session.ctzn.blob.update(blobName, base64buf, {mimeType})
-          } else {
-            res = await session.ctzn.blob.create(base64buf, {mimeType})
-          }
-        } catch (e) {
-          lastError = e
-          let shrunkDataUrl = await images.shrinkImage(dataUrl, (10 - i) / 10, mimeType)
-          let parsed = images.parseDataUrl(shrunkDataUrl)
-          base64buf = parsed.base64buf
-          mimeType = parsed.mimeType
-        }
-      }
-      if (!res) {
-        console.error(lastError)
-        throw new Error(`Failed to upload ${blobName}: ${lastError.toString()}`)
-      }
-      return res
-    }
-
-    let newProfile = await EditProfilePopup.create(this.userId, this.userProfile.value)
-    
-    try {
-      let isPending = false
-
-      // update profile data
-      if (hasChanges(newProfile.profile, this.userProfile.value)) {
-        if (this.isCitizen) {
-          await session.ctzn.user.table('ctzn.network/profile').create(newProfile.profile)
-        } else if (this.isCommunity) {
-          let res = await session.ctzn.db(this.userId).method(
-            'ctzn.network/put-profile-method',
-            newProfile.profile
-          )
-          isPending = isPending || res.pending()
-        }
-        this.userProfile.value = newProfile.profile
-      }
-
-      // update avatar
-      if (newProfile.uploadedAvatar) {
-        toast.create('Uploading avatar...')
-        if (this.isCitizen) {
-          await uploadBlob('avatar', newProfile.uploadedAvatar)
-        } else if (this.isCommunity) {
-          const blobRes = await uploadBlob(undefined, newProfile.uploadedAvatar)
-          let res = await session.ctzn.db(this.userId).method(
-            'ctzn.network/put-avatar-method',
-            {
-              blobSource: {userId: session.info.userId, dbUrl: session.info.dbUrl},
-              blobName: blobRes.name
-            }
-          )
-          isPending = isPending || res.pending()
-        }
-      }
-
-      // update banner
-      if (newProfile.uploadedBanner) {
-        toast.create('Uploading banner image...')
-        if (this.isCitizen) {
-          await uploadBlob('profile-banner', newProfile.uploadedBanner)
-        } else if (this.isCommunity) {
-          const blobRes = await uploadBlob(undefined, newProfile.uploadedBanner)
-          let res = await session.ctzn.db(this.userId).method(
-            'ctzn.network/put-blob-method',
-            {
-              source: {
-                userId: session.info.userId,
-                dbUrl: session.info.dbUrl,
-                blobName: blobRes.name
-              },
-              target: {
-                blobName: 'profile-banner'
-              }
-            }
-          )
-          isPending = isPending || res.pending()
-        }
-      }
-      if (!isPending) {
-        toast.create('Profile updated', 'success')
-      }
-      this.requestUpdate()
-
-      if (newProfile.uploadedAvatar || newProfile.uploadedBanner) {
-        setTimeout(() => location.reload(), 1e3)
-      }
-    } catch (e) {
-      toast.create(e.message, 'error')
-      console.error(e)
-    }
   }
 
   async onClickFollow (e) {
@@ -1218,7 +1183,7 @@ class CtznUser extends LitElement {
       if (this.hasPermission('ctzn.network/perm-community-edit-profile')) {
         items.push({
           label: 'Edit profile',
-          click: () => this.onClickEditProfile()
+          click: () => setView('settings')
         })
         items.push('-')
       }
@@ -1241,7 +1206,7 @@ class CtznUser extends LitElement {
   }
 }
 
-customElements.define('ctzn-user-view', CtznUser)
+customElements.define('app-user-view', CtznUser)
 
 async function listAllMembers (userId) {
   let members = []

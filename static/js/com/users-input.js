@@ -95,4 +95,4 @@ export class UsersInput extends LitElement {
   }
 }
 
-customElements.define('ctzn-users-input', UsersInput)
+customElements.define('app-users-input', UsersInput)

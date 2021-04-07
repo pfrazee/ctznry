@@ -42,6 +42,18 @@ export class CtznAPI {
     return session.api.view.get(viewId, ...args)
   }
 
+  async viewByHomeServer (userId, viewId, ...args) {
+    const domain = getDomain(userId)
+    if (session.isActive(domain)) {
+      return (await this.view(viewId, ...args))
+    }
+    // TODO views should move away from positional arguments
+    if (args[0] && typeof args[0] !== 'object') {
+      return (await httpGet(domain, `.view/${viewId}/${encodeURIComponent(args[0])}`, args[1]))
+    }
+    return (await httpGet(domain, `.view/${viewId}`, args[0]))
+  }
+
   // getters
   // =
   

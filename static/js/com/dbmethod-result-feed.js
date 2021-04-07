@@ -228,7 +228,7 @@ export class DbmethodResultFeed extends LitElement {
   }
 }
 
-customElements.define('ctzn-dbmethod-result-feed', DbmethodResultFeed)
+customElements.define('app-dbmethod-result-feed', DbmethodResultFeed)
 
 const MINUTE = 1e3 * 60
 const HOUR = 1e3 * 60 * 60

@@ -137,4 +137,4 @@ class CommentComposer extends LitElement {
   }
 }
 
-customElements.define('ctzn-comment-composer', CommentComposer)
+customElements.define('app-comment-composer', CommentComposer)

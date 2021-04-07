@@ -76,10 +76,12 @@ export function setup () {
       if (diffX > 0) {
         events.dispatchEvent(new Event('swipe-right'))
         moveNav(-1)
+        onCancel()
         return
       } else if (diffX < 0) {
         events.dispatchEvent(new Event('swipe-left'))
         moveNav(1)
+        onCancel()
         return
       }
     }

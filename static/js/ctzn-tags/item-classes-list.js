@@ -1,13 +1,13 @@
 import { LitElement, html } from '../../vendor/lit-element/lit-element.js'
 import { repeat } from '../../vendor/lit-element/lit-html/directives/repeat.js'
-import { CreateItemPopup } from './popups/create-item.js'
-import { ViewItemPopup } from './popups/view-item.js'
-import { ManageItemClasses } from './popups/manage-item-classes.js'
+import { CreateItemPopup } from '../com/popups/create-item.js'
+import { ViewItemPopup } from '../com/popups/view-item.js'
+import { ManageItemClasses } from '../com/popups/manage-item-classes.js'
 import * as session from '../lib/session.js'
 import * as displayNames from '../lib/display-names.js'
 import { AVATAR_URL, ITEM_CLASS_ICON_URL } from '../lib/const.js'
 
-export class ItemsList extends LitElement {
+export class ItemClassesList extends LitElement {
   static get properties () {
     return {
       userId: {type: String, attribute: 'user-id'},
@@ -27,6 +27,7 @@ export class ItemsList extends LitElement {
 
   constructor () {
     super()
+    this.setAttribute('ctzn-elem', '1')
     this.userId = undefined
     this.members = []
     this.currentItemClass = undefined
@@ -35,6 +36,14 @@ export class ItemsList extends LitElement {
     this.canManageItemClasses = false
     this.canCreateItem = false
     this.canTransferUnownedItem = false
+  }
+
+  setContextState (state) {
+    if (state?.page?.userId) {
+      if (!this.userId) {
+        this.userId = state.page.userId
+      }
+    }
   }
 
   get currentItems () {
@@ -85,11 +94,11 @@ export class ItemsList extends LitElement {
           </div>
           ${this.canCreateItem ? html`
             <div class="mt-1">
-              <ctzn-button
+              <app-button
                 btn-class="text-base py-1 rounded-2xl"
                 label="Generate"
                 @click=${this.onClickGenerateItem}
-              ></ctzn-button>
+              ></app-button>
             </div>
             ` : ''}
         </div>
@@ -108,11 +117,11 @@ export class ItemsList extends LitElement {
         <div class="bg-gray-50 py-12 text-center">
           <div class="mb-6 text-gray-500">This community has no virtual items.</div>
           ${this.canManageItemClasses ? html`
-            <ctzn-button
+            <app-button
               btn-class="rounded-full"
               label="Create an item class"
               @click=${this.onClickManageItemClasses}
-            ></ctzn-button>
+            ></app-button>
           ` : ''}
         </div>
       ` : html`
@@ -227,4 +236,4 @@ export class ItemsList extends LitElement {
   }
 }
 
-customElements.define('ctzn-items-list', ItemsList)
+customElements.define('ctzn-item-classes-list', ItemClassesList)

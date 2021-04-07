@@ -3,10 +3,10 @@ import {LitElement, html, css} from '../../vendor/lit-element/lit-element.js'
 /*
 Usage:
 
-<ctzn-hover-card>
+<app-hover-card>
   <span slot="el" class="fas fa-info-circle"></span>
   <div slot="card"><strong>Discovery Key:</strong> ${toHex(core.discoveryKey)}</div></div>
-</ctzn-hover-card>
+</app-hover-card>
 */
 
 export class Hoverable extends LitElement {
@@ -63,4 +63,4 @@ export class Hoverable extends LitElement {
   }
 }
 
-customElements.define('ctzn-hover-card', Hoverable)
+customElements.define('app-hover-card', Hoverable)

@@ -6,7 +6,7 @@ import PullToRefresh from '../../vendor/pulltorefreshjs/index.js'
 import '../com/header.js'
 import '../com/button.js'
 import '../com/login.js'
-import '../com/feed.js'
+import '../ctzn-tags/posts-feed.js'
 import '../com/notifications-feed.js'
 import '../com/post-composer.js'
 import '../com/img-fallbacks.js'
@@ -138,7 +138,7 @@ class CtznMainView extends LitElement {
             </div>
           </div>
           <div class="w-96">
-            <ctzn-login class="block border border-gray-300 overflow-hidden rounded-2xl shadow-xl"></ctzn-login>
+            <app-login class="block border border-gray-300 overflow-hidden rounded-2xl shadow-xl"></app-login>
           </div>
         </div>
       </div>
@@ -157,7 +157,7 @@ class CtznMainView extends LitElement {
             </div>
           </div>
           <div>
-            <ctzn-login></ctzn-login>
+            <app-login></app-login>
           </div>
         </div>
       </div>
@@ -180,36 +180,37 @@ class CtznMainView extends LitElement {
       }
     ]
     return html`
-      <ctzn-header
+      <app-header
         current-path=${this.currentPath}
         @post-created=${e => this.load()}
         @unread-notifications-changed=${this.onUnreadNotificationsChanged}
-      ></ctzn-header>
+      ></app-header>
       <main class="col2">
         <div>
-          <ctzn-subnav
+          <app-subnav
             nav-cls="mb-0.5 sm:mt-0.5"
             .items=${SUBNAV_ITEMS}
             current-path=${this.currentPath}
-          ></ctzn-subnav>
+          ></app-subnav>
           ${this.currentView === 'feed' ? html`
             ${this.renderMockComposer()}
             ${this.isEmpty ? this.renderEmptyMessage() : ''}
-            <ctzn-feed
+            <ctzn-posts-feed
+              view="ctzn.network/feed-view"
               limit="15"
               @load-state-updated=${this.onFeedLoadStateUpdated}
               @publish-reply=${this.onPublishReply}
               @delete-post=${this.onDeletePost}
               @moderator-remove-post=${this.onModeratorRemovePost}
-            ></ctzn-feed>
+            ></ctzn-posts-feed>
           ` : this.currentView === 'notifications' ? html`
             ${this.isEmpty ? this.renderEmptyMessage() : ''}
-            <ctzn-notifications-feed
+            <app-notifications-feed
               cleared-at=${this.notificationsClearedAt}
               limit="15"
               @load-state-updated=${this.onFeedLoadStateUpdated}
               @publish-reply=${this.onPublishReply}
-            ></ctzn-notifications-feed>
+            ></app-notifications-feed>
           ` : ''}
         </div>
         ${this.renderRightSidebar()}
@@ -219,19 +220,18 @@ class CtznMainView extends LitElement {
 
   renderMockComposer () {
     return html`
-      <div class="bg-white mb-0.5 px-3 py-3 sm:rounded" @click=${this.onClickCreatePost}>
-
+      <div class="bg-white mb-0.5 px-3 py-3" @click=${this.onClickCreatePost}>
         <div class="flex items-center">
           <div
             class="flex-1 mr-1 py-1 px-3 bg-gray-100 text-gray-600 text-base rounded cursor-text"
           >What's new?</div>
-          <ctzn-button
+          <app-button
             transparent
             btn-class="text-sm px-2 py-1 sm:px-4"
             label="Add Image"
             icon="far fa-image"
             @click=${e => this.onClickCreatePost(e, {intent: 'image'})}
-          ></ctzn-button>
+          ></app-button>
         </div>
       </div>
     `
@@ -264,7 +264,7 @@ class CtznMainView extends LitElement {
   renderRightSidebar () {
     return html`
       <nav class="pt-2">
-        <ctzn-suggestions-sidebar></ctzn-suggestions-sidebar>
+        <app-suggestions-sidebar></app-suggestions-sidebar>
       </nav>
     `
   }
@@ -348,4 +348,4 @@ class CtznMainView extends LitElement {
   }
 }
 
-customElements.define('ctzn-main-view', CtznMainView)
+customElements.define('app-main-view', CtznMainView)

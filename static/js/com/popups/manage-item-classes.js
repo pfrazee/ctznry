@@ -165,29 +165,29 @@ export class ManageItemClasses extends BasePopup {
             ` : ''}
 
             <div class="flex">
-              <ctzn-button
+              <app-button
                 btn-class="px-3 py-1"
                 @click=${this.onCancelEdit}
                 label="Cancel"
                 ?disabled=${this.isProcessing}
                 ?spinner=${this.isProcessing}
-              ></ctzn-button>
+              ></app-button>
               <span class="flex-1"></span>
-              <ctzn-button
+              <app-button
                 primary
                 btn-type="submit"
                 btn-class="px-3 py-1"
                 label="Save"
                 ?disabled=${this.isProcessing}
                 ?spinner=${this.isProcessing}
-              ></ctzn-button>
+              ></app-button>
             </div>
           </form>
   
           <div class="flex border-t border-gray-200 mt-4 pt-4">
-            <ctzn-button disabled label="+ New Item Class"></ctzn-button>
+            <app-button disabled label="+ New Item Class"></app-button>
             <span class="flex-1"></span>
-            <ctzn-button disabled label="Close"></ctzn-button>
+            <app-button disabled label="Close"></app-button>
           </div>
         </div>
       `
@@ -205,17 +205,17 @@ export class ManageItemClasses extends BasePopup {
           <div class="flex items-center border-gray-200 border-l border-r border-b ${i === 0 ? 'rounded-t border-t' : ''} ${i === this.itemClasses.length - 1 ? 'rounded-b' : ''} p-3">
             <span class="font-semibold">${itemClass.value.id}</span>
             <span class="flex-1"></span>
-            <ctzn-button
+            <app-button
               btn-class="text-red-600 px-3 py-0.5"
               transparent
               @click=${e => this.onClickDelete(e, i)}
               label="Delete"
-            ></ctzn-button>
-            <ctzn-button
+            ></app-button>
+            <app-button
               btn-class="px-3 py-0.5 ml-2"
               @click=${e => this.onClickEdit(e, i)}
               label="Edit"
-            ></ctzn-button>
+            ></app-button>
           </div>
         `)}
 
@@ -224,19 +224,19 @@ export class ManageItemClasses extends BasePopup {
         ` : ''}
 
         <div class="flex border-t border-gray-200 mt-4 pt-4">
-          <ctzn-button
+          <app-button
             @click=${this.onClickNew}
             label="+ New Item Class"
             ?disabled=${this.isProcessing}
             ?spinner=${this.isProcessing}
-          ></ctzn-button>
+          ></app-button>
           <span class="flex-1"></span>
-          <ctzn-button
+          <app-button
             @click=${this.onReject}
             label="Close"
             ?disabled=${this.isProcessing}
             ?spinner=${this.isProcessing}
-          ></ctzn-button>
+          ></app-button>
         </div>
       </div>
     `

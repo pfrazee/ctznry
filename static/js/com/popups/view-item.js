@@ -146,29 +146,29 @@ export class ViewItemPopup extends BasePopup {
 
       <div class="flex border-t border-gray-200 mt-4 pt-4">
         ${this.canTransferItem ? html`
-          <ctzn-button
+          <app-button
             btn-class="px-3 py-1"
             label="Transfer item"
             ?disabled=${this.isDoingSomething}
             @click=${this.onClickTransferItemToggle}
-          ></ctzn-button>
+          ></app-button>
         ` : ''}
-        <ctzn-button
+        <app-button
           transparent
           btn-class="px-3 py-1 ml-1 text-gray-600"
           label="Item data"
           icon=${this.isDataOpen ? 'fas fa-caret-up' : 'fas fa-caret-down'}
           ?disabled=${this.isDoingSomething}
           @click=${this.onClickItemDataToggle}
-        ></ctzn-button>
+        ></app-button>
         <span class="flex-1"></span>
-        <ctzn-button
+        <app-button
           btn-class="px-3 py-1"
           label="Close"
           ?disabled=${this.isDoingSomething}
           ?spinner=${this.isProcessing}
           @click=${this.onResolve}
-        ></ctzn-button>
+        ></app-button>
       </div>
 
       ${this.isTransferFormOpen ? this.renderTransferForm() : ''}
@@ -212,22 +212,22 @@ export class ViewItemPopup extends BasePopup {
         ` : ''}
 
         <div class="flex">
-          <ctzn-button
+          <app-button
             btn-class="px-3 py-1"
             @click=${this.onClickTransferItemToggle}
             label="Cancel"
             ?disabled=${this.isProcessing}
             ?spinner=${this.isProcessing}
-          ></ctzn-button>
+          ></app-button>
           <span class="flex-1"></span>
-          <ctzn-button
+          <app-button
             primary
             btn-type="submit"
             btn-class="px-3 py-1"
             label="Transfer"
             ?disabled=${this.isProcessing}
             ?spinner=${this.isProcessing}
-          ></ctzn-button>
+          ></app-button>
         </div>
       </form>
     `

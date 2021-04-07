@@ -1,13 +1,14 @@
 import { LitElement, html } from '../../vendor/lit-element/lit-element.js'
 import { repeat } from '../../vendor/lit-element/lit-html/directives/repeat.js'
 import { asyncReplace } from '../../vendor/lit-element/lit-html/directives/async-replace.js'
-import { ViewActivityPopup } from './popups/view-activity.js'
+import { ViewActivityPopup } from '../com/popups/view-activity.js'
 import * as displayNames from '../lib/display-names.js'
 import { ITEM_CLASS_ICON_URL } from '../lib/const.js'
+import { relativeDate } from '../lib/time.js'
 import * as session from '../lib/session.js'
 import { emit } from '../lib/dom.js'
 import { extractSchemaId } from '../lib/strings.js'
-import './post.js'
+import './post-view.js'
 
 const CHECK_NEW_ITEMS_INTERVAL = 15e3
 const _itemCache = {}
@@ -97,14 +98,13 @@ const METHOD_ICONS = {
   `,
 }
 
-export class ActivityFeed extends LitElement {
+export class DbmethodsFeed extends LitElement {
   static get properties () {
     return {
       userId: {type: String, attribute: 'user-id'},
-      dataview: {type: String},
-      methodsFilter: {type: Array},
+      _view: {type: String, attribute: 'view'},
+      _methodsFilter: {type: String, attribute: 'methods-filter'},
       entries: {type: Array},
-      emptyMessage: {type: String, attribute: 'empty-message'},
       hasNewEntries: {type: Boolean},
       isLoadingMore: {type: Boolean}
     }
@@ -116,11 +116,11 @@ export class ActivityFeed extends LitElement {
 
   constructor () {
     super()
+    this.setAttribute('ctzn-elem', '1')
     this.userId = undefined
-    this.dataview = undefined
-    this.methodsFilter = undefined
+    this.view = undefined
+    this._methodsFilter = undefined
     this.entries = undefined
-    this.emptyMessage = undefined
     this.hasNewEntries = false
     this.isLoadingMore = false
 
@@ -132,11 +132,43 @@ export class ActivityFeed extends LitElement {
     this.activeQuery = undefined
   }
 
+  setContextState (state) {
+    if (state?.page?.userId) {
+      if (!this.userId) {
+        this.userId = state.page.userId
+      }
+    }
+  }
+
+  get view () {
+    if (this._view === 'calls') return 'ctzn.network/dbmethod-calls-view'
+    if (this._view === 'results') return 'ctzn.network/dbmethod-results-view'
+    if (this._view === 'feed') return 'ctzn.network/dbmethod-feed-view'
+    return this._view
+  }
+
+  set view (v) {
+    this._view = v
+  }
+
+  get methodsFilter () {
+    if (this._methodsFilter) {
+      return this._methodsFilter.split(',').map(str => str.trim())
+    }
+  }
+
+  set methodsFilter (v) {
+    this._methodsFilter = v
+  }
+
   get isLoading () {
-    return !this.entries || !!this.activeQuery
+    return !!this.activeQuery
   }
 
   async load ({clearCurrent} = {clearCurrent: false}) {
+    if ((!this.userId || !this.view) && this.view !== 'ctzn.network/dbmethod-feed-view') {
+      return
+    }
     if (this.activeQuery) {
       return this.activeQuery
     }
@@ -150,7 +182,7 @@ export class ActivityFeed extends LitElement {
     if (changedProperties.has('userId') && this.userId !== changedProperties.get('userId')) {
       this.load()
     }
-    if (changedProperties.has('dataview') && this.dataview !== changedProperties.get('dataview')) {
+    if (changedProperties.has('_view') && this._view !== changedProperties.get('_view')) {
       this.load()
     }
 
@@ -181,9 +213,6 @@ export class ActivityFeed extends LitElement {
   }
 
   async query ({more} = {more: false}) {
-    if ((!this.userId || !this.dataview) && this.dataview !== 'ctzn.network/dbmethod-feed-view') {
-      return
-    }
     this.isLoadingMore = more
 
     emit(this, 'load-state-updated')
@@ -191,9 +220,9 @@ export class ActivityFeed extends LitElement {
     let entries = more ? (this.entries || []) : []
     let lt = more ? entries[entries?.length - 1]?.key : undefined
     
-    const viewRes = (this.dataview === 'ctzn.network/dbmethod-feed-view')
-      ? await session.ctzn.view(this.dataview, {limit: 25, lt})
-      : await session.ctzn.view(this.dataview, this.userId, {limit: 25, reverse: true, lt})
+    const viewRes = (this.view === 'ctzn.network/dbmethod-feed-view')
+      ? await session.ctzn.view(this.view, {limit: 25, lt})
+      : await session.ctzn.view(this.view, this.userId, {limit: 25, reverse: true, lt})
     let newEntries
     if (viewRes.results) {
       newEntries = viewRes.results.map(resultToGeneric)
@@ -220,9 +249,9 @@ export class ActivityFeed extends LitElement {
     if (!this.entries) {
       return
     }
-    const viewRes = (this.dataview === 'ctzn.network/dbmethod-feed-view')
-      ? await session.ctzn.view(this.dataview, {limit: 1})
-      : await session.ctzn.view(this.dataview, this.userId, {limit: 1, reverse: true})
+    const viewRes = (this.view === 'ctzn.network/dbmethod-feed-view')
+      ? await session.ctzn.view(this.view, {limit: 1})
+      : await session.ctzn.view(this.view, this.userId, {limit: 1, reverse: true})
     let entries = viewRes.calls || viewRes.results || viewRes.feed
     if (this.methodsFilter) {
       entries = entries.filter(entry => this.methodsFilter.includes(entry.call.method))
@@ -457,7 +486,7 @@ export class ActivityFeed extends LitElement {
   }
   
   renderPutBlobMethod (entry) {
-    const {blobName} = entry.call.args.target
+    const {blobName} = entry.call.args.target ? entry.call.args.target : ''
     return html`
       updated <span class="text-black">${displayNames.render(entry.call.database.userId)}'s</span> ${blobName} blob
     `
@@ -523,19 +552,21 @@ export class ActivityFeed extends LitElement {
       record = _itemCache[dbUrl] ? _itemCache[dbUrl] : await session.ctzn.getPost(authorId, dbUrl)
       _itemCache[dbUrl] = record
       yield html`
-        <ctzn-post
+        <ctzn-post-view
+          class="block py-2"
           .post=${record}
-          noctrls
-        ></ctzn-post>
+          mode="content-only"
+        ></ctzn-post-view>
       `
     } else if (schemaId === 'ctzn.network/comment') {
       record = _itemCache[dbUrl] ? _itemCache[dbUrl] : await session.ctzn.getComment(authorId, dbUrl)
       _itemCache[dbUrl] = record
       yield html`
-        <ctzn-post
+        <ctzn-post-view
+          class="block py-2"
           .post=${record}
-          noctrls
-        ></ctzn-post>
+          mode="content-only"
+        ></ctzn-post-view>
       `
     }
   }
@@ -554,26 +585,7 @@ export class ActivityFeed extends LitElement {
   }
 }
 
-customElements.define('ctzn-activity-feed', ActivityFeed)
-
-const MINUTE = 1e3 * 60
-const HOUR = 1e3 * 60 * 60
-const DAY = HOUR * 24
-
-const rtf = new Intl.RelativeTimeFormat('en', {numeric: 'auto'})
-function relativeDate (d) {
-  const nowMs = Date.now()
-  const endOfTodayMs = +((new Date).setHours(23,59,59,999))
-  const dMs = +(new Date(d))
-  let diff = nowMs - dMs
-  let dayDiff = Math.floor((endOfTodayMs - dMs) / DAY)
-  if (diff < (MINUTE * 5)) return 'just now'
-  if (diff < HOUR) return rtf.format(Math.ceil(diff / MINUTE * -1), 'minute')
-  if (dayDiff < 1) return rtf.format(Math.ceil(diff / HOUR * -1), 'hour')
-  if (dayDiff <= 30) return rtf.format(dayDiff * -1, 'day')
-  if (dayDiff <= 365) return rtf.format(Math.floor(dayDiff / 30) * -1, 'month')
-  return rtf.format(Math.floor(dayDiff / 365) * -1, 'year')
-}
+customElements.define('ctzn-dbmethods-feed', DbmethodsFeed)
 
 function feedToGeneric (feedEntry) {
   return {

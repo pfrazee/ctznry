@@ -81,11 +81,11 @@ export class SimpleUserList extends LitElement {
     if (session.isActive()) {
       return html`
         ${this.myFollows.includes(userId) ? html`
-          <ctzn-button btn-class="text-sm font-medium px-4 py-0.5 rounded-full" @click=${e => this.onClickUnfollow(e, userId)} label="Unfollow">
-          </ctzn-button>
+          <app-button btn-class="text-sm font-medium px-4 py-0.5 rounded-full" @click=${e => this.onClickUnfollow(e, userId)} label="Unfollow">
+          </app-button>
         ` : html`
-          <ctzn-button primary btn-class="text-sm font-medium px-4 py-0.5 rounded-full" @click=${e => this.onClickFollow(e, userId)} label="Follow">
-          </ctzn-button>
+          <app-button primary btn-class="text-sm font-medium px-4 py-0.5 rounded-full" @click=${e => this.onClickFollow(e, userId)} label="Follow">
+          </app-button>
         `}
       `
     }
@@ -114,4 +114,4 @@ export class SimpleUserList extends LitElement {
   }
 }
 
-customElements.define('ctzn-simple-user-list', SimpleUserList)
+customElements.define('app-simple-user-list', SimpleUserList)

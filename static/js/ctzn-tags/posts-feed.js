@@ -1,9 +1,8 @@
 import { LitElement, html } from '../../vendor/lit-element/lit-element.js'
 import { repeat } from '../../vendor/lit-element/lit-html/directives/repeat.js'
-import { AVATAR_URL } from '../lib/const.js'
 import * as session from '../lib/session.js'
 import { emit } from '../lib/dom.js'
-import './post.js'
+import './post-view.js'
 
 const CHECK_NEW_ITEMS_INTERVAL = 15e3
 let _cache = {
@@ -11,23 +10,12 @@ let _cache = {
   results: undefined
 }
 
-export class Feed extends LitElement {
+export class PostsFeed extends LitElement {
   static get properties () {
     return {
-      source: {type: String},
-      pathQuery: {type: Array},
-      showDateTitles: {type: Boolean, attribute: 'show-date-titles'},
-      dateTitleRange: {type: String, attribute: 'date-title-range'},
-      forceRenderMode: {type: String, attribute: 'force-render-mode'},
-      recordClass: {type: String, attribute: 'record-class'},
-      title: {type: String},
-      sort: {type: String},
-      limit: {type: Number},
-      notifications: {type: Object},
-      filter: {type: String},
+      _view: {type: String, attribute: 'view'},
+      userId: {type: String, attribute: 'user-id'},
       results: {type: Array},
-      emptyMessage: {type: String, attribute: 'empty-message'},
-      noMerge: {type: Boolean, attribute: 'no-merge'},
       hasNewItems: {type: Boolean},
       isLoadingMore: {type: Boolean}
     }
@@ -39,18 +27,10 @@ export class Feed extends LitElement {
 
   constructor () {
     super()
-    this.showDateTitles = false
-    this.dateTitleRange = undefined
-    this.forceRenderMode = undefined
-    this.recordClass = ''
-    this.title = undefined
-    this.sort = 'ctime'
-    this.limit = 15
-    this.filter = undefined
-    this.notifications = undefined
+    this.setAttribute('ctzn-elem', '1')
+    this._view = undefined
+    this.userId = undefined
     this.results = undefined
-    this.emptyMessage = undefined
-    this.noMerge = false
     this.hasNewItems = false
     this.isLoadingMore = false
 
@@ -63,11 +43,32 @@ export class Feed extends LitElement {
     this.abortController = undefined
   }
 
+  get view () {
+    if (this._view === 'posts') return 'ctzn.network/posts-view'
+    if (this._view === 'feed') return 'ctzn.network/feed-view'
+    return this._view || 'ctzn.network/posts-view'
+  }
+
+  set view (v) {
+    this._view = v
+  }
+
   get isLoading () {
-    return !this.results || !!this.activeQuery
+    return !!this.activeQuery
+  }
+
+  setContextState (state) {
+    if (state?.page?.userId) {
+      if (!this.userId) {
+        this.userId = state.page.userId
+      }
+    }
   }
 
   async load ({clearCurrent} = {clearCurrent: false}) {
+    if (!this.view || (this.view === 'ctzn.network/posts-view' && !this.userId)) {
+      return
+    }
     if (this.activeQuery) {
       return this.activeQuery
     }
@@ -90,7 +91,7 @@ export class Feed extends LitElement {
       if (!this.activeQuery) {
         this.load()
       }
-    } else if (changedProperties.has('source') && this.source !== changedProperties.get('source')) {
+    } else if (changedProperties.has('_view') || changedProperties.has('userId')) {
       this.load()
     }
 
@@ -127,12 +128,12 @@ export class Feed extends LitElement {
 
     let results = more ? (this.results || []) : []
     let lt = more ? results[results?.length - 1]?.key : undefined
-    if (this.source) {
-      results = results.concat(await session.ctzn.listUserFeed(this.source, {limit: this.limit, reverse: true, lt}))
+    if (this.view === 'ctzn.network/feed-view') {
+      results = results.concat((await session.ctzn.view(this.view, {limit: 15, reverse: true, lt}))?.feed)
     } else {
-      results = results.concat((await session.ctzn.view('ctzn.network/feed-view', {limit: this.limit, reverse: true, lt}))?.feed)
+      results = results.concat((await session.ctzn.viewByHomeServer(this.userId, this.view, this.userId, {limit: 15, reverse: true, lt}))?.posts)
     }
-    console.log(this.limit, results)
+    console.log(results)
 
     if (!more && _cache?.path === window.location.pathname && _cache?.results?.[0]?.url === results[0]?.url) {
       // stick with the cache but update the signal metrics
@@ -157,10 +158,10 @@ export class Feed extends LitElement {
       return
     }
     let results
-    if (this.source) {
-      results = await session.ctzn.listUserFeed(this.source, {limit: 1, reverse: true})
+    if (this.view === 'ctzn.network/feed-view') {
+      results = (await session.ctzn.view(this.view, {limit: 1, reverse: true}))?.feed
     } else {
-      results = (await session.ctzn.view('ctzn.network/feed-view', {limit: 1, reverse: true}))?.feed
+      results = (await session.ctzn.viewByHomeServer(this.userId, this.view, this.userId, {limit: 1, reverse: true}))?.posts
     }
     this.hasNewItems = (results[0] && results[0].key !== this.results[0].key)
   }
@@ -195,7 +196,7 @@ export class Feed extends LitElement {
   }
 
   requestResultUpdates () {
-    let postEls = this.querySelectorAll('ctzn-post')
+    let postEls = this.querySelectorAll('ctzn-post-view')
     for (let el of Array.from(postEls)) {
       el.requestUpdate()
     }
@@ -206,25 +207,29 @@ export class Feed extends LitElement {
 
   render () {
     if (!this.results) {
+      if (!this.isLoading) {
+        return ''
+      }
       return html`
-        ${this.title ? html`<h2  class="results-header"><span>${this.title}</span></h2>` : ''}
-        <div class="bg-gray-100 text-gray-500 py-44 text-center my-5">
+        <div class="bg-gray-100 text-gray-500 py-44 text-center mb-5">
           <span class="spinner"></span>
         </div>
       `
     }
     if (!this.results.length) {
-      if (!this.emptyMessage) return html``
       return html`
-        ${this.title ? html`<h2  class="results-header"><span>${this.title}</span></h2>` : ''}
         ${this.renderHasNewItems()}
-        <div class="bg-gray-100 text-gray-500 py-44 text-center my-5">
-          <div>${this.emptyMessage}</div>
+        <div class="bg-gray-100 text-gray-500 py-44 text-center">
+          <div class="fas fa-stream text-6xl text-gray-300 mb-8"></div>
+          ${this.view === 'ctzn.network/posts-view' ? html`
+            <div>This feed is empty.</div>
+          ` : html`
+            <div>Follow people and<br>join communities to see what's new.</div>
+          `}
         </div>
       `
     }
     return html`
-      ${this.title ? html`<h2  class="results-header"><span>${this.title}</span></h2>` : ''}
       ${this.renderHasNewItems()}
       ${this.renderResults()}
       ${this.results?.length ? html`
@@ -250,55 +255,20 @@ export class Feed extends LitElement {
   }
 
   renderResults () {
-    this.lastResultNiceDate = undefined // used by renderDateTitle
-    if (!this.filter) {
-      return html`
-        ${repeat(this.results, result => result.url, result => html`
-          ${this.renderDateTitle(result)}
-          ${this.renderNormalResult(result)}
-        `)}
-      `
-    }
     return html`
-      ${repeat(this.results, result => result.url, result => this.renderSearchResult(result))}
-    `
-  }
-
-  renderDateTitle (result) {
-    if (!this.showDateTitles) return ''
-    var resultNiceDate = dateHeader(result.ctime, this.dateTitleRange)
-    if (this.lastResultNiceDate === resultNiceDate) return ''
-    this.lastResultNiceDate = resultNiceDate
-    return html`
-      <h2 class="results-header"><span>${resultNiceDate}</span></h2>
+      ${repeat(this.results, result => result.url, result => this.renderResult(result))}
     `
   }
   
-  renderNormalResult (post) {
+  renderResult (post) {
     return html`
-      <div
-        class="grid grid-post px-1 py-0.5 bg-white mb-0.5 cursor-pointer"
-        style="content-visibility: auto; contain-intrinsic-size: 640px 120px;"
-        @click=${e => this.onClickPost(e, post)}
-      >
-        <div class="pl-2 pt-2">
-          <a class="block" href="/${post.author.userId}" title=${post.author.displayName}>
-            <img
-              class="block object-cover rounded-full mt-1 w-11 h-11"
-              src=${AVATAR_URL(post.author.userId)}
-            >
-          </a>
-        </div>
-        <ctzn-post
-          class="block bg-white min-w-0"
+      <div style="content-visibility: auto; contain-intrinsic-size: 640px 120px;">
+        <ctzn-post-view
           .post=${post}
-        ></ctzn-post>
+          mode="condensed"
+        ></ctzn-post-view>
       </div>
     `
-  }
-
-  renderSearchResult (result) {
-    // TODO
   }
 
   // events
@@ -309,24 +279,6 @@ export class Feed extends LitElement {
     this.load()
     window.scrollTo(0, 0)
   }
-
-  onClickPost (e, post) {
-    for (let el of e.composedPath()) {
-      if (el.tagName === 'A' || el.tagName === 'CTZN-POST') return
-    }
-    emit(this, 'view-thread', {detail: {subject: {dbUrl: post.url, authorId: post.author.userId}}})
-  }
 }
 
-customElements.define('ctzn-feed', Feed)
-
-const HOUR = 1e3 * 60 * 60
-const DAY = HOUR * 24
-function dateHeader (ts, range) {
-  const endOfTodayMs = +((new Date).setHours(23,59,59,999))
-  var diff = endOfTodayMs - ts
-  if (diff < DAY) return 'Today'
-  if (diff < DAY * 6) return (new Date(ts)).toLocaleDateString('default', { weekday: 'long' })
-  if (range === 'month') return (new Date(ts)).toLocaleDateString('default', { month: 'short', year: 'numeric' })
-  return (new Date(ts)).toLocaleDateString('default', { weekday: 'long', month: 'short', day: 'numeric' })
-}
+customElements.define('ctzn-posts-feed', PostsFeed)

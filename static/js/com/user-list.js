@@ -90,7 +90,7 @@ export class UserList extends LitElement {
                 class="rounded"
                 style="height: 80px; background: linear-gradient(0deg, #3c4af6, #2663eb);"
               >
-                <ctzn-img-fallbacks>
+                <app-img-fallbacks>
                   <img
                     slot="img1"
                     class="rounded"
@@ -98,7 +98,7 @@ export class UserList extends LitElement {
                     src=${BLOB_URL(userId, 'profile-banner')}
                   >
                   <div slot="img2"></div>
-                </ctzn-img-fallbacks>
+                </app-img-fallbacks>
               </div>
               <div class="absolute text-center w-full" style="top: 40px">
                 <a href="/${userId}" title=${profile.value.displayName}>
@@ -140,9 +140,9 @@ export class UserList extends LitElement {
       ` : html`
         <div class="text-center">
           ${profile.amIFollowing ? html`
-            <ctzn-button transparent btn-class="rounded-full border border-gray-400 text-sm mb-2 py-1 shadow-none hov:hover:bg-gray-200" @click=${e => this.onClickUnfollow(e, profile)} label="Unfollow"></ctzn-button>
+            <app-button transparent btn-class="rounded-full border border-gray-400 text-sm mb-2 py-1 shadow-none hov:hover:bg-gray-200" @click=${e => this.onClickUnfollow(e, profile)} label="Unfollow"></app-button>
           ` : html`
-            <ctzn-button transparent btn-class="rounded-full border border-blue-500 text-blue-600 text-sm mb-2 py-1 shadow-none hov:hover:bg-gray-200" @click=${e => this.onClickFollow(e, profile)} label="Follow"></ctzn-button>
+            <app-button transparent btn-class="rounded-full border border-blue-500 text-blue-600 text-sm mb-2 py-1 shadow-none hov:hover:bg-gray-200" @click=${e => this.onClickFollow(e, profile)} label="Follow"></app-button>
           `}
           ${profile.isFollowingMe ? html`
             <span class="text-sm text-gray-500 py-0.5 px-2">Follows you</span>
@@ -172,4 +172,4 @@ export class UserList extends LitElement {
   }
 }
 
-customElements.define('ctzn-user-list', UserList)
+customElements.define('app-user-list', UserList)

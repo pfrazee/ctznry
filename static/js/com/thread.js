@@ -5,7 +5,7 @@ import * as toast from './toast.js'
 import { emit } from '../lib/dom.js'
 import * as session from '../lib/session.js'
 import * as displayNames from '../lib/display-names.js'
-import './post-expanded.js'
+import '../ctzn-tags/post-view.js'
 import './comment.js'
 import './comment-composer.js'
 
@@ -112,12 +112,10 @@ export class Thread extends LitElement {
     return html`
       <div class="mb-1 bg-white sm:rounded-b">
         ${this.post ? html`
-          <ctzn-post-expanded
+          <ctzn-post-view
             .post=${this.post}
-            hover-bg-color=${this.subject.dbUrl === this.post?.url ? 'indigo-100' : 'gray-50'}
-            noborders
-            view-content-on-click
-          ></ctzn-post-expanded>
+            .renderOpts=${{noclick: true}}
+          ></ctzn-post-view>
         ` : html`
           <span class="spinner"></span>
         `}
@@ -160,12 +158,12 @@ export class Thread extends LitElement {
               class="mb-1 ${isSubject ? 'bg-blue-50 border border-blue-200 border-l-2 px-2 rounded-r highlight' : ''}"
               style="${isSubject ? 'margin-left: -14px' : ''}"
             >
-              <ctzn-comment
+              <app-comment
                 .comment=${reply}
                 @publish-reply=${this.onPublishReply}
                 @delete-comment=${this.onDeleteComment}
                 @moderator-remove-comment=${this.onModeratorRemoveComment}
-              ></ctzn-comment>
+              ></app-comment>
             </div>
             ${reply.replies?.length ? this.renderReplies(reply.replies) : ''}
           `
@@ -202,14 +200,14 @@ export class Thread extends LitElement {
     return html`
       <div class="bg-white p-3 sm:p-4 mb-1 sm:rounded">
         ${this.isReplying ? html`
-          <ctzn-comment-composer
+          <app-comment-composer
             autofocus
             .community=${this.post.value.community}
             .subject=${{dbUrl: this.post.url, authorId: this.post.author.userId}}
             placeholder="Write your comment"
             @publish=${this.onPublishReply}
             @cancel=${this.onCancelReply}
-          ></ctzn-comment-composer>
+          ></app-comment-composer>
         ` : html`
           <div class="cursor-text italic text-gray-500" @click=${this.onStartReply}>
             Write your comment
@@ -268,4 +266,4 @@ export class Thread extends LitElement {
   }
 }
 
-customElements.define('ctzn-thread', Thread)
+customElements.define('app-thread', Thread)

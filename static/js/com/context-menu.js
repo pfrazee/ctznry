@@ -245,4 +245,4 @@ a.dropdown-item {
 }
 `
 
-customElements.define('ctzn-context-menu', BeakerContextMenu)
+customElements.define('app-context-menu', BeakerContextMenu)

@@ -77,9 +77,9 @@ export class BanPopup extends BasePopup {
         ` : ''}
 
         <div class="flex border-t border-gray-200 mt-4 pt-4">
-          <ctzn-button @click=${this.onReject} tabindex="3" label="Cancel"></ctzn-button>
+          <app-button @click=${this.onReject} tabindex="3" label="Cancel"></app-button>
           <span class="flex-1"></span>
-          <ctzn-button
+          <app-button
             btn-class="mr-1"
             btn-type="submit"
             tabindex="2"
@@ -87,8 +87,8 @@ export class BanPopup extends BasePopup {
             ?spinner=${this.isProcessing}
             label="Just remove"
             @click=${this.onClickJustRemove}
-          ></ctzn-button>
-          <ctzn-button
+          ></app-button>
+          <app-button
             primary
             btn-type="submit"
             tabindex="1"
@@ -96,7 +96,7 @@ export class BanPopup extends BasePopup {
             ?spinner=${this.isProcessing}
             label="Ban and remove"
             @click=${this.onClickBan}
-          ></ctzn-button>
+          ></app-button>
         </div>
       </form>
     `

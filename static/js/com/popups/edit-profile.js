@@ -41,7 +41,7 @@ export class EditProfilePopup extends BasePopup {
         <div style="height: 190px">
           <div style="height: 130px">
             ${!this.uploadedBanner ? html`
-              <ctzn-img-fallbacks>
+              <app-img-fallbacks>
                 <img
                   slot="img1"
                   class="block rounded w-full object-cover cursor-pointer hov:hover:opacity-50"
@@ -55,7 +55,7 @@ export class EditProfilePopup extends BasePopup {
                   style="height: 130px; background: linear-gradient(0deg, #3c4af6, #2663eb);"
                   @click=${this.onClickBanner}
                 ></div>
-              </ctzn-img-fallbacks>
+              </app-img-fallbacks>
             ` : html`
               <img
                 class="block rounded w-full object-cover cursor-pointer hov:hover:opacity-50"
@@ -105,13 +105,13 @@ export class EditProfilePopup extends BasePopup {
         >${this.profile.description}</textarea>
 
         <div class="flex justify-between mt-4">
-          <ctzn-button @click=${this.onReject} tabindex="3" label="Cancel"></ctzn-button>
-          <ctzn-button
+          <app-button @click=${this.onReject} tabindex="3" label="Cancel"></app-button>
+          <app-button
             primary
             btn-type="submit"
             tabindex="2"
             label="Save"
-          ></ctzn-button>
+          ></app-button>
         </div>
       </form>
     `
@@ -169,4 +169,4 @@ export class EditProfilePopup extends BasePopup {
   }
 }
 
-customElements.define('ctzn-edit-profile', EditProfilePopup)
+customElements.define('app-edit-profile', EditProfilePopup)

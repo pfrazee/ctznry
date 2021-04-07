@@ -5,7 +5,7 @@ import { BasePopup } from './base.js'
 import * as session from '../../lib/session.js'
 import * as displayNames from '../../lib/display-names.js'
 import '../button.js'
-import '../post.js'
+import '../../ctzn-tags/post-view.js'
 
 // exported api
 // =
@@ -135,22 +135,22 @@ export class TransferItemPopup extends BasePopup {
         ` : ''}
 
         <div class="flex mt-4 pt-4 pb-2 border-t border-gray-200">
-          <ctzn-button
+          <app-button
             btn-class="px-3 py-1"
             @click=${this.onReject}
             label="Cancel"
             ?disabled=${this.isProcessing}
             ?spinner=${this.isProcessing}
-          ></ctzn-button>
+          ></app-button>
           <span class="flex-1"></span>
-          <ctzn-button
+          <app-button
             primary
             btn-type="submit"
             btn-class="px-3 py-1"
             label="Give Item"
             ?disabled=${this.isProcessing || !this.selectedItem}
             ?spinner=${this.isProcessing}
-          ></ctzn-button>
+          ></app-button>
         </div>
       </form>
     `

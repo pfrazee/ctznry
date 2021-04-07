@@ -115,15 +115,15 @@ export class EditRolePopup extends BasePopup {
         ` : ''}
 
         <div class="flex justify-between border-t border-gray-200 mt-4 pt-4">
-          <ctzn-button @click=${this.onReject} tabindex="2" label="Cancel"></ctzn-button>
-          <ctzn-button
+          <app-button @click=${this.onReject} tabindex="2" label="Cancel"></app-button>
+          <app-button
             primary
             btn-type="submit"
             tabindex="1"
             ?disabled=${this.isProcessing || !this.roleId}
             ?spinner=${this.isProcessing}
             label="${this.isNewRole ? 'Create role' : 'Save changes'}"
-          ></ctzn-button>
+          ></app-button>
         </div>
       </form>
     `

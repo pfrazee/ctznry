@@ -4,7 +4,7 @@ import { repeat } from '../../../vendor/lit-element/lit-html/directives/repeat.j
 import { BasePopup } from './base.js'
 import * as session from '../../lib/session.js'
 import '../button.js'
-import '../post.js'
+import '../../ctzn-tags/post-view.js'
 
 // exported api
 // =
@@ -73,12 +73,12 @@ export class TransferItemRelatedPopup extends BasePopup {
       <form class="" @submit=${this.onSubmit}>
         <h2 class="font-medium pb-2 text-2xl">Gift item for:</h2>
 
-        <ctzn-post
+        <ctzn-post-view
           class="block border border-gray-300 mb-1 px-2 rounded"
           .post=${this.subject}
-          noctrls
-          noclick
-        ></ctzn-post>
+          mode="content-only"
+          .renderOpts=${{noclick: true}}
+        ></ctzn-post-view>
 
         <label class="block font-semibold p-1" for="item-input">Item</label>
         <div class="relative">
@@ -126,22 +126,22 @@ export class TransferItemRelatedPopup extends BasePopup {
         ` : ''}
 
         <div class="flex mt-4 pt-4 pb-2 border-t border-gray-200">
-          <ctzn-button
+          <app-button
             btn-class="px-3 py-1"
             @click=${this.onReject}
             label="Cancel"
             ?disabled=${this.isProcessing}
             ?spinner=${this.isProcessing}
-          ></ctzn-button>
+          ></app-button>
           <span class="flex-1"></span>
-          <ctzn-button
+          <app-button
             primary
             btn-type="submit"
             btn-class="px-3 py-1"
             label="Give Item"
             ?disabled=${this.isProcessing || !this.selectedItem}
             ?spinner=${this.isProcessing}
-          ></ctzn-button>
+          ></app-button>
         </div>
       </form>
     `

@@ -55,13 +55,13 @@ export class ComposerPopup extends BasePopup {
   renderBody () {
     return html`
       <h2 class="text-3xl py-4">Create a post</h2>
-      <ctzn-post-composer
+      <app-post-composer
         .community=${this.community}
         autofocus
         nocancel
         @cancel=${this.onReject}
         @publish=${this.onPublishPost}
-      ></ctzn-post-composer>
+      ></app-post-composer>
     `
   }
 

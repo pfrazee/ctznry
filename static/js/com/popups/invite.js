@@ -53,7 +53,7 @@ export class InvitePopup extends BasePopup {
         <h2 class="text-3xl py-4">Invite user</h2>
 
         <section class="mb-2">
-          <ctzn-users-input .users=${session.myFollowing} @change-user=${this.onChangeUser}></ctzn-users-input>
+          <app-users-input .users=${session.myFollowing} @change-user=${this.onChangeUser}></app-users-input>
         </section>
 
         ${this.currentError ? html`
@@ -61,16 +61,16 @@ export class InvitePopup extends BasePopup {
         ` : ''}
 
         <div class="flex border-t border-gray-200 mt-4 pt-4">
-          <ctzn-button @click=${this.onReject} tabindex="3" label="Cancel"></ctzn-button>
+          <app-button @click=${this.onReject} tabindex="3" label="Cancel"></app-button>
           <span class="flex-1"></span>
-          <ctzn-button
+          <app-button
             primary
             btn-type="submit"
             tabindex="1"
             ?disabled=${!this.userId || this.isProcessing}
             ?spinner=${this.isProcessing}
             label="Invite"
-          ></ctzn-button>
+          ></app-button>
         </div>
       </form>
     `

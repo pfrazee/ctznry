@@ -168,27 +168,27 @@ class PostComposer extends LitElement {
         >
 
         <div class="flex border-t border-gray-200 mt-4 pt-4">
-          <ctzn-button
+          <app-button
             transparent
             label="Cancel"
             @click=${this.onCancel}
-          ></ctzn-button>
+          ></app-button>
           <div class="flex-1"></div>
-          <ctzn-button
+          <app-button
             transparent
             btn-class="mr-2"
             label="Add Image"
             icon="far fa-image"
             @click=${this.onClickAddImage}
-          ></ctzn-button>
-          <ctzn-button
+          ></app-button>
+          <app-button
             primary
             btn-type="submit"
             ?disabled=${!this.canPost}
             ?spinner=${this.isProcessing}
             tabindex="1"
             label="Create Post"
-          ></ctzn-button>
+          ></app-button>
         </div>
 
         ${this.isProcessing && this.uploadTotal > 0 ? html`
@@ -384,7 +384,7 @@ class PostComposer extends LitElement {
   }
 }
 
-customElements.define('ctzn-post-composer', PostComposer)
+customElements.define('app-post-composer', PostComposer)
 
 function parseDataUrl (url) {
   const [prelude, base64buf] = url.split(',')

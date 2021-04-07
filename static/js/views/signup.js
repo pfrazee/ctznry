@@ -109,13 +109,13 @@ class CtznSignup extends LitElement {
         </div>
         <div class="flex justify-between items-center border-t border-gray-300 pt-6">
           <a href="/">Log in to an existing account</a>
-          <ctzn-button
+          <app-button
             primary
             btn-type="submit"
             ?disabled=${this.isProcessing}
             ?spinner=${this.isProcessing}
             label="Got it, let's do this!"
-          ></ctzn-button>
+          ></app-button>
         </div>
       </form>
     `
@@ -177,13 +177,13 @@ class CtznSignup extends LitElement {
         ` : ''}
         <div class="flex justify-between items-center border-t border-gray-300 mt-10 pt-6">
           <a href="/">Log in to an existing account</a>
-          <ctzn-button
+          <app-button
             primary
             btn-type="submit"
             ?disabled=${this.isProcessing}
             ?spinner=${this.isProcessing}
             label="Next"
-          ></ctzn-button>
+          ></app-button>
         </div>
       </form>
     `
@@ -211,19 +211,19 @@ class CtznSignup extends LitElement {
           </label>
         </div>
         <div class="flex justify-between items-center border-t border-gray-300 pt-6">
-          <ctzn-button
+          <app-button
             ?disabled=${this.isProcessing}
             ?spinner=${this.isProcessing}
             label="Back"
             @click=${this.onBack}
-          ></ctzn-button>
-          <ctzn-button
+          ></app-button>
+          <app-button
             primary
             btn-type="submit"
             ?disabled=${this.isProcessing}
             ?spinner=${this.isProcessing}
             label="Next"
-          ></ctzn-button>
+          ></app-button>
         </div>
       </form>
     `
@@ -278,19 +278,19 @@ class CtznSignup extends LitElement {
           <div class="bg-red-100 p-6 text-red-600">${this.currentError}</div>
         ` : ''}
         <div class="flex justify-between items-center border-t border-gray-300 mt-10 pt-6">
-          <ctzn-button
+          <app-button
             ?disabled=${this.isProcessing}
             ?spinner=${this.isProcessing}
             label="Back"
             @click=${this.onBack}
-          ></ctzn-button>
-          <ctzn-button
+          ></app-button>
+          <app-button
             primary
             btn-type="submit"
             ?disabled=${this.isProcessing}
             ?spinner=${this.isProcessing}
             label="Next"
-          ></ctzn-button>
+          ></app-button>
         </div>
       </form>
     `
@@ -319,7 +319,7 @@ class CtznSignup extends LitElement {
           >
         `}
         <div class="text-center mb-4">
-          <ctzn-button tabindex="1" @click=${this.onClickAvatar} label="Change Avatar"></ctzn-button>
+          <app-button tabindex="1" @click=${this.onClickAvatar} label="Change Avatar"></app-button>
           <input class="hidden" type="file" accept=".jpg,.jpeg,.png" @change=${this.onChooseAvatarFile}>
         </div>
         <div class="mb-6">
@@ -347,19 +347,19 @@ class CtznSignup extends LitElement {
           <div class="bg-red-100 p-6 text-red-600">${this.currentError}</div>
         ` : ''}
         <div class="flex justify-between items-center border-t border-gray-300 mt-10 pt-6">
-          <ctzn-button
+          <app-button
             ?disabled=${this.isProcessing}
             ?spinner=${this.isProcessing}
             label="Back"
             @click=${this.onBack}
-          ></ctzn-button>
-          <ctzn-button
+          ></app-button>
+          <app-button
             primary
             btn-type="submit"
             ?disabled=${this.isProcessing}
             ?spinner=${this.isProcessing}
             label="Sign up"
-          ></ctzn-button>
+          ></app-button>
         </div>
       </form>
     `
@@ -458,7 +458,7 @@ class CtznSignup extends LitElement {
 
 }
 
-customElements.define('ctzn-signup-view', CtznSignup)
+customElements.define('app-signup-view', CtznSignup)
 
 async function checkCtznServer (domain) {
   try {

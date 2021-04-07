@@ -188,4 +188,4 @@ export class SuggestionsSidebar extends LitElement {
   }
 }
 
-customElements.define('ctzn-suggestions-sidebar', SuggestionsSidebar)
+customElements.define('app-suggestions-sidebar', SuggestionsSidebar)

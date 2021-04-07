@@ -94,11 +94,11 @@ export class MembersList extends LitElement {
           </button>
         ` : ''}
         ${this.myFollows.includes(member.value.user.userId) ? html`
-          <ctzn-button btn-class="text-sm font-medium px-4 py-0.5 rounded-full" @click=${e => this.onClickUnfollow(e, member)} label="Unfollow">
-          </ctzn-button>
+          <app-button btn-class="text-sm font-medium px-4 py-0.5 rounded-full" @click=${e => this.onClickUnfollow(e, member)} label="Unfollow">
+          </app-button>
         ` : html`
-          <ctzn-button primary btn-class="text-sm font-medium px-4 py-0.5 rounded-full" @click=${e => this.onClickFollow(e, member)} label="Follow">
-          </ctzn-button>
+          <app-button primary btn-class="text-sm font-medium px-4 py-0.5 rounded-full" @click=${e => this.onClickFollow(e, member)} label="Follow">
+          </app-button>
         `}
       `
     }
@@ -130,4 +130,4 @@ export class MembersList extends LitElement {
   }
 }
 
-customElements.define('ctzn-members-list', MembersList)
+customElements.define('app-members-list', MembersList)

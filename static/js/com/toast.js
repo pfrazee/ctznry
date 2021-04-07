@@ -4,7 +4,7 @@ import toastCSS from '../../css/com/toast.css.js'
 // exported api
 // =
 
-export function create (message, type = '', time = 5000, button = null) {
+export function create (message, type = '', time = 3000, button = null) {
   // destroy existing
   destroy()
 
@@ -50,4 +50,4 @@ class BeakerToast extends LitElement {
 }
 BeakerToast.styles = toastCSS
 
-customElements.define('ctzn-toast', BeakerToast)
+customElements.define('app-toast', BeakerToast)

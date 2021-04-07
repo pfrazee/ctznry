@@ -60,11 +60,11 @@ export class ReactionInput extends LitElement {
             class="flex-1 bg-white border border-gray-200 rounded px-2 py-1 text-sm"
             placeholder="Enter a custom reaction"
           >
-          <ctzn-button
+          <app-button
             btn-type="submit"
             btn-class="text-sm py-1 ml-2"
             label="Add"
-          ></ctzn-button>
+          ></app-button>
         </form>
       </div>
     `
@@ -90,4 +90,4 @@ export class ReactionInput extends LitElement {
   }
 }
 
-customElements.define('ctzn-reaction-input', ReactionInput)
+customElements.define('app-reaction-input', ReactionInput)

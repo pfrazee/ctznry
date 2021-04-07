@@ -3,11 +3,11 @@ import {LitElement, html} from '../../vendor/lit-element/lit-element.js'
 /*
 Usage:
 
-<ctzn-img-fallbacks>
+<app-img-fallbacks>
   <img src="/foo.png" slot="img1">
   <img src="/bar.png" slot="img2">
   <img src="/baz.png" slot="img3">
-</ctzn-img-fallbacks>
+</app-img-fallbacks>
 */
 
 export class ImgFallbacks extends LitElement {
@@ -43,4 +43,4 @@ export class ImgFallbacks extends LitElement {
   }
 }
 
-customElements.define('ctzn-img-fallbacks', ImgFallbacks)
+customElements.define('app-img-fallbacks', ImgFallbacks)

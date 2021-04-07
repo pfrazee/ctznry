@@ -83,7 +83,7 @@ class CtznPostView extends LitElement {
 
   render () {
     return html`
-      <ctzn-header></ctzn-header>
+      <app-header></app-header>
       <div>
         ${this.renderCurrentView()}
       </div>
@@ -98,18 +98,18 @@ class CtznPostView extends LitElement {
       {rightAlign: true, click: this.onClickMenu.bind(this), label: html`<span class="fas fa-ellipsis-h cursor-pointer hov:hover:text-gray-700 text-xl text-gray-600"></span>`} 
     ]
     return html`
-      <ctzn-subnav
+      <app-subnav
         nav-cls="mb-0.5 sm:mt-0.5"
         .items=${SUBNAV_ITEMS}
         current-path=${location.pathname}
-      ></ctzn-subnav>
+      ></app-subnav>
     `
   }
 
   renderRightSidebar () {
     return html`
       <nav class="pt-1.5 w-full">
-        <ctzn-user-list cols="1" .ids=${[this.authorProfile.userId]}></ctzn-user-list>
+        <app-user-list cols="1" .ids=${[this.authorProfile.userId]}></app-user-list>
       </nav>
     `
   }
@@ -152,10 +152,10 @@ class CtznPostView extends LitElement {
           ${this.renderHeader()}
           <div class="min-h-screen sm:bg-transparent">
             ${this.subject ? html`
-              <ctzn-thread
+              <app-thread
                 .subject=${this.subject}
                 @load=${this.onLoadThread}
-              ></ctzn-thread>
+              ></app-thread>
             ` : ''}
           </div>
         </div>
@@ -181,7 +181,7 @@ class CtznPostView extends LitElement {
     if (this.scrollToOnLoad) {
       window.scrollTo(0, this.scrollToOnLoad)
     } else {
-      this.querySelector('ctzn-thread').scrollHighlightedPostIntoView()
+      this.querySelector('app-thread')?.scrollHighlightedPostIntoView()
     }
   }
 
@@ -281,4 +281,4 @@ class CtznPostView extends LitElement {
   }
 }
 
-customElements.define('ctzn-post-view', CtznPostView)
+customElements.define('app-post-view', CtznPostView)

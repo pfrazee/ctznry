@@ -34,3 +34,17 @@ export function debouncer (ms, fallback) {
     })
   }
 }
+
+export function intersect (a, b) {
+  var arr = []
+  for (let av of a) {
+    if (b.includes(av)) {
+      arr.push(av)
+    }
+  }
+  return arr
+}
+
+export function deepClone (v) {
+  return JSON.parse(JSON.stringify(v))
+}

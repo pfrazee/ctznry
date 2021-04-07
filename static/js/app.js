@@ -48,6 +48,7 @@ class CtznApp extends LitElement {
     super()
 
     this.isLoading = true
+    this.pageHasChanges = false
     this.currentPath = window.location.pathname
     gestures.setup()
     this.setGestureNav()
@@ -55,6 +56,7 @@ class CtznApp extends LitElement {
     document.body.addEventListener('view-thread', this.onViewThread.bind(this))
     document.body.addEventListener('navigate-to', this.onNavigateTo.bind(this))
     window.addEventListener('popstate', this.onHistoryPopstate.bind(this))
+    window.addEventListener('beforeunload', this.onBeforeUnload.bind(this))
 
     this.load()
   }
@@ -68,6 +70,13 @@ class CtznApp extends LitElement {
   }
 
   navigateTo (pathname, replace = false) {
+    if (this.pageHasChanges) {
+      if (!confirm('Lose unsaved changes?')) {
+        return
+      }
+    }
+    this.pageHasChanges = false
+
     BasePopup.destroy()
     
     if (history.scrollRestoration) {
@@ -96,7 +105,10 @@ class CtznApp extends LitElement {
         gestures.setCurrentNav([{back: true}, '/communities'])
         return
       default:
-        gestures.setCurrentNav(undefined)
+        // NOTE: user-view specifies the gestures nav since it uses custom UIs
+        if (!USER_PATH_REGEX.test(this.currentPath)) {
+          gestures.setCurrentNav(undefined)
+        }
     }
     if (POST_PATH_REGEX.test(this.currentPath)) {
       gestures.setCurrentNav([{back: true}, this.currentPath])
@@ -104,17 +116,6 @@ class CtznApp extends LitElement {
     }
     if (COMMENT_PATH_REGEX.test(this.currentPath)) {
       gestures.setCurrentNav([{back: true}, this.currentPath])
-      return
-    }
-    if (USER_PATH_REGEX.test(this.currentPath)) {
-      const userId = USER_PATH_REGEX.exec(this.currentPath)[1]
-      gestures.setCurrentNav([
-        {back: true},
-        `/${userId}`,
-        `/${userId}/activity`,
-        `/${userId}/inventory`,
-        `/${userId}/about`,
-      ])
       return
     }
   }
@@ -148,30 +149,30 @@ class CtznApp extends LitElement {
       case '/index.html':
       case '/notifications':
       case '/activity':
-        return html`<ctzn-main-view id="view" current-path=${this.currentPath}></ctzn-main-view>`
+        return html`<app-main-view id="view" current-path=${this.currentPath}></app-main-view>`
       case '/forgot-password':
-        return html`<ctzn-forgot-password-view id="view" current-path=${this.currentPath}></ctzn-forgot-password-view>`
+        return html`<app-forgot-password-view id="view" current-path=${this.currentPath}></app-forgot-password-view>`
       case '/communities':
-        return html`<ctzn-communities-view id="view" current-path=${this.currentPath}></ctzn-communities-view>`
+        return html`<app-communities-view id="view" current-path=${this.currentPath}></app-communities-view>`
       case '/account':
-        return html`<ctzn-account-view id="view" current-path=${this.currentPath}></ctzn-account-view>`
+        return html`<app-account-view id="view" current-path=${this.currentPath}></app-account-view>`
       case '/search':
-        return html`<ctzn-search-view id="view" current-path=${this.currentPath}></ctzn-search-view>`
+        return html`<app-search-view id="view" current-path=${this.currentPath}></app-search-view>`
       case '/signup':
-        return html`<ctzn-signup-view id="view" current-path=${this.currentPath}></ctzn-signup-view>`
+        return html`<app-signup-view id="view" current-path=${this.currentPath}></app-signup-view>`
     }
     if (POST_PATH_REGEX.test(this.currentPath)) {
-      return html`<ctzn-post-view id="view" current-path=${this.currentPath}></ctzn-post-view>`
+      return html`<app-post-view id="view" current-path=${this.currentPath}></app-post-view>`
     }
     if (COMMENT_PATH_REGEX.test(this.currentPath)) {
-      return html`<ctzn-post-view id="view" current-path=${this.currentPath}></ctzn-post-view>`
+      return html`<app-post-view id="view" current-path=${this.currentPath}></app-post-view>`
     }
     if (USER_PATH_REGEX.test(this.currentPath)) {
-      return html`<ctzn-user-view id="view" current-path=${this.currentPath}></ctzn-user-view>`
+      return html`<app-user-view id="view" current-path=${this.currentPath}></app-user-view>`
     }
     return html`
       <main class="bg-gray-100 min-h-screen">
-        <ctzn-header></ctzn-header>
+        <app-header></app-header>
         <div class="text-center py-48">
           <h2 class="text-5xl text-gray-600 font-semibold mb-4">404 Not Found</h2>
           <div class="text-lg text-gray-600 mb-4">No page exists at this URL.</div>
@@ -228,6 +229,13 @@ class CtznApp extends LitElement {
       this.scrollToAfterLoad(e.state.scrollY)
     }
   }
+
+  onBeforeUnload (e) {
+    if (this.pageHasChanges) {
+      e.preventDefault()
+      e.returnValue = ''
+    }
+  }
 }
 
-customElements.define('ctzn-app', CtznApp)
+customElements.define('app-root', CtznApp)

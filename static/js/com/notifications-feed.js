@@ -247,12 +247,12 @@ export class NotificationsFeed extends LitElement {
     }
     let blendedCreatedAt = Number(new Date(note.blendedCreatedAt))
     return html`
-      <ctzn-notification
+      <app-notification
         class="block bg-white mb-0.5 sm:rounded"
         style="content-visibility: auto; contain-intrinsic-size: 640px 120px;"
         .notification=${note}
         ?is-unread=${blendedCreatedAt > this.clearedAt}
-      ></ctzn-notification>
+      ></app-notification>
     `
   }
 
@@ -260,7 +260,7 @@ export class NotificationsFeed extends LitElement {
   // =
 }
 
-customElements.define('ctzn-notifications-feed', NotificationsFeed)
+customElements.define('app-notifications-feed', NotificationsFeed)
 
 const HOUR = 1e3 * 60 * 60
 const DAY = HOUR * 24

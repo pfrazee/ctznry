@@ -1,6 +1,6 @@
 import { LitElement, html } from '../../vendor/lit-element/lit-element.js'
 import { repeat } from '../../vendor/lit-element/lit-html/directives/repeat.js'
-import { ViewItemPopup } from './popups/view-item.js'
+import { ViewItemPopup } from '../com/popups/view-item.js'
 import * as session from '../lib/session.js'
 import * as displayNames from '../lib/display-names.js'
 import { ITEM_CLASS_ICON_URL } from '../lib/const.js'
@@ -20,9 +20,18 @@ export class OwnedItemsList extends LitElement {
 
   constructor () {
     super()
+    this.setAttribute('ctzn-elem', '1')
     this.userId = undefined
     this.ownedItems = undefined
     this.databaseItems = undefined
+  }
+
+  setContextState (state) {
+    if (state?.page?.userId) {
+      if (!this.userId) {
+        this.userId = state.page.userId
+      }
+    }
   }
 
   async load () {

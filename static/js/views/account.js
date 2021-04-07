@@ -37,7 +37,7 @@ class CtznAccount extends LitElement {
   renderCurrentView () {
     if (!session.isActive()) {
       return html`
-        <ctzn-header></ctzn-header>
+        <app-header></app-header>
         <main>
           <div class="text-gray-500 py-44 text-center my-5">
             <div class="fas fa-exclamation-triangle text-6xl text-gray-300 mb-8"></div>
@@ -47,7 +47,7 @@ class CtznAccount extends LitElement {
       `
     }
     return html`
-      <ctzn-header></ctzn-header>
+      <app-header></app-header>
       <main>
         <div class="mx-auto my-6 sm:my-12 max-w-lg px-8 sm:py-8 bg-white sm:rounded-2xl sm:border border-gray-300">
           <h2 class="mb-2 text-2xl">Account</h2>
@@ -73,15 +73,15 @@ class CtznAccount extends LitElement {
                 >
               </div>
               <div class="flex">
-                <ctzn-button label="Cancel" @click=${this.onClickCancelChangePassword} ?disabled=${this.isProcessing}></ctzn-button>
+                <app-button label="Cancel" @click=${this.onClickCancelChangePassword} ?disabled=${this.isProcessing}></app-button>
                 <div class="flex-1"></div>
-                <ctzn-button
+                <app-button
                   primary
                   label="Save"
                   @click=${this.onClickSaveNewPassword}
                   ?disabled=${this.isProcessing}
                   ?spinner=${this.isProcessing}
-                ></ctzn-button>
+                ></app-button>
               </div>
             </div>
           ` : this.isChangingPassword ? html`
@@ -90,21 +90,21 @@ class CtznAccount extends LitElement {
                 To change your password, we need to send a password-change code to your email address.
               </div>
               <div class="flex">
-                <ctzn-button label="Cancel" @click=${this.onClickCancelChangePassword} ?disabled=${this.isProcessing}></ctzn-button>
+                <app-button label="Cancel" @click=${this.onClickCancelChangePassword} ?disabled=${this.isProcessing}></app-button>
                 <div class="flex-1"></div>
-                <ctzn-button btn-class="mr-2" label="I have a code" @click=${e => {this.userHasPasswordChangeCode = true}} ?disabled=${this.isProcessing}></ctzn-button>
-                <ctzn-button
+                <app-button btn-class="mr-2" label="I have a code" @click=${e => {this.userHasPasswordChangeCode = true}} ?disabled=${this.isProcessing}></app-button>
+                <app-button
                   primary
                   label="Send code"
                   @click=${this.onClickSendPasswordChangeCode}
                   ?disabled=${this.isProcessing}
                   ?spinner=${this.isProcessing}
-                ></ctzn-button>
+                ></app-button>
               </div>
             </div>
           ` : html`
             <div>
-              <ctzn-button label="Change Password" @click=${e => {this.isChangingPassword = true}}></ctzn-button>
+              <app-button label="Change Password" @click=${e => {this.isChangingPassword = true}}></app-button>
             </div>
           `}
         </div>
@@ -151,4 +151,4 @@ class CtznAccount extends LitElement {
   }
 }
 
-customElements.define('ctzn-account-view', CtznAccount)
+customElements.define('app-account-view', CtznAccount)

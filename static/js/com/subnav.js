@@ -28,9 +28,9 @@ export class Subnav extends LitElement {
     this.borderWidth = 0
   }
   
-  getNavCls (path, mobileOnly, rightAlign) {
+  getNavCls ({path, mobileOnly, rightAlign, thin}) {
     return `
-      block text-center pt-2 pb-2.5 px-4 sm:px-7 whitespace-nowrap font-semibold cursor-pointer
+      block text-center pt-2 pb-2.5 ${thin ? 'px-3 sm:px-4' : 'px-4 sm:px-7'} whitespace-nowrap font-semibold cursor-pointer
       hov:hover:bg-gray-50 hov:hover:text-blue-600
       ${mobileOnly ? 'sm:hidden' : ''}
       ${rightAlign ? 'ml-auto' : ''}
@@ -45,6 +45,11 @@ export class Subnav extends LitElement {
       const rect = el.getClientRects()[0]
       this.borderLeft = el.offsetLeft
       this.borderWidth = rect?.width
+
+      if (this.scrollWidth > this.offsetWidth && el.getBoundingClientRect().left > this.offsetWidth) {
+        // we're scrolling horizontally, bring the element into view
+        this.scrollLeft = el.offsetLeft
+      }
     }
   }
 
@@ -91,7 +96,7 @@ export class Subnav extends LitElement {
       ` : ''}
       ${repeat(this.items, item => item.path, item => html`
         <a
-          class="${this.getNavCls(item.path, item.mobileOnly, item.rightAlign)}"
+          class="${this.getNavCls(item)}"
           href=${item.path}
           @click=${e => this.onClickItem(e, item)}
         >${item.label}</a>
@@ -120,4 +125,4 @@ export class Subnav extends LitElement {
   }
 }
 
-customElements.define('ctzn-subnav', Subnav)
+customElements.define('app-subnav', Subnav)

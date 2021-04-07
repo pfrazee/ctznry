@@ -46,7 +46,7 @@ class CtznForgotPassword extends LitElement {
 
   renderCurrentView () {
     return html`
-      <ctzn-header></ctzn-header>
+      <app-header></app-header>
       <main>
         <div class="mx-auto my-6 sm:my-12 max-w-lg px-8 sm:py-8 bg-white sm:rounded-2xl sm:border border-gray-300">
           <h2 class="mb-2 text-2xl">Forgot password</h2>
@@ -77,15 +77,15 @@ class CtznForgotPassword extends LitElement {
               required
             >
             <div class="flex">
-              <ctzn-button label="Cancel" @click=${this.onClickCancel} ?disabled=${this.isProcessing}></ctzn-button>
+              <app-button label="Cancel" @click=${this.onClickCancel} ?disabled=${this.isProcessing}></app-button>
               <div class="flex-1"></div>
-              <ctzn-button
+              <app-button
                 primary
                 label="Save"
                 @click=${this.onClickSaveNewPassword}
                 ?disabled=${this.isProcessing}
                 ?spinner=${this.isProcessing}
-              ></ctzn-button>
+              ></app-button>
             </div>
           ` : html`
             <div class="bg-white border px-6 py-4 rounded-2xl shadow-md mb-6 text-center">
@@ -103,21 +103,21 @@ class CtznForgotPassword extends LitElement {
               Note: this is your UserID, not your email address.
             </div>
             <div class="flex">
-              <ctzn-button label="Cancel" @click=${this.onClickCancel} ?disabled=${this.isProcessing}></ctzn-button>
+              <app-button label="Cancel" @click=${this.onClickCancel} ?disabled=${this.isProcessing}></app-button>
               <div class="flex-1"></div>
-              <ctzn-button
+              <app-button
                 btn-class="mr-2"
                 label="I have a code"
                 @click=${e => {this.userHasPasswordChangeCode = true}}
                 ?disabled=${this.isProcessing || !this.userId}
-              ></ctzn-button>
-              <ctzn-button
+              ></app-button>
+              <app-button
                 primary
                 label="Send code"
                 @click=${this.onClickSendPasswordChangeCode}
                 ?disabled=${this.isProcessing || !this.userId}
                 ?spinner=${this.isProcessing}
-              ></ctzn-button>
+              ></app-button>
             </div>
           `}
         </div>
@@ -162,4 +162,4 @@ class CtznForgotPassword extends LitElement {
   }
 }
 
-customElements.define('ctzn-forgot-password-view', CtznForgotPassword)
+customElements.define('app-forgot-password-view', CtznForgotPassword)

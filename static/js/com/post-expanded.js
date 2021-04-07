@@ -291,10 +291,10 @@ export class PostExpanded extends LitElement {
       return ''
     }
     return html`
-      <ctzn-reaction-input
+      <app-reaction-input
         .reactions=${this.post.reactions}
         @toggle-reaction=${this.onToggleReaction}
-      ></ctzn-reaction-input>
+      ></app-reaction-input>
     `
   }
 
@@ -430,7 +430,7 @@ export class PostExpanded extends LitElement {
   }
 }
 
-customElements.define('ctzn-post-expanded', PostExpanded)
+customElements.define('app-post-expanded', PostExpanded)
 
 const MINUTE = 1e3 * 60
 const HOUR = 1e3 * 60 * 60

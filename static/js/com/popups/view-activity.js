@@ -9,7 +9,7 @@ import { relativeDate } from '../../lib/time.js'
 import { extractSchemaId } from '../../lib/strings.js'
 import * as session from '../../lib/session.js'
 import '../button.js'
-import '../post.js'
+import '../../ctzn-tags/post-view.js'
 
 const _itemCache = {}
 
@@ -98,19 +98,19 @@ export class ViewActivityPopup extends BasePopup {
       </div>
 
       <div class="flex mt-4">
-        <ctzn-button
+        <app-button
           transparent
           btn-class="px-3 py-1 text-gray-600"
           label="Activity data"
           icon=${this.isDataOpen ? 'fas fa-caret-up' : 'fas fa-caret-down'}
           @click=${this.onClickDataToggle}
-        ></ctzn-button>
+        ></app-button>
         <span class="flex-1"></span>
-        <ctzn-button
+        <app-button
           btn-class="px-3 py-1"
           label="Close"
           @click=${this.onResolve}
-        ></ctzn-button>
+        ></app-button>
       </div>
 
       ${this.isDataOpen ? html`
@@ -481,19 +481,21 @@ export class ViewActivityPopup extends BasePopup {
       record = _itemCache[dbUrl] ? _itemCache[dbUrl] : await session.ctzn.getPost(authorId, dbUrl)
       _itemCache[dbUrl] = record
       yield html`
-        <ctzn-post
+        <ctzn-post-view
+          class="block py-2"
           .post=${record}
-          noctrls
-        ></ctzn-post>
+          mode="content-only"
+        ></ctzn-post-view>
       `
     } else if (schemaId === 'ctzn.network/comment') {
       record = _itemCache[dbUrl] ? _itemCache[dbUrl] : await session.ctzn.getComment(authorId, dbUrl)
       _itemCache[dbUrl] = record
       yield html`
-        <ctzn-post
+        <ctzn-post-view
+          class="block py-2"
           .post=${record}
-          noctrls
-        ></ctzn-post>
+          mode="content-only"
+        ></ctzn-post-view>
       `
     }
   }

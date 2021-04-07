@@ -99,22 +99,22 @@ export class CreateItemPopup extends BasePopup {
         ` : ''}
 
         <div class="flex border-t border-gray-200 mt-4 pt-4">
-          <ctzn-button
+          <app-button
             btn-class="px-3 py-1"
             @click=${this.onReject}
             label="Cancel"
             ?disabled=${this.isProcessing}
             ?spinner=${this.isProcessing}
-          ></ctzn-button>
+          ></app-button>
           <span class="flex-1"></span>
-          <ctzn-button
+          <app-button
             primary
             btn-type="submit"
             btn-class="px-3 py-1"
             label="Generate"
             ?disabled=${this.isProcessing}
             ?spinner=${this.isProcessing}
-          ></ctzn-button>
+          ></app-button>
         </div>
       </form>
     `

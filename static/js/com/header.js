@@ -117,17 +117,17 @@ export class Header extends LitElement {
               <hr class="my-3 mx-3">
             </div>
             <div class="mt-3 sm:mb-auto px-4">
-              <ctzn-button
+              <app-button
                 primary
                 btn-class="text-base sm:text-sm font-semibold w-full mb-2 rounded-3xl"
                 label="Create Post"
                 @click=${this.onClickCreatePost}
-              ></ctzn-button>
-              <ctzn-button
+              ></app-button>
+              <app-button
                 btn-class="text-gray-600 text-base sm:text-sm font-semibold w-full rounded-3xl"
                 label="Create Community"
                 @click=${this.onClickCreateCommunity}
-              ></ctzn-button>
+              ></app-button>
               <hr class="mt-5">
             </div>
           ` : ''}
@@ -273,4 +273,4 @@ export class Header extends LitElement {
   }
 }
 
-customElements.define('ctzn-header', Header)
+customElements.define('app-header', Header)

@@ -3,10 +3,10 @@ import {LitElement, html} from '../../vendor/lit-element/lit-element.js'
 /*
 Usage:
 
-<ctzn-hoverable>
+<app-hoverable>
   <button class="btn" slot="default">Hover me!</button>
   <button class="btn" slot="hover">I'm hovered!</button>
-</ctzn-hoverable>
+</app-hoverable>
 */
 
 export class Hoverable extends LitElement {
@@ -47,4 +47,4 @@ export class Hoverable extends LitElement {
   }
 }
 
-customElements.define('ctzn-hoverable', Hoverable)
+customElements.define('app-hoverable', Hoverable)

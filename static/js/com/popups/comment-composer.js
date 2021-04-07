@@ -3,7 +3,7 @@ import { html } from '../../../vendor/lit-element/lit-element.js'
 import { BasePopup } from './base.js'
 import '../button.js'
 import '../post-composer.js'
-import '../post.js'
+import '../../ctzn-tags/post-view.js'
 
 // exported api
 // =
@@ -53,14 +53,13 @@ export class CommentComposerPopup extends BasePopup {
         Reply to:
       </div>
       <div class="border border-gray-300 px-3 py-2 rounded mb-2">
-        <ctzn-post
+        <ctzn-post-view
           .post=${subject}
-          nometa
-          noclick
-          light
-        ></ctzn-post>
+          mode="content-only"
+          .renderOpts=${{noclick: true}}
+        ></ctzn-post-view>
       </div>
-      <ctzn-comment-composer
+      <app-comment-composer
         autofocus
         modal-mode
         .community=${subject.value.community}
@@ -69,7 +68,7 @@ export class CommentComposerPopup extends BasePopup {
         placeholder="Write your comment"
         @publish=${this.onPublishComment}
         @cancel=${this.onReject}
-      ></ctzn-comment-composer>
+      ></app-comment-composer>
     `
   }
 

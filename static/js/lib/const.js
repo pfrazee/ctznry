@@ -68,3 +68,51 @@ export const SUGGESTED_REACTIONS = [
   '🔥',
   '😢'
 ]
+
+export const DEFAULT_COMMUNITY_PROFILE_SECTIONS = [
+  {
+    id: 'feed',
+    label: 'Feed',
+    html: `<ctzn-posts-feed></ctzn-posts-feed>`
+  },
+  {
+    id: 'activity',
+    label: 'Activity',
+    html: `<ctzn-dbmethods-feed view="results"></ctzn-dbmethods-feed>`
+  },
+  {
+    id: 'items',
+    label: 'Items',
+    html: `<ctzn-item-classes-list></ctzn-item-classes-list>`
+  },
+  {
+    id: 'about',
+    label: 'About',
+    html: `<ctzn-community-members-list></ctzn-community-members-list>`
+  }
+]
+
+export const DEFAULT_CITIZEN_PROFILE_SECTIONS = [
+  {
+    id: 'feed',
+    label: 'Feed',
+    html: `<ctzn-posts-feed></ctzn-posts-feed>`
+  },
+  {
+    id: 'activity',
+    label: 'Activity',
+    html: `<ctzn-dbmethods-feed view="calls"></ctzn-dbmethods-feed>`
+  },
+  {
+    id: 'inventory',
+    label: 'Inventory',
+    html: `<ctzn-owned-items-list></ctzn-owned-items-list>`
+  },
+  {
+    id: 'about',
+    label: 'About',
+    html: `<ctzn-followers-list></ctzn-followers-list>
+<ctzn-following-list></ctzn-following-list>
+<ctzn-community-memberships-list></ctzn-community-memberships-list>`
+  }
+]

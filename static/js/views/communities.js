@@ -123,15 +123,15 @@ class CtznCommunities extends LitElement {
       {path: '/communities', label: 'My Communities'}
     ]
     return html`
-      <ctzn-header current-path=${'/communities'}></ctzn-header>
+      <app-header current-path=${'/communities'}></app-header>
       <main class="pb-16">
         ${session.isActive() ? html`
           <div>
-            <ctzn-subnav
+            <app-subnav
               nav-cls="mb-0.5 sm:mt-0.5"
               .items=${SUBNAV_ITEMS}
               current-path=${this.currentPath}
-            ></ctzn-subnav>
+            ></app-subnav>
             <div class="mb-4">
               ${this.memberships?.length ? html`
                 ${repeat(this.memberships, membership => html`
@@ -229,4 +229,4 @@ class CtznCommunities extends LitElement {
   }
 }
 
-customElements.define('ctzn-communities-view', CtznCommunities)
+customElements.define('app-communities-view', CtznCommunities)
