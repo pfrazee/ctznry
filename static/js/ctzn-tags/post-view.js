@@ -4,6 +4,8 @@ import { repeat } from '../../vendor/lit-element/lit-html/directives/repeat.js'
 import { POST_URL, ITEM_CLASS_ICON_URL, FULL_POST_URL, AVATAR_URL, BLOB_URL } from '../lib/const.js'
 import * as session from '../lib/session.js'
 import { TransferItemRelatedPopup } from '../com/popups/transfer-item-related.js'
+import { ReactionsListPopup } from '../com/popups/reactions-list.js'
+import { RelatedItemTransfersListPopup } from '../com/popups/related-item-transfers-list.js'
 import { emit } from '../lib/dom.js'
 import { makeSafe, linkify, pluralize, parseSrcAttr } from '../lib/strings.js'
 import { relativeDate } from '../lib/time.js'
@@ -647,6 +649,19 @@ export class PostView extends LitElement {
       return
     }
     emit(this, 'moderator-remove-post', {detail: {post: this.post}})
+  }
+
+  onClickViewReactions (e) {
+    ReactionsListPopup.create({
+      reactions: this.post.reactions
+    })
+  }
+
+  onClickViewGifts (e) {
+    RelatedItemTransfersListPopup.create({
+      communityId: this.communityUserId,
+      relatedItemTransfers: this.post.relatedItemTransfers
+    })
   }
 }
 
