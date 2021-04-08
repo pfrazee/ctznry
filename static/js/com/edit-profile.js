@@ -21,7 +21,8 @@ export class EditProfile extends LitElement {
       values: {type: Object},
       customUIOverride: {type: Boolean},
       currentView: {type: String},
-      currentError: {type: String}
+      currentError: {type: String},
+      isProcessing: {type: Boolean}
     }
   }
 
@@ -41,6 +42,7 @@ export class EditProfile extends LitElement {
     this.img = undefined
     this.uploadedAvatar = undefined
     this.uploadedBanner = undefined
+    this.isProcessing = false
   }
 
   get isCitizen () {
@@ -134,7 +136,8 @@ export class EditProfile extends LitElement {
           <div class="text-lg font-semibold">Edit profile</div>
           <app-button
             ?primary=${this.hasChanges}
-            ?disabled=${!this.hasChanges}
+            ?disabled=${!this.hasChanges || this.isProcessing}
+            ?spinner=${this.isProcessing}
             btn-class="py-1 px-2 text-sm"
             btn-type="submit"
             label="Save changes"
@@ -401,6 +404,7 @@ export class EditProfile extends LitElement {
     e.stopPropagation()
 
     this.currentError = undefined
+    this.isProcessing = true
 
     try {
       let isPending = false
@@ -538,9 +542,11 @@ export class EditProfile extends LitElement {
       } else {
         toast.create('Updates processing')
       }
+      this.isProcessing = false
       this.hasChanges = false
       this.customUIOverride = undefined
     } catch (e) {
+      this.isProcessing = false
       this.currentError = e.toString()
       console.error(e)
     }
