@@ -147,7 +147,7 @@ export class EditProfile extends LitElement {
           <div class="bg-red-100 p-6 mt-2 mb-4 text-red-600">${this.currentError}</div>
         ` : ''}
         <div class="sm:flex">
-          <div class="flex sm:block border-b sm:border-b-0 sm:border-r border-gray-200">
+          <div class="flex sm:block border-b sm:border-b-0 sm:border-r border-gray-200 sm:w-32">
             ${navItem('basics', 'Basics')}
             ${navItem('images', 'Images')}
             ${navItem('advanced', 'Advanced')}
