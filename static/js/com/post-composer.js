@@ -267,7 +267,7 @@ class PostComposer extends LitElement {
             <div class="section-header small light">
               My Profile
             </div>
-            <div class="dropdown-item" @click=${e => {_this.community = undefined}}>
+            <div class="dropdown-item" @click=${e => {_this.community = undefined; this.destroy()}}>
               <div class="img-wrapper">
                 <img class="rounded" src=${AVATAR_URL(session.info.userId)}>
                 <div>
@@ -284,7 +284,7 @@ class PostComposer extends LitElement {
                 My Communities
               </div>
               ${repeat(communities, community => html`
-                <div class="dropdown-item"  @click=${e => {_this.community = community}}>
+                <div class="dropdown-item"  @click=${e => {_this.community = community; this.destroy()}}>
                   <div class="img-wrapper">
                     <img class="rounded" src=${AVATAR_URL(community.userId)}>
                     <div>
