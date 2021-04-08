@@ -76,7 +76,7 @@ export class CustomHtml extends LitElement {
     let ctznElems = Array.from(this.querySelectorAll('[ctzn-elem]'))
     for (let el of ctznElems) {
       if (el.setContextState) {
-        el.setContextState(this.contextState)
+        el.setContextState(this.contextState, this.context)
       }
     }
   }

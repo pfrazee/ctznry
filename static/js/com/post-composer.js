@@ -1,6 +1,7 @@
 /* globals beaker monaco */
 import { LitElement, html } from '../../vendor/lit-element/lit-element.js'
 import { repeat } from '../../vendor/lit-element/lit-html/directives/repeat.js'
+import { ViewCustomHtmlPopup } from './popups/view-custom-html.js'
 import * as toast from './toast.js'
 import * as session from '../lib/session.js'
 import { AVATAR_URL } from '../lib/const.js'
@@ -19,6 +20,7 @@ class PostComposer extends LitElement {
       uploadProgress: {type: Number},
       uploadTotal: {type: Number},
       isExtendedOpen: {type: Boolean},
+      isExtendedUsingHtml: {type: Boolean},
       draftText: {type: String, attribute: 'draft-text'},
       media: {type: Array},
       community: {type: Object},
@@ -31,6 +33,7 @@ class PostComposer extends LitElement {
     this.uploadProgress = 0
     this.uploadTotal = 0
     this.isExtendedOpen = false
+    this.isExtendedUsingHtml = false
     this.placeholder = 'What\'s new?'
     this.draftText = ''
     this.media = []
@@ -127,6 +130,20 @@ class PostComposer extends LitElement {
             <span class="fas fa-fw fa-caret-${this.isExtendedOpen ? 'down' : 'right'}"></span>
             Extended post text
           </label>
+          ${this.isExtendedOpen ? html`
+            <div class="flex items-center border border-b-0 border-gray-300 px-3 py-2">
+              <input type="checkbox" id="use-html-toggle" @click=${this.onToggleExtendedUsingHtml}>
+              <label for="use-html-toggle" class="ml-2">Use HTML</label>
+              ${this.isExtendedUsingHtml ? html`
+                <app-button
+                  btn-class="ml-3 px-2 py-0"
+                  transparent
+                  label="Preview"
+                  @click=${this.onClickPreviewExtendedText}
+                ></app-button>
+              ` : ''}
+            </div>
+          ` : ''}
           <textarea
             id="extendedText"
             class="${this.isExtendedOpen ? '' : 'hidden'} block py-2 px-3 w-full h-48 box-border resize-y text-base border border-gray-300 rounded-b"
@@ -218,6 +235,18 @@ class PostComposer extends LitElement {
 
   onToggleExtendedText (e) {
     this.isExtendedOpen = !this.isExtendedOpen
+  }
+
+  onToggleExtendedUsingHtml (e) {
+    this.isExtendedUsingHtml = !!e.currentTarget.checked
+  }
+
+  onClickPreviewExtendedText (e) {
+    ViewCustomHtmlPopup.create({
+      html: this.querySelector('#extendedText').value,
+      context: 'post',
+      contextState: {page: {userId: session.info.userId}}
+    })
   }
 
   onClickAddImage (e) {
@@ -366,10 +395,12 @@ class PostComposer extends LitElement {
       let media = this.media.filter(Boolean)
       let text = this.querySelector('#text').value
       let extendedText = this.querySelector('#extendedText').value
+      let extendedTextMimeType = this.isExtendedUsingHtml ? 'text/html' : undefined
       res = await session.ctzn.user.table('ctzn.network/post').create({
         text,
         media: media?.length ? media : undefined,
         extendedText,
+        extendedTextMimeType,
         community: this.community
       })
     } catch (e) {

@@ -66,6 +66,17 @@ export function sanitize (str, context = undefined) {
       FORBID_ATTR: ['class', 'style']
     })
   }
+  if (context === 'post') {
+    return DOMPurify.sanitize(str, {
+      ADD_TAGS: [
+        'ctzn-card',
+        'ctzn-post-view'
+      ],
+      ADD_ATTR: ['view', 'user-id', 'mode'],
+      FORBID_TAGS: ['style'],
+      FORBID_ATTR: ['class', 'style']
+    })
+  }
   return DOMPurify.sanitize(str, {
     FORBID_TAGS: ['style'],
     FORBID_ATTR: ['class', 'style']

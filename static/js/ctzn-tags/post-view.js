@@ -45,6 +45,16 @@ export class PostView extends LitElement {
     this.isMouseDragging = false
   }
 
+  setContextState (state, context) {
+    if (context === 'post') {
+      this.classList.add('block')
+      this.classList.add('border')
+      this.classList.add('border-gray-300')
+      this.classList.add('rounded')
+      this.classList.add('mb-3')
+    }
+  }
+
   updated (changedProperties) {
     if (changedProperties.has('src') && this.src !== changedProperties.get('src')) {
       this.load()
@@ -204,9 +214,7 @@ export class PostView extends LitElement {
         </div>
         <div class="px-3 py-3 sm:px-4 sm:py-4 min-w-0">
           <div class="whitespace-pre-wrap break-words text-lg leading-tight font-medium text-black mb-1.5">${unsafeHTML(emojify(linkify(makeSafe(this.post.value.text))))}</div>
-          ${this.post.value.extendedText ? html`
-            <div class="whitespace-pre-wrap break-words leading-snug text-gray-800 my-2">${unsafeHTML(emojify(linkify(makeSafe(this.post.value.extendedText))))}</div>
-          ` : ''}
+          ${this.renderPostExtendedText()}
           ${this.renderMedia()}
           ${this.noctrls ? '' : html`
             ${this.hasReactionsOrGifts ? html`
@@ -236,7 +244,7 @@ export class PostView extends LitElement {
         @mouseup=${this.onMouseupCard}
         @mousemove=${this.onMousemoveCard}
       >
-        ${this.renderPostText()}
+        ${this.renderPostTextNonFull()}
         ${this.renderMedia()}
       </div>
     `
@@ -281,7 +289,7 @@ export class PostView extends LitElement {
                 </span>
               </div>
             `}
-            ${this.renderPostText()}
+            ${this.renderPostTextNonFull()}
             ${this.renderMedia()}
             ${this.showContentOnly ? '' : html`
               ${this.hasReactionsOrGifts ? html`
@@ -485,7 +493,7 @@ export class PostView extends LitElement {
     `
   }
 
-  renderPostText () {
+  renderPostTextNonFull () {
     const {text, extendedText} = this.post.value
     if (!text?.trim() && !extendedText?.trim()) {
       return ''
@@ -498,6 +506,25 @@ export class PostView extends LitElement {
           ? html`<span class="bg-gray-200 ml-1 px-1 rounded text-gray-600 text-xs">more</span>`
           : ''
       }</div>
+    `
+  }
+
+  renderPostExtendedText () {
+    if (!this.post.value.extendedText) {
+      return ''
+    }
+    if (this.post.value.extendedTextMimeType === 'text/html') {
+      return html`
+        <app-custom-html
+          class="block my-2"
+          context="post"
+          .contextState=${{page: {userId: this.post.author.userId}}}
+          .html=${this.post.value.extendedText}
+        ></app-custom-html>
+      `
+    }
+    return html`
+      <div class="whitespace-pre-wrap break-words leading-snug text-gray-800 my-2">${unsafeHTML(emojify(linkify(makeSafe(this.post.value.extendedText))))}</div>
     `
   }
 

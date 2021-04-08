@@ -6,6 +6,21 @@ export class Card extends LitElement {
     this.setAttribute('ctzn-elem', '1')
   }
 
+  setContextState (state, context) {
+    if (state?.page?.userId) {
+      if (!this.userId) {
+        this.userId = state.page.userId
+      }
+    }
+    if (context === 'post') {
+      this.classList.add('block')
+      this.classList.add('border')
+      this.classList.add('border-gray-300')
+      this.classList.add('rounded')
+      this.classList.add('mb-3')
+    }
+  }
+
   firstUpdated () {
     // apply some custom styles to embedded elements
     for (let el of this.querySelectorAll('[ctzn-elem]')) {
