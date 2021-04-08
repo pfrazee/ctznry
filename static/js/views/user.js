@@ -149,7 +149,7 @@ class CtznUser extends LitElement {
     gestures.setCurrentNav([
       {back: true},
       ...v.map(s => `/${this.userId}/${s.id}`),
-      ...(this.canEditSettings ? [`/${this.userId}/settings`] : [])
+      `/${this.userId}/settings`
     ])
   }
 
@@ -158,21 +158,19 @@ class CtznUser extends LitElement {
   }
 
   get subnavItems () {
-    let items = [
-      {back: true, label: html`<span class="fas fa-angle-left"></span>`, mobileOnly: true}
-    ].concat(this.sections.map(section => ({
+    return [
+      {back: true, label: html`<span class="fas fa-angle-left"></span>`, mobileOnly: true},
+      ...this.sections.map(section => ({
         label: section.label || section.id,
         path: `/${this.userId}/${section.id}`
-    })))
-    if (this.canEditSettings) {
-      items.push({
+      })),
+      {
         path: `/${this.userId}/settings`,
         label: html`<span class="fas fa-cog"></span>`,
         thin: true,
         rightAlign: true
-      })
-    }
-    return items
+      }
+    ]
   }
 
   getMembersWithRole (roleId) {
@@ -193,10 +191,6 @@ class CtznUser extends LitElement {
       }
     }
     return false
-  }
-
-  get canEditSettings () {
-    return session.info.userId === this.userId || this.hasPermission('ctzn.network/perm-community-edit-profile')
   }
 
   async load ({force} = {force: false}) {
@@ -634,19 +628,12 @@ class CtznUser extends LitElement {
 
   renderCurrentView () {
     if (this.currentView === 'settings') {
-      if (this.canEditSettings) {
-        return html`
-          <app-edit-profile
-            user-id=${this.userId}
-            .profile=${this.userProfile}
-            @profile-updated=${this.onProfileUpdated}
-          ></app-edit-profile>
-        `
-      }
       return html`
-        <div class="bg-white px-8 py-5 text-gray-600 sm:rounded mb-0.5">
-          You don't have access to this user's settings.
-        </div>
+        <app-edit-profile
+          user-id=${this.userId}
+          .profile=${this.userProfile}
+          @profile-updated=${this.onProfileUpdated}
+        ></app-edit-profile>
       `
     } else if (this.currentSection) {
       return html`

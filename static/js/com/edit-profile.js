@@ -5,8 +5,17 @@ import * as images from '../lib/images.js'
 import { slugify, encodeBase64, decodeBase64 } from '../lib/strings.js'
 import { deepClone } from '../lib/functions.js'
 import { emit } from '../lib/dom.js'
-import { AVATAR_URL, BLOB_URL, DEFAULT_COMMUNITY_PROFILE_SECTIONS, DEFAULT_CITIZEN_PROFILE_SECTIONS } from '../lib/const.js'
+import {
+  AVATAR_URL,
+  BLOB_URL,
+  DEFAULT_COMMUNITY_PROFILE_SECTIONS,
+  DEFAULT_CITIZEN_PROFILE_SECTIONS,
+  PERM_DESCRIPTIONS
+} from '../lib/const.js'
 import { ViewCustomHtmlPopup } from './popups/view-custom-html.js'
+import { ManageBansPopup } from '../com/popups/manage-bans.js'
+import { EditRolePopup } from '../com/popups/edit-role.js'
+import { InvitePopup } from '../com/popups/invite.js'
 import * as toast from './toast.js'
 import './button.js'
 import './code-textarea.js'
@@ -17,8 +26,13 @@ export class EditProfile extends LitElement {
     return {
       userId: {type: String, attribute: 'user-id'},
       profile: {type: Object},
+      communityPerms: {type: Object},
+      communityConfig: {type: Object},
+      communityRoles: {type: Object},
+      communityMembers: {type: Object},
       _hasChanges: {type: Boolean},
       values: {type: Object},
+      communityConfigValues: {type: Object},
       customUIOverride: {type: Boolean},
       currentView: {type: String},
       currentError: {type: String},
@@ -34,8 +48,17 @@ export class EditProfile extends LitElement {
     super()
     this.userId = undefined
     this.profile = undefined
+
+    // community
+    this.communityPerms = undefined
+    this.communityConfig = undefined
+    this.communityRoles = undefined
+    this.communityMembers = undefined
+    
+    // UI state
     this.hasChanges = false
     this.values = undefined
+    this.communityConfigValues = undefined
     this.customUIOverride = undefined
     this.currentView = 'basics'
     this.currentError = undefined
@@ -82,7 +105,22 @@ export class EditProfile extends LitElement {
         }
       }
     }
-    this.values = JSON.parse(JSON.stringify(this.profile.value)) // the ole deep clone
+    this.values = deepClone(this.profile.value)
+    await this.loadCommunity()
+  }
+
+  async loadCommunity () {
+    if (!this.isCommunity) return
+    this.communityPerms = session.isActive ? (await session.ctzn.viewByHomeServer(
+      this.userId,
+      'ctzn.network/community-user-permissions-view',
+      this.userId,
+      session.info.userId
+    ))?.permissions : []
+    this.communityConfig = (await session.ctzn.db(this.userId).table('ctzn.network/community-config').get('self'))?.value || {}
+    this.communityRoles = await session.ctzn.db(this.userId).table('ctzn.network/community-role').list().catch(e => undefined) || []
+    this.communityMembers = await session.ctzn.listAllMembers(this.userId)
+    this.communityConfigValues = deepClone(this.communityConfig)
   }
 
   get hasChanges () {
@@ -99,8 +137,10 @@ export class EditProfile extends LitElement {
   }
 
   setValue (path, v) {
-    setByPath(this.values, path, v)
-    this.hasChanges = true
+    if (this.getValue(path) !== v) {
+      setByPath(this.values, path, v)
+      this.hasChanges = true
+    }
   }
 
   setCustomUI (v) {
@@ -114,6 +154,24 @@ export class EditProfile extends LitElement {
       }
     }
     this.requestUpdate()
+  }
+
+  get canEditProfile () {
+    return session.isActive () && (
+      session.info.userId === this.userId ||
+      this.hasPermission('ctzn.network/perm-community-edit-profile')
+    )
+  }
+
+  hasPermission (permId) {
+    if (!this.communityPerms?.length) {
+      return false
+    }
+    return !!this.communityPerms.find(p => p.permId === 'ctzn.network/perm-admin' || p.permId === permId)
+  }
+
+  getMembersWithRole (roleId) {
+    return this.communityMembers?.filter?.(m => m.value.roles?.includes(roleId)) || []
   }
 
   // rendering
@@ -133,7 +191,7 @@ export class EditProfile extends LitElement {
     return html`
       <form @submit=${this.onSubmit} class="bg-white sm:rounded mb-0.5">
         <div class="border-b border-gray-200 flex items-center justify-between pl-4 pr-2 py-2 rounded-t">
-          <div class="text-lg font-semibold">Edit profile</div>
+          <div class="text-lg font-semibold">Settings</div>
           <app-button
             ?primary=${this.hasChanges}
             ?disabled=${!this.hasChanges || this.isProcessing}
@@ -149,7 +207,7 @@ export class EditProfile extends LitElement {
         <div class="sm:flex">
           <div class="flex sm:block border-b sm:border-b-0 sm:border-r border-gray-200 sm:w-32">
             ${navItem('basics', 'Basics')}
-            ${navItem('images', 'Images')}
+            ${this.isCommunity ? navItem('community', 'Community') : ''}
             ${navItem('advanced', 'Advanced')}
           </div>
           <div class="sm:flex-1 px-4 pt-2 pb-4">
@@ -164,18 +222,18 @@ export class EditProfile extends LitElement {
                 class="block box-border w-full border border-gray-300 rounded p-3 mb-1"
                 placeholder="Anonymous"
                 @keyup=${e => this.onKeyupValue(e, ['displayName'])}
+                ?disabled=${!this.canEditProfile}
               />
 
               <label class="block font-semibold p-1" for="description-input">Bio</label>
               <textarea
                 id="description-input"
                 name="description"
-                class="block box-border w-full border border-gray-300 rounded p-3"
+                class="block box-border w-full border border-gray-300 rounded p-3 mb-2"
                 @keyup=${e => this.onKeyupValue(e, ['description'])}
+                ?disabled=${!this.canEditProfile}
               >${this.values.description}</textarea>
-            </div>
 
-            <div class="${this.currentView === 'images' ? 'block' : 'hidden'}">
               <div class="mb-2">
                 <label class="block font-semibold p-1">Banner Image</label>
                 ${!this.uploadedBanner ? html`
@@ -216,6 +274,10 @@ export class EditProfile extends LitElement {
               <input id="avatar-file-input" class="hidden" type="file" accept=".jpg,.jpeg,.png,.svg" @change=${this.onChooseAvatarFile}>
             </div>
 
+            <div class="${this.currentView === 'community' ? 'block' : 'hidden'}">
+              ${this.isCommunity ? this.renderCommunityForm() : ''}
+            </div>
+
             <div class="${this.currentView === 'advanced' ? 'block' : 'hidden'}">
               <label class="block font-semibold p-1">Profile UI</label>
               <div class="mb-2">
@@ -224,12 +286,14 @@ export class EditProfile extends LitElement {
                   icon="far fa-${this.hasCustomUI ? 'circle' : 'check-circle'}"
                   label="Default UI"
                   @click=${e => this.setCustomUI(false)}
+                  ?disabled=${!this.canEditProfile}
                 ></app-button>
                 <app-button
                   transparent
                   icon="far fa-${!this.hasCustomUI ? 'circle' : 'check-circle'}"
                   label="Custom UI"
                   @click=${e => this.setCustomUI(true)}
+                  ?disabled=${!this.canEditProfile}
                 ></app-button>
               </div>
               ${!this.hasCustomUI ? html`
@@ -259,6 +323,7 @@ export class EditProfile extends LitElement {
                     icon="fas fa-plus"
                     label="Add Section"
                     @click=${this.onAddSection}
+                    ?disabled=${!this.canEditProfile}
                   ></app-button>
                 </div>
               </div>
@@ -266,6 +331,128 @@ export class EditProfile extends LitElement {
           </div>
         </div>
       </form>
+    `
+  }
+
+  renderCommunityForm () {
+    const canInvite = this.hasPermission('ctzn.network/perm-community-invite')
+    const canManageRoles = this.hasPermission('ctzn.network/perm-community-manage-roles')
+    const canBan = this.hasPermission('ctzn.network/perm-community-ban')
+    const canEditConfig = this.hasPermission('ctzn.network/perm-community-update-config')
+
+    const renderRole = (roleId, permissions) => {
+      let members = this.getMembersWithRole(roleId)
+      return html`
+        <div class="px-4 py-2 bg-white border border-gray-300 rounded mb-1">
+          <div class="flex items-center">
+            <span class="font-semibold text-lg flex-1"><span class="text-sm far fa-fw fa-user"></span> ${roleId}</span>
+            ${roleId !== 'admin' && this.hasPermission('ctzn.network/perm-community-manage-roles') ? html`
+              <app-button btn-class="px-3 py-1 text-sm" @click=${e => this.onRemoveRole(e, roleId)} label="Remove"></app-button>
+            ` : ''}
+            ${this.hasPermission('ctzn.network/perm-community-manage-roles') ? html`
+              <app-button btn-class="ml-1 px-3 py-1 text-sm" @click=${e => this.onEditRole(e, roleId, permissions)} label="Edit"></app-button>
+            ` : ''}
+          </div>
+          <div class="text-gray-500">
+            ${roleId === 'admin' ? html`
+              <div>&bull; Runs this community.</div>
+            ` : permissions.length ? html`
+              ${repeat(permissions, p => p.permId, p => html`
+                <div>&bull; ${PERM_DESCRIPTIONS[p.permId] || p.permId}</div>
+              `)}
+            ` : html`
+              <em>This role has no permissions</em>
+            `}
+          </div>
+          ${members.length > 0 ? html`
+            <div class="flex mt-2">
+              ${repeat(members, member => html`
+                <a class="block" href="/${member.value.user.userId}" data-tooltip=${member.value.user.userId}>
+                  <img class="block rounded object-cover w-10 h-10 mr-1" src=${AVATAR_URL(member.value.user.userId)}>
+                </a>
+              `)}
+            </div>
+          ` : ''}
+        </div>
+      `
+    }
+
+    return html`
+      <div class="mt-2 mb-4">
+        <app-button
+          btn-class="px-3 py-1 text-sm"
+          @click=${canInvite ? this.onCreateInvite : undefined}
+          ?disabled=${!canInvite}
+          label="Invite New Member"
+        ></app-button>
+      </div>
+
+      <h4 class="font-medium border-b border-gray-200 mb-2">Join mode</h4>
+      ${this.communityConfigValues ? html`
+        <div class="py-2">
+          <div class="flex items-baseline mb-2">
+            <input
+              id="joinMode-open"
+              type="radio"
+              name="joinMode"
+              value="open"
+              class="mx-2"
+              @click=${this.onClickJoinMode}
+              ?checked=${this.communityConfigValues.joinMode !== 'closed'}
+              ?disabled=${!canEditConfig}
+            >
+            <label for="joinMode-open" class="text-gray-600">
+              <strong class="font-medium text-black">Open.</strong>
+              Anybody can join the community.
+            </label>
+          </div>
+          <div class="flex items-baseline">
+            <input
+              id="joinMode-closed"
+              type="radio"
+              name="joinMode"
+              value="closed"
+              class="mx-2"
+              @click=${this.onClickJoinMode}
+              ?checked=${this.communityConfigValues.joinMode === 'closed'}
+              ?disabled=${!canEditConfig}
+            >
+            <label for="joinMode-closed" class="text-gray-600">
+              <strong class="font-medium text-black">Closed.</strong>
+              Members must be invited to join the community.
+            </label>
+          </div>
+          <div class="mt-2 px-2 py-1 text-gray-500 text-sm">
+            Note: Closed communities are still publicly readable.
+          </div>
+        </div>
+      ` : html`
+        <div class="text-center rounded bg-gray-50 py-12">
+          <span class="spinner"></span>
+        </div>
+      `}
+      <h4 class="font-medium border-b border-gray-200 mb-2 mt-3">Member roles</h4>
+      <div class="bg-gray-100 rounded p-2 mb-2">
+        ${renderRole('admin')}
+        ${repeat(this.communityRoles || [], r => r.value.roleId, r => renderRole(r.value.roleId, r.value.permissions))}
+        <div>
+          <app-button
+            btn-class="px-3 py-1 text-sm"
+            @click=${canManageRoles ? this.onCreateRole : undefined}
+            ?disabled=${!canManageRoles}
+            label="Create New Role"
+          ></app-button>
+        </div>
+      </div>
+      <h4 class="font-medium border-b border-gray-200 mb-2 mt-3">Banned users</h4>
+      <div>
+        <app-button
+          btn-class="px-3 py-1 text-sm"
+          @click=${canBan ? this.onClickManageBans : undefined}
+          ?disabled=${!canBan}
+          label="Manage Banned Users"
+        ></app-button>
+      </div>
     `
   }
 
@@ -279,11 +466,13 @@ export class EditProfile extends LitElement {
           required
           placeholder="Label"
           @keyup=${e => this.onKeyupValue(e, ['sections', i, 'label'])}
+          ?disabled=${!this.canEditProfile}
         >
         <app-code-textarea
           textarea-class="block w-full box-border font-mono border border-gray-200 rounded px-3 py-1 h-32 mb-1 text-sm"
           @keyup=${e => this.onKeyupValue(e, ['sections', i, 'html'])}
           .value=${section.html}
+          ?disabled=${!this.canEditProfile}
         ></app-code-textarea>
         <div class="flex items-center mb-1">
           <app-button transparent btn-class="px-2 py-1 text-sm" label="Preview" @click=${e => this.onPreviewSection(e, i)}></app-button>
@@ -298,6 +487,7 @@ export class EditProfile extends LitElement {
                 icon="fas fa-arrow-up"
                 data-tooltip="Move up in the nav order"
                 @click=${e => this.onMoveSection(e, i, -1)}
+                ?disabled=${!this.canEditProfile}
               ></app-button>
             `}
             ${i === this.values.sections.length - 1 ? html`
@@ -309,6 +499,7 @@ export class EditProfile extends LitElement {
                 icon="fas fa-arrow-down"
                 data-tooltip="Move down in the nav order"
                 @click=${e => this.onMoveSection(e, i, 1)}
+                ?disabled=${!this.canEditProfile}
               ></app-button>
             `}
           </span>
@@ -318,6 +509,7 @@ export class EditProfile extends LitElement {
             class="ml-auto"
             label="Delete"
             @click=${e => this.onDeleteSection(e, i)}
+            ?disabled=${!this.canEditProfile}
           ></app-button>
         </div>
       </div>
@@ -366,6 +558,9 @@ export class EditProfile extends LitElement {
   }
 
   onClickBanner (e) {
+    if (!this.canEditProfile) {
+      return
+    }
     e.preventDefault()
     this.querySelector('#banner-file-input').click()
   }
@@ -383,6 +578,9 @@ export class EditProfile extends LitElement {
   }
 
   onClickAvatar (e) {
+    if (!this.canEditProfile) {
+      return
+    }
     e.preventDefault()
     this.querySelector('#avatar-file-input').click()
   }
@@ -399,6 +597,77 @@ export class EditProfile extends LitElement {
     fr.readAsDataURL(file)
   }
 
+  async onCreateRole (e) {
+    try {
+      await EditRolePopup.create({communityId: this.userId})
+      this.loadCommunity()
+    } catch (e) {
+      console.log(e)
+    }
+  }
+
+  async onEditRole (e, roleId, permissions) {
+    try {
+      await EditRolePopup.create({
+        communityId: this.userId,
+        roleId,
+        permissions,
+        members: this.getMembersWithRole(roleId)
+      })
+      this.loadCommunity()
+    } catch (e) {
+      console.log(e)
+    }
+  }
+
+  async onRemoveRole (e, roleId) {
+    if (!confirm('Remove this role?')) {
+      return
+    }
+    try {
+      let res = await session.ctzn.db(this.userId).method(
+        'ctzn.network/community-delete-role-method',
+        {roleId}
+      )
+      if (!res.pending()) {
+        toast.create(`${roleId} role removed`)
+      }
+      this.loadCommunity()
+    } catch (e) {
+      console.log(e)
+      toast.create(e.toString(), 'error')
+    }
+  }
+
+  async onCreateInvite (e) {
+    try {
+      await InvitePopup.create({
+        communityId: this.userId
+      })
+      toast.create('Invite created', 'success')
+    } catch (e) {
+      if (e) {
+        console.log(e)
+        toast.create(e.toString(), 'error')
+      }
+    }
+  }
+
+  async onClickManageBans (e) {
+    try {
+      await ManageBansPopup.create({
+        communityId: this.userId
+      })
+    } catch (e) {
+      // ignore
+    }
+  }
+
+  onClickJoinMode (e) {
+    this.communityConfigValues.joinMode = e.currentTarget.value
+    this.hasChanges = true
+  }
+
   async onSubmit (e) {
     e.preventDefault()
     e.stopPropagation()
@@ -411,6 +680,15 @@ export class EditProfile extends LitElement {
 
       if (this.customUIOverride === false) {
         this.values.sections = undefined
+      }
+
+      // update community settings
+      if (this.isCommunity && hasChanges(this.communityConfigValues, this.communityConfig)) {
+        let res = await session.ctzn.db(this.userId).method(
+          'ctzn.network/community-update-config-method',
+          {joinMode: this.communityConfigValues.joinMode}
+        )
+        isPending = isPending || res.pending()
       }
 
       // update profile data
@@ -600,14 +878,14 @@ async function uploadBlob (blobName, dataUrl) {
 }
 
 function getByPath (obj, path) {
-  for (let k of path) {
+  for (let k of path.slice(0, -1)) {
     if (typeof obj[k] === 'object') {
       obj = obj[k]
     } else {
       return undefined
     }
   }
-  return obj
+  return obj[path[path.length - 1]]
 }
 
 function setByPath (obj, path, v) {
