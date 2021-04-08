@@ -77,7 +77,7 @@ class CtznMainView extends LitElement {
 
   async pageLoadScrollTo (y) {
     await this.requestUpdate()
-    const feed = this.querySelector('ctzn-posts-feed') || this.querySelector('ctzn-notifications-feed')
+    const feed = this.querySelector('ctzn-posts-feed') || this.querySelector('app-notifications-feed')
     feed.pageLoadScrollTo(y)
   }
 
@@ -88,8 +88,8 @@ class CtznMainView extends LitElement {
       onRefresh: () => {
         if (this.querySelector('ctzn-posts-feed')) {
           this.querySelector('ctzn-posts-feed').load()
-        } else if (this.querySelector('ctzn-notifications-feed')) {
-          this.querySelector('ctzn-notifications-feed').load()
+        } else if (this.querySelector('app-notifications-feed')) {
+          this.querySelector('app-notifications-feed').load()
         }
       }
     }))
@@ -312,7 +312,7 @@ class CtznMainView extends LitElement {
     this.numUnreadNotifications = e.detail.count
     if (this.currentView === 'notifications') {
       document.title = e.detail.count ? `(${e.detail.count}) Notifications | CTZN` : `Notifications | CTZN`
-      this.querySelector('ctzn-notifications-feed').loadNew(e.detail.count)
+      this.querySelector('app-notifications-feed').loadNew(e.detail.count)
 
       if (document.hasFocus()) {
         session.api.notifications.updateNotificationsClearedAt()
