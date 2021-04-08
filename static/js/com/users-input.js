@@ -4,7 +4,9 @@ import * as session from '../lib/session.js'
 import * as displayNames from '../lib/display-names.js'
 import { emit } from '../lib/dom.js'
 import './button.js'
-
+import {
+  AVATAR_URL
+} from '../lib/const.js'
 export class UsersInput extends LitElement {
   static get properties () {
     return {
@@ -42,7 +44,7 @@ export class UsersInput extends LitElement {
   render () {
     const c = this.currentSuggestionsSelection
     return html`
-      <div class="bg-white border border-gray-300 rounded overflow-hidden">
+      <div class="bg-white border border-gray-300 rounded">
         <input
           class="block bg-transparent w-full px-2 py-1"
           @keydown=${this.onKeydown}
@@ -53,14 +55,18 @@ export class UsersInput extends LitElement {
           ${repeat(this.filteredUsers, userId => userId, (userId, i) => html`
             <div
               class="
-                truncate border-t border-gray-200 px-2 py-1.5 cursor-pointer
+                truncate border-t border-gray-200 px-2 py-1.5 cursor-pointer flex flex-col
                 ${this.value === userId ? 'bg-blue-600 text-white' : c === i ? 'bg-gray-100' : 'hov:hover:bg-gray-100'}
               "
               @click=${e => {this.setValue(userId)}}
             >
-              <span class="${this.value === userId ? 'fas fa-check-circle' : 'far fa-circle'} fa-fw mr-1"></span>
+              <img
+                class="border-2 border-white inline-block object-cover rounded-3xl shadow-md bg-white"
+                src=${AVATAR_URL(userId)}
+                style="width: 75px; height: 75px"
+              >
               ${displayNames.render(userId)}
-              <span class="text-sm ${this.value === userId ? 'text-blue-200' : 'text-gray-500'}">${userId}</span>
+              <span class="text-xs ${this.value === userId ? 'text-blue-200' : 'text-gray-500'}">${userId}</span>
             </div>
           `)}
         </div>
