@@ -61,6 +61,14 @@ export class CommunityMembershipsList extends LitElement {
   // =
 
   render () {
+    if (typeof this.memberships === 'undefined') {
+      return html`
+        <div class="bg-white sm:rounded my-1 px-5 py-3">
+          <span class="text-lg font-medium mr-1">Communities</span>
+          <span class="spinner text-gray-500"></span>
+        </div>
+      `
+    }
     return html`
       <div class="bg-white sm:rounded my-1 ${this.memberships ? 'pb-1' : ''}">
         <div

@@ -57,6 +57,14 @@ export class FollowersList extends LitElement {
   // =
 
   render () {
+    if (typeof this.followers === 'undefined') {
+      return html`
+        <div class="bg-white sm:rounded my-1 px-5 py-3">
+          <span class="text-lg font-medium mr-1">Followers</span>
+          <span class="spinner text-gray-500"></span>
+        </div>
+      `
+    }
     return html`
       <div class="bg-white sm:rounded my-1 ${this.followers ? 'pb-1' : ''}">
         <div
