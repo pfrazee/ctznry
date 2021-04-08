@@ -2,6 +2,7 @@ import { LitElement, html } from '../../vendor/lit-element/lit-element.js'
 import { unsafeHTML } from '../../vendor/lit-element/lit-html/directives/unsafe-html.js'
 import * as ctznHtml from '../lib/ctzn-html.js'
 import * as session from '../lib/session.js'
+import { decodeBase64 } from '../lib/strings.js'
 
 import '../ctzn-tags/card.js'
 import '../ctzn-tags/post-view.js'
@@ -62,7 +63,7 @@ export class CustomHtml extends LitElement {
     }
     try {
       let base64buf = (await session.ctzn.blob.get(this.userId, this.blobName))?.buf
-      if (base64buf) this.loadedHtml = atob(base64buf)
+      if (base64buf) this.loadedHtml = decodeBase64(base64buf)
       if (!this.loadedHtml) {
         throw 'Failed to load HTML'
       }

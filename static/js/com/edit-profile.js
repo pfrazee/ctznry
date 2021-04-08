@@ -2,7 +2,7 @@ import { LitElement, html } from '../../vendor/lit-element/lit-element.js'
 import { repeat } from '../../vendor/lit-element/lit-html/directives/repeat.js'
 import * as session from '../lib/session.js'
 import * as images from '../lib/images.js'
-import { slugify } from '../lib/strings.js'
+import { slugify, encodeBase64, decodeBase64 } from '../lib/strings.js'
 import { deepClone } from '../lib/functions.js'
 import { emit } from '../lib/dom.js'
 import { AVATAR_URL, BLOB_URL, DEFAULT_COMMUNITY_PROFILE_SECTIONS, DEFAULT_CITIZEN_PROFILE_SECTIONS } from '../lib/const.js'
@@ -70,7 +70,7 @@ export class EditProfile extends LitElement {
         if (!section.html) {
           try {
             let base64buf = (await session.ctzn.blob.get(this.userId, `ui:profile:${section.id}`))?.buf
-            if (base64buf) section.html = atob(base64buf)
+            if (base64buf) section.html = decodeBase64(base64buf)
           } catch (e) {
             console.log('Failed to load blob', e)
           }
@@ -438,7 +438,7 @@ export class EditProfile extends LitElement {
           for (let update of sectionBlobUpdates) {
             await session.ctzn.blob.update(
               `ui:profile:${update.id}`,
-              btoa(update.html),
+              encodeBase64(update.html),
               {mimeType: 'text/html'}
             )
           }
@@ -456,7 +456,7 @@ export class EditProfile extends LitElement {
           // upload section blobs to the community
           for (let update of sectionBlobUpdates) {
             let res = await session.ctzn.blob.create(
-              btoa(update.html),
+              encodeBase64(update.html),
               {mimeType: 'text/html'}
             )
             let res2 = await session.ctzn.db(this.userId).method(
