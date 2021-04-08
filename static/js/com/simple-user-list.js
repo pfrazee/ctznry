@@ -109,7 +109,7 @@ export class SimpleUserList extends LitElement {
   async onClickUnfollow (e, userId) {
     e.preventDefault()
     await session.ctzn.user.table('ctzn.network/follow').delete(userId)
-    this.myFollows.splice(this.myFollows.indexOf(userId))
+    this.myFollows.splice(this.myFollows.indexOf(userId), 1)
     this.requestUpdate()
   }
 }
