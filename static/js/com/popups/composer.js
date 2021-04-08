@@ -34,7 +34,7 @@ export class ComposerPopup extends BasePopup {
 
   firstUpdated () {
     if (this.intent === 'image') {
-      this.querySelector('ctzn-post-composer').triggerImageSelect()
+      this.querySelector('app-post-composer').triggerImageSelect()
     }
   }
 

@@ -25,7 +25,7 @@ export class EditProfilePopup extends BasePopup {
   }
 
   static destroy () {
-    return BasePopup.destroy('ctzn-edit-profile')
+    return BasePopup.destroy('app-edit-profile')
   }
 
   // rendering

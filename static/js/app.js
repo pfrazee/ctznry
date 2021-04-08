@@ -2,6 +2,7 @@ import { LitElement, html } from '../vendor/lit-element/lit-element.js'
 import * as session from './lib/session.js'
 import { emit } from './lib/dom.js'
 import * as gestures from './lib/gestures.js'
+import * as contextMenu from './com/context-menu.js'
 import { DRIVE_KEY_REGEX } from './lib/strings.js'
 import { BasePopup } from './com/popups/base.js'
 import './com/header.js'
@@ -77,6 +78,7 @@ class CtznApp extends LitElement {
     }
     this.pageHasChanges = false
 
+    contextMenu.destroy()
     BasePopup.destroy()
     
     if (history.scrollRestoration) {

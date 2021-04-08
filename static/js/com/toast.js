@@ -9,12 +9,12 @@ export function create (message, type = '', time = 3000, button = null) {
   destroy()
 
   // render toast
-  document.body.appendChild(new BeakerToast({message, type, button}))
+  document.body.appendChild(new Toast({message, type, button}))
   setTimeout(destroy, time)
 }
 
 export function destroy () {
-  var toast = document.querySelector('ctzn-toast')
+  var toast = document.querySelector('app-toast')
 
   if (toast) {
     // fadeout before removing element
@@ -26,7 +26,7 @@ export function destroy () {
 // internal
 // =
 
-class BeakerToast extends LitElement {
+class Toast extends LitElement {
   constructor ({message, type, button}) {
     super()
     this.message = message
@@ -48,6 +48,6 @@ class BeakerToast extends LitElement {
     `
   }
 }
-BeakerToast.styles = toastCSS
+Toast.styles = toastCSS
 
-customElements.define('app-toast', BeakerToast)
+customElements.define('app-toast', Toast)

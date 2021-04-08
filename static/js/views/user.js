@@ -301,13 +301,13 @@ class CtznUser extends LitElement {
   }
 
   get isLoading () {
-    let queryViewEls = Array.from(this.querySelectorAll('ctzn-feed'))
+    let queryViewEls = Array.from(this.querySelectorAll('ctzn-posts-feed'))
     return this.isProfileLoading || !!queryViewEls.find(el => el.isLoading)
   }
 
   async pageLoadScrollTo (y) {
     await this.requestUpdate()
-    const feed = this.querySelector('ctzn-feed')
+    const feed = this.querySelector('ctzn-posts-feed')
     if (feed) {
       feed.pageLoadScrollTo(y)
     } else {
@@ -1036,7 +1036,7 @@ class CtznUser extends LitElement {
         community: {userId: this.userId, dbUrl: this.userProfile?.dbUrl}
       })
       toast.create('Post published', '', 10e3)
-      this.querySelector('ctzn-feed').load()
+      this.querySelector('ctzn-posts-feed').load()
     } catch (e) {
       // ignore
       console.log(e)

@@ -65,7 +65,7 @@ export function create (opts) {
   var parent = opts.parent || document.body
 
   // render interface
-  parent.appendChild(new BeakerContextMenu(opts))
+  parent.appendChild(new ContextMenu(opts))
   document.addEventListener('keyup', onKeyUp)
   document.addEventListener('click', onClickAnywhere)
 
@@ -76,7 +76,7 @@ export function create (opts) {
 }
 
 export function destroy (value) {
-  const el = document.querySelector('ctzn-context-menu')
+  const el = document.querySelector('app-context-menu')
   if (el) {
     el.parentNode.removeChild(el)
     document.removeEventListener('keyup', onKeyUp)
@@ -98,7 +98,7 @@ function onKeyUp (e) {
 }
 
 function onClickAnywhere (e) {
-  if (!findParent(e.target, el => el.tagName === 'ctzn-CONTEXT-MENU')) {
+  if (!findParent(e.target, el => el.tagName === 'APP-CONTEXT-MENU')) {
     // click is outside the context-menu, destroy
     destroy()
   }
@@ -107,7 +107,7 @@ function onClickAnywhere (e) {
 // internal
 // =
 
-export class BeakerContextMenu extends LitElement {
+export class ContextMenu extends LitElement {
   constructor ({x, y, right, center, top, withTriangle, roomy, veryRoomy, rounded, noBorders, style, items, fontAwesomeCSSUrl, render}) {
     super()
     this.x = x
@@ -209,7 +209,7 @@ async function* renderPromiseItem (item) {
   yield value
 }
 
-BeakerContextMenu.styles = css`
+ContextMenu.styles = css`
 ${dropdownCSS}
 
 .context-menu {
@@ -245,4 +245,4 @@ a.dropdown-item {
 }
 `
 
-customElements.define('app-context-menu', BeakerContextMenu)
+customElements.define('app-context-menu', ContextMenu)

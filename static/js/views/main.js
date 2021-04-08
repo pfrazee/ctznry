@@ -70,14 +70,14 @@ class CtznMainView extends LitElement {
       }
     }
 
-    if (this.querySelector('ctzn-feed')) {
-      this.querySelector('ctzn-feed').load()
+    if (this.querySelector('ctzn-posts-feed')) {
+      this.querySelector('ctzn-posts-feed').load()
     }
   }
 
   async pageLoadScrollTo (y) {
     await this.requestUpdate()
-    const feed = this.querySelector('ctzn-feed') || this.querySelector('ctzn-notifications-feed')
+    const feed = this.querySelector('ctzn-posts-feed') || this.querySelector('ctzn-notifications-feed')
     feed.pageLoadScrollTo(y)
   }
 
@@ -86,8 +86,8 @@ class CtznMainView extends LitElement {
     this.ptr = PullToRefresh.init({
       mainElement: 'body',
       onRefresh: () => {
-        if (this.querySelector('ctzn-feed')) {
-          this.querySelector('ctzn-feed').load()
+        if (this.querySelector('ctzn-posts-feed')) {
+          this.querySelector('ctzn-posts-feed').load()
         } else if (this.querySelector('ctzn-notifications-feed')) {
           this.querySelector('ctzn-notifications-feed').load()
         }
