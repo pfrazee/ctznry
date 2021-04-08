@@ -17,7 +17,7 @@ import '../com/reaction-input.js'
 export class PostView extends LitElement {
   static get properties () {
     return {
-      mode: {type: String}, // 'full', 'condensed', or 'content-only'
+      mode: {type: String}, // 'full', 'condensed', or 'content-only' (default 'condensed')
       src: {type: String},
       post: {type: Object},
       renderOpts: {type: Object},
@@ -32,7 +32,7 @@ export class PostView extends LitElement {
   constructor () {
     super()
     this.setAttribute('ctzn-elem', '1')
-    this.mode = 'full'
+    this.mode = 'condensed'
     this.post = undefined
     this.renderOpts = {noclick: false}
     this.isReactionsOpen = false
