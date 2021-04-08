@@ -6,6 +6,7 @@ import * as session from '../lib/session.js'
 import { TransferItemRelatedPopup } from '../com/popups/transfer-item-related.js'
 import { ReactionsListPopup } from '../com/popups/reactions-list.js'
 import { RelatedItemTransfersListPopup } from '../com/popups/related-item-transfers-list.js'
+import { ViewMediaPopup } from '../com/popups/view-media.js'
 import { emit } from '../lib/dom.js'
 import { makeSafe, linkify, pluralize, parseSrcAttr } from '../lib/strings.js'
 import { relativeDate } from '../lib/time.js'
@@ -313,7 +314,10 @@ export class PostView extends LitElement {
     }
     const media = this.post.value.media
     const img = (item, size) => html`
-      <div class="bg-gray-100 rounded img-sizing-${size} img-placeholder">
+      <div
+        class="bg-gray-100 rounded img-sizing-${size} img-placeholder ${this.mode === 'full' ? 'cursor-pointer' : ''}"
+        @click=${this.mode === 'full' ? e => this.onClickImage(e, item) : undefined}
+      >
         <img
           class="box-border object-cover rounded border border-gray-300 w-full img-sizing-${size}"
           src="${BLOB_URL(this.post.author.userId, (item.blobs.thumb || item.blobs.original).blobName)}"
@@ -321,6 +325,15 @@ export class PostView extends LitElement {
         >
       </div>
     `
+    if (media.length > 4 && this.mode === 'full') {
+      return html`
+        <div class="grid grid-post-images mt-1 mb-2">
+          ${repeat(media, item => html`
+            ${img(item, 'full')}
+          `)}
+        </div>
+      `
+    }
     const moreImages = media.length - 4
     return html`
       <div class="flex mt-1 mb-2 ${this.showCondensed ? 'sm:px-1' : ''}">
@@ -661,6 +674,13 @@ export class PostView extends LitElement {
     RelatedItemTransfersListPopup.create({
       communityId: this.communityUserId,
       relatedItemTransfers: this.post.relatedItemTransfers
+    })
+  }
+
+  onClickImage (e, item) {
+    e.preventDefault()
+    ViewMediaPopup.create({
+      url: BLOB_URL(this.post.author.userId, (item.blobs.thumb || item.blobs.original).blobName)
     })
   }
 }

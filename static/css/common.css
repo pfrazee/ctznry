@@ -260,6 +260,11 @@ main.col2 > :last-child {
   grid-template-columns: 60px 1fr;
 }
 
+.grid-post-images {
+  grid-template-columns: 1fr 1fr;
+  grid-gap: 2px;
+}
+
 .grid-2col {
   grid-template-columns: 1fr 1fr;
 }
@@ -324,6 +329,11 @@ main.col2 > :last-child {
   object-fit: cover;
 }
 
+.img-sizing-full {
+  height: 225px;
+  object-fit: cover;
+}
+
 @media (max-width: 640px) {
   .img-sizing-big {
     height: 200px;
@@ -340,5 +350,10 @@ main.col2 > :last-child {
 
   .img-sizing-smaller {
     height: 98px;
+  }
+
+  .img-sizing-full {
+    height: 130px;
+    object-fit: cover;
   }
 }
