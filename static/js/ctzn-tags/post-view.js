@@ -627,6 +627,7 @@ export class PostView extends LitElement {
       })
     }
     if (this.communityUserId && session.isInCommunity(this.communityUserId)) {
+      
       items.push(
         session.ctzn.view(
           'ctzn.network/community-user-permission-view',
@@ -661,6 +662,7 @@ export class PostView extends LitElement {
     if (!confirm('Are you sure you want to remove this post?')) {
       return
     }
+    contextMenu.destroy()
     emit(this, 'moderator-remove-post', {detail: {post: this.post}})
   }
 

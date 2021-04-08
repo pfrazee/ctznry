@@ -2,6 +2,7 @@ import { LitElement, html } from '../vendor/lit-element/lit-element.js'
 import * as session from './lib/session.js'
 import { emit } from './lib/dom.js'
 import * as gestures from './lib/gestures.js'
+import * as toast from './com/toast.js'
 import * as contextMenu from './com/context-menu.js'
 import { DRIVE_KEY_REGEX } from './lib/strings.js'
 import { BasePopup } from './com/popups/base.js'
@@ -56,6 +57,8 @@ class CtznApp extends LitElement {
     document.body.addEventListener('click', this.onGlobalClick.bind(this))
     document.body.addEventListener('view-thread', this.onViewThread.bind(this))
     document.body.addEventListener('navigate-to', this.onNavigateTo.bind(this))
+    document.body.addEventListener('delete-post', this.onDeletePost.bind(this))
+    document.body.addEventListener('moderator-remove-post', this.onModeratorRemovePost.bind(this))
     window.addEventListener('popstate', this.onHistoryPopstate.bind(this))
     window.addEventListener('beforeunload', this.onBeforeUnload.bind(this))
 
@@ -129,6 +132,15 @@ class CtznApp extends LitElement {
       let view = this.querySelector('#view')
       view.pageLoadScrollTo(scrollY)
     } catch (e) {}
+  }
+
+  reloadView () {
+    try {
+      let view = this.querySelector('#view')
+      view.load()
+    } catch (e) {
+      console.log('Failed to reload view', e)
+    }
   }
 
   // rendering
@@ -236,6 +248,32 @@ class CtznApp extends LitElement {
     if (this.pageHasChanges) {
       e.preventDefault()
       e.returnValue = ''
+    }
+  }
+
+  async onDeletePost (e) {
+    try {
+      await session.ctzn.user.table('ctzn.network/post').delete(e.detail.post.key)
+      toast.create('Post deleted')
+      this.reloadView()
+    } catch (e) {
+      console.log(e)
+      toast.create(e.toString(), 'error')
+    }
+  }
+
+  async onModeratorRemovePost (e) {
+    try {
+      const post = e.detail.post
+      await session.ctzn.db(post.value.community.userId).method(
+        'ctzn.network/community-remove-content-method',
+        {contentUrl: post.url}
+      )
+      toast.create('Post removed')
+      this.reloadView()
+    } catch (e) {
+      console.log(e)
+      toast.create(e.toString(), 'error')
     }
   }
 }

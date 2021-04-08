@@ -200,8 +200,6 @@ class CtznMainView extends LitElement {
               limit="15"
               @load-state-updated=${this.onFeedLoadStateUpdated}
               @publish-reply=${this.onPublishReply}
-              @delete-post=${this.onDeletePost}
-              @moderator-remove-post=${this.onModeratorRemovePost}
             ></ctzn-posts-feed>
           ` : this.currentView === 'notifications' ? html`
             ${this.isEmpty ? this.renderEmptyMessage() : ''}
@@ -307,31 +305,6 @@ class CtznMainView extends LitElement {
     } catch (e) {
       // ignore
       console.log(e)
-    }
-  }
-
-  async onDeletePost (e) {
-    try {
-      await session.ctzn.user.table('ctzn.network/post').delete(e.detail.post.key)
-      toast.create('Post deleted')
-      this.load()
-    } catch (e) {
-      console.log(e)
-      toast.create(e.toString(), 'error')
-    }
-  }
-
-  async onModeratorRemovePost (e) {
-    try {
-      const post = e.detail.post
-      await session.ctzn.db(post.value.community.userId).method(
-        'ctzn.network/community-remove-content-method',
-        {contentUrl: post.url}
-      )
-      this.load()
-    } catch (e) {
-      console.log(e)
-      toast.create(e.toString(), 'error')
     }
   }
 

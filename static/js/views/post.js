@@ -265,6 +265,7 @@ class CtznPostView extends LitElement {
   }
 
   async onClickModeratorRemove () {
+    contextMenu.destroy()
     if (!confirm('Are you sure you want to remove this post?')) {
       return
     }
