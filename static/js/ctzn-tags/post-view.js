@@ -492,7 +492,7 @@ export class PostView extends LitElement {
   onClickCard (e) {
     if (this.renderOpts.noclick) return
     for (let el of e.composedPath()) {
-      if (el.tagName === 'A' || el.tagName === 'CTZN-COMPOSER' || el.tagName === 'CTZN-REACTION-INPUT') return
+      if (el.tagName === 'A' || el.tagName === 'APP-COMPOSER' || el.tagName === 'APP-REACTION-INPUT') return
     }
     e.preventDefault()
     e.stopPropagation()
@@ -501,7 +501,7 @@ export class PostView extends LitElement {
   onMousedownCard (e) {
     if (this.renderOpts.noclick) return
     for (let el of e.composedPath()) {
-      if (el.tagName === 'A' || el.tagName === 'CTZN-COMPOSER' || el.tagName === 'CTZN-REACTION-INPUT') return
+      if (el.tagName === 'A' || el.tagName === 'APP-COMPOSER' || el.tagName === 'APP-REACTION-INPUT') return
     }
     this.isMouseDown = true
     this.isMouseDragging = false
