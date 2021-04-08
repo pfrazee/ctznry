@@ -2,6 +2,7 @@ import { LitElement, html } from '../../vendor/lit-element/lit-element.js'
 import { repeat } from '../../vendor/lit-element/lit-html/directives/repeat.js'
 import { intersect } from '../lib/functions.js'
 import * as session from '../lib/session.js'
+import { AVATAR_URL } from '../lib/const.js'
 import '../com/simple-user-list.js'
 
 export class FollowersList extends LitElement {
