@@ -51,16 +51,14 @@ export class CommunityMembersList extends LitElement {
     this.followedMembers = undefined
     this.canBan = undefined
 
-    this.members = await listAllMembers(this.userId)
+    this.members = await session.ctzn.listAllMembers(this.userId)
     if (session.isActive() && this.userId !== session.info.userId) {
       this.followedMembers = intersect(
         session.myFollowing,
         this.members.map(m => m.value.user.userId)
       )
       if (this.amIAMember) {
-        let perm = await session.ctzn.viewByHomeServer(
-          this.userId,
-          'ctzn.network/community-user-permission-view',
+        let perm = await session.ctzn.getCommunityUserPermission(
           this.userId,
           session.info.userId,
           'ctzn.network/perm-community-ban'
@@ -73,7 +71,7 @@ export class CommunityMembersList extends LitElement {
   }
 
   get amIAMember () {
-    return !!this.members?.find?.(m => m.value.user.userId === session.info.userId)
+    return session.isActive() && !!this.members?.find?.(m => m.value.user.userId === session.info.userId)
   }
 
   // rendering
@@ -137,15 +135,3 @@ export class CommunityMembersList extends LitElement {
 }
 
 customElements.define('ctzn-community-members-list', CommunityMembersList)
-
-async function listAllMembers (userId) {
-  let members = []
-  let gt = undefined
-  for (let i = 0; i < 1000; i++) {
-    let m = await session.ctzn.db(userId).table('ctzn.network/community-member').list({gt, limit: 100})
-    members = m.length ? members.concat(m) : members
-    if (m.length < 100) break
-    gt = m[m.length - 1].key
-  }
-  return members
-}

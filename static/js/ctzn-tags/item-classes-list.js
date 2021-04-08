@@ -11,13 +11,11 @@ export class ItemClassesList extends LitElement {
   static get properties () {
     return {
       userId: {type: String, attribute: 'user-id'},
-      members: {type: Array},
       currentItemClass: {type: String},
       itemClasses: {type: Array},
       items: {type: Array},
       canManageItemClasses: {type: Boolean},
-      canCreateItem: {type: Boolean},
-      canTransferUnownedItem: {type: Boolean}
+      canCreateItem: {type: Boolean}
     }
   }
 
@@ -29,13 +27,12 @@ export class ItemClassesList extends LitElement {
     super()
     this.setAttribute('ctzn-elem', '1')
     this.userId = undefined
-    this.members = []
     this.currentItemClass = undefined
     this.itemClasses = undefined
     this.items = undefined
+    this.members = undefined
     this.canManageItemClasses = false
     this.canCreateItem = false
-    this.canTransferUnownedItem = false
   }
 
   setContextState (state) {
@@ -54,10 +51,38 @@ export class ItemClassesList extends LitElement {
   }
 
   async load () {
+    this.itemClasses = undefined
+    this.items = undefined
+    this.members = undefined
+    this.canManageItemClasses = false
+    this.canCreateItem = false
+
     this.itemClasses = await session.ctzn.db(this.userId).table('ctzn.network/item-class').list()
     console.log(this.itemClasses)
     this.items = await session.ctzn.db(this.userId).table('ctzn.network/item').list()
     console.log(this.items)
+
+    this.members = await session.ctzn.listAllMembers(this.userId)
+    if (this.amIAMember) {
+      let [perm1, perm2] = await Promise.all([
+        session.ctzn.getCommunityUserPermission(
+          this.userId,
+          session.info.userId,
+          'ctzn.network/perm-manage-item-classes'
+        ),
+        session.ctzn.getCommunityUserPermission(
+          this.userId,
+          session.info.userId,
+          'ctzn.network/perm-create-item'
+        ),
+      ])
+      this.canManageItemClasses = !!perm1
+      this.canCreateItem = !!perm2
+    }
+  }
+
+  get amIAMember () {
+    return session.isActive() && !!this.members?.find?.(m => m.value.user.userId === session.info.userId)
   }
 
   updated (changedProperties) {

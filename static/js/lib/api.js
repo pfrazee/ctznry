@@ -106,6 +106,18 @@ export class CtznAPI {
     }
     return (await httpGet(domain, `.view/ctzn.network/thread-view/${encodeURIComponent(subjectUrl)}`))?.comments
   }
+
+  async listAllMembers (userId) {
+    let members = []
+    let gt = undefined
+    for (let i = 0; i < 1000; i++) {
+      let m = await this.db(userId).table('ctzn.network/community-member').list({gt, limit: 100})
+      members = m.length ? members.concat(m) : members
+      if (m.length < 100) break
+      gt = m[m.length - 1].key
+    }
+    return members
+  }
   
   async listFollowers (userId) {
     const domain = getDomain(userId)
