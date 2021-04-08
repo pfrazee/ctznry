@@ -6,7 +6,7 @@ BehaveHooks.add(['keydown'], function(data){
 });
 
 function autosizeTextarea (el, numLines = undefined) {
-  el.style.height = Math.max(numLines * 21, 60)+'px'
+  el.style.height = Math.max(numLines * 21, 80)+'px'
 }
 
 function countNewlines (el) {
