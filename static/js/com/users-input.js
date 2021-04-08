@@ -30,7 +30,7 @@ export class UsersInput extends LitElement {
   }
   
   get filteredUsers () {
-    return this.users.filter(userId => userId.includes(this.currentFilter)).slice(0, 8)
+    return this.users.filter(userId => userId.includes(this.currentFilter))
   }
 
   setValue (value) {
@@ -51,7 +51,7 @@ export class UsersInput extends LitElement {
           @keyup=${this.onKeyup}
           placeholder="Filter..."
         >
-        <div class="overflow-y-auto" style="max-height: 300px">
+        <div class="overflow-y-auto grid grid-cols-3" style="max-height: 300px">
           ${repeat(this.filteredUsers, userId => userId, (userId, i) => html`
             <div
               class="

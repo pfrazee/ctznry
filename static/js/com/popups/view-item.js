@@ -36,6 +36,7 @@ export class ViewItemPopup extends BasePopup {
     this.isDataOpen = false
     this.isProcessing = false
     this.currentError = undefined
+    this.recipient = undefined
     this.load()
   }
 
@@ -177,26 +178,20 @@ export class ViewItemPopup extends BasePopup {
       ` : ''}
     `
   }
+  onChangeUser (e) {
+    this.recipient = e.detail.value
+  }
 
   renderTransferForm () {
+    let idsList = [this.databaseId].concat(this.members?.map((member) => member.value.user.userId) || [])
+
     return html`
       <form class="border-t border-gray-200 mt-4 pt-4 pb-2" @submit=${this.onSubmit}>
         <h2 class="font-medium pb-2 text-2xl">Transfer item</h2>
 
         <label class="block font-semibold p-1" for="recp-input">Recipient</label>
-        <div class="relative">
-          <select
-            type="text"
-            id="recp-input"
-            name="recp"
-            value="${this.databaseId}"
-            class="block box-border w-full border border-gray-300 rounded p-3 mb-2 appearance-none"
-          >
-            <option value=${this.databaseId}>${this.databaseId}</option>
-            ${repeat(this.members, member => html`<option value=${member.value.user.userId}>${member.value.user.userId}</option>`)}
-          </select>
-          <span class="fas fa-caret-down absolute z-10" style="right: 15px; top: 15px"></span>
-        </div>
+          <app-users-input .users=${session.myFollowing.concat(session.myFollowers)}
+            @change-user=${this.onChangeUser}></app-users-input>
         <label class="block font-semibold p-1" for="keyTemplate-input">Quantity</label>
         <input
           required
@@ -263,7 +258,7 @@ export class ViewItemPopup extends BasePopup {
       return
     }
 
-    if (value.recp === this.item.value.owner.userId) {
+    if (this.recipient === this.item.value.owner.userId) {
       this.currentError = `${value.recp} is already the owner`
       this.isProcessing = false
       return
@@ -271,7 +266,7 @@ export class ViewItemPopup extends BasePopup {
 
     let recp
     try {
-      recp = await session.ctzn.lookupUser(value.recp)
+      recp = await session.ctzn.lookupUser(this.recipient)
       if (!recp.userId || !recp.dbUrl) throw new Error('webfinger lookup failed')
     } catch (e) {
       this.currentError = `Failed to lookup recp details: ${e.toString()}`
