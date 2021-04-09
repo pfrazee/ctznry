@@ -8,6 +8,7 @@ export class Code extends LitElement {
 
   firstUpdated () {
     this.style.counterReset = 'line'
+    this.classList.add('mb-1')
     const rawLines = this.textContent.trim().split('\n')
     this.innerHTML = ''
     for (const rawLine of rawLines) {
