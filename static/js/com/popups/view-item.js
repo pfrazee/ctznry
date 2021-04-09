@@ -190,8 +190,10 @@ export class ViewItemPopup extends BasePopup {
         <h2 class="font-medium pb-2 text-2xl">Transfer item</h2>
 
         <label class="block font-semibold p-1" for="recp-input">Recipient</label>
-          <app-users-input .users=${session.myFollowing.concat(session.myFollowers)}
-            @change-user=${this.onChangeUser}></app-users-input>
+          <app-users-input
+            .users=${Array.from(new Set([...session.myFollowing, ...session.myFollowers]))}
+            @change-user=${this.onChangeUser}
+          ></app-users-input>
         <label class="block font-semibold p-1" for="keyTemplate-input">Quantity</label>
         <input
           required

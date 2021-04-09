@@ -44,29 +44,30 @@ export class UsersInput extends LitElement {
   render () {
     const c = this.currentSuggestionsSelection
     return html`
-      <div class="bg-white border border-gray-300 rounded">
+      <div class="bg-white">
         <input
-          class="block bg-transparent w-full px-2 py-1"
+          class="block bg-transparent w-full px-2 py-1 border border-gray-300 rounded-t"
           @keydown=${this.onKeydown}
           @keyup=${this.onKeyup}
           placeholder="Filter..."
         >
-        <div class="overflow-y-auto grid grid-cols-3" style="max-height: 300px">
+        <div class="overflow-y-auto grid grid-cols-2 border border-t-0 border-gray-300 rounded-b" style="max-height: 300px">
           ${repeat(this.filteredUsers, userId => userId, (userId, i) => html`
             <div
               class="
-                truncate border-t border-gray-200 px-2 py-1.5 cursor-pointer flex flex-col
+                flex items-center px-2 py-1.5 cursor-pointer
                 ${this.value === userId ? 'bg-blue-600 text-white' : c === i ? 'bg-gray-100' : 'hov:hover:bg-gray-100'}
               "
               @click=${e => {this.setValue(userId)}}
             >
               <img
-                class="border-2 border-white inline-block object-cover rounded-3xl shadow-md bg-white"
+                class="h-12 mr-2 object-cover rounded-lg w-12"
                 src=${AVATAR_URL(userId)}
-                style="width: 75px; height: 75px"
               >
-              ${displayNames.render(userId)}
-              <span class="text-xs ${this.value === userId ? 'text-blue-200' : 'text-gray-500'}">${userId}</span>
+              <div class="min-w-0">
+                <div class="truncate">${displayNames.render(userId)}</div>
+                <div class="truncate text-xs ${this.value === userId ? 'text-blue-200' : 'text-gray-500'}">${userId}</div>
+              </div>
             </div>
           `)}
         </div>
