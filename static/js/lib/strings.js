@@ -165,23 +165,6 @@ export function highlightSearchResult (str = '', nonce = 0) {
   return makeSafe(str).replace(start, '<strong>').replace(end, '</strong>')
 }
 
-export function slugifyUrl (str = '') {
-  try {
-    let url = new URL(str)
-    str = url.protocol + url.hostname + url.pathname + url.search + url.hash
-  } catch (e) {
-    // ignore
-  }
-  return slugify(str)
-}
-
-const reservedChars = /[^\w]/g
-const endingDashes = /([-]+$)/g
-const extraDashes = /(-[-]+)/g
-export function slugify (str = '') {
-  return str.replace(reservedChars, '-').replace(endingDashes, '').replace(extraDashes, '-')
-}
-
 export function normalizeUrl (str = '') {
   try {
     let url = new URL(str)

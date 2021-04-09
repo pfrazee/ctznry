@@ -1,8 +1,9 @@
 import { LitElement, html } from '../../vendor/lit-element/lit-element.js'
 import { repeat } from '../../vendor/lit-element/lit-html/directives/repeat.js'
+import { slugify } from '../../vendor/slugify.js'
 import * as session from '../lib/session.js'
 import * as images from '../lib/images.js'
-import { slugify, encodeBase64, decodeBase64 } from '../lib/strings.js'
+import { encodeBase64, decodeBase64 } from '../lib/strings.js'
 import { deepClone } from '../lib/functions.js'
 import { emit } from '../lib/dom.js'
 import {
@@ -695,7 +696,7 @@ export class EditProfile extends LitElement {
       if (hasChanges(this.values, this.profile.value)) {
         let usedSectionIds = new Set()
         for (let section of (this.values.sections || [])) {
-          const baseId = slugify(section.label).toLocaleLowerCase()
+          const baseId = (slugify(section.label) || 'page').toLocaleLowerCase()
           let id = baseId
           let n = 2
           while (usedSectionIds.has(id)) {
