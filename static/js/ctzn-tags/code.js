@@ -22,9 +22,9 @@ export class Code extends LitElement {
       <style>
         div {
           overflow-x: scroll;
-          background-color: darkgray;
+          background-color: #F3F4F6; /*bg-gray-100*/
           padding: 0.8rem;
-          border: 1px solid gray;
+          border: 1px solid #D1D5DB /*border-gray-300*/;
           border-radius: 5px;
         }
         ::slotted(:last-child) {
@@ -33,14 +33,16 @@ export class Code extends LitElement {
         ::slotted(code) {
           display: block;
           white-space: pre;
+          color: #1F2937 /*text-gray-800*/;
           background-color: transparent;
+          font-size: 90% !important;
         }
         ::slotted(code)::before {
           display: inline-block;
           text-align: right;
           width: 2ch;
           margin-right: 1ch;
-          color: gray;
+          color: #9CA3AF /*text-gray-400*/;
           counter-increment: line;
           content: counter(line);
         }
