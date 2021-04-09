@@ -53,6 +53,7 @@ export function sanitize (str, context = undefined) {
       ADD_TAGS: [
         'ctzn-card',
         'ctzn-code',
+        'ctzn-iframe',
         'ctzn-posts-feed',
         'ctzn-post-view',
         'ctzn-followers-list',
@@ -72,6 +73,7 @@ export function sanitize (str, context = undefined) {
     return DOMPurify.sanitize(str, {
       ADD_TAGS: [
         'ctzn-card',
+        'ctzn-iframe',
         'ctzn-code',
         'ctzn-post-view'
       ],

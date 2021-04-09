@@ -143,6 +143,19 @@ pre > code {
   text-decoration: underline;
 }
 
+.iframe-sizer {
+  position:relative;
+  padding-top:56.25%;
+}
+
+.iframe-sizer > iframe {
+  position:absolute;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+}
+
 *[data-tooltip] {
   position: relative;
 }

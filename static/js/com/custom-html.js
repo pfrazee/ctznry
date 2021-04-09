@@ -6,6 +6,7 @@ import { decodeBase64 } from '../lib/strings.js'
 
 import '../ctzn-tags/card.js'
 import '../ctzn-tags/code.js'
+import '../ctzn-tags/iframe.js'
 import '../ctzn-tags/post-view.js'
 import '../ctzn-tags/posts-feed.js'
 import '../ctzn-tags/followers-list.js'
@@ -155,6 +156,21 @@ export class CustomHtml extends LitElement {
           }
         </style>
       `
+    }
+    if (this.context === 'post') {
+      return html`
+        <style>
+          .custom-html > [ctzn-elem] {
+            display: block;
+            border: 1px solid #D1D5DB/*border-gray-300*/;
+            border-radius: 0.25rem;
+          }
+          svg {
+            max-width: 100%;
+          }
+        </style>
+      `
+
     }
     return ''
   }
