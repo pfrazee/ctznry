@@ -52,7 +52,7 @@ export class ViewMediaPopup extends BasePopup {
         <span
           title="Close"
           @click=${this.onReject}
-          class="absolute close-btn cursor-pointer text-white text-3xl z-50"
+          class="absolute bg-white close-btn cursor-pointer px-2 rounded text-3xl text-black z-50"
           style="top: 10px; right: 15px"
         >
           <span class="fas fa-times"></span>
