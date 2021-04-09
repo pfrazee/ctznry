@@ -64,7 +64,7 @@ export function sanitize (str, context = undefined) {
         'ctzn-item-classes-list'
       ],
       ADD_ATTR: ['view', 'user-id', 'mode', 'methods-filter'],
-      FORBID_TAGS: ['style'],
+      FORBID_TAGS: ['form', 'style'],
       FORBID_ATTR: ['class', 'style']
     })
   }
@@ -76,12 +76,12 @@ export function sanitize (str, context = undefined) {
         'ctzn-post-view'
       ],
       ADD_ATTR: ['view', 'user-id', 'mode'],
-      FORBID_TAGS: ['style'],
+      FORBID_TAGS: ['form', 'style'],
       FORBID_ATTR: ['class', 'style']
     })
   }
   return DOMPurify.sanitize(str, {
-    FORBID_TAGS: ['style'],
+    FORBID_TAGS: ['form', 'style'],
     FORBID_ATTR: ['class', 'style']
   })
 }
