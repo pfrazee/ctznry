@@ -51,7 +51,9 @@ export class CommunityMembersList extends LitElement {
     this.followedMembers = undefined
     this.canBan = undefined
 
-    this.members = await session.ctzn.listAllMembers(this.userId)
+    const members = await session.ctzn.listAllMembers(this.userId)
+    members.sort((a, b) => b.value.joinDate.localeCompare(a.value.joinDate))
+    this.members = members
     if (session.isActive() && this.userId !== session.info.userId) {
       this.followedMembers = intersect(
         session.myFollowing,
