@@ -57,6 +57,12 @@ main.col2 > :last-child {
   min-width: 0;
 }
 
+pre > code {
+  display: block;
+  overflow-y: scroll;
+  padding: 0.6rem 1rem !important;
+}
+
 @media (max-width: 1400px) {
   main.col2 {
     display: block;
