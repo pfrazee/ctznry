@@ -323,8 +323,8 @@ export class PostView extends LitElement {
     const media = this.post.value.media
     const img = (item, size) => html`
       <div
-        class="bg-gray-100 rounded img-sizing-${size} img-placeholder ${this.mode === 'full' ? 'cursor-pointer' : ''}"
-        @click=${this.mode === 'full' ? e => this.onClickImage(e, item) : undefined}
+        class="bg-gray-100 rounded img-sizing-${size} img-placeholder cursor-pointer"
+        @click=${e => this.onClickImage(e, item)}
       >
         <img
           class="box-border object-cover rounded border border-gray-300 w-full img-sizing-${size}"
@@ -534,7 +534,7 @@ export class PostView extends LitElement {
   onClickCard (e) {
     if (this.renderOpts.noclick) return
     for (let el of e.composedPath()) {
-      if (el.tagName === 'A' || el.tagName === 'APP-COMPOSER' || el.tagName === 'APP-REACTION-INPUT') return
+      if (el.tagName === 'A' || el.tagName === 'IMG' || el.tagName === 'APP-COMPOSER' || el.tagName === 'APP-REACTION-INPUT') return
     }
     e.preventDefault()
     e.stopPropagation()
@@ -543,7 +543,7 @@ export class PostView extends LitElement {
   onMousedownCard (e) {
     if (this.renderOpts.noclick) return
     for (let el of e.composedPath()) {
-      if (el.tagName === 'A' || el.tagName === 'APP-COMPOSER' || el.tagName === 'APP-REACTION-INPUT') return
+      if (el.tagName === 'A' || el.tagName === 'IMG' || el.tagName === 'APP-COMPOSER' || el.tagName === 'APP-REACTION-INPUT') return
     }
     this.isMouseDown = true
     this.isMouseDragging = false
@@ -654,7 +654,6 @@ export class PostView extends LitElement {
       })
     }
     if (this.communityUserId && session.isInCommunity(this.communityUserId)) {
-      
       items.push(
         session.ctzn.view(
           'ctzn.network/community-user-permission-view',
@@ -708,6 +707,7 @@ export class PostView extends LitElement {
 
   onClickImage (e, item) {
     e.preventDefault()
+    e.stopPropagation()
     ViewMediaPopup.create({
       url: BLOB_URL(this.post.author.userId, (item.blobs.thumb || item.blobs.original).blobName)
     })
