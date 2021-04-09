@@ -516,7 +516,7 @@ export class PostView extends LitElement {
     if (this.post.value.extendedTextMimeType === 'text/html') {
       return html`
         <app-custom-html
-          class="block my-2"
+          class="post-custom-html-horz-margins block border-t border-b border-gray-300 py-4 mt-4 mb-3"
           context="post"
           .contextState=${{page: {userId: this.post.author.userId}}}
           .html=${this.post.value.extendedText}

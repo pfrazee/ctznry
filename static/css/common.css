@@ -156,6 +156,22 @@ pre > code {
   height:100%;
 }
 
+.post-custom-html-horz-margins {
+  padding-left: 1rem;
+  padding-right: 1rem;
+  margin-left: -1rem;
+  margin-right: -1rem;
+}
+
+@media (max-width: 639px /*sm:*/) {
+  .post-custom-html-horz-margins {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+    margin-left: -0.75rem;
+    margin-right: -0.75rem;
+  }
+}
+
 *[data-tooltip] {
   position: relative;
 }

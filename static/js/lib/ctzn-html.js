@@ -15,7 +15,7 @@ const EL_CLASSES = {
   'TD': 'border border-gray-300 px-2 py-1 break-words',
   'BLOCKQUOTE': 'mb-3 break-words border-gray-100 border-l-4 border-l-8 pl-4 py-2 text-gray-600',
   'FIGCAPTION': 'mb-3 break-words',
-  'PRE': 'mb-3 break-none overflow-x-auto',
+  'PRE': 'mb-3 break-none overflow-x-auto text-sm',
   'DL': 'mb-3 break-words',
   'DT': 'font-semibold italic break-words',
   'DD': 'mb-3 pl-6 last:mb-0 break-words',
