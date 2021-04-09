@@ -693,7 +693,7 @@ export class EditProfile extends LitElement {
       }
 
       // update profile data
-      if (hasChanges(this.values, this.profile.value)) {
+      if (this.canEditProfile && hasChanges(this.values, this.profile.value)) {
         let usedSectionIds = new Set()
         for (let section of (this.values.sections || [])) {
           const baseId = (slugify(section.label) || 'page').toLocaleLowerCase()

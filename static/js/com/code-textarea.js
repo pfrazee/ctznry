@@ -17,7 +17,8 @@ export class CodeTextarea extends LitElement {
   static get properties () {
     return {
       textareaClass: {type: String, attribute: 'textarea-class'},
-      value: {type: String}
+      value: {type: String},
+      disabled: {type: Boolean}
     }
   }
   
@@ -30,6 +31,7 @@ export class CodeTextarea extends LitElement {
     this.behave = undefined
     this.textareaClass = ''
     this.value = ''
+    this.disabled = false
   }
 
   async connectedCallback () {
@@ -65,6 +67,7 @@ export class CodeTextarea extends LitElement {
       <textarea
         class="${this.textareaClass} whitespace-nowrap"
         spellcheck="false"
+        ?disabled=${this.disabled}
       >${this.value}</textarea>
     `
   }
