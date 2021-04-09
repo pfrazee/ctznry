@@ -104,6 +104,7 @@ export class DbmethodsFeed extends LitElement {
       userId: {type: String, attribute: 'user-id'},
       _view: {type: String, attribute: 'view'},
       _methodsFilter: {type: String, attribute: 'methods-filter'},
+      limit: {type: Number},
       entries: {type: Array},
       hasNewEntries: {type: Boolean},
       isLoadingMore: {type: Boolean}
@@ -120,6 +121,7 @@ export class DbmethodsFeed extends LitElement {
     this.userId = undefined
     this.view = undefined
     this._methodsFilter = undefined
+    this.limit = undefined
     this.entries = undefined
     this.hasNewEntries = false
     this.isLoadingMore = false
@@ -163,6 +165,10 @@ export class DbmethodsFeed extends LitElement {
 
   get isLoading () {
     return !!this.activeQuery
+  }
+
+  get hasHitLimit () {
+    return (this.limit > 0 && this.entries?.length >= this.limit)
   }
 
   async load ({clearCurrent} = {clearCurrent: false}) {
@@ -213,6 +219,10 @@ export class DbmethodsFeed extends LitElement {
   }
 
   async query ({more} = {more: false}) {
+    if (this.hasHitLimit) {
+      return
+    }
+
     this.isLoadingMore = more
 
     emit(this, 'load-state-updated')
@@ -237,6 +247,11 @@ export class DbmethodsFeed extends LitElement {
     }
 
     entries = entries.concat(newEntries)
+    
+    if (this.limit > 0 && entries.length > this.limit) {
+      entries = entries.slice(0, this.limit)
+    }
+
     console.log(entries)
     this.entries = entries
     this.activeQuery = undefined
@@ -246,7 +261,7 @@ export class DbmethodsFeed extends LitElement {
   }
 
   async checkNewItems () {
-    if (!this.entries) {
+    if (!this.entries || this.hasHitLimit) {
       return
     }
     const viewRes = (this.view === 'ctzn.network/dbmethod-feed-view')
@@ -311,7 +326,7 @@ export class DbmethodsFeed extends LitElement {
     return html`
       ${this.renderHasNewEntries()}
       ${this.renderEntries()}
-      ${this.entries?.length ? html`
+      ${this.entries?.length && !this.hasHitLimit ? html`
         <div class="bottom-of-feed ${this.isLoadingMore ? 'bg-white' : ''} mb-10 py-4 sm:rounded text-center">
           ${this.isLoadingMore ? html`<span class="spinner w-6 h-6 text-gray-500"></span>` : ''}
         </div>

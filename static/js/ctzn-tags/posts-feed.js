@@ -15,6 +15,7 @@ export class PostsFeed extends LitElement {
     return {
       _view: {type: String, attribute: 'view'},
       userId: {type: String, attribute: 'user-id'},
+      limit: {type: Number},
       results: {type: Array},
       hasNewItems: {type: Boolean},
       isLoadingMore: {type: Boolean}
@@ -30,6 +31,7 @@ export class PostsFeed extends LitElement {
     this.setAttribute('ctzn-elem', '1')
     this._view = undefined
     this.userId = undefined
+    this.limit = undefined
     this.results = undefined
     this.hasNewItems = false
     this.isLoadingMore = false
@@ -55,6 +57,10 @@ export class PostsFeed extends LitElement {
 
   get isLoading () {
     return !!this.activeQuery
+  }
+
+  get hasHitLimit () {
+    return (this.limit > 0 && this.results?.length >= this.limit)
   }
 
   setContextState (state) {
@@ -122,6 +128,10 @@ export class PostsFeed extends LitElement {
   }
 
   async query ({more} = {more: false}) {
+    if (this.hasHitLimit) {
+      return
+    }
+
     emit(this, 'load-state-updated')
     this.abortController = new AbortController()
     this.isLoadingMore = more
@@ -132,6 +142,9 @@ export class PostsFeed extends LitElement {
       results = results.concat((await session.ctzn.view(this.view, {limit: 15, reverse: true, lt}))?.feed)
     } else {
       results = results.concat((await session.ctzn.viewByHomeServer(this.userId, this.view, this.userId, {limit: 15, reverse: true, lt}))?.posts)
+    }
+    if (this.limit > 0 && results.length > this.limit) {
+      results = results.slice(0, this.limit)
     }
     console.log(results)
 
@@ -154,7 +167,7 @@ export class PostsFeed extends LitElement {
   }
 
   async checkNewItems () {
-    if (!this.results) {
+    if (!this.results || this.hasHitLimit) {
       return
     }
     let results
@@ -232,7 +245,7 @@ export class PostsFeed extends LitElement {
     return html`
       ${this.renderHasNewItems()}
       ${this.renderResults()}
-      ${this.results?.length ? html`
+      ${this.results?.length && !this.hasHitLimit ? html`
         <div class="bottom-of-feed ${this.isLoadingMore ? 'bg-white' : ''} mb-10 py-4 sm:rounded text-center">
           ${this.isLoadingMore ? html`<span class="spinner w-6 h-6 text-gray-500"></span>` : ''}
         </div>

@@ -72,7 +72,7 @@ export function sanitize (str, context = undefined) {
         'ctzn-owned-items-list',
         'ctzn-item-classes-list'
       ],
-      ADD_ATTR: ['view', 'user-id', 'mode', 'methods-filter'],
+      ADD_ATTR: ['view', 'user-id', 'mode', 'limit', 'methods-filter'],
       FORBID_TAGS: ['form', 'style'],
       FORBID_ATTR: ['class', 'style']
     })
