@@ -45,6 +45,13 @@ export class PostsFeed extends LitElement {
     this.abortController = undefined
   }
 
+  disconnectedCallback () {
+    super.disconnectedCallback()
+    if (this.loadMoreObserver) {
+      this.loadMoreObserver.disconnect()
+    }
+  }
+
   get view () {
     if (this._view === 'posts') return 'ctzn.network/posts-view'
     if (this._view === 'feed') return 'ctzn.network/feed-view'

@@ -35,6 +35,13 @@ export class DbmethodResultFeed extends LitElement {
     this.activeQuery = undefined
   }
 
+  disconnectedCallback () {
+    super.disconnectedCallback()
+    if (this.loadMoreObserver) {
+      this.loadMoreObserver.disconnect()
+    }
+  }
+
   get isLoading () {
     return !this.results || !!this.activeQuery
   }

@@ -43,6 +43,13 @@ export class NotificationsFeed extends LitElement {
     this.activeQuery = undefined
   }
 
+  disconnectedCallback () {
+    super.disconnectedCallback()
+    if (this.loadMoreObserver) {
+      this.loadMoreObserver.disconnect()
+    }
+  }
+
   get isLoading () {
     return !this.results || !!this.activeQuery
   }
@@ -61,10 +68,6 @@ export class NotificationsFeed extends LitElement {
       return
     }
     return this.queueQuery()
-  }
-
-  disconnectedCallback (...args) {
-    super.disconnectedCallback(...args)
   }
 
   updated () {

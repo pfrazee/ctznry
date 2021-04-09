@@ -69,6 +69,7 @@ class CtznUser extends LitElement {
 
     // ui helper state
     this.lastScrolledToUserId = undefined
+    this.positionStickyObserver = undefined
 
     const pathParts = (new URL(location)).pathname.split('/')
     this.userId = pathParts[1]
@@ -292,6 +293,14 @@ class CtznUser extends LitElement {
     } else if (this.querySelector('ctzn-dbmethods-feed')) {
       this.querySelector('ctzn-dbmethods-feed').load()
     }
+
+    const scrollTargetEl = this.querySelector('#scroll-target')
+    if (!this.positionStickyObserver && scrollTargetEl) {
+      this.positionStickyObserver = new IntersectionObserver((entries) => {
+        this.querySelector('app-subnav').setOpaque(entries[0]?.isIntersecting)
+      }, {threshold: 1.0})
+      this.positionStickyObserver.observe(scrollTargetEl)
+    }
   }
 
   get isLoading () {
@@ -322,6 +331,9 @@ class CtznUser extends LitElement {
   disconnectedCallback (...args) {
     super.disconnectedCallback(...args)
     PullToRefresh.destroyAll()
+    if (this.positionStickyObserver) {
+      this.positionStickyObserver.disconnect()
+    }
   }
 
   // rendering
@@ -396,7 +408,7 @@ class CtznUser extends LitElement {
           ` : ''}
           <div id="scroll-target"></div>
           <app-subnav
-            nav-cls="mb-1"
+            nav-cls="mb-1 sm:rounded-b"
             .items=${this.subnavItems}
             current-path=${this.currentPath}
           ></app-subnav>

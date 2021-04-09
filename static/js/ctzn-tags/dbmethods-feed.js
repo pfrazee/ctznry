@@ -134,6 +134,13 @@ export class DbmethodsFeed extends LitElement {
     this.activeQuery = undefined
   }
 
+  disconnectedCallback () {
+    super.disconnectedCallback()
+    if (this.loadMoreObserver) {
+      this.loadMoreObserver.disconnect()
+    }
+  }
+
   setContextState (state) {
     if (state?.page?.userId) {
       if (!this.userId) {

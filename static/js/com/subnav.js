@@ -31,7 +31,7 @@ export class Subnav extends LitElement {
   getNavCls ({path, mobileOnly, rightAlign, thin}) {
     return `
       block text-center pt-2 pb-2.5 ${thin ? 'px-3 sm:px-4' : 'px-4 sm:px-7'} whitespace-nowrap font-semibold cursor-pointer
-      hov:hover:bg-gray-50 hov:hover:text-blue-600
+      hov:hover:text-blue-600
       ${mobileOnly ? 'sm:hidden' : ''}
       ${rightAlign ? 'ml-auto' : ''}
       ${path === this.currentPath ? 'text-blue-600' : ''}
@@ -58,19 +58,20 @@ export class Subnav extends LitElement {
     gestures.setOnSwiping((dx, dxN) => {
       this.borderEl.style.left = `${this.borderLeft + -dxN * this.borderWidth * 0.15}px`
     })
+    const rounded = this.navClass.indexOf('round') === -1 ? 'sm:rounded' : ''
     this.className = `
-      sticky top-0 z-10 flex overflow-x-auto bg-white sm:rounded ${this.navClass}
-    `
-    this.style = `
-      backdrop-filter: blur(4px);
-      -webkit-backdrop-filter: blur(4px);
-      background: rgba(255, 255, 255, 0.9);
+      white-glass sticky top-0 z-10 flex overflow-x-auto bg-white ${rounded} ${this.navClass}
     `
   }
 
   disconnectedCallback () {
     super.disconnectedCallback()
     gestures.setOnSwiping(undefined)
+  }
+
+  setOpaque (b) {
+    if (b) this.classList.add('white-glass-opaque')
+    else this.classList.remove('white-glass-opaque')
   }
 
   get borderEl () {
@@ -99,9 +100,11 @@ export class Subnav extends LitElement {
           class="${this.getNavCls(item)}"
           href=${item.path}
           @click=${e => this.onClickItem(e, item)}
+          style="-webkit-transform: translate3d(0,0,0);"
         >${item.label}</a>
       `)}
     `
+    // the webkit-transform style above fixes a rendering issue in safari
   }
 
   // events

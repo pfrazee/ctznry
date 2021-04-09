@@ -172,6 +172,16 @@ pre > code {
   }
 }
 
+.white-glass:not(.white-glass-opaque) {
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.white-glass.white-glass-opaque {
+  background: #fff;
+}
+
 *[data-tooltip] {
   position: relative;
 }
