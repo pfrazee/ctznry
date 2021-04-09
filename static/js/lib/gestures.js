@@ -1,7 +1,7 @@
 import { BasePopup } from '../com/popups/base.js'
 
 // we put the constants on window so that mobile debuggers can tweak the values
-window.SWIPE_VEL_THRESH = 0.3
+window.SWIPE_VEL_THRESH = 0.5
 window.SWIPE_X_THRESH = 60
 window.SWIPE_XN_THRESH = 2
 window.SWIPE_Y_MAX = 500
