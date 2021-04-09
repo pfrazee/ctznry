@@ -24,12 +24,12 @@ export class Card extends LitElement {
   firstUpdated () {
     // apply some custom styles to embedded elements
     for (let el of this.querySelectorAll('[ctzn-elem]')) {
-      if (el.tagName === 'CTZN-POST-VIEW') {
-        el.classList.add('block')
-        el.classList.add('border')
-        el.classList.add('border-gray-300')
-        el.classList.add('rounded')
-      }
+      el.classList.add('block')
+      el.classList.add('border')
+      el.classList.add('border-gray-300')
+      el.classList.add('rounded')
+      el.classList.add('mb-0.5')
+      el.classList.add('last:mb-0')
     }
   }
 
