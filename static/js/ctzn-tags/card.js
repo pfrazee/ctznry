@@ -35,15 +35,24 @@ export class Card extends LitElement {
 
   render () {
     return html`
-      <link rel="stylesheet" href="/css/common.css">
-      <link rel="stylesheet" href="/css/fontawesome.css">
-      <link rel="stylesheet" href="/css/tailwind.css">
       <style>
+        div {
+          background: #fff;
+          padding: 1em;
+          margin-bottom: 0.25rem;
+          border-radius: 0.25rem;
+        }
+        @media (max-width: 639px /*sm:*/) {
+          div {
+            border-radius: 0;
+            padding: 0.7em 1em;
+          }
+        }
         ::slotted(:last-child) {
           margin-bottom: 0 !important;
         }
       </style>
-      <div class="bg-white px-3 py-2 sm:px-4 sm:py-3 sm:rounded mb-1">
+      <div>
         <slot></slot>
       </div>
     `
