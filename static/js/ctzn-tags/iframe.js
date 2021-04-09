@@ -25,7 +25,7 @@ export class Iframe extends LitElement {
         <div class="iframe-sizer bg-white sm:rounded mb-0.5">
           <iframe
             src=${this.src}
-            allow="autoplay camera encrypted-media fullscreen microphone midi payment usb web-share"
+            allow="autoplay;camera;encrypted-media;fullscreen;microphone;midi;payment;usb;web-share"
             sandbox="allow-downloads allow-forms allow-modals allow-popups allow-presentation allow-same-origin allow-scripts"
           ></iframe>
         </div>
