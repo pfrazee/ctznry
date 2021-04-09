@@ -5,6 +5,7 @@ import * as session from '../lib/session.js'
 import { decodeBase64 } from '../lib/strings.js'
 
 import '../ctzn-tags/card.js'
+import '../ctzn-tags/code.js'
 import '../ctzn-tags/post-view.js'
 import '../ctzn-tags/posts-feed.js'
 import '../ctzn-tags/followers-list.js'
