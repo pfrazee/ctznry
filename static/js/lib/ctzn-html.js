@@ -51,6 +51,7 @@ export function sanitize (str, context = undefined) {
     return DOMPurify.sanitize(str, {
       ADD_TAGS: [
         'ctzn-card',
+        'ctzn-code',
         'ctzn-posts-feed',
         'ctzn-post-view',
         'ctzn-followers-list',
@@ -70,6 +71,7 @@ export function sanitize (str, context = undefined) {
     return DOMPurify.sanitize(str, {
       ADD_TAGS: [
         'ctzn-card',
+        'ctzn-code',
         'ctzn-post-view'
       ],
       ADD_ATTR: ['view', 'user-id', 'mode'],

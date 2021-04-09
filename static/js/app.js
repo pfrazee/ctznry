@@ -83,7 +83,7 @@ class CtznApp extends LitElement {
 
     contextMenu.destroy()
     BasePopup.destroy()
-    
+
     if (history.scrollRestoration) {
       history.scrollRestoration = 'manual'
     }
@@ -218,7 +218,7 @@ class CtznApp extends LitElement {
 
     const href = anchor.getAttribute('href')
     if (href === null) return
-    
+
     const url = new URL(href, window.location.origin)
     if (url.origin === window.location.origin) {
       e.preventDefault()
