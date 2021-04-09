@@ -150,6 +150,9 @@ export class CustomHtml extends LitElement {
             display: block;
             margin: 0.5rem;
           }
+          svg {
+            max-width: 100%;
+          }
         </style>
       `
     }
