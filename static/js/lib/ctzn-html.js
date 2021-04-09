@@ -36,6 +36,14 @@ const INPUT_CLASSES = {
   'text': 'block border border-gray-300 rounded w-full px-2 py-1'
 }
 
+DOMPurify.addHook('beforeSanitizeElements', currentNode => {
+  if (currentNode.tagName === 'CTZN-CODE') {
+    // turn everything inside a <ctzn-code> into escaped rendering
+    currentNode.textContent = currentNode.innerHTML
+  }
+  return currentNode;
+})
+
 DOMPurify.addHook('afterSanitizeAttributes', currentNode => {
   if (currentNode.tagName in EL_CLASSES) {
     currentNode.className = EL_CLASSES[currentNode.tagName]
