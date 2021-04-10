@@ -71,7 +71,8 @@ export function sanitize (str, context = undefined) {
         'ctzn-dbmethods-feed',
         'ctzn-owned-items-list',
         'ctzn-item-classes-list',
-        'ctzn-comment-view'
+        'ctzn-comment-view',
+        'ctzn-comments-feed'
       ],
       ADD_ATTR: ['view', 'user-id', 'mode', 'limit', 'methods-filter'],
       FORBID_TAGS: ['form', 'style'],
