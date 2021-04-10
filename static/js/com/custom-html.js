@@ -9,6 +9,7 @@ import '../ctzn-tags/code.js'
 import '../ctzn-tags/iframe.js'
 import '../ctzn-tags/post-view.js'
 import '../ctzn-tags/posts-feed.js'
+import '../ctzn-tags/comment-view.js'
 import '../ctzn-tags/followers-list.js'
 import '../ctzn-tags/following-list.js'
 import '../ctzn-tags/community-memberships-list.js'
@@ -146,6 +147,10 @@ export class CustomHtml extends LitElement {
             margin: 1em 0.5rem;
           }
           .custom-html > ctzn-post-view[mode="content-only"] {
+            display: block;
+            margin: 0.5rem;
+          }
+          .custom-html > ctzn-comment-view[mode="content-only"] {
             display: block;
             margin: 0.5rem;
           }

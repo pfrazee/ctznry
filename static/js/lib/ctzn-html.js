@@ -70,7 +70,8 @@ export function sanitize (str, context = undefined) {
         'ctzn-community-members-list',
         'ctzn-dbmethods-feed',
         'ctzn-owned-items-list',
-        'ctzn-item-classes-list'
+        'ctzn-item-classes-list',
+        'ctzn-comment-view'
       ],
       ADD_ATTR: ['view', 'user-id', 'mode', 'limit', 'methods-filter'],
       FORBID_TAGS: ['form', 'style'],
@@ -83,7 +84,8 @@ export function sanitize (str, context = undefined) {
         'ctzn-card',
         'ctzn-iframe',
         'ctzn-code',
-        'ctzn-post-view'
+        'ctzn-post-view',
+        'ctzn-comment-view'
       ],
       ADD_ATTR: ['view', 'user-id', 'mode'],
       FORBID_TAGS: ['form', 'style'],
