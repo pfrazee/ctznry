@@ -240,7 +240,6 @@ export class CommentsFeed extends LitElement {
         <div class="bg-gray-100 text-gray-500 py-44 text-center">
           <div class="fas fa-stream text-6xl text-gray-300 mb-8"></div>
             <div>This feed is empty.</div>
-          `}
         </div>
       `
     }
