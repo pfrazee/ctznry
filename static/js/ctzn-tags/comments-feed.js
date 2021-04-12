@@ -133,15 +133,10 @@ export class CommentsFeed extends LitElement {
     let results = more ? (this.results || []) : []
     let lt = more ? results[results?.length - 1]?.key : undefined
 
-    const commentList = await session.ctzn.db(this.userId).table("ctzn.network/comment").list({limit: 15, reverse: true, lt})
-    let agg = []
-    await Promise.allSettled(
-      commentList.map(async (item) => {
-        let comment = await session.ctzn.getComment(this.userId, item.key)
-        agg.push(comment)
-      })
-    )
-    results = results.concat(agg.reverse())
+    const entries = await session.ctzn.db(this.userId).table("ctzn.network/comment").list({limit: 15, reverse: true, lt})
+    results = results.concat(await Promise.all(entries.map(entry => (
+      session.ctzn.getComment(this.userId, entry.key)
+    ))))
     this.requestUpdate()
     if (this.limit > 0 && results.length > this.limit) {
       results = results.slice(0, this.limit)
@@ -171,16 +166,7 @@ export class CommentsFeed extends LitElement {
     if (!this.results || this.hasHitLimit) {
       return
     }
-    let results = []
-    const commentList = await session.ctzn.db(this.userId).table("ctzn.network/comment").list({limit: 15, reverse: true})
-    await Promise.allSettled(
-      commentList.map(async (item) => {
-        let comment = await session.ctzn.getComment(this.userId, item.key)
-        results.push(comment)
-      })
-    )
-    results.reverse() // yeah there's probably a way to do this more efficiently
-
+    const results = await session.ctzn.db(this.userId).table("ctzn.network/comment").list({limit: 1, reverse: true})
     this.hasNewItems = (results[0] && results[0].key !== this.results[0].key)
   }
 
