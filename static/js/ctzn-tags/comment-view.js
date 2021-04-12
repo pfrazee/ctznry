@@ -592,7 +592,7 @@ export class CommentView extends LitElement {
           'ctzn.network/community-user-permission-view',
           this.communityUserId,
           session.info.userId,
-          'ctzn.network/perm-community-remove-post'
+          'ctzn.network/perm-community-remove-comment'
         ).then(perm => {
           if (perm) {
             return html`
