@@ -6,6 +6,11 @@ body.no-pad {
   padding: 0;
 }
 
+/* hackfix: overflow-wrap wasnt working on ios safari */
+.break-words {
+  word-break: break-word;
+}
+
 /* reset some styles */
 input[type="text"],
 input[type="password"],
