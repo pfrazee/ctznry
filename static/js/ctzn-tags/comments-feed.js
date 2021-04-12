@@ -279,7 +279,7 @@ export class CommentsFeed extends LitElement {
       <div style="content-visibility: auto; contain-intrinsic-size: 640px 120px;">
         <ctzn-comment-view
           .comment=${comment}
-          mode="condensed"
+          mode="default"
         ></ctzn-comment-view>
       </div>
     `

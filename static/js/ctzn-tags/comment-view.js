@@ -1,29 +1,33 @@
 import { LitElement, html } from '../../vendor/lit-element/lit-element.js'
 import { unsafeHTML } from '../../vendor/lit-element/lit-html/directives/unsafe-html.js'
+import { ifDefined } from '../../vendor/lit-element/lit-html/directives/if-defined.js'
 import { repeat } from '../../vendor/lit-element/lit-html/directives/repeat.js'
-import { COMMENT_URL, ITEM_CLASS_ICON_URL, FULL_COMMENT_URL, AVATAR_URL, BLOB_URL } from '../lib/const.js'
-import * as session from '../lib/session.js'
+import { asyncReplace } from '../../vendor/lit-element/lit-html/directives/async-replace.js'
+import { AVATAR_URL, ITEM_CLASS_ICON_URL, COMMENT_URL, FULL_COMMENT_URL, SUGGESTED_REACTIONS } from '../lib/const.js'
+import { writeToClipboard } from '../lib/clipboard.js'
+import { CommentComposerPopup } from '../com/popups/comment-composer.js'
 import { TransferItemRelatedPopup } from '../com/popups/transfer-item-related.js'
 import { ReactionsListPopup } from '../com/popups/reactions-list.js'
 import { RelatedItemTransfersListPopup } from '../com/popups/related-item-transfers-list.js'
-import { ViewMediaPopup } from '../com/popups/view-media.js'
+import * as session from '../lib/session.js'
 import { emit } from '../lib/dom.js'
-import { makeSafe, linkify, pluralize, parseSrcAttr } from '../lib/strings.js'
+import { makeSafe, linkify, pluralize, parseSrcAttr, extractSchemaId } from '../lib/strings.js'
 import { relativeDate } from '../lib/time.js'
 import { emojify } from '../lib/emojify.js'
-import { writeToClipboard } from '../lib/clipboard.js'
 import * as displayNames from '../lib/display-names.js'
 import * as contextMenu from '../com/context-menu.js'
 import * as toast from '../com/toast.js'
+import '../com/comment-composer.js'
 import '../com/reaction-input.js'
 
 export class CommentView extends LitElement {
   static get properties () {
     return {
-      mode: {type: String}, // 'full', 'condensed', or 'content-only' (default 'condensed')
+      mode: {type: String}, // 'default', 'as-reply', or 'content-only'
       src: {type: String},
       comment: {type: Object},
       renderOpts: {type: Object},
+      isReplyOpen: {type: Boolean},
       isReactionsOpen: {type: Boolean}
     }
   }
@@ -35,9 +39,10 @@ export class CommentView extends LitElement {
   constructor () {
     super()
     this.setAttribute('ctzn-elem', '1')
-    this.mode = 'condensed'
     this.comment = undefined
+    this.mode = 'default'
     this.renderOpts = {noclick: false}
+    this.isReplyOpen = false
     this.isReactionsOpen = false
 
     // helper state
@@ -64,30 +69,11 @@ export class CommentView extends LitElement {
   async load () {
     this.comment = undefined
     const {userId, schemaId, key} = parseSrcAttr(this.src)
-    try {
-      this.comment = await session.ctzn.getComment(userId, key)
-    } catch(e) {
-      this.comment = {error: true, message: e.toString()}
-    }
-  }
-
-  get showCondensed () {
-    return this.mode === 'condensed'
-  }
-
-  get showContentOnly () {
-    return this.mode === 'content-only'
+    this.comment = await session.ctzn.getComment(userId, key).catch(e => ({error: true, message: e.toString()}))
   }
 
   get communityUserId () {
     return this.comment?.value?.community?.userId
-  }
-
-  get replyCount () {
-    if (typeof this.comment?.replyCount !== 'undefined') {
-      return this.comment.replyCount
-    }
-    return 0
   }
 
   get isMyComment () {
@@ -101,15 +87,25 @@ export class CommentView extends LitElement {
     if (this.communityUserId) {
       return session.isInCommunity(this.communityUserId)
     }
-    return session.isFollowingMe(this.comment?.author.userId)
+    return session.isFollowingMe(this.comment.author.userId)
   }
 
   get ctrlTooltip () {
     if (this.canInteract) return undefined
     if (this.communityUserId) {
-      return `Only members of ${displayNames.render(this.communityUserId)} can interact with this comment`
+      return `Only members of ${this.communityUserId} can interact with this comment`
     }
     return `Only people followed by ${this.comment.author.displayName} can interact with this comment`
+  }
+
+  get replyCount () {
+    if (typeof this.comment?.replyCount !== 'undefined') {
+      return this.comment.replyCount
+    }
+    if (typeof this.comment?.replies !== 'undefined') {
+      return this.comment.replies.length
+    }
+    return 0
   }
 
   haveIReacted (reaction) {
@@ -133,8 +129,7 @@ export class CommentView extends LitElement {
   }
 
   async reloadSignals () {
-    try {
-      this.comment.reactions = (await session.ctzn.view('ctzn.network/reactions-to-view', this.comment.url))?.reactions
+    this.comment.reactions = (await session.ctzn.view('ctzn.network/reactions-to-view', this.comment.url))?.reactions
     if (this.communityUserId) {
       this.comment.relatedItemTransfers = (
         await session.ctzn.db(`server@${this.communityUserId.split('@')[1]}`)
@@ -143,9 +138,6 @@ export class CommentView extends LitElement {
       )?.value.transfers
     }
     this.requestUpdate()
-    } catch(e) {
-      console.error(e)
-    }
   }
 
   // rendering
@@ -156,127 +148,54 @@ export class CommentView extends LitElement {
       return html``
     }
 
-
     if (this.comment.error) {
       return html`
-        <div class="flex items-center bg-gray-50 sm:rounded">
-          <div class="text-xl pl-4 py-2 text-gray-500">
-            <span class="fas fa-fw fa-exclamation-circle"></span>
+        <div class="px-4 py-2 min-w-0 bg-gray-50">
+          <div class="font-semibold text-gray-600">
+            <span class="fas fa-fw fa-exclamation-circle"></span> Failed to load comment
           </div>
-          <div class="px-4 py-2 min-w-0">
-            <div class="font-semibold text-gray-600">
-              Failed to load comment
+          ${this.comment.message ? html`
+            <div class="text-gray-500 text-sm">
+              ${this.comment.message}
             </div>
-            ${this.comment.message ? html`
-              <div class="text-gray-500 text-sm">
-                ${this.comment.message}
-              </div>
-            ` : ''}
-          </div>
+          ` : ''}
         </div>
       `
     }
 
-
-    if (this.showContentOnly) {
+    if (this.mode === 'as-reply') {
+      return this.renderAsReply()
+    } else if (this.mode === 'content-only') {
       return this.renderContentOnly()
-    } else if (this.showCondensed) {
-      return this.renderCondensed()
+    } else {
+      return this.renderDefault()
     }
-    
-    return html`
-      <div
-        class="${this.renderOpts?.noclick ? '' : 'cursor-pointer'}"
-        @mousedown=${this.onMousedownCard}
-        @mouseup=${this.onMouseupCard}
-        @mousemove=${this.onMousemoveCard}
-      >
-        <div class="flex items-center pt-2 px-3 sm:pt-3 sm:px-4">
-          <a class="inline-block w-10 h-10 mr-2" href="/${this.comment.author.userId}" title=${this.comment.author.displayName}>
-            <img
-              class="inline-block w-10 h-10 object-cover rounded"
-              src=${AVATAR_URL(this.comment.author.userId)}
-            >
-          </a>
-          <div class="flex-1">
-            <div>
-              <a class="hov:hover:underline" href="/${this.comment.author.userId}" title=${this.comment.author.displayName}>
-                <span class="text-black font-bold">${displayNames.render(this.comment.author.userId)}</span>
-              </a>
-            </div>
-            <div class="text-sm">
-              <a class="text-gray-600 hov:hover:underline" href="${COMMENT_URL(this.comment)}" data-tooltip=${(new Date(this.comment.value.createdAt)).toLocaleString()}>
-                ${relativeDate(this.comment.value.createdAt)}
-              </a>
-              ${this.comment.value.community ? html`
-                <span class="text-gray-700">
-                  in
-                  <a href="/${this.communityUserId}" class="whitespace-nowrap font-semibold hov:hover:underline">
-                    ${displayNames.render(this.communityUserId)}
-                  </a>
-                </span>
-              ` : ''}
-            </div>
-          </div>
-        </div>
-        <div class="px-3 py-3 sm:px-4 sm:py-4 min-w-0">
-          <div class="whitespace-pre-wrap break-words text-lg leading-tight font-medium text-black mb-1.5">
-            ${unsafeHTML(emojify(linkify(makeSafe(this.comment.value.text))))}
-          </div>
-          ${this.noctrls ? '' : html`
-            ${this.hasReactionsOrGifts ? html`
-              <div class="my-1.5">
-                ${this.renderGiftedItems()}
-                ${this.renderReactions()}
-              </div>
-            ` : ''}
-            <div class="flex items-center justify-around text-sm text-gray-600 px-1 pt-1 pr-8 sm:pr-80">
-              ${this.renderRepliesCtrl()}
-              ${this.renderReactionsBtn()}
-              ${this.renderGiftItemBtn()}
-              ${this.renderActionsSummary()}
-            </div>
-            ${this.renderReactionsCtrl()}
-          `}
-        </div>
-      </div>
-    `
   }
 
-  renderContentOnly () {
+  renderDefault () {
     return html`
       <div
-        class="${this.renderOpts.noclick ? '' : 'cursor-pointer'}"
-        @mousedown=${this.onMousedownCard}
-        @mouseup=${this.onMouseupCard}
-        @mousemove=${this.onMousemoveCard}
-      >
-        ${this.renderCommentTextNonFull()}
-      </div>
-    `
-  }
-
-
-  renderCondensed () {
-    return html`
-      <div
-        class="grid grid-comment px-1 py-0.5 bg-white mb-0.5 ${this.renderOpts.noclick ? '' : 'cursor-pointer'} text-gray-600"
+        class="px-1 py-0.5 bg-white mb-0.5 ${this.renderOpts.noclick ? '' : 'cursor-pointer'} text-gray-600"
         @click=${this.onClickCard}
         @mousedown=${this.onMousedownCard}
         @mouseup=${this.onMouseupCard}
         @mousemove=${this.onMousemoveCard}
       >
-        <div class="pl-2 pt-2">
-          <a class="block" href="/${this.comment.author.userId}" title=${this.comment.author.displayName}>
-            <img
-              class="block object-cover rounded-full mt-1 w-11 h-11"
-              src=${AVATAR_URL(this.comment.author.userId)}
-            >
-          </a>
-        </div>
-        <div class="block bg-white min-w-0">
-          <div class="${this.showContentOnly ? '' : 'pr-2 py-2'} min-w-0">
-            ${this.showContentOnly ? '' : html`
+        <div class="grid grid-post">
+          <div class="pl-2 pt-2">
+            <a class="block" href="/${this.comment.author.userId}" title=${this.comment.author.displayName}>
+              <img
+                class="block object-cover rounded-full mt-1 w-11 h-11"
+                src=${AVATAR_URL(this.comment.author.userId)}
+              >
+            </a>
+          </div>
+          <div class="block min-w-0">
+            <div class="block min-w-0 pl-1 pt-2 text-sm truncate">
+              <span class="fas fa-reply"></span> Reply to
+              ${asyncReplace(this.renderReplyParentAsync())}
+            </div>
+            <div class="pr-2 pb-2 min-w-0">
               <div class="pl-1 pr-2.5 text-gray-600 truncate">
                 <span class="sm:mr-1 whitespace-nowrap">
                   <a class="hov:hover:underline" href="/${this.comment.author.userId}" title=${this.comment.author.displayName}>
@@ -294,18 +213,16 @@ export class CommentView extends LitElement {
                     </a>
                   ` : ''}
                 </span>
-              </div>`
-            }
-            ${this.renderCommentTextNonFull()}
-            ${this.showContentOnly ? '' : html`
+              </div>
+              ${this.renderCommentText()}
               ${this.hasReactionsOrGifts ? html`
                 <div class="flex items-center my-1.5 mx-0.5 text-gray-500 text-sm truncate">
                   ${this.renderGiftedItems()}
                   ${this.renderReactions()}
                 </div>
               ` : ''}
-              <div class="flex pl-1 mt-1.5 text-gray-500 text-sm items-center justify-between pr-12 sm:pr-80">
-                ${this.renderRepliesCtrl()}
+              <div class="flex pl-1 mt-0.5 text-gray-500 text-sm items-center justify-between pr-12 sm:pr-80">
+                ${this.renderRepliesBtn()}
                 ${this.renderReactionsBtn()}
                 ${this.renderGiftItemBtn()}
                 <div>
@@ -315,63 +232,212 @@ export class CommentView extends LitElement {
                 </div>
               </div>
               ${this.renderReactionsCtrl()}
-            `}
+            </div>
           </div>
         </div>
       </div>
     `
   }
 
-  renderActionsSummary () {
-    const reactionsCount = this.comment.reactions ? Object.values(this.comment.reactions).reduce((acc, v) => acc + v.length, 0) : 0
-    const giftsCount = this.comment.relatedItemTransfers?.length || 0
-    let reactionsCls = `inline-block ml-1 rounded text-gray-500 ${reactionsCount ? 'cursor-pointer hov:hover:underline' : ''}`
+  renderAsReply () {
     return html`
-      <a class=${reactionsCls} @click=${reactionsCount ? this.onClickViewReactions : undefined}>
-        ${reactionsCount} ${pluralize(reactionsCount, 'reaction')}${giftsCount > 0 ? ', ' : ''}
-      </a>
-      ${giftsCount > 0 ? html`
-        <a class="inline-block rounded text-gray-500 cursor-pointer hov:hover:underline" @click=${this.onClickViewGifts}>
-          ${giftsCount} ${pluralize(giftsCount, 'gift')}
-        </a>
-      ` : ''}
+      <div
+        class="text-gray-600 sm:rounded mb-0.5 ${this.renderOpts.noclick ? '' : 'cursor-pointer'}"
+        @click=${this.onClickCard}
+        @mousedown=${this.onMousedownCard}
+        @mouseup=${this.onMouseupCard}
+        @mousemove=${this.onMousemoveCard}
+      >
+        <div class="py-2 min-w-0">
+          <div class="flex pr-2.5 text-gray-500 text-xs items-center">
+            <a class="block relative" href="/${this.comment.author.userId}" title=${this.comment.author.displayName}>
+              <img class="block w-4 h-4 object-cover rounded-full mr-1" src=${AVATAR_URL(this.comment.author.userId)}>
+            </a>
+            <div class="whitespace-nowrap">
+              <a class="hov:hover:underline" href="/${this.comment.author.userId}" title=${this.comment.author.displayName}>
+                <span class="text-gray-700 font-medium">${displayNames.render(this.comment.author.userId)}</span>
+              </a>
+            </div>
+            <span class="mx-1">&middot;</span>
+            <a class="text-gray-500 hov:hover:underline" href="${COMMENT_URL(this.comment)}" data-tooltip=${(new Date(this.comment.value.createdAt)).toLocaleString()}>
+              ${relativeDate(this.comment.value.createdAt)}
+            </a>
+          </div>
+          ${this.renderCommentText()}
+          ${this.hasReactionsOrGifts ? html`
+            <div class="pb-1 pl-5">
+              ${this.renderGiftedItems()}
+              ${this.renderReactions()}
+            </div>
+          ` : ''}
+          <div class="pl-4">
+            ${this.renderRepliesBtn()}
+            ${this.renderReactionsBtn()}
+            ${this.renderGiftItemBtn()}
+            ${this.renderActionsSummary()}
+            <a
+              class="cursor-pointer tooltip-right hov:hover:bg-gray-100 px-2 py-1 ml-2 text-xs text-gray-500 font-bold"
+              @click=${this.onClickMenu}
+            >
+              <span class="fas fa-fw fa-ellipsis-h"></span>
+            </a>
+          </div>
+          ${this.renderReactionsCtrl()}
+          ${this.isReplyOpen ? html`
+            <div class="border border-gray-300 rounded py-2 px-3 my-2 mx-1 bg-white">
+              <app-comment-composer
+                autofocus
+                .community=${this.comment.value.community}
+                .subject=${this.comment.value.reply.root}
+                .parent=${{dbUrl: this.comment.url, authorId: this.comment.author.userId}}
+                placeholder="Write your reply"
+                @publish=${this.onPublishReply}
+                @cancel=${this.onCancelReply}
+              ></app-comment-composer>
+            </div>
+          ` : ''}
+        </div>
+      </div>
     `
   }
 
-  renderRepliesCtrl () {
-    let aCls = `inline-block ml-1 mr-6`
-    if (this.canInteract) {
-      aCls += ` text-gray-500`
-    } else {
-      aCls += ` text-gray-400`
-    }
+  renderContentOnly () {
     return html`
-      <span class=${aCls}>
-        <span class="far fa-comment"></span>
-        ${this.replyCount}
-      </span>
+      <div
+        class="${this.renderOpts.noclick ? '' : 'cursor-pointer'}"
+        @mousedown=${this.onMousedownCard}
+        @mouseup=${this.onMouseupCard}
+        @mousemove=${this.onMousemoveCard}
+      >
+        ${this.renderCommentText()}
+      </div>
+    `
+  }
+
+  async *renderReplyParentAsync () {
+    let parent = this.comment.value.reply.parent || this.comment.value.reply.root
+    if (!parent) return ''
+    const schemaId = extractSchemaId(parent.dbUrl)
+    let record
+    if (schemaId === 'ctzn.network/post') {
+      record = await session.ctzn.getPost(parent.authorId, parent.dbUrl)
+    } else if (schemaId === 'ctzn.network/comment') {
+      record = await session.ctzn.getComment(parent.authorId, parent.dbUrl)
+    } else {
+      return html`Content by ${parent.authorId}`
+    }
+    if (!record) {
+      return html`A ${schemaId === 'ctzn.network/post' ? 'post' : 'comment'} by ${parent.authorId}`
+    }
+    yield html`${record.value.text}`
+  }
+
+  renderCommentText () {
+    let cls
+    let style
+    if (this.mode === 'as-reply') {
+      cls = 'whitespace-pre-wrap break-words text-base leading-snug text-gray-700 pt-2 pb-1.5 pl-5 pr-2.5'
+    } else {
+      cls = 'whitespace-pre-wrap break-words text-black mt-1 mb-1 ml-1 mr-2.5'
+      style = 'font-size: 16px; letter-spacing: 0.1px; line-height: 1.3;'
+    }
+    return html`<div class="${cls}" style=${style}>${unsafeHTML(emojify(linkify(makeSafe(this.comment.value.text))))}</div>`
+  }
+
+  renderRepliesBtn () {
+    return html`
+      <a
+        class="
+          tooltip-right px-2 py-1
+          ${this.mode === 'as-reply' ? 'text-xs font-bold' : ''}
+          ${this.canInteract ? 'cursor-pointer text-gray-500 hov:hover:bg-gray-100' : 'text-gray-400'}
+        "
+        data-tooltip=${ifDefined(this.ctrlTooltip)}
+        @click=${this.canInteract ? this.onClickReply : undefined}
+      >
+        ${this.mode === 'default' ? html`
+          <span class="far fa-comment"></span> ${this.replyCount}
+        ` : html`
+          <span class="fas fa-fw fa-reply"></span> Reply
+        `}
+      </a>
     `
   }
 
   renderReactionsBtn () {
-    let aCls = `inline-block ml-1 mr-6 rounded`
-    if (this.canInteract) {
-      aCls += ` text-gray-500 hov:hover:bg-gray-200`
-    } else {
-      aCls += ` text-gray-400`
-    }
     return html`
-      <a class=${aCls} @click=${e => {this.isReactionsOpen = !this.isReactionsOpen}}>
+      <a
+        class="
+          tooltip-right px-2 py-1
+          ${this.mode === 'as-reply' ? 'text-xs font-bold' : ''}
+          ${this.canInteract ? 'cursor-pointer text-gray-500 hov:hover:bg-gray-100' : 'text-gray-400'}
+        "
+        data-tooltip=${ifDefined(this.ctrlTooltip)}
+        @click=${this.canInteract ? (e => {this.isReactionsOpen = !this.isReactionsOpen}) : undefined}
+      >
         <span class="fas fa-fw fa-${this.isReactionsOpen ? 'minus' : 'plus'}"></span>
       </a>
     `
   }
 
+  renderReactionsCtrl () {
+    if (!this.isReactionsOpen) {
+      return ''
+    }
+    return html`
+      <app-reaction-input
+        .reactions=${this.comment.reactions}
+        @toggle-reaction=${this.onToggleReaction}
+      ></app-reaction-input>
+    `
+  }
+
+  renderReactions () {
+    if (!this.comment.reactions || !Object.keys(this.comment.reactions).length) {
+      return ''
+    }
+    return html`
+      ${repeat(Object.entries(this.comment.reactions), ([reaction, userIds]) => {
+        const colors = this.haveIReacted(reaction) ? 'bg-blue-50 hov:hover:bg-blue-100 text-blue-600' : 'bg-gray-100 text-gray-500 hov:hover:bg-gray-200'
+        return html`
+          <a
+            class="inline-block mr-1 px-1.5 py-0.5 mt-1 text-sm rounded cursor-pointer ${colors}"
+            @click=${e => this.onClickReaction(e, reaction)}
+          >
+            ${unsafeHTML(emojify(makeSafe(reaction)))}
+            <sup class="font-medium">${userIds.length}</sup>
+          </a>
+        `
+      })}
+    `
+  }
+
+  renderGiftedItems () {
+    if (!this.comment.relatedItemTransfers?.length) {
+      return ''
+    }
+    return html`
+      ${repeat(this.comment.relatedItemTransfers, item => html`
+        <span
+          class="inline-block border border-gray-300 px-1 py-0.5 rounded mt-1 mr-1 text-sm font-semibold"
+        >
+          <img
+            class="inline relative w-4 h-4 object-cover mr-1"
+            src=${ITEM_CLASS_ICON_URL(this.communityUserId, item.itemClassId)}
+            style="top: -1px"
+          >
+          ${item.qty}
+        </span>
+      `)}
+    `
+  }
+
   renderGiftItemBtn () {
-    let aCls = `inline-block ml-1 mr-6 px-1 rounded`
+    let aCls = `inline-block px-1 rounded px-2 py-1`
+    if (this.mode === 'as-reply') aCls += ' text-xs'
     if (this.communityUserId && this.canInteract && !this.isMyComment) {
       return html`
-        <a class="${aCls} text-gray-500 hov:hover:bg-gray-200" @click=${this.onClickGiftItem}>
+        <a class="${aCls} text-gray-500 cursor-pointer hov:hover:bg-gray-100" @click=${this.onClickGiftItem}>
           <span class="fas fa-fw fa-gift"></span>
         </a>
       `
@@ -389,64 +455,19 @@ export class CommentView extends LitElement {
     }
   }
 
-  renderReactionsCtrl () {
-    if (!this.isReactionsOpen) {
-      return ''
-    }
+  renderActionsSummary () {
+    const reactionsCount = this.comment.reactions ? Object.values(this.comment.reactions).reduce((acc, v) => acc + v.length, 0) : 0
+    const giftsCount = this.comment.relatedItemTransfers?.length || 0
+    let reactionsCls = `inline-block ml-1 text-sm text-gray-500 ${reactionsCount ? 'cursor-pointer hov:hover:underline' : ''}`
     return html`
-      <app-reaction-input
-        .reactions=${this.comment.reactions}
-        @toggle-reaction=${this.onToggleReaction}
-      ></app-reaction-input>
-    `
-  }
-
-  renderGiftedItems () {
-    if (!this.comment.relatedItemTransfers?.length) {
-      return ''
-    }
-    return html`
-      ${repeat(this.comment.relatedItemTransfers, item => html`
-        <span
-          class="flex-shrink-0 inline-flex items-center border border-gray-300 px-1 py-0.5 rounded mr-1.5 text-sm font-semibold"
-        >
-          <img
-            class="block w-4 h-4 object-cover mr-1"
-            src=${ITEM_CLASS_ICON_URL(this.communityUserId, item.itemClassId)}
-          >
-          ${item.qty}
-        </span>
-      `)}
-    `
-  }
-
-  renderReactions () {
-    if (!this.comment.reactions || !Object.keys(this.comment.reactions).length) {
-      return ''
-    }
-    return html`
-      ${repeat(Object.entries(this.comment.reactions), ([reaction, userIds]) => {
-        const colors = this.haveIReacted(reaction) ? 'bg-blue-50 hov:hover:bg-blue-100 text-blue-600' : 'bg-gray-100 text-gray-500 hov:hover:bg-gray-200'
-        return html`
-          <a
-            class="inline-block mr-2 px-1.5 py-0.5 rounded text-sm flex-shrink-0 ${colors}"
-            @click=${e => this.onClickReaction(e, reaction)}
-          >${unsafeHTML(emojify(makeSafe(reaction)))} <sup class="font-medium">${userIds.length}</sup></a>
-        `
-      })}
-    `
-  }
-
-  renderCommentTextNonFull () {
-    const {text} = this.comment.value
-    if (!text?.trim()) {
-      return ''
-    }
-    return html`
-      <div
-        class="whitespace-pre-wrap break-words text-black ${this.showContentOnly ? '' : 'mt-1 mb-2 ml-1 mr-2.5'}"
-        style="font-size: 16px; letter-spacing: 0.1px; line-height: 1.3;"
-      >${unsafeHTML(linkify(emojify(makeSafe(this.comment?.value.text))))}</div>
+      <a class=${reactionsCls} @click=${reactionsCount ? this.onClickViewReactions : undefined}>
+        ${reactionsCount} ${pluralize(reactionsCount, 'reaction')}${giftsCount > 0 ? ', ' : ''}
+      </a>
+      ${giftsCount > 0 ? html`
+        <a class="inline-block ml-1 text-sm rounded text-gray-500 cursor-pointer hov:hover:underline" @click=${this.onClickViewGifts}>
+          ${giftsCount} ${pluralize(giftsCount, 'gift')}
+        </a>
+      ` : ''}
     `
   }
 
@@ -484,13 +505,41 @@ export class CommentView extends LitElement {
     if (!this.isMouseDragging) {
       e.preventDefault()
       e.stopPropagation()
-      let root = this.comment?.value?.reply?.root
-      if (root) {
-        emit(this, 'view-thread', {detail: {subject: {dbUrl: root?.dbUrl, authorId: root?.userId}}})
-      }
+      emit(this, 'view-thread', {detail: {subject: {dbUrl: this.comment.url, authorId: this.comment.author.userId}}})
     }
     this.isMouseDown = false
     this.isMouseDragging = false
+  }
+
+  async onClickReply (e) {
+    e.preventDefault()
+    if (matchMedia('(max-width: 1150px)').matches) {
+      await CommentComposerPopup.create({
+        comment: this.comment
+      })
+      emit(this, 'publish-reply')
+    } else {
+      this.isReplyOpen = true
+    }
+  }
+
+  onPublishReply (e) {
+    e.preventDefault()
+    e.stopPropagation()
+    this.isReplyOpen = false
+    emit(this, 'publish-reply')
+  }
+
+  onCancelReply (e) {
+    this.isReplyOpen = false
+  }
+
+  onViewThread (e, record) {
+    if (!this.viewContentOnClick && e.button === 0 && !e.metaKey && !e.ctrlKey) {
+      e.preventDefault()
+      e.stopPropagation()
+      emit(this, 'view-thread', {detail: {subject: {dbUrl: this.comment.url, authorId: this.comment.author.userId}}})
+    }
   }
 
   onToggleReaction (e) {
@@ -514,11 +563,7 @@ export class CommentView extends LitElement {
         reaction
       })
     }
-    this.reloadSignals().catch((e) =>{
-      this.comment.error = e
-      this.comment.message = e.message
-      console.error(e)
-    })
+    this.reloadSignals()
   }
 
   async onClickCustomReaction (e) {
@@ -544,11 +589,7 @@ export class CommentView extends LitElement {
     })
     this.comment.reactions[reaction] = (this.comment.reactions[reaction] || []).concat([session.info.userId])
     this.requestUpdate()
-    this.reloadSignals().catch((e) => {
-      this.comment.error = e
-      this.comment.message = e.message
-      console.error(e)
-    })
+    this.reloadSignals()
   }
 
   async onClickGiftItem () {
@@ -556,7 +597,7 @@ export class CommentView extends LitElement {
       communityId: this.communityUserId,
       subject: this.comment
     })
-      this.reloadSignals()
+    this.reloadSignals()
   }
 
   onClickMenu (e) {
@@ -621,7 +662,6 @@ export class CommentView extends LitElement {
     if (!confirm('Are you sure you want to remove this comment?')) {
       return
     }
-    contextMenu.destroy()
     emit(this, 'moderator-remove-comment', {detail: {comment: this.comment}})
   }
 
@@ -637,7 +677,6 @@ export class CommentView extends LitElement {
       relatedItemTransfers: this.comment.relatedItemTransfers
     })
   }
-
 }
 
 customElements.define('ctzn-comment-view', CommentView)

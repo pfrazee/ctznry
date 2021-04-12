@@ -6,7 +6,7 @@ import { emit } from '../lib/dom.js'
 import * as session from '../lib/session.js'
 import * as displayNames from '../lib/display-names.js'
 import '../ctzn-tags/post-view.js'
-import './comment.js'
+import '../ctzn-tags/comment-view.js'
 import './comment-composer.js'
 
 export class Thread extends LitElement {
@@ -51,7 +51,6 @@ export class Thread extends LitElement {
 
   async load () {
     this.isLoading = true
-    // this.reset() TODO causes a flash of the loading spinner, needed?
     console.log('loading', this.subject)
     const onError = e => ({
       error: true,
@@ -159,12 +158,14 @@ export class Thread extends LitElement {
               class="mb-1 ${isSubject ? 'bg-blue-50 border border-blue-200 border-l-2 px-2 rounded-r highlight' : ''}"
               style="${isSubject ? 'margin-left: -14px' : ''}"
             >
-              <app-comment
+              <ctzn-comment-view
                 .comment=${reply}
+                .renderOpts=${{noclick: true}}
+                mode="as-reply"
                 @publish-reply=${this.onPublishReply}
                 @delete-comment=${this.onDeleteComment}
                 @moderator-remove-comment=${this.onModeratorRemoveComment}
-              ></app-comment>
+              ></ctzn-comment-view>
             </div>
             ${reply.replies?.length ? this.renderReplies(reply.replies) : ''}
           `
