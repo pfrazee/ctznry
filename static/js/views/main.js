@@ -197,7 +197,6 @@ class CtznMainView extends LitElement {
             ${this.isEmpty ? this.renderEmptyMessage() : ''}
             <ctzn-posts-feed
               view="ctzn.network/feed-view"
-              limit="15"
               @load-state-updated=${this.onFeedLoadStateUpdated}
               @publish-reply=${this.onPublishReply}
             ></ctzn-posts-feed>
@@ -205,7 +204,6 @@ class CtznMainView extends LitElement {
             ${this.isEmpty ? this.renderEmptyMessage() : ''}
             <app-notifications-feed
               cleared-at=${this.notificationsClearedAt}
-              limit="15"
               @load-state-updated=${this.onFeedLoadStateUpdated}
               @publish-reply=${this.onPublishReply}
             ></app-notifications-feed>
