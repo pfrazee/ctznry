@@ -285,7 +285,7 @@ export class PostsFeed extends LitElement {
       <div style="content-visibility: auto; contain-intrinsic-size: 640px 120px;">
         <ctzn-post-view
           .post=${post}
-          mode="condensed"
+          mode="default"
         ></ctzn-post-view>
       </div>
     `

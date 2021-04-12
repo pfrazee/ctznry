@@ -113,7 +113,7 @@ export class Thread extends LitElement {
       <div class="mb-1 bg-white sm:rounded-b">
         ${this.post ? html`
           <ctzn-post-view
-            mode="full"
+            mode="expanded"
             .post=${this.post}
             .renderOpts=${{noclick: true}}
           ></ctzn-post-view>

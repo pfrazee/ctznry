@@ -20,7 +20,7 @@ import '../com/reaction-input.js'
 export class PostView extends LitElement {
   static get properties () {
     return {
-      mode: {type: String}, // 'full', 'condensed', or 'content-only' (default 'condensed')
+      mode: {type: String}, // 'default', 'expanded', or 'content-only'
       src: {type: String},
       post: {type: Object},
       renderOpts: {type: Object},
@@ -35,7 +35,8 @@ export class PostView extends LitElement {
   constructor () {
     super()
     this.setAttribute('ctzn-elem', '1')
-    this.mode = 'condensed'
+    this.mode = 'default'
+    this.src = undefined
     this.post = undefined
     this.renderOpts = {noclick: false}
     this.isReactionsOpen = false
@@ -67,12 +68,16 @@ export class PostView extends LitElement {
     this.post = await session.ctzn.getPost(userId, key).catch(e => ({error: true, message: e.toString()}))
   }
 
-  get showCondensed () {
-    return this.mode === 'condensed'
+  get showDefault () {
+    return this.mode === 'default' || !this.mode
   }
 
   get showContentOnly () {
     return this.mode === 'content-only'
+  }
+
+  get showExpanded () {
+    return this.mode === 'expanded'
   }
 
   get communityUserId () {
@@ -173,10 +178,28 @@ export class PostView extends LitElement {
 
     if (this.showContentOnly) {
       return this.renderContentOnly()
-    } else if (this.showCondensed) {
-      return this.renderCondensed()
+    } else if (this.showExpanded) {
+      return this.renderExpanded()
+    } else {
+      return this.renderDefault()
     }
-    
+  }
+
+  renderContentOnly () {
+    return html`
+      <div
+        class="${this.renderOpts.noclick ? '' : 'cursor-pointer'}"
+        @mousedown=${this.onMousedownCard}
+        @mouseup=${this.onMouseupCard}
+        @mousemove=${this.onMousemoveCard}
+      >
+        ${this.renderPostTextNonFull()}
+        ${this.renderMedia()}
+      </div>
+    `
+  }
+
+  renderExpanded () {
     return html`
       <div
         class="${this.renderOpts.noclick ? '' : 'cursor-pointer'}"
@@ -236,21 +259,7 @@ export class PostView extends LitElement {
     `
   }
 
-  renderContentOnly () {
-    return html`
-      <div
-        class="${this.renderOpts.noclick ? '' : 'cursor-pointer'}"
-        @mousedown=${this.onMousedownCard}
-        @mouseup=${this.onMouseupCard}
-        @mousemove=${this.onMousemoveCard}
-      >
-        ${this.renderPostTextNonFull()}
-        ${this.renderMedia()}
-      </div>
-    `
-  }
-
-  renderCondensed () {
+  renderDefault () {
     return html`
       <div
         class="grid grid-post px-1 py-0.5 bg-white mb-0.5 ${this.renderOpts.noclick ? '' : 'cursor-pointer'} text-gray-600"
@@ -268,48 +277,44 @@ export class PostView extends LitElement {
           </a>
         </div>
         <div class="block bg-white min-w-0">
-          <div class="${this.showContentOnly ? '' : 'pr-2 py-2'} min-w-0">
-            ${this.showContentOnly ? '' : html`
-              <div class="pl-1 pr-2.5 text-gray-600 truncate">
-                <span class="sm:mr-1 whitespace-nowrap">
-                  <a class="hov:hover:underline" href="/${this.post.author.userId}" title=${this.post.author.displayName}>
-                    <span class="text-gray-800 font-semibold">${displayNames.render(this.post.author.userId)}</span>
+          <div class="pr-2 py-2 min-w-0">
+            <div class="pl-1 pr-2.5 text-gray-600 truncate">
+              <span class="sm:mr-1 whitespace-nowrap">
+                <a class="hov:hover:underline" href="/${this.post.author.userId}" title=${this.post.author.displayName}>
+                  <span class="text-gray-800 font-semibold">${displayNames.render(this.post.author.userId)}</span>
+                </a>
+              </span>
+              <span class="mr-2 text-sm">
+                <a class="hov:hover:underline" href="${POST_URL(this.post)}" data-tooltip=${(new Date(this.post.value.createdAt)).toLocaleString()}>
+                  ${relativeDate(this.post.value.createdAt)}
+                </a>
+                ${this.post.value.community ? html`
+                  in
+                  <a href="/${this.communityUserId}" class="whitespace-nowrap font-semibold text-gray-700 hov:hover:underline">
+                    ${displayNames.render(this.communityUserId)}
                   </a>
-                </span>
-                <span class="mr-2 text-sm">
-                  <a class="hov:hover:underline" href="${POST_URL(this.post)}" data-tooltip=${(new Date(this.post.value.createdAt)).toLocaleString()}>
-                    ${relativeDate(this.post.value.createdAt)}
-                  </a>
-                  ${this.post.value.community ? html`
-                    in
-                    <a href="/${this.communityUserId}" class="whitespace-nowrap font-semibold text-gray-700 hov:hover:underline">
-                      ${displayNames.render(this.communityUserId)}
-                    </a>
-                  ` : ''}
-                </span>
-              </div>
-            `}
+                ` : ''}
+              </span>
+            </div>
             ${this.renderPostTextNonFull()}
             ${this.renderMedia()}
-            ${this.showContentOnly ? '' : html`
-              ${this.hasReactionsOrGifts ? html`
-                <div class="flex items-center my-1.5 mx-0.5 text-gray-500 text-sm truncate">
-                  ${this.renderGiftedItems()}
-                  ${this.renderReactions()}
-                </div>
-              ` : ''}
-              <div class="flex pl-1 mt-1.5 text-gray-500 text-sm items-center justify-between pr-12 sm:pr-80">
-                ${this.renderRepliesCtrl()}
-                ${this.renderReactionsBtn()}
-                ${this.renderGiftItemBtn()}
-                <div>
-                  <a class="hov:hover:bg-gray-200 px-1 rounded" @click=${this.onClickMenu}>
-                    <span class="fas fa-fw fa-ellipsis-h"></span>
-                  </a>
-                </div>
+            ${this.hasReactionsOrGifts ? html`
+              <div class="flex items-center my-1.5 mx-0.5 text-gray-500 text-sm truncate">
+                ${this.renderGiftedItems()}
+                ${this.renderReactions()}
               </div>
-              ${this.renderReactionsCtrl()}
-            `}
+            ` : ''}
+            <div class="flex pl-1 mt-1.5 text-gray-500 text-sm items-center justify-between pr-12 sm:pr-80">
+              ${this.renderRepliesCtrl()}
+              ${this.renderReactionsBtn()}
+              ${this.renderGiftItemBtn()}
+              <div>
+                <a class="hov:hover:bg-gray-200 px-1 rounded" @click=${this.onClickMenu}>
+                  <span class="fas fa-fw fa-ellipsis-h"></span>
+                </a>
+              </div>
+            </div>
+            ${this.renderReactionsCtrl()}
           </div>
         </div>
       </div>
@@ -344,7 +349,7 @@ export class PostView extends LitElement {
     }
     const moreImages = media.length - 4
     return html`
-      <div class="flex mt-1 mb-2 ${this.showCondensed ? 'sm:px-1' : ''}">
+      <div class="flex mt-1 mb-2 ${this.showDefault ? 'sm:px-1' : ''}">
         ${media.length >= 4 ? html`
           <div class="flex-1 flex flex-col pr-0.5">
             <div class="flex-1 pb-0.5">${img(media[0], 'small')}</div>
