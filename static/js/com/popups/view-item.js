@@ -1,6 +1,5 @@
 /* globals beaker */
 import { html } from '../../../vendor/lit-element/lit-element.js'
-import { repeat } from '../../../vendor/lit-element/lit-html/directives/repeat.js'
 import { BasePopup } from './base.js'
 import * as session from '../../lib/session.js'
 import { AVATAR_URL, ITEM_CLASS_ICON_URL } from '../../lib/const.js'
@@ -191,7 +190,7 @@ export class ViewItemPopup extends BasePopup {
 
         <label class="block font-semibold p-1" for="recp-input">Recipient</label>
           <app-users-input
-            .users=${Array.from(new Set([...session.myFollowing, ...session.myFollowers]))}
+            .users=${idsList}
             @change-user=${this.onChangeUser}
           ></app-users-input>
         <label class="block font-semibold p-1" for="keyTemplate-input">Quantity</label>
