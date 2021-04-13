@@ -9,6 +9,7 @@ import * as images from '../lib/images.js'
 import * as contextMenu from './context-menu.js'
 import * as displayNames from '../lib/display-names.js'
 import './button.js'
+import './rich-editor.js'
 
 const CHAR_LIMIT = 256
 const THUMB_WIDTH = 640
@@ -123,32 +124,23 @@ class PostComposer extends LitElement {
         </section>
 
         <section class="mb-2">
-          <label
-            class="block border border-gray-300 p-2 cursor-pointer hov:hover:bg-gray-100 ${this.isExtendedOpen ? 'rounded-0 rounded-t border-b-0' : 'rounded'}"
+          <div
+            class="flex items-center border border-gray-300 p-2 cursor-pointer hov:hover:bg-gray-100 ${this.isExtendedOpen ? 'rounded-0 rounded-t border-b-0' : 'rounded'}"
             @click=${this.onToggleExtendedText}
           >
             <span class="fas fa-fw fa-caret-${this.isExtendedOpen ? 'down' : 'right'}"></span>
             Extended post text
-          </label>
-          ${this.isExtendedOpen ? html`
-            <div class="flex items-center border border-b-0 border-gray-300 px-3 py-2">
-              <input type="checkbox" id="use-html-toggle" @click=${this.onToggleExtendedUsingHtml}>
-              <label for="use-html-toggle" class="ml-2">Use HTML</label>
-              ${this.isExtendedUsingHtml ? html`
-                <app-button
-                  btn-class="ml-3 px-2 py-0"
-                  transparent
-                  label="Preview"
-                  @click=${this.onClickPreviewExtendedText}
-                ></app-button>
-              ` : ''}
-            </div>
-          ` : ''}
-          <textarea
-            id="extendedText"
-            class="${this.isExtendedOpen ? '' : 'hidden'} block py-2 px-3 w-full h-48 box-border resize-y text-base border border-gray-300 rounded-b"
-            placeholder="Add more to your post! This is optional, and there's no character limit."
-          ></textarea>
+            <app-button
+              transparent
+              class="ml-auto"
+              btn-class="py-0 ${this.isExtendedOpen ? 'inline-block' : 'hidden'}"
+              label="Preview"
+              @click=${this.onClickPreviewExtendedText}
+            ></app-button>
+          </div>
+          <div class="${this.isExtendedOpen ? '' : 'hidden'}">
+            <app-rich-editor></app-rich-editor>
+          </div>
         </section>
 
         ${this.media.length ? html`
@@ -242,8 +234,10 @@ class PostComposer extends LitElement {
   }
 
   onClickPreviewExtendedText (e) {
+    e.preventDefault()
+    e.stopPropagation()
     ViewCustomHtmlPopup.create({
-      html: this.querySelector('#extendedText').value,
+      html: this.querySelector('app-rich-editor').value,
       context: 'post',
       contextState: {page: {userId: session.info.userId}}
     })
@@ -394,8 +388,8 @@ class PostComposer extends LitElement {
     try {
       let media = this.media.filter(Boolean)
       let text = this.querySelector('#text').value
-      let extendedText = this.querySelector('#extendedText').value
-      let extendedTextMimeType = this.isExtendedUsingHtml ? 'text/html' : undefined
+      let extendedText = this.querySelector('app-rich-editor').value.trim()
+      let extendedTextMimeType = !!extendedText ? 'text/html' : undefined
       res = await session.ctzn.user.table('ctzn.network/post').create({
         text,
         media: media?.length ? media : undefined,
