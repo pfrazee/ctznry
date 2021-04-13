@@ -42,6 +42,9 @@ export class RichEditor extends LitElement {
       'bold italic underline strikethrough | link | bullist numlist outdent indent | ' +
       'ctzn-code | table tabledelete | removeformat',
       statusbar: false,
+      formats: {
+        strikethrough: { inline: 'del' }
+      },
       
       custom_elements: POST_TAGS.map(t => t.name).join(','),
       extended_valid_elements: POST_TAGS.map(t => t.validElements).filter(Boolean).join(','),
