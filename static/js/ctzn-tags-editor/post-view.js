@@ -159,6 +159,7 @@ function doPropertiesDialog (el, editor) {
         editor.undoManager.transact(() => {
           el.mode = data.mode
           el.src = data.src
+          editor.dom.setAttribs(el, data)
         })
         editor.nodeChanged()
       }
