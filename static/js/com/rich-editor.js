@@ -3,11 +3,13 @@ import { LitElement, html } from '../../vendor/lit-element/lit-element.js'
 import * as postView from '../ctzn-tags-editor/post-view.js'
 import * as commentView from '../ctzn-tags-editor/comment-view.js'
 import * as iframe from '../ctzn-tags-editor/iframe.js'
+import * as code from '../ctzn-tags-editor/code.js'
 
 const POST_TAGS = [
   postView,
   commentView,
-  iframe
+  iframe,
+  code
 ]
 
 export class RichEditor extends LitElement {
@@ -38,10 +40,11 @@ export class RichEditor extends LitElement {
       ],
       toolbar: 'undo redo | post-embeds | formatselect | ' +
       'bold italic underline strikethrough | link | bullist numlist outdent indent | ' +
-      'table tabledelete | removeformat',
+      'ctzn-code | table tabledelete | removeformat',
       
       custom_elements: POST_TAGS.map(t => t.name).join(','),
       extended_valid_elements: POST_TAGS.map(t => t.validElements).filter(Boolean).join(','),
+      valid_children: 'ctzn-code[pre,#text]',
 
       setup: (editor) => {
         editor.on('PreInit', () => {
@@ -52,6 +55,11 @@ export class RichEditor extends LitElement {
             tag.setup(win, doc, editor)
             editor.serializer.addNodeFilter(tag.name, contentEditableFilter)
           }
+        })
+        editor.ui.registry.addButton('ctzn-code', {
+          icon: 'code-sample',
+          tooltip: 'Code snippet',
+          onAction: () => code.insert(editor)
         })
         editor.ui.registry.addMenuButton('post-embeds', {
           icon: 'image',

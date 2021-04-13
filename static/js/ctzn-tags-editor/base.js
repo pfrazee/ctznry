@@ -7,15 +7,17 @@ export function createBaseClass (win, doc, editor) {
       this.setAttribute('contenteditable', false)
       this.attachShadow({mode: 'open'})
       
-      for (let attrName of this.constructor.observedAttributes) {
-        Object.defineProperty(this, attrName, {
-          get: () => {
-            return this.getAttribute(attrName)
-          },
-          set: (v) => {
-            this.setAttribute(attrName, v)
-          }
-        })
+      if (this.constructor.observedAttributes) {
+        for (let attrName of this.constructor.observedAttributes) {
+          Object.defineProperty(this, attrName, {
+            get: () => {
+              return this.getAttribute(attrName)
+            },
+            set: (v) => {
+              this.setAttribute(attrName, v)
+            }
+          })
+        }
       }
 
       this.updateDom()
@@ -27,12 +29,17 @@ export function createBaseClass (win, doc, editor) {
 
     updateDom () {
       render(this.render(), this.shadowRoot)
+      this.updated()
     }
 
     render () {
       return html`
         TODO - override render()
       `
+    }
+
+    updated () {
+      // optional override
     }
 
     attributeChangedCallback (name, oldValue, newValue) {
