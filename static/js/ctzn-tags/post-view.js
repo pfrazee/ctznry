@@ -38,7 +38,7 @@ export class PostView extends LitElement {
     this.mode = 'default'
     this.src = undefined
     this.post = undefined
-    this.renderOpts = {noclick: false}
+    this.renderOpts = {noclick: false, preview: false}
     this.isReactionsOpen = false
 
     // helper state
@@ -102,6 +102,9 @@ export class PostView extends LitElement {
   }
 
   get canInteract () {
+    if (this.renderOpts?.preview) {
+      return false
+    }
     if (this.communityUserId) {
       return session.isInCommunity(this.communityUserId)
     }
@@ -326,18 +329,26 @@ export class PostView extends LitElement {
       return ''
     }
     const media = this.post.value.media
-    const img = (item, size) => html`
-      <div
-        class="bg-gray-100 rounded img-sizing-${size} img-placeholder cursor-pointer"
-        @click=${e => this.onClickImage(e, item)}
-      >
-        <img
-          class="box-border object-cover rounded border border-gray-300 w-full img-sizing-${size}"
-          src="${BLOB_URL(this.post.author.userId, (item.blobs.thumb || item.blobs.original).blobName)}"
-          alt=${item.caption || 'Image'}
+    const img = (item, size) => {
+      let url = ''
+      if (item.blobs.original.dataUrl) {
+        url = item.blobs.original.dataUrl
+      } else {
+        url = BLOB_URL(this.post.author.userId, (item.blobs.thumb || item.blobs.original).blobName)
+      }
+      return html`
+        <div
+          class="bg-gray-100 rounded img-sizing-${size} img-placeholder cursor-pointer"
+          @click=${this.renderOpts?.preview ? undefined : e => this.onClickImage(e, item)}
         >
-      </div>
-    `
+          <img
+            class="box-border object-cover rounded border border-gray-300 w-full img-sizing-${size}"
+            src="${url}"
+            alt=${item.caption || 'Image'}
+          >
+        </div>
+      `
+    }
     if (media.length > 4 && this.mode === 'full') {
       return html`
         <div class="grid grid-post-images mt-1 mb-2">
@@ -422,7 +433,7 @@ export class PostView extends LitElement {
       aCls += ` text-gray-400`
     }
     return html`
-      <a class=${aCls} @click=${e => {this.isReactionsOpen = !this.isReactionsOpen}}>
+      <a class=${aCls} @click=${this.canInteract ? e => {this.isReactionsOpen = !this.isReactionsOpen} : undefined}>
         <span class="fas fa-fw fa-${this.isReactionsOpen ? 'minus' : 'plus'}"></span>
       </a>
     `

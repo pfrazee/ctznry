@@ -1,7 +1,7 @@
 /* globals beaker monaco */
 import { LitElement, html } from '../../vendor/lit-element/lit-element.js'
 import { repeat } from '../../vendor/lit-element/lit-html/directives/repeat.js'
-import { ViewCustomHtmlPopup } from './popups/view-custom-html.js'
+import { ViewPostPopup } from './popups/view-post.js'
 import * as toast from './toast.js'
 import * as session from '../lib/session.js'
 import { AVATAR_URL } from '../lib/const.js'
@@ -125,18 +125,11 @@ class PostComposer extends LitElement {
 
         <section class="mb-2">
           <div
-            class="flex items-center border border-gray-300 p-2 cursor-pointer hov:hover:bg-gray-100 ${this.isExtendedOpen ? 'rounded-0 rounded-t border-b-0' : 'rounded'}"
+            class="block border border-gray-300 p-2 cursor-pointer hov:hover:bg-gray-100 ${this.isExtendedOpen ? 'rounded-0 rounded-t border-b-0' : 'rounded'}"
             @click=${this.onToggleExtendedText}
           >
             <span class="fas fa-fw fa-caret-${this.isExtendedOpen ? 'down' : 'right'}"></span>
             Extended post text
-            <app-button
-              transparent
-              class="ml-auto"
-              btn-class="py-0 ${this.isExtendedOpen ? 'inline-block' : 'hidden'}"
-              label="Preview"
-              @click=${this.onClickPreviewExtendedText}
-            ></app-button>
           </div>
           <div class="${this.isExtendedOpen ? '' : 'hidden'}">
             <app-rich-editor placeholder="Add more to your post! This is optional, and there's no character limit."></app-rich-editor>
@@ -179,16 +172,23 @@ class PostComposer extends LitElement {
         <div class="flex border-t border-gray-200 mt-4 pt-4">
           <app-button
             transparent
+            btn-class="hidden sm:block"
             label="Cancel"
             @click=${this.onCancel}
           ></app-button>
           <div class="flex-1"></div>
           <app-button
             transparent
-            btn-class="mr-2"
-            label="Add Image"
+            btn-class="mr-3 sm:mr-0 px-2 sm:px-4"
             icon="far fa-image"
+            label="Add Image"
             @click=${this.onClickAddImage}
+          ></app-button>
+          <app-button
+            transparent
+            btn-class="mr-6 sm:mr-4 px-2 sm:px-4"
+            label="Preview"
+            @click=${this.onClickPreview}
           ></app-button>
           <app-button
             primary
@@ -233,13 +233,25 @@ class PostComposer extends LitElement {
     this.isExtendedUsingHtml = !!e.currentTarget.checked
   }
 
-  onClickPreviewExtendedText (e) {
+  onClickPreview (e) {
     e.preventDefault()
     e.stopPropagation()
-    ViewCustomHtmlPopup.create({
-      html: this.querySelector('app-rich-editor').value,
-      context: 'post',
-      contextState: {page: {userId: session.info.userId}}
+    ViewPostPopup.create({
+      mode: 'expanded',
+      post: {
+        key: '',
+        author: {
+          userId: session.info.userId,
+          displayName: session.info.displayName
+        },
+        value: {
+          text: this.draftText,
+          extendedText: this.querySelector('app-rich-editor').value,
+          extendedTextMimeType: 'text/html',
+          media: this.media,
+          createdAt: (new Date()).toISOString()
+        }
+      }
     })
   }
 
