@@ -1,9 +1,11 @@
 import { LitElement, html } from '../../vendor/lit-element/lit-element.js'
 
 import * as postView from '../ctzn-tags-editor/post-view.js'
+import * as commentView from '../ctzn-tags-editor/comment-view.js'
 
 const POST_TAGS = [
-  postView
+  postView,
+  commentView
 ]
 
 export class RichEditor extends LitElement {
@@ -54,12 +56,8 @@ export class RichEditor extends LitElement {
           tooltip: 'Insert media',
           fetch: cb => {
             cb([
-              {type: 'menuitem', text: 'Image', onAction: () => {/*TODO*/}},
-              {type: 'menuitem', text: 'Video Player', onAction: () => {/*TODO*/}},
-              {type: 'menuitem', text: 'Audio Player', onAction: () => {/*TODO*/}},
-              {type: 'separator'},
               {type: 'menuitem', text: 'Embedded Post', onAction: () => postView.insert(editor)},
-              {type: 'menuitem', text: 'Embedded Comment', onAction: () => {/*TODO*/}},
+              {type: 'menuitem', text: 'Embedded Comment', onAction: () => commentView.insert(editor)},
               {type: 'menuitem', text: 'Embedded Page (iframe)', onAction: () => {/*TODO*/}},
             ])
           }
