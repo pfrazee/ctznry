@@ -39,7 +39,7 @@ export class RichEditor extends LitElement {
         'media table paste code noneditable'
       ],
       toolbar: 'undo redo | post-embeds | formatselect | ' +
-      'bold italic underline strikethrough | link | bullist numlist outdent indent | ' +
+      'bold italic underline strikethrough | link | bullist numlist | ' +
       'ctzn-code | table tabledelete | removeformat',
       statusbar: false,
       formats: {
