@@ -34,6 +34,7 @@ export class RichEditor extends LitElement {
       target: this.querySelector('.editor'),
       placeholder: this.getAttribute('placeholder') || '',
       content_style: "body {margin: 0.6rem 0.7rem;} p {margin: 0.5em 0;}",
+      height: 400,
       menubar: false,
       plugins: [
         'advlist autolink lists link image charmap',
