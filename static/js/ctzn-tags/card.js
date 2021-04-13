@@ -24,11 +24,13 @@ export class Card extends LitElement {
   firstUpdated () {
     // apply some custom styles to embedded elements
     for (let el of this.querySelectorAll('[ctzn-elem]')) {
+      el.renderEmbedded = true
       el.classList.add('block')
       el.classList.add('border')
       el.classList.add('border-gray-300')
       el.classList.add('rounded')
       el.classList.add('mb-0.5')
+      el.classList.add('overflow-hidden')
       el.classList.add('last:mb-0')
     }
   }
@@ -38,7 +40,7 @@ export class Card extends LitElement {
       <style>
         div {
           background: #fff;
-          padding: 1em;
+          padding: 0.8rem;
           margin-bottom: 0.25rem;
           border-radius: 0.25rem;
         }

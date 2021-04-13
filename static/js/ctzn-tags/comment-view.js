@@ -50,16 +50,6 @@ export class CommentView extends LitElement {
     this.isMouseDragging = false
   }
 
-  setContextState (state, context) {
-    if (context === 'post') {
-      this.classList.add('block')
-      this.classList.add('border')
-      this.classList.add('border-gray-300')
-      this.classList.add('rounded')
-      this.classList.add('mb-3')
-    }
-  }
-
   updated (changedProperties) {
     if (changedProperties.has('src') && this.src !== changedProperties.get('src')) {
       this.load()
@@ -175,7 +165,7 @@ export class CommentView extends LitElement {
   renderDefault () {
     return html`
       <div
-        class="px-1 py-0.5 bg-white mb-0.5 ${this.renderOpts.noclick ? '' : 'cursor-pointer'} text-gray-600"
+        class="px-1 py-0.5 bg-white sm:rounded mb-0.5 ${this.renderOpts.noclick ? '' : 'cursor-pointer'} text-gray-600"
         @click=${this.onClickCard}
         @mousedown=${this.onMousedownCard}
         @mouseup=${this.onMouseupCard}

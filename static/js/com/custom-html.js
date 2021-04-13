@@ -99,84 +99,8 @@ export class CustomHtml extends LitElement {
         </div>`
     }
     return html`
-      ${this.renderContextStyles()}
-      <div class="custom-html">
-        ${unsafeHTML(ctznHtml.sanitize(this.loadedHtml, this.context))}
-      </div>
+      ${unsafeHTML(ctznHtml.sanitize(this.loadedHtml, this.context))}
     `
-  }
-
-  renderContextStyles () {
-    if (this.context === 'profile') {
-      return html`
-        <style>
-          .custom-html > address,
-          .custom-html > article,
-          .custom-html > aside,
-          .custom-html > blockquote,
-          .custom-html > details,
-          .custom-html > dialog,
-          .custom-html > dd,
-          .custom-html > div,
-          .custom-html > dl,
-          .custom-html > dt,
-          .custom-html > fieldset,
-          .custom-html > figcaption,
-          .custom-html > figure,
-          .custom-html > footer,
-          .custom-html > form,
-          .custom-html > h1,
-          .custom-html > h2,
-          .custom-html > h3,
-          .custom-html > h4,
-          .custom-html > h5,
-          .custom-html > h6,
-          .custom-html > header,
-          .custom-html > hgroup,
-          .custom-html > li,
-          .custom-html > main,
-          .custom-html > nav,
-          .custom-html > ol,
-          .custom-html > p,
-          .custom-html > pre,
-          .custom-html > section,
-          .custom-html > table,
-          .custom-html > ul {
-            margin: 0.5rem;
-          }
-          .custom-html > hr {
-            margin: 1em 0.5rem;
-          }
-          .custom-html > ctzn-post-view[mode="content-only"] {
-            display: block;
-            margin: 0.5rem;
-          }
-          .custom-html > ctzn-comment-view[mode="content-only"] {
-            display: block;
-            margin: 0.5rem;
-          }
-          svg {
-            max-width: 100%;
-          }
-        </style>
-      `
-    }
-    if (this.context === 'post') {
-      return html`
-        <style>
-          .custom-html > [ctzn-elem] {
-            display: block;
-            border: 1px solid #D1D5DB/*border-gray-300*/;
-            border-radius: 0.25rem;
-          }
-          svg {
-            max-width: 100%;
-          }
-        </style>
-      `
-
-    }
-    return ''
   }
 }
 

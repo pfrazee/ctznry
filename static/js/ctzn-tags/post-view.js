@@ -46,16 +46,6 @@ export class PostView extends LitElement {
     this.isMouseDragging = false
   }
 
-  setContextState (state, context) {
-    if (context === 'post') {
-      this.classList.add('block')
-      this.classList.add('border')
-      this.classList.add('border-gray-300')
-      this.classList.add('rounded')
-      this.classList.add('mb-3')
-    }
-  }
-
   updated (changedProperties) {
     if (changedProperties.has('src') && this.src !== changedProperties.get('src')) {
       this.load()
@@ -205,7 +195,7 @@ export class PostView extends LitElement {
   renderExpanded () {
     return html`
       <div
-        class="${this.renderOpts.noclick ? '' : 'cursor-pointer'}"
+        class="bg-white sm:rounded ${this.renderOpts.noclick ? '' : 'cursor-pointer'}"
         @mousedown=${this.onMousedownCard}
         @mouseup=${this.onMouseupCard}
         @mousemove=${this.onMousemoveCard}
@@ -265,7 +255,7 @@ export class PostView extends LitElement {
   renderDefault () {
     return html`
       <div
-        class="grid grid-post px-1 py-0.5 bg-white mb-0.5 ${this.renderOpts.noclick ? '' : 'cursor-pointer'} text-gray-600"
+        class="grid grid-post px-1 py-0.5 bg-white sm:rounded mb-0.5 ${this.renderOpts.noclick ? '' : 'cursor-pointer'} text-gray-600"
         @click=${this.onClickCard}
         @mousedown=${this.onMousedownCard}
         @mouseup=${this.onMouseupCard}
@@ -532,7 +522,7 @@ export class PostView extends LitElement {
     if (this.post.value.extendedTextMimeType === 'text/html') {
       return html`
         <app-custom-html
-          class="post-custom-html-horz-margins block border-t border-b border-gray-300 py-4 mt-4 mb-3"
+          class="py-4 mt-4 mb-3"
           context="post"
           .contextState=${{page: {userId: this.post.author.userId}}}
           .html=${this.post.value.extendedText}

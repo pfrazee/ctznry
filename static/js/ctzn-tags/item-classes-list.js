@@ -150,7 +150,7 @@ export class ItemClassesList extends LitElement {
           ` : ''}
         </div>
       ` : html`
-        <div class="grid grid-2col gap-1 mb-16">
+        <div class="grid grid-2col gap-1">
           ${repeat(this.itemClasses, cls => {
             return html`
               <div
@@ -196,7 +196,7 @@ export class ItemClassesList extends LitElement {
           <div>This community has not issued any ${cls.value.displayName || cls.value.id}!</div>
         </div>
       ` : html`
-        <div class="mb-16">
+        <div>
           ${repeat(this.currentItems, item => item.key, item => {
             return html`
               <div

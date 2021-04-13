@@ -153,7 +153,7 @@ export class DbmethodsFeed extends LitElement {
     if (this._view === 'calls') return 'ctzn.network/dbmethod-calls-view'
     if (this._view === 'results') return 'ctzn.network/dbmethod-results-view'
     if (this._view === 'feed') return 'ctzn.network/dbmethod-feed-view'
-    return this._view
+    return this._view || 'ctzn.network/dbmethod-calls-view'
   }
 
   set view (v) {

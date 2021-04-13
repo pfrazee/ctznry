@@ -155,9 +155,9 @@ export class PostsFeed extends LitElement {
     }
     console.log(results)
 
-    if (!more && _cache?.path === window.location.pathname && _cache?.results?.[0]?.url === results[0]?.url) {
+    if (!more && this.results?.length && _cache?.path === window.location.pathname && _cache?.results?.[0]?.url === results[0]?.url) {
       // stick with the cache but update the signal metrics
-      for (let i = 0; i < results.length; i++) {
+      for (let i = 0; i < results.length && i < this.results.length; i++) {
         this.results[i].reactions = _cache.results[i].reactions = results[i].reactions
         this.results[i].replyCount = _cache.results[i].replyCount = results[i].replyCount
       }

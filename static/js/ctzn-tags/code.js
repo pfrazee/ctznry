@@ -17,16 +17,17 @@ export class Code extends LitElement {
       <style>
         :host {
           display: block;
-          overflow-x: scroll;
-          background-color: #F3F4F6; /*bg-gray-100*/
-          padding: 0.8rem;
-          border: 1px solid #D1D5DB /*border-gray-300*/;
-          border-radius: 5px;
+          background: #fff;
+          padding: 0.2rem;
         }
         slot {
           display: none;
         }
         .rendered-code {
+          overflow-x: scroll;
+          background-color: #F3F4F6; /*bg-gray-100*/
+          padding: 0.4rem;
+          border-radius: 5px;
           counter-reset: line;
         }
         .rendered-code > :last-child {
@@ -37,6 +38,7 @@ export class Code extends LitElement {
           white-space: pre;
           color: #1F2937 /*text-gray-800*/;
           background-color: transparent;
+          font-size: 1.2rem;
         }
         .rendered-code > code::before {
           display: inline-block;

@@ -265,6 +265,127 @@ class CtznMainView extends LitElement {
     `
   }
 
+  /* DEBUG - you can use this to test custom HTML as needed */
+  renderHTMLDebug () {
+    const testHtml = `
+      <h1>Heading 1</h1>
+      <p>Content</p>
+      <h2>Heading 2</h2>
+      <p>Content</p>
+      <h3>Heading 3</h3>
+      <p>Content</p>
+      <h4>Heading 4</h4>
+      <p>Content</p>
+      <h5>Heading 5</h5>
+      <p>Content</p>
+      <h6>Heading 6</h6>
+      <p>Content</p>
+      <h1>Table</h1>
+      <table>
+        <tr><td>One</td><td>Two</td><td>Three</td></tr>
+        <tr><td>One</td><td>Two</td><td>Three</td></tr>
+        <tr><td>One</td><td>Two</td><td>Three</td></tr>
+      </table>
+      <ul>
+        <li>One<ul>
+          <li>Two</li>
+        </ul>
+        <li>Three</li>
+        <li>Four</li>
+      </ul>
+      <ol>
+        <li>One<ol>
+          <li>Two</li>
+        </ol>
+        <li>Three</li>
+        <li>Four</li>
+      </ol>
+      <blockquote>
+        <p>This is a fancy quote</p>
+      </blockquote>
+      <pre>this is some
+pre text</pre>
+      <p>This is <code>code</code> and a <kbd>shift+s</kbd></p>
+      <p>And <strong>bold</strong> <i>italic</i> <u>underline</u> and <del>strike</del></p>
+      <a href="https://example.com">Link outside containing element</a>
+      <p>A <a href="https://example.com">Link</a></p>
+      <dl>
+        <dt>One</dt><dd>Definition</dd>
+        <dt>One</dt><dd>Definition</dd>
+        <dt>One</dt><dd>Definition</dd>
+      </dl>
+      <h1>Code</h1>
+      <ctzn-code>This is some
+custom code</ctzn-code>
+      <h1>Post</h1>
+      <ctzn-post-view src="http://localhost:4000/pfrazee@dev1.localhost/ctzn.network/post/ff080bc59b95a9d0"></ctzn-post-view>
+      <h1>Post expanded</h1>
+      <ctzn-post-view mode="expanded" src="http://localhost:4000/pfrazee@dev1.localhost/ctzn.network/post/ff080bc59b95a9d0"></ctzn-post-view>
+      <h1>Post content-only</h1>
+      <ctzn-post-view mode="content-only" src="http://localhost:4000/pfrazee@dev1.localhost/ctzn.network/post/ff080bc59b95a9d0"></ctzn-post-view>
+      <h1>Comment</h1>
+      <ctzn-comment-view src="http://localhost:4000/pfrazee@dev1.localhost/ctzn.network/comment/ff080bc63c67dac0"></ctzn-comment-view>
+      <h1>Comment content-only</h1>
+      <ctzn-comment-view mode="content-only" src="http://localhost:4000/pfrazee@dev1.localhost/ctzn.network/comment/ff080bc63c67dac0"></ctzn-comment-view>
+      <h1>Iframe</h1>
+      <ctzn-iframe src="https://example.com"></ctzn-iframe>
+      <h1>Card</h1>
+      <ctzn-card>
+        <h1>This is inside a card</h1>
+        <p>Looks good.</p>
+        <ctzn-post-view src="http://localhost:4000/pfrazee@dev1.localhost/ctzn.network/post/ff080bc59b95a9d0"></ctzn-post-view>
+        <ctzn-iframe src="https://example.com"></ctzn-iframe>
+        <ctzn-code>This is some
+  custom code</ctzn-code>
+      </ctzn-card>
+      <h1>Posts feed</h1>
+      <ctzn-posts-feed limit="3"></ctzn-posts-feed>
+      <h1>ctzn-followers-list</h1>
+      <ctzn-followers-list></ctzn-followers-list>
+      <h1>ctzn-following-list</h1>
+      <ctzn-following-list></ctzn-following-list>
+      <h1>ctzn-community-memberships-list</h1>
+      <ctzn-community-memberships-list></ctzn-community-memberships-list>
+      <h1>ctzn-community-members-list</h1>
+      <ctzn-community-members-list user-id="invite-only@dev1.localhost"></ctzn-community-members-list>
+      <h1>ctzn-dbmethods-feed</h1>
+      <ctzn-dbmethods-feed limit="3"></ctzn-dbmethods-feed>
+      <h1>ctzn-owned-items-list</h1>
+      <ctzn-owned-items-list></ctzn-owned-items-list>
+      <h1>ctzn-item-classes-list</h1>
+      <ctzn-item-classes-list user-id="invite-only@dev1.localhost"></ctzn-item-classes-list>
+      <h1>ctzn-comments-feed</h1>
+      <ctzn-comments-feed limit="3"></ctzn-comments-feed>
+    `
+
+    const post = {
+      key: '',
+      author: {userId: session.info.userId, displayName: session.info.displayName},
+      value: {
+        text: 'Debug',
+        extendedText: testHtml,
+        extendedTextMimeType: 'text/html',
+        createdAt: (new Date()).toISOString()
+      }
+    }
+    return html`
+      <h1 class="font-bold mb-1">Profile Context</h1>
+      <app-custom-html
+        context="profile"
+        .contextState=${{page: {userId: session.info.userId}}}
+        .html=${testHtml}
+      ></app-custom-html>
+      <h1 class="font-bold mb-1">Post Context</h1>
+      <div class="bg-white">
+        <ctzn-post-view
+          .post=${post}
+          mode="expanded"
+          .renderOpts=${{noclick: true, preview: true}}
+        ></ctzn-post-view>
+      </div>
+    `
+  }
+
   // events
   // =
 

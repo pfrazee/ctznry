@@ -10,7 +10,8 @@ export class OwnedItemsList extends LitElement {
     return {
       userId: {type: String, attribute: 'user-id'},
       ownedItems: {type: Array},
-      databaseItems: {type: Array}
+      databaseItems: {type: Array},
+      renderEmbedded: {type: Boolean}
     }
   }
 
@@ -24,6 +25,7 @@ export class OwnedItemsList extends LitElement {
     this.userId = undefined
     this.ownedItems = undefined
     this.databaseItems = undefined
+    this.renderEmbedded = false
   }
 
   setContextState (state) {
@@ -74,18 +76,25 @@ export class OwnedItemsList extends LitElement {
           <div>${displayNames.render(this.userId)}'s inventory is empty.</div>
         </div>
       ` : html`
-        <div class="mb-16">
-          ${repeat(this.databaseItems, database => database.databaseId, database => html`
-            <div class="px-2 pb-1">
+        <div>
+          ${repeat(this.databaseItems, database => database.databaseId, (database, i) => html`
+            <div class="
+              px-2 pb-1
+              ${this.renderEmbedded ? 'border-b border-gray-200 bg-gray-50 pt-1' : ''}
+              ${!this.renderEmbedded && i !== 0 ? 'mt-3' : ''}
+            ">
               <a href="/${database.databaseId}" class="hov:hover:underline">
                 <span class="font-medium">${displayNames.render(database.databaseId)}</span>
                 <span class="text-sm text-gray-600">${database.databaseId}</span>
               </a>
             </div>
-            <div class="mb-3">
+            <div class="">
               ${repeat(database.items, item => item.key, item => html`
                 <div
-                  class="flex items-center px-3 py-3 bg-white mb-0.5 cursor-pointer sm:rounded hov:hover:bg-gray-50"
+                  class="
+                    flex items-center px-3 py-3 bg-white cursor-pointer hov:hover:bg-gray-50
+                    ${this.renderEmbedded ? 'border-b border-gray-200' : 'sm:rounded mb-0.5'}
+                  "
                   @click=${e => this.onClickViewItem(e, item)}
                 >
                   <span class="mr-2">
