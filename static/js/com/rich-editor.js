@@ -41,6 +41,7 @@ export class RichEditor extends LitElement {
       toolbar: 'undo redo | post-embeds | formatselect | ' +
       'bold italic underline strikethrough | link | bullist numlist outdent indent | ' +
       'ctzn-code | table tabledelete | removeformat',
+      statusbar: false,
       
       custom_elements: POST_TAGS.map(t => t.name).join(','),
       extended_valid_elements: POST_TAGS.map(t => t.validElements).filter(Boolean).join(','),
@@ -96,6 +97,9 @@ export class RichEditor extends LitElement {
   render () {
     return html`
       <div id=${this.id} class="editor"></div>
+      <p class="text-xs pt-0.5 pl-0.5">
+        Powered by <a class="text-blue-600 hov:hover:underline" href="https://www.tiny.cloud" target="_blank">Tiny</a>
+      </p>
     `
   }
 }
