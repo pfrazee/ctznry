@@ -85,8 +85,8 @@ export class UiEditorPopup extends BasePopup {
           primary
           btn-type="submit"
           btn-class="px-3 py-1"
-          label="Save"
-          @click=${this.onClickSave}
+          label="OK"
+          @click=${this.onClickOK}
           ?disabled=${!this.canSave}
         ></app-button>
       </div>
@@ -97,7 +97,6 @@ export class UiEditorPopup extends BasePopup {
   // =
 
   onClickPreview (e) {
-    console.log(this.querySelector('app-rich-editor').value)
     ViewCustomHtmlPopup.create({
       context: this.context,
       contextState: this.contextState,
@@ -105,7 +104,7 @@ export class UiEditorPopup extends BasePopup {
     })
   }
 
-  onClickSave (e) {
+  onClickOK (e) {
     this.dispatchEvent(new CustomEvent('resolve', {
       detail: {
         label: this.querySelector('[name="label"]').value,
