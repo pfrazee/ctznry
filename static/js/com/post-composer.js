@@ -132,7 +132,7 @@ class PostComposer extends LitElement {
             Extended post text
           </div>
           <div class="${this.isExtendedOpen ? '' : 'hidden'}">
-            <app-rich-editor placeholder="Add more to your post! This is optional, and there's no character limit."></app-rich-editor>
+            <app-rich-editor context="post" placeholder="Add more to your post! This is optional, and there's no character limit."></app-rich-editor>
           </div>
         </section>
 

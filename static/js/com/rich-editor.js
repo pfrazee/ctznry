@@ -47,7 +47,7 @@ export class RichEditor extends LitElement {
     if (this.context === 'profile') {
       return PROFILE_TAGS
     }
-    return ''
+    return []
   }
 
   get editorToolbar () {
