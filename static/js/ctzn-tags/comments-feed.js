@@ -6,7 +6,7 @@ import './comment-view.js'
 
 const CHECK_NEW_ITEMS_INTERVAL = 15e3
 let _cache = {
-  path: undefined,
+  id: undefined,
   results: undefined
 }
 
@@ -66,6 +66,10 @@ export class CommentsFeed extends LitElement {
     }
   }
 
+  get cacheId () {
+    return `${this.userId}|${this.limit}`
+  }
+
   async load ({clearCurrent} = {clearCurrent: false}) {
     if (!this.userId) {
       return
@@ -78,7 +82,7 @@ export class CommentsFeed extends LitElement {
     }
     if (clearCurrent) {
       this.results = undefined
-    } else if (_cache.path === window.location.pathname) {
+    } else if (_cache.id === this.cacheId) {
       // use cached results
       this.results = _cache.results
       /* dont await */ this.queueQuery() // queue up a load to make sure we're getting latest
@@ -143,7 +147,7 @@ export class CommentsFeed extends LitElement {
     }
     console.log(results)
 
-    if (!more && _cache?.path === window.location.pathname && _cache?.results?.[0]?.url === results[0]?.url) {
+    if (!more && _cache?.id === this.cacheId && _cache?.results?.[0]?.url === results[0]?.url) {
       // stick with the cache but update the signal metrics
       for (let i = 0; i < results.length; i++) {
         this.results[i].reactions = _cache.results[i].reactions = results[i].reactions
@@ -152,7 +156,7 @@ export class CommentsFeed extends LitElement {
       this.requestResultUpdates()
     } else {
       this.results = results
-      _cache = {path: window.location.pathname, results}
+      _cache = {id: this.cacheId, results}
     }
 
     this.activeQuery = undefined
