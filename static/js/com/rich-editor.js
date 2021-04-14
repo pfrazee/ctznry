@@ -241,7 +241,7 @@ export class RichEditor extends LitElement {
           }
         })
         editor.on('PreProcess', (e) => {
-          removeEmptyNodes(e.node)
+          preProcessOutput(e.node)
         })
       }
     })
@@ -307,7 +307,8 @@ function loadTinyMCEAsNeeded () {
   return _loadPromise
 }
 
-function removeEmptyNodes (node) {
+function preProcessOutput (node) {
+  // remove empty nodes
   if (!node.getAttribute('ctzn-elem')) {
     const inner = (node.innerHTML || '').trim()
     if (!inner || inner === '&nbsp;') {
@@ -317,6 +318,6 @@ function removeEmptyNodes (node) {
 
   const children = Array.from(node.children)
   for (let child of children) {
-    removeEmptyNodes(child, node.tagName + ' > ')
+    preProcessOutput(child, node.tagName + ' > ')
   }
 }

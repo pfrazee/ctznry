@@ -1,5 +1,6 @@
 import { LitElement, html } from '../../vendor/lit-element/lit-element.js'
 import { repeat } from '../../vendor/lit-element/lit-html/directives/repeat.js'
+import { makeUnsafe } from '../lib/strings.js'
 
 export class Code extends LitElement {
   constructor () {
@@ -9,7 +10,7 @@ export class Code extends LitElement {
   }
 
   get codeLines () {
-    return this.textContent.trim().split('\n')
+    return this.textContent.trim().split('\n').map(makeUnsafe)
   }
 
   render () {

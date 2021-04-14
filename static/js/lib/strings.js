@@ -119,6 +119,17 @@ export function makeSafe (str = '') {
   return str.replace(/["'&<>]/g, (match) => MAKE_SAFE_MAP[match] || '')
 }
 
+const MAKE_UNSAFE_MAP = {
+  '&quot;': '"',
+  '&#39;': "'",
+  '&lt;': '<',
+  '&gt;': '>',
+  '&amp;': '&'
+}
+export function makeUnsafe (str = '') {
+  return str.replace(/(&quot;|&#39;|&lt;|&gt;|&amp;)/g, (_, match) => MAKE_UNSAFE_MAP[match] || '')
+}
+
 const URL_RE = /(http|https|hyper):\/\/([a-z0-9\-._~:/\?#\[\]@!$&'\(\)*+,;=%]+)/gi
 const PUNCTUATION_RE = /[^a-z0-9]$/i
 const OPEN_PARENS_RE = /\(/g
