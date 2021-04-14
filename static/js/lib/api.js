@@ -17,7 +17,7 @@ export class CtznAPI {
   }
 
   get blob () {
-    return session.api.blob
+    return session.api?.blob
   }
 
   async lookupUser (userId) {

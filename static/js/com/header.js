@@ -41,6 +41,7 @@ export class Header extends LitElement {
     setInterval(this.checkNotifications.bind(this), CHECK_NOTIFICATIONS_INTERVAL)
     session.onChange(() =>  this.requestUpdate())
     session.onSecondaryState(() =>  this.requestUpdate())
+    // TODO make sure sections are reloaded on 'profile-updated'
   }
 
   firstUpdated () {
@@ -100,6 +101,7 @@ export class Header extends LitElement {
                 <span class="fas mr-1.5 fa-fw navicon fa-users"></span>
                 Communities
               </a>
+              ${info ? html`
               <hr class="my-3 mx-3">
               <a
                 class="flex items-center ${this.getMenuNavClass()} mt-1"
@@ -122,8 +124,9 @@ export class Header extends LitElement {
                     <span class="fas mr-1.5 fa-fw navicon fa-angle-right"></span>
                       ${section.label}
                   </a>`
-              }) : ''}
+    }) : ''}
                   <hr class="my-3 mx-3"></hr>
+              `: ''}
             </div>
             <div class="mt-3 sm:mb-auto px-4">
               <app-button
@@ -144,6 +147,7 @@ export class Header extends LitElement {
             ${this.renderSessionCtrls()}
           </div>
         </div>
+        ${!info ? '' : html`
         <div class="secondary-menu bg-white overflow-y-auto px-2 py-2">
           <a
             class="flex items-center pl-2 pr-4 py-1 text-sm rounded hov:hover:bg-gray-100"
@@ -209,7 +213,7 @@ export class Header extends LitElement {
               <span class="truncate font-medium">${displayNames.render(f)}</span>
             </a>
           `)}
-        </div>
+        </div>`}
       </header>
       ${this.isMenuOpen ? html`
         <div
