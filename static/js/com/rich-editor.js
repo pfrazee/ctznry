@@ -1,6 +1,7 @@
 import { LitElement, html } from '../../vendor/lit-element/lit-element.js'
 
 import * as postView from '../ctzn-tags-editor/post-view.js'
+import * as postsFeed from '../ctzn-tags-editor/posts-feed.js'
 import * as commentView from '../ctzn-tags-editor/comment-view.js'
 import * as iframe from '../ctzn-tags-editor/iframe.js'
 import * as code from '../ctzn-tags-editor/code.js'
@@ -11,10 +12,19 @@ const POST_TAGS = [
   iframe,
   code
 ]
+const PROFILE_TAGS = [
+  postView,
+  postsFeed,
+  commentView,
+  iframe,
+  code
+]
 
 export class RichEditor extends LitElement {
   static get properties () {
     return {
+      context: {type: String},
+      editorHeight: {type: String, attribute: 'editor-height'}
     }
   }
   
@@ -25,6 +35,90 @@ export class RichEditor extends LitElement {
   constructor () {
     super()
     this.id = 'tinymce-editor-' + Date.now()
+    this.initialValue = ''
+    this.context = ''
+    this.editorHeight = '400px'
+  }
+
+  get supportedTags () {
+    if (this.context === 'post') {
+      return POST_TAGS
+    }
+    if (this.context === 'profile') {
+      return PROFILE_TAGS
+    }
+    return ''
+  }
+
+  get editorToolbar () {
+    if (this.context === 'post') {
+      return 'undo redo | formatselect | bold italic underline strikethrough | link | post-embeds | bullist numlist | ctzn-code | table | removeformat | code'
+    }
+    if (this.context === 'profile') {
+      return 'undo redo | formatselect | bold italic underline strikethrough | link | profile-embeds | bullist numlist | ctzn-code | table | removeformat | code'
+    }
+  }
+
+  get editorContentStyle () {
+    const bg = (this.context === 'profile') ? '#E5E7EB' : '#FFF'
+    return `
+      body {
+        margin: 0.6rem 0.7rem;
+        background: ${bg};
+      }
+      h1,
+      h2,
+      h3,
+      h4,
+      h5,
+      h6,
+      p,
+      ul,
+      ol,
+      table,
+      blockquote,
+      figcaption,
+      dl {
+        margin: 0 0 0.75rem;
+      }
+      h1 {
+        font-size: 1.2rem;
+        line-height: 1.75rem;
+        font-weight: 700;
+      }
+      h2 {
+        font-size: 1.15rem;
+        line-height: 1.6rem;
+        font-weight: 700;
+      }
+      h3 {
+        font-size: 1.1rem;
+        line-height: 1.5rem;
+        font-weight: 700;
+      }
+      h4 {
+        font-size: 1.05rem;
+        line-height: 1.4rem;
+        font-weight: 600;
+      }
+      h5 {
+        font-size: 1.0rem;
+        line-height: 1.4rem;
+        font-weight: 600;
+      }
+      h6 {
+        font-size: 1.0rem;
+        line-height: 1.4rem;
+        font-weight: 500;
+      }
+      *[ctzn-elem="1"] {
+        display: block;
+        margin-bottom: 0.25rem;
+      }
+      *[ctzn-elem="1"] + *:not([ctzn-elem="1"]) {
+        margin-top: 0.75rem;
+      }
+    `
   }
   
   async connectedCallback () {
@@ -33,24 +127,22 @@ export class RichEditor extends LitElement {
     tinymce.init({
       target: this.querySelector('.editor'),
       placeholder: this.getAttribute('placeholder') || '',
-      content_style: "body {margin: 0.6rem 0.7rem;} p {margin: 0.5em 0;}",
-      height: 400,
+      content_style: this.editorContentStyle,
+      height: this.editorHeight,
       menubar: false,
       plugins: [
         'advlist autolink lists link image charmap',
         'visualblocks code fullscreen',
         'media table paste code noneditable'
       ],
-      toolbar: 'undo redo | post-embeds | formatselect | ' +
-      'bold italic underline strikethrough | link | bullist numlist | ' +
-      'ctzn-code | table tabledelete | removeformat',
+      toolbar: this.editorToolbar,
       statusbar: false,
       formats: {
         strikethrough: { inline: 'del' }
       },
       
-      custom_elements: POST_TAGS.map(t => t.name).join(','),
-      extended_valid_elements: POST_TAGS.map(t => t.validElements).filter(Boolean).join(','),
+      custom_elements: this.supportedTags.map(t => t.name).join(','),
+      extended_valid_elements: this.supportedTags.map(t => t.validElements).filter(Boolean).join(','),
       valid_children: 'ctzn-code[pre,#text]',
 
       setup: (editor) => {
@@ -58,7 +150,7 @@ export class RichEditor extends LitElement {
           const win = editor.getWin()
           const doc = editor.getDoc()
           
-          for (let tag of POST_TAGS) {
+          for (let tag of this.supportedTags) {
             tag.setup(win, doc, editor)
             editor.serializer.addNodeFilter(tag.name, contentEditableFilter)
           }
@@ -79,6 +171,24 @@ export class RichEditor extends LitElement {
             ])
           }
         })
+        editor.ui.registry.addMenuButton('profile-embeds', {
+          icon: 'image',
+          tooltip: 'Insert media',
+          fetch: cb => {
+            cb([
+              {type: 'menuitem', text: 'Posts Feed', onAction: () => postsFeed.insert(editor)},
+              {type: 'separator'},
+              {type: 'menuitem', text: 'Embedded Post', onAction: () => postView.insert(editor)},
+              {type: 'menuitem', text: 'Embedded Comment', onAction: () => commentView.insert(editor)},
+              {type: 'menuitem', text: 'Embedded Page (iframe)', onAction: () => iframe.insert(editor)},
+            ])
+          }
+        })
+        editor.on('init', () => {
+          if (this.initialValue) {
+            editor.setContent(this.initialValue, {format: 'html'})
+          }
+        })
       }
     })
   }
@@ -89,11 +199,20 @@ export class RichEditor extends LitElement {
   }
   
   get editor () {
-    return tinymce.get(this.id)
+    return window.tinymce?.get(this.id)
   }
   
   get value () {
     return this.editor?.getContent() || ''
+  }
+
+  set value (v) {
+    if (this.editor) {
+      console.log('setting value', this.initialValue)
+      this.editor.setContent(v, {format: 'html'})
+    } else {
+      this.initialValue = v
+    }
   }
   
   // rendering

@@ -13,7 +13,7 @@ import {
   DEFAULT_CITIZEN_PROFILE_SECTIONS,
   PERM_DESCRIPTIONS
 } from '../lib/const.js'
-import { ViewCustomHtmlPopup } from './popups/view-custom-html.js'
+import { UiEditorPopup } from './popups/ui-editor.js'
 import { ManageBansPopup } from '../com/popups/manage-bans.js'
 import { EditRolePopup } from '../com/popups/edit-role.js'
 import { InvitePopup } from '../com/popups/invite.js'
@@ -459,60 +459,48 @@ export class EditProfile extends LitElement {
 
   renderSection (section, i) {
     return html`
-      <div class="bg-white rounded px-2 py-2 ${i !== 0 ? 'border-t border-gray-200' : ''}">
-        <input
-          type="text"
-          class="block w-full box-border border border-gray-200 rounded px-3 py-1 mb-1 font-medium"
-          value=${section.label || ''}
-          required
-          placeholder="Label"
-          @keyup=${e => this.onKeyupValue(e, ['sections', i, 'label'])}
-          ?disabled=${!this.canEditProfile}
+      <div class="flex items-center bg-white pl-2 pr-1 py-2 ${i !== 0 ? 'border-t border-gray-200 rounded-t' : ''}">
+        <span class="text-sm">
+          ${i === 0 ? html`
+            <span class="fas fa-arrow-up px-1.5 py-0.5 text-gray-300"></span>
+          ` : html`
+            <app-button
+              transparent
+              btn-class="px-1.5 py-0.5"
+              icon="fas fa-arrow-up"
+              data-tooltip="Move up in the nav order"
+              @click=${e => this.onMoveSection(e, i, -1)}
+              ?disabled=${!this.canEditProfile}
+            ></app-button>
+          `}
+          ${i === this.values.sections.length - 1 ? html`
+            <span class="fas fa-arrow-down px-1.5 py-0.5 text-gray-300"></span>
+          ` : html`
+            <app-button
+              transparent
+              btn-class="px-1.5 py-0.5"
+              icon="fas fa-arrow-down"
+              data-tooltip="Move down in the nav order"
+              @click=${e => this.onMoveSection(e, i, 1)}
+              ?disabled=${!this.canEditProfile}
+            ></app-button>
+          `}
+        </span>
+        <span
+          class="flex-1 truncate ml-2 border border-gray-200 rounded px-2 py-1 font-medium cursor-pointer hov:hover:bg-gray-50"
+          @click=${e => this.onEditSection(e, i)}
         >
-        <app-code-textarea
-          textarea-class="block w-full box-border font-mono border border-gray-200 rounded px-3 py-1 h-32 mb-1 text-sm"
-          @keyup=${e => this.onKeyupValue(e, ['sections', i, 'html'])}
-          .value=${section.html}
+          <span class="fa-fw fa-pen fas text-gray-400 text-gray-600 text-sm"></span>
+          ${section.label || html`<em>Unnamed section</em>`}
+        </span>
+        <app-button
+          transparent
+          btn-class="ml-1 px-2 py-1 text-red-500 text-sm"
+          class="ml-auto"
+          icon="fas fa-times"
+          @click=${e => this.onDeleteSection(e, i)}
           ?disabled=${!this.canEditProfile}
-        ></app-code-textarea>
-        <div class="flex items-center mb-1">
-          <app-button transparent btn-class="px-2 py-1 text-sm" label="Preview" @click=${e => this.onPreviewSection(e, i)}></app-button>
-          <span class="text-sm ml-2">
-            Move:
-            ${i === 0 ? html`
-              <span class="fas fa-arrow-up px-1.5 py-0.5 text-gray-300"></span>
-            ` : html`
-              <app-button
-                transparent
-                btn-class="px-1.5 py-0.5"
-                icon="fas fa-arrow-up"
-                data-tooltip="Move up in the nav order"
-                @click=${e => this.onMoveSection(e, i, -1)}
-                ?disabled=${!this.canEditProfile}
-              ></app-button>
-            `}
-            ${i === this.values.sections.length - 1 ? html`
-              <span class="fas fa-arrow-down px-1.5 py-0.5 text-gray-300"></span>
-            ` : html`
-              <app-button
-                transparent
-                btn-class="px-1.5 py-0.5"
-                icon="fas fa-arrow-down"
-                data-tooltip="Move down in the nav order"
-                @click=${e => this.onMoveSection(e, i, 1)}
-                ?disabled=${!this.canEditProfile}
-              ></app-button>
-            `}
-          </span>
-          <app-button
-            transparent
-            btn-class="px-2 py-1 text-red-500 text-sm"
-            class="ml-auto"
-            label="Delete"
-            @click=${e => this.onDeleteSection(e, i)}
-            ?disabled=${!this.canEditProfile}
-          ></app-button>
-        </div>
+        ></app-button>
       </div>
     `
   }
@@ -550,12 +538,20 @@ export class EditProfile extends LitElement {
     this.requestUpdate()
   }
 
-  onPreviewSection (e, index) {
-    ViewCustomHtmlPopup.create({
-      html: this.values.sections[index].html,
+  async onEditSection (e, index) {
+    const res = await UiEditorPopup.create({
+      label: this.values.sections[index].label,
       context: 'profile',
-      contextState: {page: {userId: this.userId}}
+      contextState: {page: {userId: this.userId}},
+      value: this.values.sections[index].html,
+      placeholder: 'Build your UI here!',
+      canSave: this.canEditProfile
     })
+    if (this.canEditProfile) {
+      this.setValue(['sections', index, 'label'], res.label)
+      this.setValue(['sections', index, 'html'], res.html)
+      this.requestUpdate()
+    }
   }
 
   onClickBanner (e) {
