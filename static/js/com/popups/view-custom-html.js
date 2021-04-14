@@ -62,7 +62,7 @@ export class ViewCustomHtmlPopup extends BasePopup {
           .userId=${this.userId}
           .blobName=${this.blobName}
           .html=${this.html}
-          .context=${this.context}
+          context=${this.context}
           .contextState=${this.contextState}
         ></app-custom-html>
       </div>
