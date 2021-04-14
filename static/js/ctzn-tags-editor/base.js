@@ -54,6 +54,7 @@ export function createBaseClass (win, doc, editor) {
 export function createWidgetBaseClass (win, doc, editor) {
   return class EditorWidgetComponent extends createBaseClass(win) {
     render () {
+      const footer = this.renderFooter()
       return html`
         <style>
         :host {
@@ -95,9 +96,7 @@ export function createWidgetBaseClass (win, doc, editor) {
           ${this.renderHeader()}
           <span class="btn" @click=${e => this.onClickEdit(e)}>${penSvg}</span>
         </header>
-        <footer>
-          ${this.renderFooter()}
-        </footer>
+        ${footer ? html`<footer>${footer}</footer>` : ''}
       `
     }
 
@@ -108,7 +107,6 @@ export function createWidgetBaseClass (win, doc, editor) {
 
     renderFooter () {
       // override me
-      return html`footer todo`
     }
 
     onClickEdit (e) {

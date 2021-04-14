@@ -4,6 +4,7 @@ import * as postView from '../ctzn-tags-editor/post-view.js'
 import * as postsFeed from '../ctzn-tags-editor/posts-feed.js'
 import * as commentView from '../ctzn-tags-editor/comment-view.js'
 import * as commentsFeed from '../ctzn-tags-editor/comments-feed.js'
+import * as communityMembersList from '../ctzn-tags-editor/community-members-list.js'
 import * as iframe from '../ctzn-tags-editor/iframe.js'
 import * as code from '../ctzn-tags-editor/code.js'
 
@@ -18,6 +19,7 @@ const PROFILE_TAGS = [
   postsFeed,
   commentView,
   commentsFeed,
+  communityMembersList,
   iframe,
   code
 ]
@@ -57,7 +59,7 @@ export class RichEditor extends LitElement {
       return 'undo redo | formatselect | bold italic underline strikethrough | link | post-embeds | bullist numlist | ctzn-code | table | removeformat | code'
     }
     if (this.context === 'profile') {
-      return 'undo redo | formatselect | bold italic underline strikethrough | link | profile-embeds | bullist numlist | ctzn-code | table | removeformat | code'
+      return 'undo redo | formatselect | bold italic underline strikethrough | link | content-widgets user-widgets | bullist numlist | ctzn-code | table | removeformat | code'
     }
   }
 
@@ -148,6 +150,7 @@ export class RichEditor extends LitElement {
       valid_children: 'ctzn-code[pre,#text]',
 
       setup: (editor) => {
+        editor.ui.registry.addIcon('user-widgets', '<svg width="20" height="20" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="user-friends" class="svg-inline--fa fa-user-friends fa-w-20" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512"><path fill="currentColor" d="M192 256c61.9 0 112-50.1 112-112S253.9 32 192 32 80 82.1 80 144s50.1 112 112 112zm76.8 32h-8.3c-20.8 10-43.9 16-68.5 16s-47.6-6-68.5-16h-8.3C51.6 288 0 339.6 0 403.2V432c0 26.5 21.5 48 48 48h288c26.5 0 48-21.5 48-48v-28.8c0-63.6-51.6-115.2-115.2-115.2zM480 256c53 0 96-43 96-96s-43-96-96-96-96 43-96 96 43 96 96 96zm48 32h-3.8c-13.9 4.8-28.6 8-44.2 8s-30.3-3.2-44.2-8H432c-20.4 0-39.2 5.9-55.7 15.4 24.4 26.3 39.7 61.2 39.7 99.8v38.4c0 2.2-.5 4.3-.6 6.4H592c26.5 0 48-21.5 48-48 0-61.9-50.1-112-112-112z"></path></svg>')
         editor.on('PreInit', () => {
           const win = editor.getWin()
           const doc = editor.getDoc()
@@ -173,9 +176,9 @@ export class RichEditor extends LitElement {
             ])
           }
         })
-        editor.ui.registry.addMenuButton('profile-embeds', {
+        editor.ui.registry.addMenuButton('content-widgets', {
           icon: 'image',
-          tooltip: 'Insert media',
+          tooltip: 'Insert content widget',
           fetch: cb => {
             cb([
               {type: 'menuitem', text: 'Posts Feed', onAction: () => postsFeed.insert(editor)},
@@ -184,6 +187,15 @@ export class RichEditor extends LitElement {
               {type: 'menuitem', text: 'Embedded Post', onAction: () => postView.insert(editor)},
               {type: 'menuitem', text: 'Embedded Comment', onAction: () => commentView.insert(editor)},
               {type: 'menuitem', text: 'Embedded Page (iframe)', onAction: () => iframe.insert(editor)},
+            ])
+          }
+        })
+        editor.ui.registry.addMenuButton('user-widgets', {
+          icon: 'user-widgets',
+          tooltip: 'Insert user widget',
+          fetch: cb => {
+            cb([
+              {type: 'menuitem', text: 'Community Members List', onAction: () => communityMembersList.insert(editor)}
             ])
           }
         })

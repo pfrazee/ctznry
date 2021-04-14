@@ -61,7 +61,7 @@ export class EditProfile extends LitElement {
     this.values = undefined
     this.communityConfigValues = undefined
     this.customUIOverride = undefined
-    this.currentView = 'advanced'
+    this.currentView = 'basics'
     this.currentError = undefined
     this.img = undefined
     this.uploadedAvatar = undefined
