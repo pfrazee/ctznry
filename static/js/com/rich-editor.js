@@ -5,6 +5,7 @@ import * as postsFeed from '../ctzn-tags-editor/posts-feed.js'
 import * as commentView from '../ctzn-tags-editor/comment-view.js'
 import * as commentsFeed from '../ctzn-tags-editor/comments-feed.js'
 import * as communityMembersList from '../ctzn-tags-editor/community-members-list.js'
+import * as communityMembershipsList from '../ctzn-tags-editor/community-memberships-list.js'
 import * as iframe from '../ctzn-tags-editor/iframe.js'
 import * as code from '../ctzn-tags-editor/code.js'
 
@@ -20,6 +21,7 @@ const PROFILE_TAGS = [
   commentView,
   commentsFeed,
   communityMembersList,
+  communityMembershipsList,
   iframe,
   code
 ]
@@ -195,7 +197,8 @@ export class RichEditor extends LitElement {
           tooltip: 'Insert user widget',
           fetch: cb => {
             cb([
-              {type: 'menuitem', text: 'Community Members List', onAction: () => communityMembersList.insert(editor)}
+              {type: 'menuitem', text: 'Community Members List', onAction: () => communityMembersList.insert(editor)},
+              {type: 'menuitem', text: 'Community Memberships List', onAction: () => communityMembershipsList.insert(editor)}
             ])
           }
         })

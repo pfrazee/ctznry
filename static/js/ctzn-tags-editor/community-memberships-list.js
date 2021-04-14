@@ -5,18 +5,18 @@ import { makeSafe } from '../lib/strings.js'
 // exported api
 // =
 
-export const name = 'ctzn-community-members-list'
-export const validElements = 'ctzn-community-members-list[user-id|limit]'
+export const name = 'ctzn-community-memberships-list'
+export const validElements = 'ctzn-community-memberships-list[user-id|limit]'
 
 export function setup (win, doc, editor) {
-  class CtznCommunityMembersList extends createWidgetBaseClass(win) {
+  class CtznCommunityMembershipsList extends createWidgetBaseClass(win) {
     static get observedAttributes () {
       return ['user-id']
     }
 
     renderHeader () {
       return html`
-        <strong>Community Members List</strong>
+        <strong>Community Memberships List</strong>
         of
         ${this['user-id'] ? html`
           <span class="link" @click=${e => this.onClickUser(e)}>${this['user-id']}</span>
@@ -36,7 +36,7 @@ export function setup (win, doc, editor) {
       window.open(`/${this['user-id']}`)
     }
   }
-  win.customElements.define('ctzn-community-members-list', CtznCommunityMembersList)
+  win.customElements.define('ctzn-community-memberships-list', CtznCommunityMembershipsList)
 }
 
 export function insert (editor) {
@@ -48,7 +48,7 @@ export function insert (editor) {
 
 function doPropertiesDialog (el, editor) {
   editor.windowManager.open({
-    title: 'Community members list',
+    title: 'Community memberships list',
     body: {
       type: 'panel',
       items: [
@@ -84,7 +84,7 @@ function doPropertiesDialog (el, editor) {
       if (!el) {
         let attrs = []
         if (data['user-id']) attrs.push(`user-id="${makeSafe(data['user-id'])}"`)
-        editor.insertContent(`<ctzn-community-members-list ${attrs.join(' ')}></ctzn-community-members-list>`)
+        editor.insertContent(`<ctzn-community-memberships-list ${attrs.join(' ')}></ctzn-community-memberships-list>`)
       }
       else {
         editor.undoManager.transact(() => {
