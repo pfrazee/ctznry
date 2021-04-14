@@ -292,7 +292,7 @@ export class PostView extends LitElement {
             ${this.renderPostTextNonFull()}
             ${this.renderMedia()}
             ${this.hasReactionsOrGifts ? html`
-              <div class="flex items-center my-1.5 mx-0.5 text-gray-500 text-sm truncate">
+              <div class="flex items-center my-1.5 mx-0.5 text-gray-500 text-sm overflow-ellipsis whitspace-nowrap">
                 ${this.renderGiftedItems()}
                 ${this.renderReactions()}
               </div>
@@ -468,17 +468,20 @@ export class PostView extends LitElement {
       return ''
     }
     return html`
-      ${repeat(this.post.relatedItemTransfers, item => html`
+      ${repeat(this.post.relatedItemTransfers, item => {
+        let tooltipUser = item.dbmethodCall?.authorId
+        return html`
         <span
-          class="flex-shrink-0 inline-flex items-center border border-gray-300 px-1 py-0.5 rounded mr-1.5 text-sm font-semibold"
-        >
+          class="flex-shrink-0 inline-flex items-center border border-gray-300 px-1 py-0.5 rounded mr-1.5 text-sm font-semibold tooltip-top"
+          data-tooltip="${tooltipUser}">
           <img
             class="block w-4 h-4 object-cover mr-1"
             src=${ITEM_CLASS_ICON_URL(this.communityUserId, item.itemClassId)}
           >
           ${item.qty}
         </span>
-      `)}
+      `}
+      )}
     `
   }
 
@@ -488,12 +491,15 @@ export class PostView extends LitElement {
     }
     return html`
       ${repeat(Object.entries(this.post.reactions), ([reaction, userIds]) => {
+        let tooltipUsersText = (userIds?.slice(0,4) || []).join(", ")
         const colors = this.haveIReacted(reaction) ? 'bg-blue-50 hov:hover:bg-blue-100 text-blue-600' : 'bg-gray-100 text-gray-500 hov:hover:bg-gray-200'
         return html`
           <a
-            class="inline-block mr-2 px-1.5 py-0.5 rounded text-sm flex-shrink-0 ${colors}"
+            class="inline-block mr-2 px-1.5 py-0.5 rounded text-sm flex-shrink-0 ${colors} tooltip-top"
             @click=${e => this.onClickReaction(e, reaction)}
-          >${unsafeHTML(emojify(makeSafe(reaction)))} <sup class="font-medium">${userIds.length}</sup></a>
+            data-tooltip="${tooltipUsersText}${userIds?.length > 4 ? '...' : ''}"
+          >${unsafeHTML(emojify(makeSafe(reaction)))} <sup class="font-medium">${userIds.length}</sup></span>
+          </a>
         `
       })}
     `
