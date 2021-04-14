@@ -1,6 +1,9 @@
 import { LitElement, html } from '../../vendor/lit-element/lit-element.js'
 import { repeat } from '../../vendor/lit-element/lit-html/directives/repeat.js'
 import * as session from '../lib/session.js'
+import { AVATAR_URL } from '../lib/const.js'
+import { getFollowedUsersCommunities } from '../lib/algorithms.js'
+import { pluralize } from '../lib/strings.js'
 import * as toast from './toast.js'
 import './button.js'
 import './img-fallbacks.js'
@@ -88,8 +91,31 @@ export class SuggestionsSidebar extends LitElement {
   async load () {
     if (!this.suggestedCommunities) {
       if (session.isActive() && session.myCommunities) {
-        this.suggestedCommunities = SUGGESTED_COMMUNITIES.filter(c => !session.isInCommunity(c.userId))
-        this.suggestedCommunities = this.suggestedCommunities.sort(() => Math.random() - 0.5).slice(0, 8)
+        let suggestedCommunities = SUGGESTED_COMMUNITIES.filter(c => !session.isInCommunity(c.userId))
+
+        let moreSuggestions = await getFollowedUsersCommunities({cachedOnly: true})
+        if (!moreSuggestions) {
+          // wait a few seconds for the page to finish loading, as this query can slow down the UI
+          await new Promise(r => setTimeout(r, 10e3))
+          moreSuggestions = await getFollowedUsersCommunities({cachedOnly: false})
+        }
+
+        if (moreSuggestions?.length) {
+          suggestedCommunities = suggestedCommunities.concat(moreSuggestions)
+          suggestedCommunities = suggestedCommunities.filter((entry, index) => {
+            return suggestedCommunities.findIndex(entry2 => entry2.userId === entry.userId) === index
+          })
+        }
+
+        suggestedCommunities = suggestedCommunities.sort(() => Math.random() - 0.5).slice(0, 8)
+        for (let suggestedCommunity of suggestedCommunities) {
+          if (!suggestedCommunity.displayName) {
+            let profile = await session.ctzn.getProfile(suggestedCommunity.userId)
+            suggestedCommunity.displayName = profile.value.displayName
+            suggestedCommunity.description = profile.value.description
+          }
+        }
+        this.suggestedCommunities = suggestedCommunities
       } else {
         session.onSecondaryState(this.load.bind(this))
       }
@@ -105,26 +131,35 @@ export class SuggestionsSidebar extends LitElement {
         <section>
           ${repeat(this.suggestedCommunities, community => community.userId, community => {
             const hasJoined = session.isInCommunity(community.userId)
+            let tooltipIds = community.members?.slice(0, 4).join(', ')
+            if (community.members?.length > 4) tooltipIds += `, + ${community.members?.length - 4} more`
             return html`
               <div class="text-sm bg-white mb-2 px-2 py-2 rounded-lg">
-                <div>
-                  <a class="text-sm hov:hover:pointer hov:hover:underline" href="/${community.userId}" title=${community.displayName}>
-                  ${community.displayName}
+                <div class="text-base font-medium truncate">
+                  <a class="hov:hover:pointer hov:hover:underline" href="/${community.userId}" title=${community.displayName}>
+                    ${community.displayName}
                   </a>
                 </div>
-                <div class="text-gray-600 mb-1">${community.description}</div>
-                <div>
+                ${community.members?.length ? html`
+                  <div class="mb-1 text-gray-500 font-semibold">
+                    <span class="hov:hover:underline" data-tooltip=${tooltipIds}>
+                      ${community.members.length} ${pluralize(community.members.length, 'member')} you follow
+                    </span>
+                  </div>
+                ` : ''}
+                <div class="mb-1">${community.description}</div>
+                <div class="mt-1.5">
                   ${hasJoined ? html`
                     <button
-                      class="border border-blue-400 px-4 py-0.5 rounded-2xl text-blue-600 text-sm cursor-default"
+                      class="border border-gray-300 bg-gray-100 px-3 py-0.5 rounded text-sm cursor-default"
                       disabled
                     >Joined!</button>
                   ` : html`
                     <button
-                      class="border border-blue-400 hov:hover:bg-gray-100 hov:hover:pointer px-4 py-0.5 rounded-2xl text-blue-600 text-sm"
+                      class="border border-gray-300 bg-gray-100 px-3 py-0.5 rounded text-sm truncate hov:hover:bg-gray-200 cursor-pointer"
                       @click=${e => this.onClickJoinSuggestedCommunity(e, community)}
                       ?disabled=${hasJoined}
-                    >${community.isJoining ? html`<span class="spinner"></span>` : 'Join'}</button>
+                    >${community.isJoining ? html`<span class="spinner"></span>` : `Join community`}</button>
                   `}
                 </div>
               </div>
@@ -140,7 +175,7 @@ export class SuggestionsSidebar extends LitElement {
           <div>
             CTZN is donation-driven software. Help us develop this network by joining our patreon.
             <a
-              class="block text-center py-1 mt-2 rounded border border-blue-500 text-blue-600 hov:hover:bg-gray-50"
+              class="block text-center w-full border border-gray-300 bg-gray-100 px-4 py-1 rounded text-sm truncate hov:hover:bg-gray-200 cursor-pointer mt-2"
               href="https://patreon.com/paul_maf_and_andrew"
               target="_blank"
             >Join our Patreon</a>            
@@ -153,12 +188,12 @@ export class SuggestionsSidebar extends LitElement {
           <div>
             Follow CTZN's development by joining the daily livestream by the core team every weekday.
             <a
-              class="block text-center py-1 mt-2 rounded border border-blue-500 text-blue-600 hov:hover:bg-gray-50"
+              class="block text-center w-full border border-gray-300 bg-gray-100 px-4 py-1 rounded text-sm truncate hov:hover:bg-gray-200 cursor-pointer mt-2"
               href="https://www.youtube.com/channel/UCSkcL4my2wgDRFvjQOJzrlg"
               target="_blank"
             >Subscribe on YouTube</a>
             <a 
-              class="block text-center py-1 mt-2 rounded border border-blue-500 text-blue-600 hov:hover:bg-gray-50"
+              class="block text-center w-full border border-gray-300 bg-gray-100 px-4 py-1 rounded text-sm truncate hov:hover:bg-gray-200 cursor-pointer mt-2"
               href="https://ctzn.network/dev-vlog"
               target="_blank"
             >Watch the archives</a>
