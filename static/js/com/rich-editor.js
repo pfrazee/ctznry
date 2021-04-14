@@ -240,6 +240,9 @@ export class RichEditor extends LitElement {
             editor.setContent(this.initialValue, {format: 'html'})
           }
         })
+        editor.on('PreProcess', (e) => {
+          removeEmptyNodes(e.node)
+        })
       }
     })
   }
@@ -302,4 +305,18 @@ function loadTinyMCEAsNeeded () {
     document.body.append(script)
   })
   return _loadPromise
+}
+
+function removeEmptyNodes (node) {
+  if (!node.getAttribute('ctzn-elem')) {
+    const inner = (node.innerHTML || '').trim()
+    if (!inner || inner === '&nbsp;') {
+      node.remove()
+    }
+  }
+
+  const children = Array.from(node.children)
+  for (let child of children) {
+    removeEmptyNodes(child, node.tagName + ' > ')
+  }
 }
