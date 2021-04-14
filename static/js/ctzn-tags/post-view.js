@@ -292,7 +292,7 @@ export class PostView extends LitElement {
             ${this.renderPostTextNonFull()}
             ${this.renderMedia()}
             ${this.hasReactionsOrGifts ? html`
-              <div class="flex items-center my-1.5 mx-0.5 text-gray-500 text-sm truncate">
+              <div class="flex items-center my-1.5 mx-0.5 text-gray-500 text-sm overflow-ellipsis whitspace-nowrap">
                 ${this.renderGiftedItems()}
                 ${this.renderReactions()}
               </div>
@@ -491,9 +491,11 @@ export class PostView extends LitElement {
         const colors = this.haveIReacted(reaction) ? 'bg-blue-50 hov:hover:bg-blue-100 text-blue-600' : 'bg-gray-100 text-gray-500 hov:hover:bg-gray-200'
         return html`
           <a
-            class="inline-block mr-2 px-1.5 py-0.5 rounded text-sm flex-shrink-0 ${colors}"
+            class="inline-block mr-2 px-1.5 py-0.5 rounded text-sm flex-shrink-0 ${colors} tooltip-top"
             @click=${e => this.onClickReaction(e, reaction)}
-          >${unsafeHTML(emojify(makeSafe(reaction)))} <sup class="font-medium">${userIds.length}</sup></a>
+            data-tooltip="${userIds.join(", ")}"
+          >${unsafeHTML(emojify(makeSafe(reaction)))} <sup class="font-medium">${userIds.length}</sup></span>
+          </a>
         `
       })}
     `
