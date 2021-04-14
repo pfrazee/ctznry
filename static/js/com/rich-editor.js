@@ -13,12 +13,14 @@ import * as itemClassesList from '../ctzn-tags-editor/item-classes-list.js'
 import * as ownedItemsList from '../ctzn-tags-editor/owned-items-list.js'
 import * as iframe from '../ctzn-tags-editor/iframe.js'
 import * as code from '../ctzn-tags-editor/code.js'
+import * as card from '../ctzn-tags-editor/card.js'
 
 const POST_TAGS = [
   postView,
   commentView,
   iframe,
-  code
+  code,
+  card
 ]
 const PROFILE_TAGS = [
   postView,
@@ -33,7 +35,8 @@ const PROFILE_TAGS = [
   itemClassesList,
   ownedItemsList,
   iframe,
-  code
+  code,
+  card
 ]
 
 export class RichEditor extends LitElement {
@@ -186,6 +189,8 @@ export class RichEditor extends LitElement {
               {type: 'menuitem', text: 'Embedded Post', onAction: () => postView.insert(editor)},
               {type: 'menuitem', text: 'Embedded Comment', onAction: () => commentView.insert(editor)},
               {type: 'menuitem', text: 'Embedded Page (iframe)', onAction: () => iframe.insert(editor)},
+              {type: 'separator'},
+              {type: 'menuitem', text: 'Card UI Element', onAction: () => card.insert(editor)},
             ])
           }
         })
@@ -194,6 +199,8 @@ export class RichEditor extends LitElement {
           tooltip: 'Insert content widget',
           fetch: cb => {
             cb([
+              {type: 'menuitem', text: 'Card UI Element', onAction: () => card.insert(editor)},
+              {type: 'separator'},
               {type: 'menuitem', text: 'Posts Feed', onAction: () => postsFeed.insert(editor)},
               {type: 'menuitem', text: 'Comments Feed', onAction: () => commentsFeed.insert(editor)},
               {type: 'menuitem', text: 'DB Method Calls Feed', onAction: () => dbmethodsFeed.insert(editor)},
