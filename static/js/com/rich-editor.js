@@ -3,6 +3,7 @@ import { LitElement, html } from '../../vendor/lit-element/lit-element.js'
 import * as postView from '../ctzn-tags-editor/post-view.js'
 import * as postsFeed from '../ctzn-tags-editor/posts-feed.js'
 import * as commentView from '../ctzn-tags-editor/comment-view.js'
+import * as commentsFeed from '../ctzn-tags-editor/comments-feed.js'
 import * as iframe from '../ctzn-tags-editor/iframe.js'
 import * as code from '../ctzn-tags-editor/code.js'
 
@@ -16,6 +17,7 @@ const PROFILE_TAGS = [
   postView,
   postsFeed,
   commentView,
+  commentsFeed,
   iframe,
   code
 ]
@@ -177,6 +179,7 @@ export class RichEditor extends LitElement {
           fetch: cb => {
             cb([
               {type: 'menuitem', text: 'Posts Feed', onAction: () => postsFeed.insert(editor)},
+              {type: 'menuitem', text: 'Comments Feed', onAction: () => commentsFeed.insert(editor)},
               {type: 'separator'},
               {type: 'menuitem', text: 'Embedded Post', onAction: () => postView.insert(editor)},
               {type: 'menuitem', text: 'Embedded Comment', onAction: () => commentView.insert(editor)},
