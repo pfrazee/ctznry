@@ -65,6 +65,9 @@ export class CustomHtml extends LitElement {
       this.loadedHtml = this.html
       return
     }
+    if (!session.ctzn?.blob) {
+      this.currentError = "Custom Html could not be loaded. If you are not logged in, please join a server to see this profile."
+    }
     try {
       let base64buf = (await session.ctzn.blob.get(this.userId, this.blobName))?.buf
       if (base64buf) this.loadedHtml = decodeBase64(base64buf)

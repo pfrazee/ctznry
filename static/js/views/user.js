@@ -262,11 +262,11 @@ class CtznUser extends LitElement {
         this.roles = roles
         console.log({userProfile: this.userProfile, members, roles})
 
-        if (session.isActive() && !this.amIFollowing && this.isMembershipClosed) {
+        if (session.isActive() && session.ctzn && !this.amIFollowing && this.isMembershipClosed) {
           let inviteEntry = await session.ctzn.db(this.userId)
             .table('ctzn.network/community-invite')
-            .get(session.info.userId)
-            .catch(e => undefined)
+            ?.get(session.info.userId)
+            .catch((_) => undefined)
           this.isUserInvited = !!inviteEntry?.value
         }
       }
