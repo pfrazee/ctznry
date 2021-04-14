@@ -5,18 +5,18 @@ import { makeSafe } from '../lib/strings.js'
 // exported api
 // =
 
-export const name = 'ctzn-community-members-list'
-export const validElements = 'ctzn-community-members-list[user-id]'
+export const name = 'ctzn-followers-list'
+export const validElements = 'ctzn-followers-list[user-id]'
 
 export function setup (win, doc, editor) {
-  class CtznCommunityMembersList extends createWidgetBaseClass(win) {
+  class CtznFollowersList extends createWidgetBaseClass(win) {
     static get observedAttributes () {
       return ['user-id']
     }
 
     renderHeader () {
       return html`
-        <strong>Community Members List</strong>
+        <strong>Followers List</strong>
         of
         ${this['user-id'] ? html`
           <span class="link" @click=${e => this.onClickUser(e)}>${this['user-id']}</span>
@@ -36,7 +36,7 @@ export function setup (win, doc, editor) {
       window.open(`/${this['user-id']}`)
     }
   }
-  win.customElements.define('ctzn-community-members-list', CtznCommunityMembersList)
+  win.customElements.define('ctzn-followers-list', CtznFollowersList)
 }
 
 export function insert (editor) {
@@ -48,7 +48,7 @@ export function insert (editor) {
 
 function doPropertiesDialog (el, editor) {
   editor.windowManager.open({
-    title: 'Community members list',
+    title: 'Followers list',
     body: {
       type: 'panel',
       items: [
@@ -56,7 +56,7 @@ function doPropertiesDialog (el, editor) {
           type: 'input',
           name: 'user-id',
           label: 'User ID',
-          placeholder: 'Which community\'s members to show? (Optional, defaults to the profile being viewed.)'
+          placeholder: 'Whose feed to show? (Optional, defaults to the profile being viewed.)'
         }
       ]
     },
@@ -84,7 +84,7 @@ function doPropertiesDialog (el, editor) {
       if (!el) {
         let attrs = []
         if (data['user-id']) attrs.push(`user-id="${makeSafe(data['user-id'])}"`)
-        editor.insertContent(`<ctzn-community-members-list ${attrs.join(' ')}></ctzn-community-members-list>`)
+        editor.insertContent(`<ctzn-followers-list ${attrs.join(' ')}></ctzn-followers-list>`)
       }
       else {
         editor.undoManager.transact(() => {

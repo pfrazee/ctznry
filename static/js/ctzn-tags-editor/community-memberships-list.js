@@ -6,7 +6,7 @@ import { makeSafe } from '../lib/strings.js'
 // =
 
 export const name = 'ctzn-community-memberships-list'
-export const validElements = 'ctzn-community-memberships-list[user-id|limit]'
+export const validElements = 'ctzn-community-memberships-list[user-id]'
 
 export function setup (win, doc, editor) {
   class CtznCommunityMembershipsList extends createWidgetBaseClass(win) {
@@ -56,7 +56,7 @@ function doPropertiesDialog (el, editor) {
           type: 'input',
           name: 'user-id',
           label: 'User ID',
-          placeholder: 'Whose feed to show? (Optional, defaults to the profile being viewed.)'
+          placeholder: 'Whose community memberships to show? (Optional, defaults to the profile being viewed.)'
         }
       ]
     },
