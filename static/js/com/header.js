@@ -9,6 +9,8 @@ import { CreateCommunityPopup } from './popups/create-community.js'
 import * as toast from './toast.js'
 import './button.js'
 
+import {DEFAULT_CITIZEN_PROFILE_SECTIONS} from '../lib/const.js'
+
 const CHECK_NOTIFICATIONS_INTERVAL = 10e3
 
 export class Header extends LitElement {
@@ -31,11 +33,14 @@ export class Header extends LitElement {
     this.isMenuOpen = false
     this.unreadNotificationsCount = 0
     this.community = undefined
+    this.sections = DEFAULT_CITIZEN_PROFILE_SECTIONS
+
     document.body.addEventListener('open-main-menu', e => {
       this.isMenuOpen = true
     })
     setInterval(this.checkNotifications.bind(this), CHECK_NOTIFICATIONS_INTERVAL)
-    session.onChange(() => this.requestUpdate())
+    session.onChange(() =>  this.requestUpdate())
+    session.onSecondaryState(() =>  this.requestUpdate())
   }
 
   firstUpdated () {
@@ -110,11 +115,15 @@ export class Header extends LitElement {
                 </span>
                 My Profile
               </a>
-              <a href="/${info.userId}/inventory" class=${this.getMenuNavClass()} @click=${this.onClickLink}>
-                <span class="fas mr-1.5 fa-fw navicon fa-suitcase"></span>
-                My Inventory
-              </a>
-              <hr class="my-3 mx-3">
+              ${session.mySections?.length > 0 ? repeat(session.mySections, (section) => {
+                return html`<a href="/${info?.userId}/${section.id}"
+                  class=${this.getMenuNavClass()}
+                  @click=${this.onClickLink}>
+                    <span class="fas mr-1.5 fa-fw navicon fa-angle-right"></span>
+                      ${section.label}
+                  </a>`
+              }) : ''}
+                  <hr class="my-3 mx-3"></hr>
             </div>
             <div class="mt-3 sm:mb-auto px-4">
               <app-button
