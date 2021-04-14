@@ -23,7 +23,6 @@ export function setup (win, doc, editor) {
           border-radius: 6px;
           border: 1px solid #ccc;
           padding: 1rem;
-          box-shadow: 0 2px 4px #0001;
         }
         .btn {
           display: inline-block;

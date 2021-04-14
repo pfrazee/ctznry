@@ -99,8 +99,8 @@ function doPropertiesDialog (el, editor) {
       }
     ],
     initialData: {
-      mode: el ? el.mode : 'default' ,
-      src: el ? el.src: ''
+      mode: el?.mode || 'default',
+      src: el?.src || ''
     },
     onSubmit: (dialog) => {
       var data = dialog.getData()

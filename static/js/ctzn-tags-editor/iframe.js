@@ -74,7 +74,7 @@ function doPropertiesDialog (el, editor) {
       }
     ],
     initialData: {
-      src: el ? el.src: ''
+      src: el?.src || ''
     },
     onSubmit: (dialog) => {
       var data = dialog.getData()
