@@ -143,6 +143,7 @@ export class RichEditor extends LitElement {
   async connectedCallback () {
     super.connectedCallback()
     await loadTinyMCEAsNeeded()
+    await this.requestUpdate()
     tinymce.init({
       target: this.querySelector('.editor'),
       placeholder: this.getAttribute('placeholder') || '',
