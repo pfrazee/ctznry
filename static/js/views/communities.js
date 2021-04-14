@@ -4,6 +4,8 @@ import * as toast from '../com/toast.js'
 import * as session from '../lib/session.js'
 import { AVATAR_URL } from '../lib/const.js'
 import * as displayNames from '../lib/display-names.js'
+import { getFollowedUsersCommunities } from '../lib/algorithms.js'
+import { pluralize } from '../lib/strings.js'
 import '../com/header.js'
 import '../com/subnav.js'
 
@@ -102,6 +104,25 @@ class CtznCommunities extends LitElement {
         this.suggestedCommunities = SUGGESTED_COMMUNITIES.filter(c => !this.memberships?.find(m => c.userId === m.value.community.userId))
         this.suggestedCommunities = this.suggestedCommunities.sort(() => Math.random() - 0.5)
       }
+
+      let moreSuggestions = await getFollowedUsersCommunities({cachedOnly: false})
+      console.log({moreSuggestions})
+      if (moreSuggestions?.length) {
+        this.suggestedCommunities = this.suggestedCommunities.concat(moreSuggestions)
+        this.suggestedCommunities = this.suggestedCommunities.filter((entry, index) => {
+          return this.suggestedCommunities.findIndex(entry2 => entry2.userId === entry.userId) === index
+        })
+      }
+      this.suggestedCommunities = this.suggestedCommunities.sort(() => Math.random() - 0.5).slice(0, 40)
+      for (let suggestedCommunity of this.suggestedCommunities) {
+        if (!suggestedCommunity.displayName) {
+          session.ctzn.getProfile(suggestedCommunity.userId).then(profile => {
+            suggestedCommunity.displayName = profile.value.displayName
+            suggestedCommunity.description = profile.value.description
+            this.requestUpdate()
+          })
+        }
+      }
     } else {
       this.memberships = []
       this.suggestedCommunities = SUGGESTED_COMMUNITIES.sort(() => Math.random() - 0.5)
@@ -166,16 +187,25 @@ class CtznCommunities extends LitElement {
             </div>
             ${repeat(this.suggestedCommunities, community => community.userId, community => {
               const hasJoined = this.memberships?.find(m => community.userId === m.value.community.userId)
+            let tooltipIds = community.members?.slice(0, 4).join(', ')
+            if (community.members?.length > 4) tooltipIds += `, + ${community.members?.length - 4} more`
               return html`
                 <div class="flex bg-white px-4 py-3 mb-0.5 sm:rounded">
                   <img class="block rounded-lg w-10 h-10 mr-4" src=${AVATAR_URL(community.userId)}>
                   <div class="flex-1 min-w-0">
                     <div>
                       <a class="font-medium hov:hover:pointer hov:hover:underline" href="/${community.userId}" title=${community.displayName}>
-                        ${community.displayName}
+                        ${community.displayName || community.userId}
                       </a>
                     </div>
                     <div class="text-gray-600 mb-1">${community.description}</div>
+                    ${community.members?.length ? html`
+                      <div class="mb-2 text-sm text-gray-500 font-semibold">
+                        <span class="hov:hover:underline" data-tooltip=${tooltipIds}>
+                          ${community.members.length} ${pluralize(community.members.length, 'member')} you follow
+                        </span>
+                      </div>
+                    ` : ''}
                     ${session.isActive() ? html`<div>
                       ${hasJoined ? html`
                         <button

@@ -1,7 +1,6 @@
 import { LitElement, html } from '../../vendor/lit-element/lit-element.js'
 import { repeat } from '../../vendor/lit-element/lit-html/directives/repeat.js'
 import * as session from '../lib/session.js'
-import { AVATAR_URL } from '../lib/const.js'
 import { getFollowedUsersCommunities } from '../lib/algorithms.js'
 import { pluralize } from '../lib/strings.js'
 import * as toast from './toast.js'
@@ -110,9 +109,11 @@ export class SuggestionsSidebar extends LitElement {
         suggestedCommunities = suggestedCommunities.sort(() => Math.random() - 0.5).slice(0, 8)
         for (let suggestedCommunity of suggestedCommunities) {
           if (!suggestedCommunity.displayName) {
-            let profile = await session.ctzn.getProfile(suggestedCommunity.userId)
-            suggestedCommunity.displayName = profile.value.displayName
-            suggestedCommunity.description = profile.value.description
+            session.ctzn.getProfile(suggestedCommunity.userId).then(profile => {
+              suggestedCommunity.displayName = profile.value.displayName
+              suggestedCommunity.description = profile.value.description
+              this.requestUpdate()
+            })
           }
         }
         this.suggestedCommunities = suggestedCommunities
@@ -137,7 +138,7 @@ export class SuggestionsSidebar extends LitElement {
               <div class="text-sm bg-white mb-2 px-2 py-2 rounded-lg">
                 <div class="text-base font-medium truncate">
                   <a class="hov:hover:pointer hov:hover:underline" href="/${community.userId}" title=${community.displayName}>
-                    ${community.displayName}
+                    ${community.displayName || community.userId}
                   </a>
                 </div>
                 ${community.members?.length ? html`
