@@ -16,7 +16,7 @@ export function setup (win, doc, editor) {
 
     renderHeader () {
       return html`
-        <strong>Community Memberships List</strong>
+        <strong>User's Communities List</strong>
         of
         ${this['user-id'] ? html`
           <span class="link" @click=${e => this.onClickUser(e)}>${this['user-id']}</span>
@@ -48,7 +48,7 @@ export function insert (editor) {
 
 function doPropertiesDialog (el, editor) {
   editor.windowManager.open({
-    title: 'Community memberships list',
+    title: 'User\'s communities list',
     body: {
       type: 'panel',
       items: [

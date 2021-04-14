@@ -221,7 +221,7 @@ export class RichEditor extends LitElement {
               {type: 'menuitem', text: 'Following List', onAction: () => followingList.insert(editor)},
               {type: 'separator'},
               {type: 'menuitem', text: 'Community Members List', onAction: () => communityMembersList.insert(editor)},
-              {type: 'menuitem', text: 'Community Memberships List', onAction: () => communityMembershipsList.insert(editor)}
+              {type: 'menuitem', text: 'User\'s Communities List', onAction: () => communityMembershipsList.insert(editor)}
             ])
           }
         })
