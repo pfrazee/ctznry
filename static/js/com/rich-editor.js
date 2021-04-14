@@ -4,6 +4,7 @@ import * as postView from '../ctzn-tags-editor/post-view.js'
 import * as postsFeed from '../ctzn-tags-editor/posts-feed.js'
 import * as commentView from '../ctzn-tags-editor/comment-view.js'
 import * as commentsFeed from '../ctzn-tags-editor/comments-feed.js'
+import * as dbmethodsFeed from '../ctzn-tags-editor/dbmethods-feed.js'
 import * as communityMembersList from '../ctzn-tags-editor/community-members-list.js'
 import * as communityMembershipsList from '../ctzn-tags-editor/community-memberships-list.js'
 import * as followersList from '../ctzn-tags-editor/followers-list.js'
@@ -22,6 +23,7 @@ const PROFILE_TAGS = [
   postsFeed,
   commentView,
   commentsFeed,
+  dbmethodsFeed,
   communityMembersList,
   communityMembershipsList,
   followersList,
@@ -189,6 +191,7 @@ export class RichEditor extends LitElement {
             cb([
               {type: 'menuitem', text: 'Posts Feed', onAction: () => postsFeed.insert(editor)},
               {type: 'menuitem', text: 'Comments Feed', onAction: () => commentsFeed.insert(editor)},
+              {type: 'menuitem', text: 'DB Method Calls Feed', onAction: () => dbmethodsFeed.insert(editor)},
               {type: 'separator'},
               {type: 'menuitem', text: 'Embedded Post', onAction: () => postView.insert(editor)},
               {type: 'menuitem', text: 'Embedded Comment', onAction: () => commentView.insert(editor)},

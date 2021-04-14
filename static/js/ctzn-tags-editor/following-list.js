@@ -40,7 +40,7 @@ export function setup (win, doc, editor) {
 }
 
 export function insert (editor) {
-  doPropertiesDialog(null, editor)
+  editor.insertContent(`<ctzn-following-list></ctzn-following-list>`)
 }
 
 // internal methods
@@ -56,7 +56,7 @@ function doPropertiesDialog (el, editor) {
           type: 'input',
           name: 'user-id',
           label: 'User ID',
-          placeholder: 'Whose followed users to show? (Optional, defaults to the profile being viewed.)'
+          placeholder: 'Whose followed users to show? (Defaults to the profile being viewed.)'
         }
       ]
     },

@@ -46,7 +46,7 @@ export function setup (win, doc, editor) {
 }
 
 export function insert (editor) {
-  doPropertiesDialog(null, editor)
+  editor.insertContent(`<ctzn-posts-feed></ctzn-posts-feed>`)
 }
 
 // internal methods
@@ -62,13 +62,13 @@ function doPropertiesDialog (el, editor) {
           type: 'input',
           name: 'user-id',
           label: 'User ID',
-          placeholder: 'Whose feed to show? (Optional, defaults to the profile being viewed.)'
+          placeholder: 'Whose feed to show? (Defaults to the profile being viewed.)'
         },
         {
           type: 'input',
           name: 'limit',
           label: 'Posts limit',
-          placeholder: 'How many posts should we show? (Optional, defaults to infinite scroll.)'
+          placeholder: 'How many posts should we show? (Defaults to infinite scroll.)'
         }
       ]
     },

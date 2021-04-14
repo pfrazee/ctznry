@@ -125,6 +125,7 @@ export class DbmethodsFeed extends LitElement {
     this.entries = undefined
     this.hasNewEntries = false
     this.isLoadingMore = false
+    this.userProfile = undefined
 
     // ui state
     this.loadMoreObserver = undefined
@@ -153,11 +154,18 @@ export class DbmethodsFeed extends LitElement {
     if (this._view === 'calls') return 'ctzn.network/dbmethod-calls-view'
     if (this._view === 'results') return 'ctzn.network/dbmethod-results-view'
     if (this._view === 'feed') return 'ctzn.network/dbmethod-feed-view'
-    return this._view || 'ctzn.network/dbmethod-calls-view'
+    return this._view || this.getViewForUser()
   }
 
   set view (v) {
     this._view = v
+  }
+
+  getViewForUser () {
+    if (this.userProfile?.dbType === 'ctzn.network/public-community-db') {
+      return 'ctzn.network/dbmethod-results-view'
+    }
+    return 'ctzn.network/dbmethod-calls-view'
   }
 
   get methodsFilter () {
@@ -187,6 +195,9 @@ export class DbmethodsFeed extends LitElement {
     }
     if (clearCurrent) {
       this.entries = undefined
+    }
+    if (this.userProfile?.userId !== this.userId) {
+      this.userProfile = await session.ctzn.getProfile(this.userId)
     }
     return this.queueQuery()
   }

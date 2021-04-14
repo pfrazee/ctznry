@@ -40,7 +40,7 @@ export function setup (win, doc, editor) {
 }
 
 export function insert (editor) {
-  doPropertiesDialog(null, editor)
+  editor.insertContent(`<ctzn-community-memberships-list></ctzn-community-memberships-list>`)
 }
 
 // internal methods
@@ -56,7 +56,7 @@ function doPropertiesDialog (el, editor) {
           type: 'input',
           name: 'user-id',
           label: 'User ID',
-          placeholder: 'Whose community memberships to show? (Optional, defaults to the profile being viewed.)'
+          placeholder: 'Whose community memberships to show? (Defaults to the profile being viewed.)'
         }
       ]
     },
