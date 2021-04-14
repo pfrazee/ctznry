@@ -1,4 +1,4 @@
-import { DEBUG_ENDPOINTS } from './const.js'
+import { DEBUG_ENDPOINTS, DEFAULT_CITIZEN_PROFILE_SECTIONS } from './const.js'
 import { create as createRpcApi } from './rpc-api.js'
 import { CtznAPI } from './api.js'
 import * as images from './images.js'
@@ -9,6 +9,7 @@ export let info = undefined
 export let myCommunities = undefined
 export let myFollowers = undefined
 export let myFollowing = undefined
+export let mySections = undefined
 export let api = undefined
 export let ctzn = new CtznAPI()
 
@@ -53,6 +54,9 @@ export async function loadSecondaryState () {
   myCommunities = memberships.map(m => m.value.community)
   myFollowers = followers?.followers
   myFollowing = follows?.entries?.map(e => e.value.subject.userId) || []
+
+  let userProfile = await ctzn.getProfile(info.userId).catch(e => undefined)
+  mySections = userProfile?.value?.sections || DEFAULT_CITIZEN_PROFILE_SECTIONS
   emitter.dispatchEvent(new Event('secondary-state'))
 }
 
