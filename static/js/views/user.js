@@ -385,7 +385,7 @@ class CtznUser extends LitElement {
           ${this.userProfile?.value.description ? html`
             <div class="text-center pb-4 px-4 sm:px-7 bg-white">${unsafeHTML(linkify(emojify(makeSafe(this.userProfile?.value.description))))}</div>
           ` : ''}
-          ${!this.isProfileLoading && !this.isMe && this.isCitizen && this.amIFollowing === false ? html`
+          ${!this.isProfileLoading && session.isActive() && !this.isMe && this.isCitizen && this.amIFollowing === false ? html`
             <div class="bg-white text-center pb-4 px-4">
               <app-button
                 btn-class="font-semibold py-1 text-base block w-full rounded-lg sm:px-10 sm:inline sm:w-auto sm:rounded-full"
@@ -395,7 +395,7 @@ class CtznUser extends LitElement {
               ></app-button>
             </div>
           ` : ''}
-          ${!this.isProfileLoading && this.isCommunity && this.amIAMember === false && canJoin ? html`
+          ${!this.isProfileLoading && session.isActive() && this.isCommunity && this.amIAMember === false && canJoin ? html`
             <div class="bg-white text-center pb-4 px-4">
               <app-button
                 btn-class="font-semibold py-1 text-base block w-full rounded-lg sm:px-10 sm:inline sm:w-auto sm:rounded-full"
