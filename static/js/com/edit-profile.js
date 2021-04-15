@@ -95,7 +95,7 @@ export class EditProfile extends LitElement {
       for (let section of this.profile.value.sections) {
         if (!section.html) {
           try {
-            let base64buf = (await session.getBlobByHomeServer(this.userId, `ui:profile:${section.id}`))?.buf
+            let base64buf = (await session.ctzn.getBlobByHomeServer(this.userId, `ui:profile:${section.id}`))?.buf
             if (base64buf) section.html = decodeBase64(base64buf)
           } catch (e) {
             console.log('Failed to load blob', e)
