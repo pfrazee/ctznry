@@ -26,35 +26,43 @@ export class Subnav extends LitElement {
     this.currentPath = undefined
     this.borderLeft = undefined
     this.borderWidth = 0
+    this.mediaQueryObserver = undefined
+    this.onViewportWidthChange = () => this.recalculateUnderline()
   }
   
   getNavCls ({path, mobileOnly, rightAlign, thin}) {
     return `
       block text-center pt-2 pb-2.5 ${thin ? 'px-3 sm:px-4' : 'px-4 sm:px-7'} whitespace-nowrap font-semibold cursor-pointer
       hov:hover:text-blue-600
-      ${mobileOnly ? 'sm:hidden' : ''}
+      ${mobileOnly ? 'lg:hidden' : ''}
       ${rightAlign ? 'ml-auto' : ''}
       ${path === this.currentPath ? 'text-blue-600' : ''}
     `.replace('\n', '')
   }
 
+  recalculateUnderline () {
+    const el = this.querySelector(`a[href="${this.currentPath}"]`)
+    if (!el) return
+    const rect = el.getClientRects()[0]
+    this.borderLeft = el.offsetLeft
+    this.borderWidth = rect?.width
+
+    if (this.scrollWidth > this.offsetWidth && el.getBoundingClientRect().left > this.offsetWidth) {
+      // we're scrolling horizontally, bring the element into view
+      this.scrollLeft = el.offsetLeft
+    }
+  }
+
   updated (changedProperties) {
     if (changedProperties.has('currentPath') || changedProperties.has('items')) {
-      const el = this.querySelector(`a[href="${this.currentPath}"]`)
-      if (!el) return
-      const rect = el.getClientRects()[0]
-      this.borderLeft = el.offsetLeft
-      this.borderWidth = rect?.width
-
-      if (this.scrollWidth > this.offsetWidth && el.getBoundingClientRect().left > this.offsetWidth) {
-        // we're scrolling horizontally, bring the element into view
-        this.scrollLeft = el.offsetLeft
-      }
+      this.recalculateUnderline()
     }
   }
 
   connectedCallback () {
     super.connectedCallback()
+    this.mediaQueryObserver = window.matchMedia("(max-width: 1024px)")
+    this.mediaQueryObserver.addListener(this.onViewportWidthChange)
     gestures.setOnSwiping((dx, dxN) => {
       this.borderEl.style.left = `${this.borderLeft + -dxN * this.borderWidth * 0.15}px`
     })
@@ -67,6 +75,7 @@ export class Subnav extends LitElement {
   disconnectedCallback () {
     super.disconnectedCallback()
     gestures.setOnSwiping(undefined)
+    this.mediaQueryObserver?.removeListener(this.onViewportWidthChange)
   }
 
   setOpaque (b) {
