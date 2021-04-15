@@ -32,9 +32,9 @@ export class Subnav extends LitElement {
   
   getNavCls ({path, mobileOnly, rightAlign, thin}) {
     return `
-      block text-center pt-2 pb-2.5 ${thin ? 'px-3 sm:px-4' : 'px-4 sm:px-7'} whitespace-nowrap font-semibold cursor-pointer
+      text-center pt-2 pb-2.5 ${thin ? 'px-3 sm:px-4' : 'px-4 sm:px-7'} whitespace-nowrap font-semibold cursor-pointer
       hov:hover:text-blue-600
-      ${mobileOnly ? 'lg:hidden' : ''}
+      ${mobileOnly ? 'no-header-only' : 'block'}
       ${rightAlign ? 'ml-auto' : ''}
       ${path === this.currentPath ? 'text-blue-600' : ''}
     `.replace('\n', '')
@@ -61,7 +61,7 @@ export class Subnav extends LitElement {
 
   connectedCallback () {
     super.connectedCallback()
-    this.mediaQueryObserver = window.matchMedia("(max-width: 1024px)")
+    this.mediaQueryObserver = window.matchMedia("(max-width: 1150px)")
     this.mediaQueryObserver.addListener(this.onViewportWidthChange)
     gestures.setOnSwiping((dx, dxN) => {
       this.borderEl.style.left = `${this.borderLeft + -dxN * this.borderWidth * 0.15}px`
