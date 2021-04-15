@@ -62,24 +62,16 @@ export class Header extends LitElement {
     return html`
       <header>
         <div class="menu ${this.isMenuOpen ? 'open transition-enabled' : 'closed'} flex flex-col leading-none text-xl sm:leading-none sm:text-lg bg-white">
-          <div class="hidden lg:block px-3 pt-2.5 pb-1">
+          <div class="mobile-only flex-1 bg-gray-50 mb-2"></div>
+          <div class="px-4 pt-2.5 pb-1">
             <div class="font-bold text-3xl text-gray-800">
               CTZN
               <span class="text-lg text-gray-500 tracking-tight">alpha</span>
             </div>
           </div>
           ${session.hasOneSaved() ? html`
-            <div class="flex flex-col px-2 h-full sm:h-auto">
-              <div
-                class="sm:hidden flex flex-1 items-center justify-center mt-2 mb-3 rounded"
-                style="background: linear-gradient(45deg, #d800ff, #008cff)"
-              >
-                <div class="font-black text-4xl text-white">
-                  CTZN
-                  <span class="font-bold opacity-80 text-2xl">alpha</span>
-                </div>
-              </div>
-              <hr class="my-3 mx-3 hidden sm:block">
+            <div class="flex flex-col px-2">
+              <hr class="my-3 mx-3">
               <a href="/" class=${this.getMenuNavClass('/')} @click=${this.onClickLink}>
                 <span class="fas mr-1.5 fa-fw navicon fa-home"></span>
                 Home

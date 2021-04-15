@@ -216,7 +216,7 @@ class CtznMainView extends LitElement {
 
   renderMockComposer () {
     return html`
-      <div class="bg-white mb-0.5 px-3 py-3" @click=${this.onClickCreatePost}>
+      <div class="bg-white mb-0.5 px-3 py-3 sm:rounded" @click=${this.onClickCreatePost}>
         <div class="flex items-center">
           <div
             class="flex-1 mr-1 py-1 px-3 bg-gray-100 text-gray-600 text-base rounded cursor-text"

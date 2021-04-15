@@ -68,6 +68,16 @@ pre > code {
   padding: 0.6rem 1rem !important;
 }
 
+.mobile-only {
+  display: none;
+}
+
+@media (max-width: 640px) and (max-height: 900px) {
+  .mobile-only {
+    display: block;
+  }
+}
+
 @media (max-width: 1400px) {
   main.col2 {
     display: block;
