@@ -36,6 +36,15 @@ header .menu.open {
   transform: translateX(0%);
 }
 
+header .logged-out-prompt {
+  box-shadow: 0 8px 12px #0001;
+}
+
+header .logged-out-prompt > div {
+  max-width: 920px;
+  margin: 0 auto;
+}
+
 header .secondary-menu {
   position: fixed;
   z-index: 29;
@@ -85,6 +94,9 @@ pre > code {
   }
   main.col2 > :last-child {
     display: none;
+  }
+  header .logged-out-prompt > div {
+    max-width: 640px;
   }
 }
 
