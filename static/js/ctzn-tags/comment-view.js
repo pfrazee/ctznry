@@ -332,7 +332,12 @@ export class CommentView extends LitElement {
       cls = 'whitespace-pre-wrap break-words text-black mt-1 mb-1 ml-1 mr-2.5'
       style = 'font-size: 16px; letter-spacing: 0.1px; line-height: 1.3;'
     }
-    return html`<div class="${cls}" style=${style}>${unsafeHTML(emojify(linkify(makeSafe(this.comment.value.text))))}</div>`
+    return html`
+      <div
+        class="${cls}"
+        style=${style}
+        @click=${this.onClickText}
+      >${unsafeHTML(emojify(linkify(makeSafe(this.comment.value.text))))}</div>`
   }
 
   renderRepliesBtn () {
@@ -465,7 +470,7 @@ export class CommentView extends LitElement {
   // events
   // =
 
-  onClickCard (e) {
+  onClickText (e) {
     for (let el of e.composedPath()) {
       if (el.tagName === 'A') {
         // open in a new window
@@ -473,11 +478,17 @@ export class CommentView extends LitElement {
         e.preventDefault()
         e.stopPropagation()
         return
-      } else if (el.tagName === 'IMG' || el.tagName === 'APP-COMPOSER' || el.tagName === 'APP-REACTION-INPUT') {
+      }
+    }
+  }
+
+  onClickCard (e) {
+    if (this.renderOpts.noclick) return
+    for (let el of e.composedPath()) {
+      if (el.tagName === 'A' || el.tagName === 'IMG' || el.tagName === 'APP-COMPOSER' || el.tagName === 'APP-REACTION-INPUT') {
         return
       }
     }
-    if (this.renderOpts.noclick) return
     e.preventDefault()
     e.stopPropagation()
   }

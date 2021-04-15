@@ -510,6 +510,7 @@ export class PostView extends LitElement {
       <div
         class="whitespace-pre-wrap break-words text-black ${this.showContentOnly ? '' : 'mt-1 mb-2 ml-1 mr-2.5'}"
         style="font-size: 16px; letter-spacing: 0.1px; line-height: 1.3;"
+        @click=${this.onClickText}
       >${unsafeHTML(linkify(emojify(makeSafe(this.post.value.text))))}${this.post.value.extendedText
           ? html`<span class="bg-gray-200 ml-1 px-1 rounded text-gray-600 text-xs">more</span>`
           : ''
@@ -528,18 +529,22 @@ export class PostView extends LitElement {
           context="post"
           .contextState=${{page: {userId: this.post.author.userId}}}
           .html=${this.post.value.extendedText}
+          @click=${this.onClickText}
         ></app-custom-html>
       `
     }
     return html`
-      <div class="whitespace-pre-wrap break-words leading-snug text-gray-800 my-2">${unsafeHTML(emojify(linkify(makeSafe(this.post.value.extendedText))))}</div>
+      <div
+        class="whitespace-pre-wrap break-words leading-snug text-gray-800 my-2"
+        @click=${this.onClickText}
+      >${unsafeHTML(emojify(linkify(makeSafe(this.post.value.extendedText))))}</div>
     `
   }
 
   // events
   // =
 
-  onClickCard (e) {
+  onClickText (e) {
     for (let el of e.composedPath()) {
       if (el.tagName === 'A') {
         // open in a new window
@@ -547,11 +552,17 @@ export class PostView extends LitElement {
         e.preventDefault()
         e.stopPropagation()
         return
-      } else if (el.tagName === 'IMG' || el.tagName === 'APP-COMPOSER' || el.tagName === 'APP-REACTION-INPUT') {
+      }
+    }
+  }
+
+  onClickCard (e) {
+    if (this.renderOpts.noclick) return
+    for (let el of e.composedPath()) {
+      if (el.tagName === 'A' || el.tagName === 'IMG' || el.tagName === 'APP-COMPOSER' || el.tagName === 'APP-REACTION-INPUT') {
         return
       }
     }
-    if (this.renderOpts.noclick) return
     e.preventDefault()
     e.stopPropagation()
   }
