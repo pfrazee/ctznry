@@ -56,7 +56,7 @@ export class SearchableUserList extends LitElement {
     const users = this.getFilteredUsers()
     const communities = this.getFilteredCommunities()
     return html`
-      <div class="flex items-center bg-gray-100 rounded-2xl mb-3 mr-2 px-3 py-0.5">
+      <div class="flex items-center bg-gray-100 rounded-2xl mb-3 mr-2 px-3 py-1.5 sm:py-0.5">
         <span class="fas fa-search text-sm text-gray-500 mr-2"></span>
         <input
           type="text"

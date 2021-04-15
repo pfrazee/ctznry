@@ -104,7 +104,8 @@ class CtznApp extends LitElement {
       case '/index':
       case '/index.html':
       case '/notifications':
-        gestures.setCurrentNav(['/', '/notifications'])
+      case '/search':
+        gestures.setCurrentNav(['/', '/notifications', '/search'])
         return
       case '/communities':
         gestures.setCurrentNav([{back: true}, '/communities'])
@@ -162,6 +163,7 @@ class CtznApp extends LitElement {
       case '/index':
       case '/index.html':
       case '/notifications':
+      case '/search':
       case '/activity':
         return html`<app-main-view id="view" current-path=${this.currentPath}></app-main-view>`
       case '/forgot-password':
@@ -170,8 +172,6 @@ class CtznApp extends LitElement {
         return html`<app-communities-view id="view" current-path=${this.currentPath}></app-communities-view>`
       case '/account':
         return html`<app-account-view id="view" current-path=${this.currentPath}></app-account-view>`
-      case '/search':
-        return html`<app-search-view id="view" current-path=${this.currentPath}></app-search-view>`
       case '/signup':
         return html`<app-signup-view id="view" current-path=${this.currentPath}></app-signup-view>`
     }

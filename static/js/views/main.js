@@ -11,6 +11,7 @@ import '../com/notifications-feed.js'
 import '../com/post-composer.js'
 import '../com/img-fallbacks.js'
 import '../com/suggestions-sidebar.js'
+import '../com/searchable-user-list.js'
 import '../com/subnav.js'
 
 class CtznMainView extends LitElement {
@@ -177,6 +178,11 @@ class CtznMainView extends LitElement {
           ` : ''}
           Notifications
         `
+      },
+      {
+        path: '/search',
+        mobileOnly: true,
+        label: 'Search'
       }
     ]
     return html`
@@ -207,6 +213,14 @@ class CtznMainView extends LitElement {
               @load-state-updated=${this.onFeedLoadStateUpdated}
               @publish-reply=${this.onPublishReply}
             ></app-notifications-feed>
+          ` : this.currentView === 'search' ? html`
+            <div class="bg-white px-2 py-4">
+              <div class="text-sm px-2 pb-3 text-gray-500">
+                <span class="fas fa-info mr-1 text-xs"></span>
+                Search is limited to your communities and follows.
+              </div>
+              <app-searchable-user-list></app-searchable-user-list>
+            </div>
           ` : ''}
         </div>
         ${this.renderRightSidebar()}
