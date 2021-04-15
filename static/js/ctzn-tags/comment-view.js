@@ -295,6 +295,7 @@ export class CommentView extends LitElement {
     return html`
       <div
         class="${this.renderOpts.noclick ? '' : 'cursor-pointer'}"
+        @click=${this.onClickCard}
         @mousedown=${this.onMousedownCard}
         @mouseup=${this.onMouseupCard}
         @mousemove=${this.onMousemoveCard}
@@ -465,10 +466,18 @@ export class CommentView extends LitElement {
   // =
 
   onClickCard (e) {
-    if (this.renderOpts.noclick) return
     for (let el of e.composedPath()) {
-      if (el.tagName === 'A' || el.tagName === 'IMG' || el.tagName === 'APP-COMPOSER' || el.tagName === 'APP-REACTION-INPUT') return
+      if (el.tagName === 'A') {
+        // open in a new window
+        window.open(el.getAttribute('href'))
+        e.preventDefault()
+        e.stopPropagation()
+        return
+      } else if (el.tagName === 'IMG' || el.tagName === 'APP-COMPOSER' || el.tagName === 'APP-REACTION-INPUT') {
+        return
+      }
     }
+    if (this.renderOpts.noclick) return
     e.preventDefault()
     e.stopPropagation()
   }
