@@ -1,4 +1,4 @@
-import { DEBUG_ENDPOINTS } from './const.js'
+import { DEBUG_ENDPOINTS, BLOB_URL } from './const.js'
 import { joinPath, parseUserId } from './strings.js'
 import * as session from './session.js'
 import * as toast from '../com/toast.js'
@@ -17,7 +17,26 @@ export class CtznAPI {
   }
 
   get blob () {
-    return session.api.blob
+    if (session.isActive()) {
+      return session.api.blob
+    }
+  }
+
+  async getBlobByHomeServer (userId, blobName) {
+    const domain = getDomain(userId)
+    if (session.isActive(domain)) {
+      return session.api.blob.get(userId, blobName)
+    }
+    const req = await fetch(BLOB_URL(userId, blobName))
+    const blob = await req.blob()
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader()
+      reader.onerror = reject
+      reader.onload = () => {
+        resolve({buf: reader.result.split(',')[1]})
+      }
+      reader.readAsDataURL(blob)
+    })
   }
 
   async lookupUser (userId) {
