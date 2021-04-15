@@ -1,5 +1,4 @@
 import { LitElement, html } from '../../vendor/lit-element/lit-element.js'
-import { repeat } from '../../vendor/lit-element/lit-html/directives/repeat.js'
 import { unsafeHTML } from '../../vendor/lit-element/lit-html/directives/unsafe-html.js'
 import { ComposerPopup } from '../com/popups/composer.js'
 import { EditRolePopup } from '../com/popups/edit-role.js'
@@ -14,13 +13,11 @@ import * as toast from '../com/toast.js'
 import {
   AVATAR_URL,
   BLOB_URL,
-  PERM_DESCRIPTIONS,
   DEFAULT_COMMUNITY_PROFILE_SECTIONS,
   DEFAULT_CITIZEN_PROFILE_SECTIONS
 } from '../lib/const.js'
 import * as session from '../lib/session.js'
 import * as gestures from '../lib/gestures.js'
-import * as displayNames from '../lib/display-names.js'
 import { pluralize, makeSafe, linkify } from '../lib/strings.js'
 import { emit } from '../lib/dom.js'
 import { emojify } from '../lib/emojify.js'
@@ -51,8 +48,7 @@ class CtznUser extends LitElement {
       roles: {type: Array},
       isUserInvited: {type: Boolean},
       isEmpty: {type: Boolean},
-      isJoiningOrLeaving: {type: Boolean},
-      expandedSections: {type: Object}
+      isJoiningOrLeaving: {type: Boolean}
     }
   }
 
@@ -65,7 +61,6 @@ class CtznUser extends LitElement {
     this.reset()
     this.currentView = undefined
     this.isJoiningOrLeaving = false
-    this.expandedSections = {}
 
     // ui helper state
     this.lastScrolledToUserId = undefined
@@ -101,10 +96,6 @@ class CtznUser extends LitElement {
       const pathParts = urlp.pathname.split('/')
       this.userId = pathParts[1]
       this.currentView = pathParts[2]
-      this.expandedSections = {}
-      if (urlp.hash.length > 1) {
-        this.expandedSections[urlp.hash.slice(1)] = true
-      }
       this.load()
     }
   }
@@ -172,10 +163,6 @@ class CtznUser extends LitElement {
         rightAlign: true
       }
     ]
-  }
-
-  getMembersWithRole (roleId) {
-    return this.members?.filter(m => m.value.roles?.includes(roleId)) || []
   }
 
   hasPermission (permId) {
@@ -275,15 +262,6 @@ class CtznUser extends LitElement {
 
     if (!this.currentView) {
       emit(this, 'navigate-to', {detail: {url: `/${this.userId}/${this.sections[0].id}`, replace: true}})
-    }
-
-    let expanded = Object.keys(this.expandedSections)
-    if (expanded.length > 0 && this.querySelector(`#expandable-section-${expanded[0]}`)) {
-      const el = this.querySelector(`#expandable-section-${expanded[0]}`)
-      window.scrollTo({
-        top: el.getBoundingClientRect().top - 40,
-        behavior: 'smooth'
-      })
     }
 
     if (this.querySelector('ctzn-posts-feed')) {
@@ -658,325 +636,13 @@ class CtznUser extends LitElement {
         ></app-custom-html>
       `
     }
-    // } else if (this.currentView === 'inventory') {
-    //   if (this.isCitizen) {
-    //     return this.renderCitizenInventory()
-    //   } else if (this.isCommunity) {
-    //     return this.renderCommunityInventory()
-    //   }
-    // } else if (this.currentView === 'activity') {
-    //   return html`
-    //     ${this.isEmpty ? this.renderEmptyMessage() : ''}
-    //     <app-activity-feed
-    //       user-id=${this.userId}
-    //       dataview=${this.isCommunity ? 'ctzn.network/dbmethod-results-view' : 'ctzn.network/dbmethod-calls-view'}
-    //       @load-state-updated=${this.onFeedLoadStateUpdated}
-    //     ></app-activity-feed>
-    //   `
-    // } else if (this.currentView === 'audit-log') {
-    //   return html`
-    //     <div class="bg-white">
-    //       <app-dbmethod-result-feed
-    //         user-id=${this.userId}
-    //       ></app-dbmethod-result-feed>
-    //     </div>
-    //   `
-    // } else if (this.currentView === 'about') {
-    //   if (this.isCitizen) {
-    //     return this.renderCitizenAbout()
-    //   } else if (this.isCommunity) {
-    //     return this.renderCommunityAbout()
-    //   }
-    // }
-    // return html`
-    //   ${this.isEmpty ? this.renderEmptyMessage() : ''}
-    //   <app-feed
-    //     .source=${this.userId}
-    //     limit="15"
-    //     @load-state-updated=${this.onFeedLoadStateUpdated}
-    //     @publish-reply=${this.onPublishReply}
-    //     @delete-post=${this.onDeletePost}
-    //     @moderator-remove-post=${this.onModeratorRemovePost}
-    //   ></app-feed>
-    // `
   }
-
-  /*renderCitizenAbout () {
-    const onToggleExpandSection = id => {
-      this.expandedSections = Object.assign(this.expandedSections, {[id]: !this.expandedSections[id]})
-      this.requestUpdate()
-    }
-    const expandableSectionHeader = (id, label, count, extra = '') => html`
-      <div
-        id="expandable-section-${id}"
-        class="px-5 py-3 sm:rounded ${count ? 'cursor-pointer hov:hover:text-blue-600' : ''}"
-        @click=${count ? e => onToggleExpandSection(id) : undefined}
-      >
-        <div class="flex items-center justify-between">
-          <span>
-            <span class="text-lg font-medium mr-1">${label}</span>
-            <span class="text-gray-500 font-bold">${count || '0'}</span>
-          </span>
-          ${count ? html`
-            <span class="fas fa-angle-${this.expandedSections[id] ? 'up' : 'down'}"></span>
-          ` : ''}
-        </div>
-        ${extra}
-      </div>
-    `
-    return html`
-      <div class="bg-white sm:rounded my-1 ${this.expandedSections.followers ? 'pb-1' : ''}">
-        ${expandableSectionHeader('followers', 'Followers', this.followers?.length, this.sharedFollowers?.length ? html`
-          <div class="pt-1 flex items-center text-gray-500">
-            <span class="mr-2">Shared:</span>
-            ${repeat(this.sharedFollowers.slice(0, 7), (userId, i) => html`
-              <span data-tooltip=${userId}>
-                <img src=${AVATAR_URL(userId)} class="inline-block rounded-md w-7 h-7 mr-1">
-              </span>
-            `)}
-            ${this.sharedFollowers.length > 7 ? html`<span class="font-semibold ml-1">+${this.sharedFollowers.length - 7}` : ''}
-          </div>
-        ` : '')}
-        ${this.expandedSections.followers ? html`
-          <div class="sm:mx-2 mb-1 sm:rounded px-1 py-1 bg-gray-100">
-            <app-simple-user-list .ids=${this.followers} empty-message="${this.userProfile.value.displayName} has no followers."></app-simple-user-list>
-          </div>
-        ` : ''}
-      </div>
-      <div class="bg-white sm:rounded my-1 ${this.expandedSections.following ? 'pb-1' : ''}">
-        ${expandableSectionHeader('following', 'Following', this.following?.length)}
-        ${this.expandedSections.following ? html`
-          <div class="sm:mx-2 mb-1 sm:rounded px-1 py-1 bg-gray-100">
-            <app-simple-user-list .ids=${this.following?.map(f => f.value.subject.userId)} empty-message="${this.userProfile.value.displayName} is not following anybody."></app-simple-user-list>
-          </div>
-        ` : ''}
-      </div>
-      <div class="bg-white sm:rounded my-1 ${this.expandedSections.communities ? 'pb-1' : ''}">
-        ${expandableSectionHeader('communities', 'Communities', this.memberships?.length, this.sharedCommunities?.length ? html`
-          <div class="pt-1 flex items-center text-gray-500">
-            <span class="mr-2">Shared:</span>
-            ${repeat(this.sharedCommunities.slice(0, 7), (userId, i) => html`
-              <span data-tooltip=${userId}>
-                <img src=${AVATAR_URL(userId)} class="inline-block rounded-md w-7 h-7 mr-1">
-              </span>
-            `)}
-            ${this.sharedCommunities.length > 7 ? html`<span class="font-semibold ml-1">+${this.sharedCommunities.length - 7}</span>` : ''}
-          </div>
-        ` : '')}
-        ${this.expandedSections.communities ? html`
-          <div class="sm:mx-2 mb-1 sm:rounded px-1 py-1 bg-gray-100">
-            ${repeat(this.memberships || [], (membership, i) => {
-              const userId = membership.value.community.userId
-              const [username, domain] = userId.split('@')
-              return html`
-                <div class="flex items-center px-2 py-2 bg-white rounded ${i !== 0 ? 'mt-1' : ''}">
-                  <a class="ml-1 mr-3" href="/${userId}" title=${userId}>
-                    <img class="block rounded-md w-10 h-10 object-cover shadow-sm" src=${AVATAR_URL(userId)}>
-                  </a>
-                  <div class="flex-1 min-w-0 truncate">
-                    <a class="hov:hover:underline" href="/${userId}" title=${userId}>
-                      <span class="font-medium">${displayNames.render(userId)}</span>
-                    </a>
-                    <span class="hidden sm:inline text-sm text-gray-500">${domain}</span>
-                  </div>
-                </div>
-              `
-            })}
-          </div>
-        ` : ''}
-      </div>
-    `
-  }
-
-  renderCommunityInventory () {
-    return html`
-      <app-items-list
-        user-id=${this.userId}
-        .members=${this.members}
-        ?canManageItemClasses=${this.hasPermission('ctzn.network/perm-manage-item-classes')}
-        ?canCreateItem=${this.hasPermission('ctzn.network/perm-create-item')}
-        ?canTransferUnownedItem=${this.hasPermission('ctzn.network/perm-transfer-unowned-item')}
-      ></app-items-list>
-    `
-  }
-
-  renderCitizenInventory () {
-    return html`
-      ${!this.isMe ? html`
-        <div class="mx-2 sm:mx-0 mt-3 mb-2 rounded-full border border-gray-300 px-2 py-2">
-          <app-button
-            btn-class="rounded-full py-1"
-            icon="fas fa-fw fa-exchange-alt"
-            label="Give Item"
-            @click=${this.onClickGiveItem}
-          ></app-button>
-        </div>
-      ` : html`<div class="mb-3"></div>`}
-      <app-owned-items-list
-        user-id=${this.userId}
-      ></app-owned-items-list>
-    `
-  }
-
-  renderCommunityAbout () {
-    const canInvite = this.hasPermission('ctzn.network/perm-community-invite')
-    const canManageRoles = this.hasPermission('ctzn.network/perm-community-manage-roles')
-    const canBan = this.hasPermission('ctzn.network/perm-community-ban')
-    const canEditConfig = this.hasPermission('ctzn.network/perm-community-update-config')
-    const onToggleExpandSection = id => {
-      this.expandedSections = Object.assign(this.expandedSections, {[id]: !this.expandedSections[id]})
-      this.requestUpdate()
-    }
-    const expandableSectionHeader = (id, label, count, extra = '') => html`
-      <div
-        id="expandable-section-${id}"
-        class="px-5 py-3 sm:rounded ${count ? 'cursor-pointer hov:hover:text-blue-600' : ''}"
-        @click=${count ? e => onToggleExpandSection(id) : undefined}
-      >
-        <div class="flex items-center justify-between">
-          <span>
-            <span class="text-lg font-medium mr-1">${label}</span>
-            <span class="text-gray-500 font-bold">${count || '0'}</span>
-          </span>
-          ${count ? html`
-            <span class="fas fa-angle-${this.expandedSections[id] ? 'up' : 'down'}"></span>
-          ` : ''}
-        </div>
-        ${extra}
-      </div>
-    `
-    const renderRole = (roleId, permissions) => {
-      let members = this.getMembersWithRole(roleId)
-      return html`
-        <div class="px-4 py-2 bg-white sm:rounded mb-1">
-          <div class="flex items-center">
-            <span class="font-semibold text-lg flex-1"><span class="text-sm far fa-fw fa-user"></span> ${roleId}</span>
-            ${roleId !== 'admin' && this.hasPermission('ctzn.network/perm-community-manage-roles') ? html`
-              <button class="text-sm ml-1 px-2 py-0 border border-gray-200 rounded cursor-pointer hov:hover:bg-gray-50" @click=${e => this.onRemoveRole(e, roleId)}>Remove</button>
-            ` : ''}
-            ${this.hasPermission('ctzn.network/perm-community-manage-roles') ? html`
-              <button class="text-sm ml-1 px-2 py-0 border border-gray-200 rounded cursor-pointer hov:hover:bg-gray-50" @click=${e => this.onEditRole(e, roleId, permissions)}>Edit</button>
-            ` : ''}
-          </div>
-          <div class="text-gray-500">
-            ${roleId === 'admin' ? html`
-              <div>&bull; Runs this community.</div>
-            ` : permissions.length ? html`
-              ${repeat(permissions, p => p.permId, p => html`
-                <div>&bull; ${PERM_DESCRIPTIONS[p.permId] || p.permId}</div>
-              `)}
-            ` : html`
-              <em>This role has no permissions</em>
-            `}
-          </div>
-          ${members.length > 0 ? html`
-            <div class="flex px-1 py-1 mt-2 rounded bg-gray-100">
-              ${repeat(members, member => html`
-                <a class="block" href="/${member.value.user.userId}" data-tooltip=${member.value.user.userId}>
-                  <img class="block rounded object-cover w-10 h-10 mr-1" src=${AVATAR_URL(member.value.user.userId)}>
-                </a>
-              `)}
-            </div>
-          ` : ''}
-        </div>
-      `
-    }
-    return html`
-      ${canInvite || canManageRoles || canBan || canEditConfig ? html`
-        <div class="px-3 py-2 sm:rounded bg-white mb-1">
-          ${canInvite ? html`
-            <button
-              class="block w-full text-center mb-1 px-3 py-2 border border-gray-200 rounded cursor-pointer sm:text-sm sm:inline-block sm:w-auto hov:hover:bg-gray-50 sm:py-1 sm:mb-0"
-              @click=${this.onCreateInvite}
-            >Invite New Member</button>
-          ` : ''}
-          ${canManageRoles ? html`
-            <button
-              class="block w-full text-center mb-1 px-3 py-2 border border-gray-200 rounded cursor-pointer sm:text-sm sm:inline-block sm:w-auto hov:hover:bg-gray-50 sm:py-1 sm:mb-0"
-              @click=${this.onCreateRole}
-            >Create Role</button>
-          ` : ''}
-          ${canBan ? html`
-            <button
-              class="block w-full text-center mb-1 px-3 py-2 border border-gray-200 rounded cursor-pointer sm:text-sm sm:inline-block sm:w-auto hov:hover:bg-gray-50 sm:py-1 sm:mb-0"
-              @click=${this.onClickManageBans}
-            >Manage Banned Users</button>
-          ` : ''}
-          ${canEditConfig ? html`
-            <button
-              class="block w-full text-center mb-1 px-3 py-2 border border-gray-200 rounded cursor-pointer sm:text-sm sm:inline-block sm:w-auto hov:hover:bg-gray-50 sm:py-1 sm:mb-0"
-              @click=${this.onClickEditSettings}
-            >Edit Settings</button>
-          ` : ''}
-        </div>
-      ` : ''}
-      ${renderRole('admin')}
-      ${repeat(this.roles || [], r => r.value.roleId, r => renderRole(r.value.roleId, r.value.permissions))}
-      <div class="bg-white sm:rounded my-1 ${this.expandedSections.communities ? 'pb-1' : ''}">
-      ${expandableSectionHeader('members', 'Members', this.members?.length, this.followedMembers?.length ? html`
-        <div class="py-1 flex items-center text-gray-500">
-          <span class="mr-2">Followed:</span>
-          ${repeat(this.followedMembers.slice(0, 7), (userId, i) => html`
-            <span data-tooltip=${userId}>
-              <img src=${AVATAR_URL(userId)} class="inline-block rounded-md w-7 h-7 mr-1">
-            </span>
-          `)}
-          ${this.followedMembers.length > 7 ? html`<span class="font-semibold ml-1">+${this.followedMembers.length - 7}</span>` : ''}
-        </div>
-      ` : '')}
-      ${this.expandedSections.members ? html`
-        <div class="sm:mx-2 mb-1 sm:rounded px-1 py-1 bg-gray-100">
-          <app-members-list
-            .members=${this.members}
-            ?canban=${canBan}
-            @ban=${this.onBan}
-          ></app-members-list>
-        </div>
-      ` : ''}
-    `
-  }
-
-  renderEmptyMessage () {
-    if (this.currentView === 'activity') {
-      return html`
-        <div class="bg-gray-50 text-gray-500 py-12 text-center">
-          ${this.isCitizen ? html`
-            <div>${this.userProfile?.value?.displayName} hasn't created any actions yet.</div>
-          ` : this.isCommunity ? html`
-            <div>No items activity has occurred in ${this.userProfile?.value?.displayName} yet.</div>
-          ` : ''}
-        </div>
-      `
-    }
-    return html`
-      <div class="bg-gray-50 text-gray-500 py-12 text-center">
-        ${this.isCitizen ? html`
-          <div>${this.userProfile?.value?.displayName} hasn't posted anything yet.</div>
-        ` : this.isCommunity ? html`
-          <div>Nobody has posted to ${this.userProfile?.value?.displayName} yet.</div>
-        ` : ''}
-      </div>
-    `
-  }*/
 
   // events
   // =
 
   onProfileUpdated (e) {
     this.load({force: true})
-  }
-
-  onFeedLoadStateUpdated (e) {
-    if (typeof e.detail?.isEmpty !== 'undefined') {
-      this.isEmpty = e.detail.isEmpty
-    }
-    this.requestUpdate()
-  }
-
-  async onGotoExpandedView (e, id) {
-    e.preventDefault()
-    emit(this, 'navigate-to', {detail: {url: `/${this.userId}/about#${id}`}})
-    this.expandedSections = {[id]: true}
   }
 
   onClickAvatar (e) {
@@ -1022,11 +688,6 @@ class CtznUser extends LitElement {
     this.isJoiningOrLeaving = false
   }
 
-  onPublishReply (e) {
-    toast.create('Reply published', '', 10e3)
-    this.load()
-  }
-
   async onClickCreatePost (e) {
     e.preventDefault()
     e.stopPropagation()
@@ -1040,133 +701,6 @@ class CtznUser extends LitElement {
       // ignore
       console.log(e)
     }
-  }
-
-  async onCreateRole (e) {
-    try {
-      await EditRolePopup.create({communityId: this.userId})
-      this.load()
-    } catch (e) {
-      // ignore
-    }
-  }
-
-  async onEditRole (e, roleId, permissions) {
-    try {
-      await EditRolePopup.create({
-        communityId: this.userId,
-        roleId,
-        permissions,
-        members: this.getMembersWithRole(roleId)
-      })
-      this.load()
-    } catch (e) {
-      // ignore
-    }
-  }
-
-  async onRemoveRole (e, roleId) {
-    if (!confirm('Remove this role?')) {
-      return
-    }
-    try {
-      let res = await session.ctzn.db(this.userId).method(
-        'ctzn.network/community-delete-role-method',
-        {roleId}
-      )
-      if (!res.pending()) {
-        toast.create(`${roleId} role removed`)
-      }
-      this.load()
-    } catch (e) {
-      console.log(e)
-      toast.create(e.toString(), 'error')
-    }
-  }
-
-  async onCreateInvite (e) {
-    try {
-      await InvitePopup.create({
-        communityId: this.userId
-      })
-      toast.create('Invite created', 'success')
-      this.load()
-    } catch (e) {
-      if (e) {
-        console.log(e)
-        toast.create(e.toString(), 'error')
-      }
-    }
-  }
-
-  async onBan (e) {
-    try {
-      await BanPopup.create({
-        communityId: this.userId,
-        member: e.detail.member
-      })
-      this.load()
-    } catch (e) {
-      // ignore
-    }
-  }
-
-  async onClickManageBans (e) {
-    try {
-      await ManageBansPopup.create({
-        communityId: this.userId,
-        citizenId: e.detail.userId
-      })
-      this.load()
-    } catch (e) {
-      // ignore
-    }
-  }
-
-  async onClickEditSettings (e) {
-    try {
-      await EditCommunityConfigPopup.create({
-        communityId: this.userId
-      })
-      toast.create('Settings updated', 'success')
-      this.load()
-    } catch (e) {
-      if (e) {
-        console.log(e)
-        toast.create(e.toString(), 'error')
-      }
-    }
-  }
-
-  async onDeletePost (e) {
-    try {
-      await session.ctzn.user.table('ctzn.network/post').delete(e.detail.post.key)
-      toast.create('Post deleted')
-      this.load()
-    } catch (e) {
-      console.log(e)
-      toast.create(e.toString(), 'error')
-    }
-  }
-
-  async onModeratorRemovePost (e) {
-    try {
-      const post = e.detail.post
-      await session.ctzn.db(post.value.community.userId).method(
-        'ctzn.network/community-remove-content-method',
-        {contentUrl: post.url}
-      )
-      this.load()
-    } catch (e) {
-      console.log(e)
-      toast.create(e.toString(), 'error')
-    }
-  }
-
-  async onClickGiveItem (e) {
-    TransferItemPopup.create({
-      recpUserId: this.userId
-    })
   }
 
   onClickControlsMenu (e) {

@@ -88,9 +88,8 @@ export class Header extends LitElement {
               <span class="fas mr-1.5 fa-fw navicon fa-users"></span>
               Communities
             </a>
-            <hr class="my-3 mx-3">
             <a
-              class="flex items-center ${this.getMenuNavClass()} mt-1"
+              class="flex items-center ${this.getMenuNavClass()}"
               href="/${info.userId}"
               title=${info.userId}
               @click=${this.onClickLink}
@@ -102,10 +101,6 @@ export class Header extends LitElement {
                 >
               </span>
               My Profile
-            </a>
-            <a href="/${info.userId}/inventory" class=${this.getMenuNavClass()} @click=${this.onClickLink}>
-              <span class="fas mr-1.5 fa-fw navicon fa-suitcase"></span>
-              My Inventory
             </a>
             <hr class="my-3 mx-3">
           </div>
