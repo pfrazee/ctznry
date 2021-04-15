@@ -1,13 +1,12 @@
 import {LitElement, html} from '../../vendor/lit-element/lit-element.js'
-import { repeat } from '../../vendor/lit-element/lit-html/directives/repeat.js'
 import * as session from '../lib/session.js'
-import * as displayNames from '../lib/display-names.js'
 import { AVATAR_URL } from '../lib/const.js'
 import { emit } from '../lib/dom.js'
 import { ComposerPopup } from './popups/composer.js'
 import { CreateCommunityPopup } from './popups/create-community.js'
 import * as toast from './toast.js'
 import './button.js'
+import './searchable-user-list.js'
 
 const CHECK_NOTIFICATIONS_INTERVAL = 10e3
 
@@ -134,70 +133,7 @@ export class Header extends LitElement {
           </div>
         </div>
         <div class="secondary-menu bg-white overflow-y-auto px-2 py-2">
-          <a
-            class="flex items-center pl-2 pr-4 py-1 text-sm rounded hov:hover:bg-gray-100"
-            href="/${info.userId}"
-            title=${info.userId}
-          >
-            <img class="w-8 h-8 object-cover rounded-md mr-2" src=${AVATAR_URL(info.userId)} style="left: 10px; top: 6px">
-            ${displayNames.render(info.userId)}
-          </a>
-          <h3 class="font-bold pl-2 mt-4 mb-2 text-gray-500 text-xs">
-            My Communities
-          </h3>
-          <div class="mb-4">
-            ${session.myCommunities?.length ? html`
-              ${repeat(session.myCommunities, community => html`
-                <a
-                  class="flex items-center pl-2 pr-4 py-1 text-sm rounded hov:hover:bg-gray-100"
-                  href="/${community.userId}"
-                >
-                  <img
-                    class="lazyload w-8 h-8 object-cover rounded-md mr-2"
-                    data-src=${AVATAR_URL(community.userId)}
-                  >
-                  <span class="truncate font-medium">${displayNames.render(community.userId)}</span>
-                </a>
-              `)}
-            ` : html`
-              <div class="pl-2 pr-5 mb-1 text-base text-gray-700">
-                Join a community to get connected to more people!
-              </div>
-            `}
-            <a
-              class="flex items-center pl-2 pr-4 py-1 text-sm rounded cursor-pointer hov:hover:bg-gray-100"
-              @click=${this.onClickCreateCommunity}
-            >
-              <span
-                class="w-8 py-1.5 text-center object-cover rounded-md mr-2 bg-gray-300 text-gray-600"
-              ><span class="fas fa-plus"></span></span>
-              <span class="truncate font-semibold text-gray-600">Create community</span>
-            </a>
-            <a
-              class="flex items-center pl-2 pr-4 py-1 text-sm rounded cursor-pointer hov:hover:bg-gray-100"
-              href="/communities"
-            >
-              <span
-                class="w-8 py-1.5 text-center object-cover rounded-md mr-2 bg-gray-300 text-gray-600"
-              ><span class="fas fa-users"></span></span>
-              <span class="truncate font-semibold text-gray-600">Browse</span>
-            </a>
-          </div>
-          <h3 class="font-bold pl-2 mb-2 text-gray-500 text-xs">
-            My Follows
-          </h3>
-          ${repeat(session.myFollowing || [], f => f, f => html`
-            <a
-              class="flex items-center pl-2 pr-4 py-1 text-sm rounded hov:hover:bg-gray-100"
-              href="/${f}"
-            >
-              <img
-                class="lazyload w-8 h-8 object-cover rounded-md mr-2"
-                data-src=${AVATAR_URL(f)}
-              >
-              <span class="truncate font-medium">${displayNames.render(f)}</span>
-            </a>
-          `)}
+          <app-searchable-user-list></app-searchable-user-list>
         </div>
       </header>
       ${this.isMenuOpen ? html`

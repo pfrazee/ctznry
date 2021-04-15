@@ -6,6 +6,7 @@ import { emojify } from './emojify.js'
 import * as session from './session.js'
 
 let _activeFetches = {}
+let _cache = {}
 
 export function render (userId) {
   return asyncReplace(fetcher(userId))
@@ -31,9 +32,11 @@ export async function* fetcher (userId) {
 }
 
 export function get (userId) {
-  sessionStorage.getItem(`dn:${userId}`)
+  if (_cache[userId]) return _cache[userId]
+  return sessionStorage.getItem(`dn:${userId}`)
 }
 
 export function set (userId, displayName) {
+  _cache[userId] = displayName
   sessionStorage.setItem(`dn:${userId}`, displayName)
 }
