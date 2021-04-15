@@ -1,13 +1,8 @@
 import { LitElement, html } from '../../vendor/lit-element/lit-element.js'
 import { unsafeHTML } from '../../vendor/lit-element/lit-html/directives/unsafe-html.js'
 import { ComposerPopup } from '../com/popups/composer.js'
-import { EditRolePopup } from '../com/popups/edit-role.js'
-import { EditCommunityConfigPopup } from '../com/popups/edit-community-config.js'
 import { ViewMediaPopup } from '../com/popups/view-media.js'
-import { InvitePopup } from '../com/popups/invite.js'
-import { BanPopup } from '../com/popups/ban.js'
-import { ManageBansPopup } from '../com/popups/manage-bans.js'
-import { TransferItemPopup } from '../com/popups/transfer-item.js'
+import { GeneralPopup } from '../com/popups/general.js'
 import * as contextMenu from '../com/context-menu.js'
 import * as toast from '../com/toast.js'
 import {
@@ -339,11 +334,17 @@ class CtznUser extends LitElement {
         <div>
           ${this.isCitizen ? html`
             <div class="bg-white text-center pb-4">
-              <span class="bg-gray-50 font-semibold px-2 py-1 rounded text-gray-500">
+              <span
+                class="bg-gray-50 font-semibold px-2 py-1 rounded text-gray-500 hov:hover:bg-gray-100 cursor-pointer"
+                @click=${this.onClickViewFollowers}
+              >
                 <span class="fas fa-fw fa-user"></span>
                 ${nFollowers} ${pluralize(nFollowers, 'Follower')}
               </span>
-              <span class="ml-1 bg-gray-50 font-semibold px-2 py-1 rounded text-gray-500">
+              <span
+                class="ml-1 bg-gray-50 font-semibold px-2 py-1 rounded text-gray-500 hov:hover:bg-gray-100 cursor-pointer"
+                @click=${this.onClickViewCommunities}
+              >
                 <span class="fas fa-fw fa-users"></span>
                 ${nCommunities} ${nCommunities === 1 ? 'Community' : 'Communities'}
               </span>
@@ -351,7 +352,10 @@ class CtznUser extends LitElement {
           ` : ''}
           ${this.isCommunity ? html`
             <div class="bg-white text-center pb-4">
-              <span class="bg-gray-50 font-bold px-2 py-1 rounded text-gray-500">
+              <span
+                class="bg-gray-50 font-bold px-2 py-1 rounded text-gray-500 hov:hover:bg-gray-100 cursor-pointer"
+                @click=${this.onClickViewMembers}
+              >
                 <span class="fas fa-users"></span>
                 ${nMembers} ${pluralize(nMembers, 'Member')}
               </span>
@@ -701,6 +705,45 @@ class CtznUser extends LitElement {
       // ignore
       console.log(e)
     }
+  }
+
+  onClickViewFollowers (e) {
+    e.preventDefault()
+    e.stopPropagation()
+    GeneralPopup.create({
+      render: () => html`
+        <ctzn-followers-list
+          user-id=${this.userId}
+          .renderOpts=${{expandedOnly: true}}
+        ></ctzn-followers-list>
+      `
+    })
+  }
+
+  onClickViewCommunities (e) {
+    e.preventDefault()
+    e.stopPropagation()
+    GeneralPopup.create({
+      render: () => html`
+        <ctzn-community-memberships-list
+          user-id=${this.userId}
+          .renderOpts=${{expandedOnly: true}}
+        ></ctzn-community-memberships-list>
+      `
+    })
+  }
+
+  onClickViewMembers (e) {
+    e.preventDefault()
+    e.stopPropagation()
+    GeneralPopup.create({
+      render: () => html`
+        <ctzn-community-members-list
+          user-id=${this.userId}
+          .renderOpts=${{expandedOnly: true}}
+        ></ctzn-community-members-list>
+      `
+    })
   }
 
   onClickControlsMenu (e) {

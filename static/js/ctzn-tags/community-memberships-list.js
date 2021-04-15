@@ -11,7 +11,8 @@ export class CommunityMembershipsList extends LitElement {
       userId: {type: String, attribute: 'user-id'},
       memberships: {type: Array},
       sharedCommunities: {type: Array},
-      isExpanded: {type: Boolean}
+      isExpanded: {type: Boolean},
+      renderOpts: {type: Boolean}
     }
   }
 
@@ -27,6 +28,15 @@ export class CommunityMembershipsList extends LitElement {
     this.memberships = undefined
     this.sharedCommunities = undefined
     this.isExpanded = false
+    this.renderOpts = {expandedOnly: false}
+  }
+
+  get showExpanded () {
+    return this.isExpanded || this.renderOpts?.expandedOnly
+  }
+
+  get canToggleExpanded () {
+    return !this.renderOpts?.expandedOnly && this.memberships?.length
   }
 
   setContextState (state) {
@@ -72,15 +82,15 @@ export class CommunityMembershipsList extends LitElement {
     return html`
       <div class="bg-white sm:rounded my-1 ${this.memberships ? 'pb-1' : ''}">
         <div
-          class="px-5 py-3 sm:rounded ${this.memberships?.length ? 'cursor-pointer hov:hover:text-blue-600' : ''}"
-          @click=${this.memberships?.length ? this.onToggleExpanded : undefined}
+          class="px-5 py-3 sm:rounded ${this.canToggleExpanded ? 'cursor-pointer hov:hover:text-blue-600' : ''}"
+          @click=${this.canToggleExpanded ? this.onToggleExpanded : undefined}
         >
           <div class="flex items-center justify-between">
             <span>
               <span class="text-lg font-medium mr-1">Communities</span>
               <span class="text-gray-500 font-bold">${this.memberships?.length || '0'}</span>
             </span>
-            ${this.memberships?.length ? html`
+            ${this.canToggleExpanded ? html`
               <span class="fas fa-angle-${this.isExpanded ? 'up' : 'down'}"></span>
             ` : ''}
           </div>
@@ -96,7 +106,7 @@ export class CommunityMembershipsList extends LitElement {
             </div>
           ` : ''}
         </div>
-        ${this.isExpanded ? html`
+        ${this.showExpanded ? html`
         <div class="sm:mx-2 mb-1 sm:rounded px-1 py-1 bg-gray-100">
             ${repeat(this.memberships || [], (membership, i) => {
               const userId = membership.value.community.userId

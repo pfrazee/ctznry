@@ -11,7 +11,8 @@ export class FollowersList extends LitElement {
       userId: {type: String, attribute: 'user-id'},
       followers: {type: Array},
       sharedFollowers: {type: Array},
-      isExpanded: {type: Boolean}
+      isExpanded: {type: Boolean},
+      renderOpts: {type: Boolean}
     }
   }
 
@@ -27,6 +28,15 @@ export class FollowersList extends LitElement {
     this.followers = undefined
     this.sharedFollowers = undefined
     this.isExpanded = false
+    this.renderOpts = {expandedOnly: false}
+  }
+
+  get showExpanded () {
+    return this.isExpanded || this.renderOpts?.expandedOnly
+  }
+
+  get canToggleExpanded () {
+    return !this.renderOpts?.expandedOnly && this.followers?.length
   }
 
   setContextState (state) {
@@ -69,16 +79,16 @@ export class FollowersList extends LitElement {
     return html`
       <div class="bg-white sm:rounded my-1 ${this.followers ? 'pb-1' : ''}">
         <div
-          class="px-5 py-3 sm:rounded ${this.followers?.length ? 'cursor-pointer hov:hover:text-blue-600' : ''}"
-          @click=${this.followers?.length ? this.onToggleExpanded : undefined}
+          class="px-5 py-3 sm:rounded ${this.canToggleExpanded ? 'cursor-pointer hov:hover:text-blue-600' : ''}"
+          @click=${this.canToggleExpanded ? this.onToggleExpanded : undefined}
         >
           <div class="flex items-center justify-between">
             <span>
               <span class="text-lg font-medium mr-1">Followers</span>
               <span class="text-gray-500 font-bold">${this.followers?.length || '0'}</span>
             </span>
-            ${this.followers?.length ? html`
-              <span class="fas fa-angle-${this.isExpanded ? 'up' : 'down'}"></span>
+            ${this.canToggleExpanded ? html`
+              <span class="fas fa-angle-${this.showExpanded ? 'up' : 'down'}"></span>
             ` : ''}
           </div>
           ${this.sharedFollowers?.length ? html`
@@ -93,7 +103,7 @@ export class FollowersList extends LitElement {
             </div>
           ` : ''}
         </div>
-        ${this.isExpanded ? html`
+        ${this.showExpanded ? html`
           <div class="sm:mx-2 mb-1 sm:rounded px-1 py-1 bg-gray-100">
             <app-simple-user-list .ids=${this.followers} empty-message="${this.userId} has no followers."></app-simple-user-list>
           </div>
