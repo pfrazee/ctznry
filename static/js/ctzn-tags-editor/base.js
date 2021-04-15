@@ -17,7 +17,11 @@ export function createBaseClass (win, doc, editor) {
               return this.getAttribute(attrName)
             },
             set: (v) => {
-              this.setAttribute(attrName, v)
+              if (v === false || typeof v === 'undefined') {
+                this.removeAttribute(attrName)
+              } else {
+                this.setAttribute(attrName, v)
+              }
             }
           })
         }

@@ -102,10 +102,14 @@ function doPropertiesDialog (el, editor) {
       }
       else {
         editor.undoManager.transact(() => {
-          if (!data['user-id']) delete data['user-id']
-          else el['user-id'] = data['user-id']
-          if (!data['limit']) delete data['limit']
-          else el.limit = data.limit
+          for (let k in data) {
+            if (!data[k]) {
+              el[k] = undefined
+              delete data[k]
+            } else {
+              el[k] = data[k]
+            }
+          }
           editor.dom.setAttribs(el, data)
         })
         editor.nodeChanged()
