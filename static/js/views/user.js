@@ -1,5 +1,6 @@
 import { LitElement, html } from '../../vendor/lit-element/lit-element.js'
 import { unsafeHTML } from '../../vendor/lit-element/lit-html/directives/unsafe-html.js'
+import { repeat } from '../../vendor/lit-element/lit-html/directives/repeat.js'
 import { ComposerPopup } from '../com/popups/composer.js'
 import { ViewMediaPopup } from '../com/popups/view-media.js'
 import { GeneralPopup } from '../com/popups/general.js'
@@ -330,72 +331,180 @@ class CtznUser extends LitElement {
       ></app-header>
       ${this.renderDesktopHeader()}
       ${this.renderMobileHeader()}
-      <main>
+      <main class="col2">
         <div>
-          ${this.isCitizen ? html`
-            <div class="bg-white text-center pb-4">
-              <span
-                class="bg-gray-50 font-semibold px-2 py-1 rounded text-gray-500 hov:hover:bg-gray-100 cursor-pointer"
-                @click=${this.onClickViewFollowers}
-              >
-                <span class="fas fa-fw fa-user"></span>
-                ${nFollowers} ${pluralize(nFollowers, 'Follower')}
-              </span>
-              <span
-                class="ml-1 bg-gray-50 font-semibold px-2 py-1 rounded text-gray-500 hov:hover:bg-gray-100 cursor-pointer"
-                @click=${this.onClickViewCommunities}
-              >
-                <span class="fas fa-fw fa-users"></span>
-                ${nCommunities} ${nCommunities === 1 ? 'Community' : 'Communities'}
-              </span>
-            </div>
-          ` : ''}
-          ${this.isCommunity ? html`
-            <div class="bg-white text-center pb-4">
-              <span
-                class="bg-gray-50 font-bold px-2 py-1 rounded text-gray-500 hov:hover:bg-gray-100 cursor-pointer"
-                @click=${this.onClickViewMembers}
-              >
-                <span class="fas fa-users"></span>
-                ${nMembers} ${pluralize(nMembers, 'Member')}
-              </span>
-              ${this.isMembershipClosed ? html`
-                <span class="font-semibold ml-3 py-1 rounded text-gray-600">Invite only</span>
-              ` : ''}
-            </div>
-          ` : ''}
-          ${this.userProfile?.value.description ? html`
-            <div class="text-center pb-4 px-4 sm:px-7 bg-white">${unsafeHTML(linkify(emojify(makeSafe(this.userProfile?.value.description))))}</div>
-          ` : ''}
-          ${!this.isProfileLoading && session.isActive() && !this.isMe && this.isCitizen && this.amIFollowing === false ? html`
-            <div class="bg-white text-center pb-4 px-4">
-              <app-button
-                btn-class="font-semibold py-1 text-base block w-full rounded-lg sm:px-10 sm:inline sm:w-auto sm:rounded-full"
-                @click=${this.onClickFollow}
-                label="Follow ${this.userProfile?.value.displayName || this.userId}"
-                primary
-              ></app-button>
-            </div>
-          ` : ''}
-          ${!this.isProfileLoading && session.isActive() && this.isCommunity && this.amIAMember === false && canJoin ? html`
-            <div class="bg-white text-center pb-4 px-4">
-              <app-button
-                btn-class="font-semibold py-1 text-base block w-full rounded-lg sm:px-10 sm:inline sm:w-auto sm:rounded-full"
-                @click=${this.onClickJoin}
-                label="Join community"
-                ?spinner=${this.isJoiningOrLeaving}
-                primary
-              ></app-button>
-            </div>
-          ` : ''}
-          <div id="scroll-target"></div>
-          <app-subnav
-            nav-cls="mb-1 sm:rounded-b"
-            .items=${this.subnavItems}
-            current-path=${this.currentPath}
-          ></app-subnav>
+          <div class="widescreen-hidden">
+            ${this.isCitizen ? html`
+              <div class="bg-white text-center pb-4">
+                <span
+                  class="bg-gray-50 font-semibold px-2 py-1 rounded text-gray-500 hov:hover:bg-gray-100 cursor-pointer"
+                  @click=${this.onClickViewFollowers}
+                >
+                  <span class="fas fa-fw fa-user"></span>
+                  ${nFollowers} ${pluralize(nFollowers, 'Follower')}
+                </span>
+                <span
+                  class="ml-1 bg-gray-50 font-semibold px-2 py-1 rounded text-gray-500 hov:hover:bg-gray-100 cursor-pointer"
+                  @click=${this.onClickViewCommunities}
+                >
+                  <span class="fas fa-fw fa-users"></span>
+                  ${nCommunities} ${nCommunities === 1 ? 'Community' : 'Communities'}
+                </span>
+              </div>
+            ` : ''}
+            ${this.isCommunity ? html`
+              <div class="bg-white text-center pb-4">
+                <span
+                  class="bg-gray-50 font-bold px-2 py-1 rounded text-gray-500 hov:hover:bg-gray-100 cursor-pointer"
+                  @click=${this.onClickViewMembers}
+                >
+                  <span class="fas fa-users"></span>
+                  ${nMembers} ${pluralize(nMembers, 'Member')}
+                </span>
+                ${this.isMembershipClosed ? html`
+                  <span class="font-semibold ml-3 py-1 rounded text-gray-600">Invite only</span>
+                ` : ''}
+              </div>
+            ` : ''}
+            ${this.userProfile?.value.description ? html`
+              <div class="text-center pb-4 px-4 sm:px-7 bg-white">${unsafeHTML(linkify(emojify(makeSafe(this.userProfile?.value.description))))}</div>
+            ` : ''}
+            ${!this.isProfileLoading && session.isActive() && !this.isMe && this.isCitizen && this.amIFollowing === false ? html`
+              <div class="bg-white text-center pb-4 px-4">
+                <app-button
+                  btn-class="font-semibold py-1 text-base block w-full rounded-lg sm:px-10 sm:inline sm:w-auto sm:rounded-full"
+                  @click=${this.onClickFollow}
+                  label="Follow ${this.userProfile?.value.displayName || this.userId}"
+                  primary
+                ></app-button>
+              </div>
+            ` : ''}
+            ${!this.isProfileLoading && session.isActive() && this.isCommunity && this.amIAMember === false && canJoin ? html`
+              <div class="bg-white text-center pb-4 px-4">
+                <app-button
+                  btn-class="font-semibold py-1 text-base block w-full rounded-lg sm:px-10 sm:inline sm:w-auto sm:rounded-full"
+                  @click=${this.onClickJoin}
+                  label="Join community"
+                  ?spinner=${this.isJoiningOrLeaving}
+                  primary
+                ></app-button>
+              </div>
+            ` : ''}
+            <div id="scroll-target"></div>
+            <app-subnav
+              nav-cls="mb-1 sm:rounded-b"
+              .items=${this.subnavItems}
+              current-path=${this.currentPath}
+            ></app-subnav>
+          </div>
           <div class="min-h-screen">
             ${this.renderCurrentView()}
+          </div>
+        </div>
+        <div>
+          <div class="sticky" style="top: 66px">
+            <div class="absolute" style="top: -60px; right: 75px;">
+              <a href="/${this.userId}" title=${this.userProfile?.value.displayName}>
+                <img
+                  class="border-2 border-white inline-block object-cover rounded-3xl shadow-md bg-white"
+                  src=${AVATAR_URL(this.userId)}
+                  style="width: 130px; height: 130px"
+                  @click=${this.onClickAvatar}
+                >
+              </a>
+            </div>
+            <div class="rounded bg-white px-5 pt-20 pb-4 mb-2 break-words">
+              <h2 class="text-2xl font-semibold">
+                <a
+                  class="inline-block"
+                  href="/${this.userId}"
+                  title=${this.userProfile?.value.displayName}
+                >
+                  ${unsafeHTML(emojify(makeSafe(this.userProfile?.value.displayName), 'w-6', '0'))}
+                </a>
+              </h2>
+              <h2 class="text-gray-600 font-semibold mb-4">
+                <a href="/${this.userId}" title="${this.userId}">
+                  ${this.userId}
+                </a>
+              </h2>
+              ${this.userProfile?.value.description ? html`
+                <div class="pb-4">${unsafeHTML(linkify(emojify(makeSafe(this.userProfile?.value.description))))}</div>
+              ` : ''}
+              ${this.isCitizen ? html`
+                <div class="pb-2">
+                  <span
+                    class="font-semibold text-gray-500 hov:hover:underline cursor-pointer"
+                    @click=${this.onClickViewFollowers}
+                  >
+                    <span class="fas fa-fw fa-user"></span>
+                    ${nFollowers} ${pluralize(nFollowers, 'Follower')}
+                  </span>
+                </div>
+                <div class="pb-2">
+                  <span
+                    class="font-semibold text-gray-500 hov:hover:underline cursor-pointer"
+                    @click=${this.onClickViewCommunities}
+                  >
+                    <span class="fas fa-fw fa-users"></span>
+                    ${nCommunities} ${nCommunities === 1 ? 'Community' : 'Communities'}
+                  </span>
+                </div>
+              ` : ''}
+              ${this.isCommunity ? html`
+                <div class="pb-2">
+                  <span
+                    class="font-semibold text-gray-500 hov:hover:underline cursor-pointer"
+                    @click=${this.onClickViewMembers}
+                  >
+                    <span class="fas fa-users"></span>
+                    ${nMembers} ${pluralize(nMembers, 'Member')}
+                  </span>
+                  ${this.isMembershipClosed ? html`
+                    <span class="font-semibold ml-3 py-1 rounded text-gray-600">Invite only</span>
+                  ` : ''}
+                </div>
+              ` : ''}
+              ${!this.isProfileLoading && session.isActive() && !this.isMe && this.isCitizen && this.amIFollowing === false ? html`
+                <div class="pb-2">
+                  <app-button
+                    btn-class="font-semibold py-1 text-base block w-full rounded-lg"
+                    @click=${this.onClickFollow}
+                    label="Follow ${this.userProfile?.value.displayName || this.userId}"
+                    primary
+                  ></app-button>
+                </div>
+              ` : ''}
+              ${!this.isProfileLoading && session.isActive() && this.isCommunity && this.amIAMember === false && canJoin ? html`
+                <div class="pt-2 pb-2">
+                  <app-button
+                    btn-class="font-semibold py-1 text-base block w-full rounded-lg"
+                    @click=${this.onClickJoin}
+                    label="Join community"
+                    ?spinner=${this.isJoiningOrLeaving}
+                    primary
+                  ></app-button>
+                </div>
+              ` : ''}
+            </div>
+            <div>
+              ${repeat(this.subnavItems, (item, i) => {
+                if (item.mobileOnly) return ''
+                return html`
+                  <a
+                    class="
+                      block px-3 py-2 mb-0.5 cursor-pointer hover:bg-white hover:border-blue-600
+                      ${item.path === this.currentPath ? 'border-blue-600 bg-white' : 'border-gray-50 bg-gray-50'}
+                      ${i === 0 ? 'rounded-tr' : ''}
+                      ${i === this.subnavItems.length - 1 ? 'rounded-br' : ''}
+                    "
+                    href="${item.path}"
+                  >
+                    ${item.label}
+                  </a>
+                `
+              })}
+            </div>
           </div>
         </div>
       </main>
@@ -421,7 +530,7 @@ class CtznUser extends LitElement {
 
   renderDesktopHeader () {
     return html`
-      <main class="hidden sm:block" style="padding: 0">
+      <main class="widescreen-only wide mb-2" style="padding: 0">
         <div class="relative">
           <div class="absolute" style="top: 8px; left: 10px">
             <app-button
@@ -436,57 +545,28 @@ class CtznUser extends LitElement {
             ${this.renderProfileControls()}
           </div>
           <div
-            class="mt-2 rounded-2xl bg-blue-600"
+            class="mt-2 rounded bg-blue-600"
             style="height: 300px"
           >
             <app-img-fallbacks id=${this.userId}>
               <img
                 slot="img1"
-                class="rounded-2xl"
+                class="rounded"
                 style="display: block; object-fit: cover; width: 100%; height: 300px;"
                 src=${BLOB_URL(this.userId, 'profile-banner')}
               >
               <div slot="img2"></div>
             </app-img-fallbacks>
           </div>
-          <div class="absolute" style="top: 150px; left: 20px">
-            <a href="/${this.userId}" title=${this.userProfile?.value.displayName}>
-              <img
-                class="border-2 border-white inline-block object-cover rounded-3xl shadow-md bg-white"
-                src=${AVATAR_URL(this.userId)}
-                style="width: 130px; height: 130px"
-                @click=${this.onClickAvatar}
-              >
-            </a>
-          </div>
         </div>
-      </main>
-      <main class="hidden sm:block rounded-t-2xl mt-2 bg-white px-2 py-4 text-center">
-        <h2
-          class="text-5xl font-semibold"
-        >
-          <a
-            class="inline-block"
-            href="/${this.userId}"
-            title=${this.userProfile?.value.displayName}
-          >
-            ${unsafeHTML(emojify(makeSafe(this.userProfile?.value.displayName), 'w-10', '0'))}
-          </a>
-        </h2>
-        <h2
-          class="text-gray-600 font-semibold"
-        >
-          <a href="/${this.userId}" title="${this.userId}">
-            ${this.userId}
-          </a>
-        </h2>
+        <div id="scroll-target"></div>
       </main>
     `
   }
 
   renderMobileHeader () {
     return html`
-      <main class="block sm:hidden" style="padding: 0">
+      <main class="widescreen-hidden" style="padding: 0">
         <div class="relative">
           <div class="absolute" style="top: 8px; left: 10px">
             <app-button

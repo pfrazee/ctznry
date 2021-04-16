@@ -60,6 +60,10 @@ main {
   max-width: 640px;
 }
 
+main.wide {
+  max-width: 920px;
+}
+
 main.col2 {
   display: grid;
   grid-template-columns: 640px 1fr;
@@ -87,7 +91,29 @@ pre > code {
   }
 }
 
+@media (max-width: 640px) {
+  .mobile-hidden {
+    display: none;
+  }
+}
+
+.widescreen-only {
+  display: none;
+}
+
+@media (min-width: 1400px) {
+  .widescreen-hidden {
+    display: none;
+  }
+  .widescreen-only {
+    display: block;
+  }
+}
+
 @media (max-width: 1400px) {
+  main.wide {
+    max-width: 640px;
+  }
   main.col2 {
     display: block;
     max-width: 640px;
