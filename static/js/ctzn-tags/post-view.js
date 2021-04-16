@@ -232,8 +232,8 @@ export class PostView extends LitElement {
         </div>
         <div class="px-3 py-3 sm:px-4 sm:py-4 min-w-0">
           <div class="whitespace-pre-wrap break-words text-lg leading-tight font-medium text-black mb-1.5">${unsafeHTML(emojify(linkify(makeSafe(this.post.value.text))))}</div>
-          ${this.renderPostExtendedText()}
           ${this.renderMedia()}
+          ${this.renderPostExtendedText()}
           ${this.noctrls ? '' : html`
             ${this.hasReactionsOrGifts ? html`
               <div class="my-1.5">
@@ -316,36 +316,37 @@ export class PostView extends LitElement {
     `
   }
 
+  renderImg (item, size) {
+    let url = ''
+    if (item.blobs.original.dataUrl) {
+      url = item.blobs.original.dataUrl
+    } else {
+      url = BLOB_URL(this.post.author.userId, (item.blobs.thumb || item.blobs.original).blobName)
+    }
+    return html`
+      <div
+        class="bg-gray-100 rounded img-sizing-${size} img-placeholder cursor-pointer"
+        @click=${this.renderOpts?.preview ? undefined : e => this.onClickImage(e, item)}
+      >
+        <img
+          class="box-border object-cover rounded border border-gray-300 w-full img-sizing-${size}"
+          src="${url}"
+          alt=${item.caption || 'Image'}
+        >
+      </div>
+    `
+  }
+
   renderMedia () {
-    if (!this.post.value.media?.length) {
+    const media = this.post.value.media
+    if (!media?.length) {
       return ''
     }
-    const media = this.post.value.media
-    const img = (item, size) => {
-      let url = ''
-      if (item.blobs.original.dataUrl) {
-        url = item.blobs.original.dataUrl
-      } else {
-        url = BLOB_URL(this.post.author.userId, (item.blobs.thumb || item.blobs.original).blobName)
-      }
-      return html`
-        <div
-          class="bg-gray-100 rounded img-sizing-${size} img-placeholder cursor-pointer"
-          @click=${this.renderOpts?.preview ? undefined : e => this.onClickImage(e, item)}
-        >
-          <img
-            class="box-border object-cover rounded border border-gray-300 w-full img-sizing-${size}"
-            src="${url}"
-            alt=${item.caption || 'Image'}
-          >
-        </div>
-      `
-    }
-    if (media.length > 4 && this.mode === 'full') {
+    if (media.length > 4 && this.mode === 'expanded') {
       return html`
         <div class="grid grid-post-images mt-1 mb-2">
           ${repeat(media, item => html`
-            ${img(item, 'full')}
+            ${this.renderImg(item, 'full')}
           `)}
         </div>
       `
@@ -355,11 +356,11 @@ export class PostView extends LitElement {
       <div class="flex mt-1 mb-2 ${this.showDefault ? 'sm:px-1' : ''}">
         ${media.length >= 4 ? html`
           <div class="flex-1 flex flex-col pr-0.5">
-            <div class="flex-1 pb-0.5">${img(media[0], 'small')}</div>
-            <div class="flex-1 pt-0.5">${img(media[2], 'small')}</div>
+            <div class="flex-1 pb-0.5">${this.renderImg(media[0], 'small')}</div>
+            <div class="flex-1 pt-0.5">${this.renderImg(media[2], 'small')}</div>
           </div>
           <div class="flex-1 flex flex-col pl-0.5">
-            <div class="flex-1 pb-0.5">${img(media[1], 'small')}</div>
+            <div class="flex-1 pb-0.5">${this.renderImg(media[1], 'small')}</div>
             <div class="flex-1 pt-0.5 relative">
               ${moreImages > 0 ? html`
                 <span
@@ -367,20 +368,20 @@ export class PostView extends LitElement {
                   style="left: 50%; top: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,.85);"
                 >+${moreImages}</span>
               ` : ''}
-              ${img(media[3], 'small')}
+              ${this.renderImg(media[3], 'small')}
             </div>
           </div>
         ` : media.length === 3 ? html`
-          <div class="flex-1 pr-0.5">${img(media[0], 'big')}</div>
+          <div class="flex-1 pr-0.5">${this.renderImg(media[0], 'big')}</div>
           <div class="flex-1 flex flex-col pl-0.5">
-            <div class="flex-1 pb-0.5">${img(media[1], 'smaller')}</div>
-            <div class="flex-1 pt-0.5">${img(media[2], 'smaller')}</div>
+            <div class="flex-1 pb-0.5">${this.renderImg(media[1], 'smaller')}</div>
+            <div class="flex-1 pt-0.5">${this.renderImg(media[2], 'smaller')}</div>
           </div>
         ` : media.length === 2 ? html`
-          <div class="flex-1 pr-0.5">${img(media[0], 'medium')}</div>
-          <div class="flex-1 pl-0.5">${img(media[1], 'medium')}</div>
+          <div class="flex-1 pr-0.5">${this.renderImg(media[0], 'medium')}</div>
+          <div class="flex-1 pl-0.5">${this.renderImg(media[1], 'medium')}</div>
         ` : html`
-          <div class="flex-1">${img(media[0], 'big')}</div>
+          <div class="flex-1">${this.renderImg(media[0], 'big')}</div>
         `}
       </div>
     `
