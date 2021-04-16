@@ -114,6 +114,7 @@ class PostComposer extends LitElement {
             class="py-2 px-3 w-full h-32 sm:h-20 box-border resize-y text-lg border border-gray-300 rounded"
             placeholder="What's new?"
             @keyup=${this.onTextareaKeyup}
+            @change=${this.onTextareaKeyup}
             @keydown=${this.onTextareaKeydown}
           ></textarea>
           <div>
@@ -169,7 +170,7 @@ class PostComposer extends LitElement {
           @change=${this.onChooseImageFile}
         >
 
-        <div class="flex border-t border-gray-200 mt-4 pt-4">
+        <div class="flex pt-3">
           <app-button
             transparent
             btn-class="hidden sm:block"
@@ -208,6 +209,11 @@ class PostComposer extends LitElement {
             ></div>
           </div>
         ` : ''}
+
+        <div class="bg-gray-100 font-medium mt-4 sm:mt-2 px-3 py-2 rounded text-center text-gray-700 text-sm">
+          <span class="fas fa-fw fa-info text-gray-600"></span>
+          Gentle reminder: always be kind and respectful of others!
+        </div>
       </form>
     `
   }

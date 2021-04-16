@@ -74,6 +74,11 @@ class CommentComposer extends LitElement {
             ?disabled=${!this.canPost}
           >${this.isProcessing ? html`<span class="spinner"></span>` : 'Post comment'}</button>
         </div>
+
+        <div class="bg-gray-100 font-medium mt-3 sm:mt-2 px-3 py-2 rounded text-center text-gray-700 text-sm">
+          <span class="fas fa-fw fa-info text-gray-600"></span>
+          Gentle reminder: always be kind and respectful of others!
+        </div>
       </form>
     `
   }
