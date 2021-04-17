@@ -183,6 +183,10 @@ class CtznMainView extends LitElement {
         path: '/search',
         mobileOnly: true,
         label: 'Search'
+      },
+      {
+        path: '/follow-only',
+        label: 'Follows'
       }
     ]
     return html`
@@ -221,6 +225,15 @@ class CtznMainView extends LitElement {
               </div>
               <app-searchable-user-list></app-searchable-user-list>
             </div>
+          ` : this.currentView === 'follow-only' ? html`
+            ${this.isEmpty ? this.renderEmptyMessage() : ''}
+            <ctzn-posts-feed
+              cleared-at=${this.notificationsClearedAt}
+              view="ctzn.network/feed-view"
+              follow-only=true
+              @load-state-updated=${this.onFeedLoadStateUpdated}
+              @publish-reply=${this.onPublishReply}
+            ></ctzn-posts-feed>
           ` : ''}
         </div>
         ${this.renderRightSidebar()}

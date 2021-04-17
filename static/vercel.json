@@ -36,6 +36,13 @@
       }
     },
     {
+      "src": "/follow-only",
+      "dest": "/index.html",
+      "headers": {
+        "Content-Security-Policy": "script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self';"
+      }
+    },
+    {
       "src": "/notifications",
       "dest": "/index.html",
       "headers": {

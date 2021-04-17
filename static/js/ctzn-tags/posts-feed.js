@@ -18,7 +18,8 @@ export class PostsFeed extends LitElement {
       limit: {type: Number},
       results: {type: Array},
       hasNewItems: {type: Boolean},
-      isLoadingMore: {type: Boolean}
+      isLoadingMore: {type: Boolean},
+      followOnly: {type: Boolean, attribute: 'follow-only'}
     }
   }
 
@@ -35,6 +36,7 @@ export class PostsFeed extends LitElement {
     this.results = undefined
     this.hasNewItems = false
     this.isLoadingMore = false
+    this.followOnly = false
 
     // ui state
     this.loadMoreObserver = undefined
@@ -150,9 +152,10 @@ export class PostsFeed extends LitElement {
     let results = more ? (this.results || []) : []
     let lt = more ? results[results?.length - 1]?.key : undefined
     if (this.view === 'ctzn.network/feed-view') {
-      results = results.concat((await session.ctzn.view(this.view, {limit: 15, reverse: true, lt}))?.feed)
+      let res = (await session.ctzn.view(this.view, {limit: 15, reverse: true, lt, followOnly: this.followOnly}))
+      results = results.concat(res?.feed)
     } else {
-      results = results.concat((await session.ctzn.viewByHomeServer(this.userId, this.view, this.userId, {limit: 15, reverse: true, lt}))?.posts)
+      results = results.concat((await session.ctzn.viewByHomeServer(this.userId, this.view, this.userId, {limit: 15, reverse: true, lt, followOnly: this.followOnly}))?.posts)
     }
     if (this.limit > 0 && results.length > this.limit) {
       results = results.slice(0, this.limit)
@@ -183,9 +186,9 @@ export class PostsFeed extends LitElement {
     }
     let results
     if (this.view === 'ctzn.network/feed-view') {
-      results = (await session.ctzn.view(this.view, {limit: 1, reverse: true}))?.feed
+      results = (await session.ctzn.view(this.view, {limit: 1, reverse: true, followOnly: this.followOnly}))?.feed
     } else {
-      results = (await session.ctzn.viewByHomeServer(this.userId, this.view, this.userId, {limit: 1, reverse: true}))?.posts
+      results = (await session.ctzn.viewByHomeServer(this.userId, this.view, this.userId, {limit: 1, reverse: true, followOnly: this.followOnly}))?.posts
     }
     this.hasNewItems = (results[0] && results[0].key !== this.results[0].key)
   }
