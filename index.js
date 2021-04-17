@@ -45,6 +45,7 @@ export async function start ({port, configDir, domain}) {
   app.get('/signup', staticFile('static/index.html'))
   app.get('/forgot-password', staticFile('static/index.html'))
   app.get('/notifications', staticFile('static/index.html'))
+  app.get('/follow-only', staticFile('static/index.html'))
   app.get('/communities', staticFile('static/index.html'))
   app.get('/account', staticFile('static/index.html'))
   app.get('/profile', staticFile('static/index.html'))
