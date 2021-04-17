@@ -109,7 +109,7 @@ class CtznUser extends LitElement {
   }
 
   get amIFollowing () {
-    return !!this.followers?.find?.(id => id === session.info?.userId)
+    return !!session.myFollowing?.find?.(id => id === this.userId)
   }
 
   get isFollowingMe () {
