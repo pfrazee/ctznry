@@ -280,7 +280,7 @@ export class CommentView extends LitElement {
                 .community=${this.comment.value.community}
                 .subject=${this.comment.value.reply.root}
                 .parent=${{dbUrl: this.comment.url, authorId: this.comment.author.userId}}
-                placeholder="Write your reply"
+                placeholder="Write your reply. Remember to always be kind!"
                 @publish=${this.onPublishReply}
                 @cancel=${this.onCancelReply}
               ></app-comment-composer>

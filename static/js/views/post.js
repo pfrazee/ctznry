@@ -99,7 +99,7 @@ class CtznPostView extends LitElement {
     ]
     return html`
       <app-subnav
-        nav-cls="mb-0.5 sm:mt-0.5"
+        nav-cls="mb-0.5 sm:mt-0.5 sm:relative sm:border-b sm:border-gray-200"
         .items=${SUBNAV_ITEMS}
         current-path=${location.pathname}
       ></app-subnav>
@@ -108,8 +108,12 @@ class CtznPostView extends LitElement {
 
   renderRightSidebar () {
     return html`
-      <nav class="pt-1.5 w-full">
-        <app-user-list cols="1" .ids=${[this.authorProfile.userId]}></app-user-list>
+      <nav class="pt-4">
+        <app-user-list
+          class="block sticky top-18"
+          cols="1"
+          .ids=${[this.authorProfile.userId]}
+        ></app-user-list>
       </nav>
     `
   }
@@ -150,7 +154,7 @@ class CtznPostView extends LitElement {
       <main class="col2 mb-32">
         <div>
           ${this.renderHeader()}
-          <div class="min-h-screen sm:bg-transparent">
+          <div class="min-h-screen sm:bg-transparent sm:py-2">
             ${this.subject ? html`
               <app-thread
                 .subject=${this.subject}

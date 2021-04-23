@@ -18,7 +18,7 @@ app-custom-html table.sanitized,
 app-custom-html blockquote.sanitized,
 app-custom-html figcaption.sanitized,
 app-custom-html dl.sanitized {
-  margin-bottom: 0.75rem;
+  margin-bottom: 1rem;
 }
 
 app-custom-html h1.sanitized {

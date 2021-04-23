@@ -34,7 +34,7 @@ export class Subnav extends LitElement {
   
   getNavCls ({path, mobileOnly, rightAlign, thin}) {
     return `
-      text-center pt-2 pb-2.5 ${thin ? 'px-3 sm:px-4' : 'px-4 sm:px-7'} whitespace-nowrap font-semibold cursor-pointer
+      text-center pt-2 pb-2.5 sm:pt-4 sm:pb-4 ${thin ? 'px-3 sm:px-4' : 'px-4 sm:px-7'} whitespace-nowrap font-semibold cursor-pointer
       hov:hover:text-blue-600
       ${mobileOnly ? 'no-header-only' : 'block'}
       ${rightAlign ? 'ml-auto' : ''}

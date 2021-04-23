@@ -24,6 +24,10 @@ textarea {
   border-color: rgb(37, 99, 235) !important;
 }
 
+.top-18 {
+  top: 4.5rem;
+}
+
 app-header .menu {
   display: none;
   position: fixed;

@@ -22,7 +22,7 @@ class CommentComposer extends LitElement {
     this.isProcessing = false
     this.autofocus = false
     this.draftText = ''
-    this.placeholder = 'Write your comment'
+    this.placeholder = 'Write your comment. Remember to always be kind!'
     this.subject = undefined
     this.parent = undefined
     this.modalMode = false
@@ -53,7 +53,7 @@ class CommentComposer extends LitElement {
             id="text"
             class="
               w-full box-border resize-none outline-none h-32 text-base
-              ${this.modalMode ? 'border border-gray-300 px-3 py-2 h-56 rounded' : 'h-32'}
+              ${this.modalMode ? 'border border-gray-300 px-3 py-2 h-56 rounded' : 'h-32 px-1.5'}
             "
             placeholder=${this.placeholder}
             @keyup=${this.onTextareaKeyup}
@@ -73,11 +73,6 @@ class CommentComposer extends LitElement {
             tabindex="3"
             ?disabled=${!this.canPost}
           >${this.isProcessing ? html`<span class="spinner"></span>` : 'Post comment'}</button>
-        </div>
-
-        <div class="bg-gray-100 font-medium mt-3 sm:mt-2 px-3 py-2 rounded text-center text-gray-700 text-sm">
-          <span class="fas fa-fw fa-info text-gray-600"></span>
-          Gentle reminder: always be kind and respectful of others!
         </div>
       </form>
     `

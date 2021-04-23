@@ -85,15 +85,15 @@ export class UserList extends LitElement {
           }
           const userId = (new URL(profile.url)).pathname.split('/')[1]
           return html`
-            <div class="rounded relative">
+            <div class="rounded relative border border-gray-200">
               <div
-                class="rounded"
+                class="rounded-t"
                 style="height: 80px; background: linear-gradient(0deg, #3c4af6, #2663eb);"
               >
                 <app-img-fallbacks>
                   <img
                     slot="img1"
-                    class="rounded"
+                    class="rounded-t"
                     style="display: block; object-fit: cover; width: 100%; height: 80px;"
                     src=${BLOB_URL(userId, 'profile-banner')}
                   >
@@ -109,7 +109,7 @@ export class UserList extends LitElement {
                   >
                 </a>
               </div>
-              <div class="pt-8 pb-2 px-2 bg-white rounded-lg mt-1">
+              <div class="pt-8 pb-2 px-4 bg-white rounded-lg mt-1">
                 <div class="text-center">
                   <div class="font-medium text-lg truncate leading-tight">
                     <a href="/${profile.userId}" title=${profile.value.displayName}>
@@ -121,7 +121,7 @@ export class UserList extends LitElement {
                       ${userId}
                     </a>
                   </div>
-                  <div class="text-sm text-gray-600 mb-4 break-words">${unsafeHTML(linkify(emojify(makeSafe(profile.value.description))))}</div>
+                  <div class="text-sm mb-4 break-words">${unsafeHTML(linkify(emojify(makeSafe(profile.value.description))))}</div>
                 </div>
                 ${this.renderProfileControls(profile)}
               </div>
