@@ -56,7 +56,7 @@ export class SearchableUserList extends LitElement {
     const users = this.getFilteredUsers()
     const communities = this.getFilteredCommunities()
     return html`
-      <div class="flex items-center bg-gray-100 rounded-2xl mb-3 mr-2 px-3 py-1.5 sm:py-0.5">
+      <div class="flex items-center border border-gray-300 bg-gray-100 rounded-2xl mb-3 mr-2 px-3 py-1.5 sm:py-1">
         <span class="fas fa-search text-sm text-gray-500 mr-2"></span>
         <input
           type="text"
@@ -90,7 +90,7 @@ export class SearchableUserList extends LitElement {
                   class="lazyload w-8 h-8 object-cover rounded-md mr-2"
                   data-src=${AVATAR_URL(userId)}
                 >
-                <span class="truncate font-medium">${displayNames.render(userId)}</span>
+                <span class="truncate">${displayNames.render(userId)}</span>
               </a>
             `)}
           ` : html`
@@ -133,7 +133,7 @@ export class SearchableUserList extends LitElement {
               class="lazyload w-8 h-8 object-cover rounded-md mr-2"
               data-src=${AVATAR_URL(userId)}
             >
-            <span class="truncate font-medium">${displayNames.render(userId)}</span>
+            <span class="truncate">${displayNames.render(userId)}</span>
           </a>
         `)}
       ` : ''}

@@ -135,7 +135,7 @@ export class SuggestionsSidebar extends LitElement {
             let tooltipIds = community.members?.slice(0, 4).join(', ')
             if (community.members?.length > 4) tooltipIds += `, + ${community.members?.length - 4} more`
             return html`
-              <div class="text-sm bg-white mb-2 px-2 py-2 rounded-lg">
+              <div class="text-sm bg-white mb-2 px-2 py-2 rounded">
                 <div class="text-base font-medium truncate">
                   <a class="hov:hover:pointer hov:hover:underline" href="/${community.userId}" title=${community.displayName}>
                     ${community.displayName || community.userId}
@@ -169,7 +169,7 @@ export class SuggestionsSidebar extends LitElement {
         </section>
       ` : ''}
       <section class="sticky top-0 py-2">
-        <div class="text-sm bg-white p-3 rounded-lg mb-2">
+        <div class="text-sm bg-white p-3 rounded mb-2">
           <div class="text-lg font-medium">
             <span class="fas fa-heart fa-fw mr-1"></span> Support CTZN!
           </div>
@@ -182,7 +182,7 @@ export class SuggestionsSidebar extends LitElement {
             >Join our Patreon</a>            
           </div>
         </div>
-        <div class="text-sm bg-white p-3 rounded-lg">
+        <div class="text-sm bg-white p-3 rounded">
           <div class="text-lg font-medium">
             <span class="fas fa-video fa-fw mr-1"></span> Watch the dev stream
           </div>
