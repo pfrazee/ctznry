@@ -51,6 +51,11 @@ export class Header extends LitElement {
     }
   }
 
+  getHeaderNavClass (str) {
+    const additions = str === this.currentPath ? 'text-blue-600' : 'text-gray-700 hov:hover:text-blue-600'
+    return `px-5 py-3 rounded font-medium ${additions}`
+  }
+
   getMenuNavClass (str) {
     const additions = str === this.currentPath ? 'text-blue-600' : 'text-gray-700 hov:hover:text-blue-600'
     return `pl-3 pr-4 py-3 rounded font-medium ${additions}`
@@ -62,67 +67,116 @@ export class Header extends LitElement {
     }
     let info = session.getSavedInfo()
     return html`
-      <header>
-        <div class="menu ${this.isMenuOpen ? 'open transition-enabled' : 'closed'} flex flex-col leading-none font-medium">
-          <div class="mobile-only flex-1 bg-gray-50 mb-2"></div>
-          <div class="px-4 pt-2.5 pb-1">
-            <div class="font-bold text-3xl text-gray-800">
-              CTZN
-              <span class="text-lg text-gray-500 tracking-tight">alpha</span>
-            </div>
+      <div class="hidden lg:block white-glass sticky top-0 z-10 shadow">
+        <div class="flex items-center leading-none font-medium py-2 px-2">
+          <a href="/" class=${this.getHeaderNavClass(undefined)} @click=${this.onClickLink}>
+            CTZN <small>alpha</small>
+          </a>
+          <a href="/" class=${this.getHeaderNavClass('/')} @click=${this.onClickLink} data-tooltip="Home">
+            <span class="fas fa-fw navicon fa-home"></span>
+          </a>
+          <a href="/notifications" class="relative ${this.getHeaderNavClass('/notifications')}" @click=${this.onClickLink} data-tooltip="Notfications">
+            ${this.unreadNotificationsCount > 0 ? html`
+              <span class="absolute bg-blue-500 font-medium leading-none px-1.5 py-0.5 rounded-2xl text-white text-xs" style="top: 5px; left: 32px">${this.unreadNotificationsCount}</span>
+            ` : ''}
+            <span class="fas fa-fw navicon fa-bell"></span>
+          </a>
+          <a href="/communities" class="${this.getHeaderNavClass('/communities')}" @click=${this.onClickLink} data-tooltip="Communities">
+            <span class="fas fa-fw navicon fa-users"></span>
+          </a>
+          <div class="bg-gray-100 rounded-full py-1.5 px-3.5 text-sm flex-1 flex items-center ml-2 mr-4">
+            <span class="fas fa-fw fa-search mr-2 text-gray-500"></span>
+            <input type="text" class="bg-gray-100 flex-1" placeholder="Search">
           </div>
-          <div class="flex flex-col px-2">
-            <a href="/" class=${this.getMenuNavClass('/')} @click=${this.onClickLink}>
-              <span class="fas mr-2 fa-fw navicon fa-home"></span>
-              Home
-            </a>
-            <a href="/notifications" class="relative ${this.getMenuNavClass('/notifications')}" @click=${this.onClickLink}>
-              ${this.unreadNotificationsCount > 0 ? html`
-                <span class="absolute bg-blue-500 font-medium leading-none px-1.5 py-0.5 rounded-2xl text-white text-xs" style="top: 5px; left: 22px">${this.unreadNotificationsCount}</span>
-              ` : ''}
-              <span class="fas mr-2 fa-fw navicon fa-bell"></span>
-              Notifications
-            </a>
-            <a href="/communities" class="${this.getMenuNavClass('/communities')}" @click=${this.onClickLink}>
-              <span class="fas mr-2 fa-fw navicon fa-users"></span>
-              Communities
-            </a>
-            <a
-              class="${this.getMenuNavClass(`/${info.userId}`)}"
-              href="/${info.userId}"
-              title=${info.userId}
-              @click=${this.onClickLink}
-            >
-              <span class="fas mr-2 fa-fw navicon fa-user"></span>
-              Profile
-            </a>
-          </div>
-          <div class="py-3 px-4">
-            <app-button
-              primary
-              btn-class="text-base sm:text-sm font-semibold w-full mb-2"
-              label="Create Post"
-              @click=${this.onClickCreatePost}
-            ></app-button>
-            <app-button
-              btn-class="text-gray-600 text-base sm:text-sm font-semibold w-full"
-              label="Create Community"
-              @click=${this.onClickCreateCommunity}
-            ></app-button>
-          </div>
-          <div class="px-2">
-            <div class="pb-16 sm:pb-6 flex flex-col">
-              <a class=${this.getMenuNavClass('/account')} href="/account" @click=${this.onClickLink}><span class="fas fa-fw fa-cog mr-1.5"></span> Account</a>
-              <a class=${this.getMenuNavClass()} href="#" @click=${this.onLogOut}>
-                <span class="fas fa-fw fa-sign-out-alt mr-1.5"></span> Log out
-              </a>
-            </div>
+          <app-button
+            primary
+            class="ml-auto mr-2"
+            btn-class="text-base sm:text-sm font-semibold w-full py-1 rounded-full"
+            label="Create Post"
+            @click=${this.onClickCreatePost}
+          ></app-button>
+          <app-button
+            class="mr-2"
+            btn-class="text-gray-600 text-base sm:text-sm font-semibold w-full py-1 rounded-full"
+            label="Create Community"
+            @click=${this.onClickCreateCommunity}
+          ></app-button>
+          <a
+            class="${this.getHeaderNavClass(`/${info.userId}`)}"
+            href="/${info.userId}"
+            title=${info.userId}
+            @click=${this.onClickLink}
+            data-tooltip="Profile"
+          >
+            <span class="fas fa-fw navicon fa-user"></span>
+          </a>
+          <a class=${this.getHeaderNavClass('/account')} href="/account" @click=${this.onClickLink} data-tooltip="Account">
+            <span class="fas fa-fw fa-cog"></span>
+          </a>
+          <a class=${this.getHeaderNavClass()} href="#" @click=${this.onLogOut} data-tooltip="Log">
+            <span class="fas fa-fw fa-sign-out-alt"></span>
+          </a>
+        </div>
+      </div>
+      <!-- <div class="rainbow-gradient" style="height: 1px"></div> -->
+      <div class="menu ${this.isMenuOpen ? 'open transition-enabled' : 'closed'} flex flex-col leading-none font-medium bg-white">
+        <div class="px-4 pt-2.5 pb-1">
+          <div class="font-bold text-3xl text-gray-800">
+            CTZN
+            <span class="text-lg text-gray-500 tracking-tight">alpha</span>
           </div>
         </div>
-        <div class="secondary-menu overflow-y-auto px-2 py-2">
-          <app-searchable-user-list></app-searchable-user-list>
+        <div class="flex flex-col px-2">
+          <a href="/" class=${this.getMenuNavClass('/')} @click=${this.onClickLink}>
+            <span class="fas mr-2 fa-fw navicon fa-home"></span>
+            Home
+          </a>
+          <a href="/notifications" class="relative ${this.getMenuNavClass('/notifications')}" @click=${this.onClickLink}>
+            ${this.unreadNotificationsCount > 0 ? html`
+              <span class="absolute bg-blue-500 font-medium leading-none px-1.5 py-0.5 rounded-2xl text-white text-xs" style="top: 5px; left: 22px">${this.unreadNotificationsCount}</span>
+            ` : ''}
+            <span class="fas mr-2 fa-fw navicon fa-bell"></span>
+            Notifications
+          </a>
+          <a href="/communities" class="${this.getMenuNavClass('/communities')}" @click=${this.onClickLink}>
+            <span class="fas mr-2 fa-fw navicon fa-users"></span>
+            Communities
+          </a>
+          <a
+            class="${this.getMenuNavClass(`/${info.userId}`)}"
+            href="/${info.userId}"
+            title=${info.userId}
+            @click=${this.onClickLink}
+          >
+            <span class="fas mr-2 fa-fw navicon fa-user"></span>
+            Profile
+          </a>
         </div>
-      </header>
+        <div class="py-3 px-4">
+          <app-button
+            primary
+            btn-class="text-base sm:text-sm font-semibold w-full mb-2"
+            label="Create Post"
+            @click=${this.onClickCreatePost}
+          ></app-button>
+          <app-button
+            btn-class="text-gray-600 text-base sm:text-sm font-semibold w-full"
+            label="Create Community"
+            @click=${this.onClickCreateCommunity}
+          ></app-button>
+        </div>
+        <div class="px-2">
+          <div class="pb-16 sm:pb-6 flex flex-col">
+            <a class=${this.getMenuNavClass('/account')} href="/account" @click=${this.onClickLink}><span class="fas fa-fw fa-cog mr-1.5"></span> Account</a>
+            <a class=${this.getMenuNavClass()} href="#" @click=${this.onLogOut}>
+              <span class="fas fa-fw fa-sign-out-alt mr-1.5"></span> Log out
+            </a>
+          </div>
+        </div>
+      </div>
+      ${''/*<div class="secondary-menu overflow-y-auto px-2 py-2">
+        <app-searchable-user-list></app-searchable-user-list>
+</div>*/}
       ${this.isMenuOpen ? html`
         <div
           class="fixed top-0 left-0 w-full h-full z-40" style="background: rgba(0, 0, 0, 0.5)"

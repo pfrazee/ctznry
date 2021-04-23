@@ -106,7 +106,7 @@ export class SuggestionsSidebar extends LitElement {
           })
         }
 
-        suggestedCommunities = suggestedCommunities.sort(() => Math.random() - 0.5).slice(0, 8)
+        suggestedCommunities = suggestedCommunities.sort(() => Math.random() - 0.5).slice(0, 3)
         for (let suggestedCommunity of suggestedCommunities) {
           if (!suggestedCommunity.displayName) {
             session.ctzn.getProfile(suggestedCommunity.userId).then(profile => {
@@ -129,35 +129,36 @@ export class SuggestionsSidebar extends LitElement {
   render () {
     return html`
       ${this.suggestedCommunities?.length ? html`
-        <section>
+        <section class="border-gray-200 border-l pl-6 pr-3 py-2">
+          <h4 class="font-bold mb-2 text-lg">Suggested communities</h4>
           ${repeat(this.suggestedCommunities, community => community.userId, community => {
             const hasJoined = session.isInCommunity(community.userId)
             let tooltipIds = community.members?.slice(0, 4).join(', ')
             if (community.members?.length > 4) tooltipIds += `, + ${community.members?.length - 4} more`
             return html`
-              <div class="text-sm bg-white mb-2 px-2 py-2 rounded">
-                <div class="text-base font-medium truncate">
+              <div class="text-sm py-3">
+                <div class="text-base font-medium truncate leading-snug">
                   <a class="hov:hover:pointer hov:hover:underline" href="/${community.userId}" title=${community.displayName}>
                     ${community.displayName || community.userId}
                   </a>
                 </div>
                 ${community.members?.length ? html`
-                  <div class="mb-1 text-gray-500 font-semibold">
+                  <div class="text-gray-500 font-semibold">
                     <span class="hov:hover:underline" data-tooltip=${tooltipIds}>
                       ${community.members.length} ${pluralize(community.members.length, 'member')} you follow
                     </span>
                   </div>
                 ` : ''}
-                <div class="mb-1">${community.description}</div>
+                <div class="mt-1.5">${community.description}</div>
                 <div class="mt-1.5">
                   ${hasJoined ? html`
                     <button
-                      class="border border-gray-300 bg-gray-100 px-3 py-0.5 rounded text-sm cursor-default"
+                      class="text-pink-600 cursor-default"
                       disabled
                     >Joined!</button>
                   ` : html`
                     <button
-                      class="border border-gray-300 bg-gray-100 px-3 py-0.5 rounded text-sm truncate hov:hover:bg-gray-200 cursor-pointer"
+                      class="text-pink-600 hov:hover:underline cursor-pointer"
                       @click=${e => this.onClickJoinSuggestedCommunity(e, community)}
                       ?disabled=${hasJoined}
                     >${community.isJoining ? html`<span class="spinner"></span>` : `Join community`}</button>
@@ -168,33 +169,41 @@ export class SuggestionsSidebar extends LitElement {
           })}
         </section>
       ` : ''}
-      <section class="sticky top-0 py-2">
-        <div class="text-sm bg-white p-3 rounded mb-2">
-          <div class="text-lg font-medium">
+      <hr class="mx-4">
+      <section class="sticky top-16 border-gray-200 border-l pl-6 pr-3 py-5">
+        <h4 class="font-bold mb-2 text-lg">C T Z N</h4>
+        <div class="text-sm bg-white rounded mb-6">
+          <div class="text-base font-medium">
             <span class="fas fa-heart fa-fw mr-1"></span> Support CTZN!
           </div>
-          <div>
+          <div class="py-1.5">
             CTZN is donation-driven software. Help us develop this network by joining our patreon.
+          </div>
+          <div>
             <a
-              class="block text-center w-full border border-gray-300 bg-gray-100 px-4 py-1 rounded text-sm truncate hov:hover:bg-gray-200 cursor-pointer mt-2"
+              class="text-pink-600 hov:hover:underline cursor-pointer"
               href="https://patreon.com/paul_maf_and_andrew"
               target="_blank"
             >Join our Patreon</a>            
           </div>
         </div>
-        <div class="text-sm bg-white p-3 rounded">
-          <div class="text-lg font-medium">
+        <div class="text-sm bg-white rounded">
+          <div class="text-base font-medium">
             <span class="fas fa-video fa-fw mr-1"></span> Watch the dev stream
           </div>
-          <div>
+          <div class="py-1.5">
             Follow CTZN's development by joining the daily livestream by the core team every weekday.
+          </div>
+          <div class="pb-1">
             <a
-              class="block text-center w-full border border-gray-300 bg-gray-100 px-4 py-1 rounded text-sm truncate hov:hover:bg-gray-200 cursor-pointer mt-2"
+              class="text-pink-600 py-1 hov:hover:underline cursor-pointer"
               href="https://www.youtube.com/channel/UCSkcL4my2wgDRFvjQOJzrlg"
               target="_blank"
             >Subscribe on YouTube</a>
-            <a 
-              class="block text-center w-full border border-gray-300 bg-gray-100 px-4 py-1 rounded text-sm truncate hov:hover:bg-gray-200 cursor-pointer mt-2"
+          </div>
+          <div>
+            <a
+              class="text-pink-600 py-1 hov:hover:underline cursor-pointer"
               href="https://ctzn.network/dev-vlog"
               target="_blank"
             >Watch the archives</a>

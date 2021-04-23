@@ -530,7 +530,7 @@ class CtznUser extends LitElement {
 
   renderDesktopHeader () {
     return html`
-      <main class="widescreen-only wide mb-2" style="padding: 0">
+      <main class="widescreen-only fullwidth mb-2" style="padding: 0">
         <div class="relative">
           <div class="absolute" style="top: 8px; left: 10px">
             <app-button
@@ -545,13 +545,12 @@ class CtznUser extends LitElement {
             ${this.renderProfileControls()}
           </div>
           <div
-            class="mt-2 rounded bg-blue-600"
+            class="bg-blue-600"
             style="height: 300px"
           >
             <app-img-fallbacks id=${this.userId}>
               <img
                 slot="img1"
-                class="rounded"
                 style="display: block; object-fit: cover; width: 100%; height: 300px;"
                 src=${BLOB_URL(this.userId, 'profile-banner')}
               >

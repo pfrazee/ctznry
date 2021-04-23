@@ -39,7 +39,6 @@ export class Code extends LitElement {
           white-space: pre;
           color: #1F2937 /*text-gray-800*/;
           background-color: transparent;
-          font-size: 1.2rem;
         }
         .rendered-code > code::before {
           display: inline-block;

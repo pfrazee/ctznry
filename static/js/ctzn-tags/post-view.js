@@ -257,7 +257,7 @@ export class PostView extends LitElement {
   renderDefault () {
     return html`
       <div
-        class="grid grid-post px-1 py-0.5 bg-white sm:rounded mb-0.5 ${this.renderOpts.noclick ? '' : 'cursor-pointer'} text-gray-600"
+        class="grid grid-post px-1 py-0.5 bg-white sm:rounded ${this.renderOpts.noclick ? '' : 'cursor-pointer'} text-gray-600"
         @click=${this.onClickCard}
         @mousedown=${this.onMousedownCard}
         @mouseup=${this.onMouseupCard}

@@ -9,6 +9,7 @@ export class Subnav extends LitElement {
     return {
       currentPath: {type: String, attribute: 'current-path'},
       items: {type: Array},
+      mobileOnly: {type: Boolean, attribute: 'mobile-only'},
       navClass: {type: String, attribute: 'nav-cls'},
       borderLeft: {type: Number},
       borderWidth: {type: Number}
@@ -23,6 +24,7 @@ export class Subnav extends LitElement {
     super()
     this.items = []
     this.navClass = ''
+    this.mobileOnly = false
     this.currentPath = undefined
     this.borderLeft = undefined
     this.borderWidth = 0
@@ -68,7 +70,10 @@ export class Subnav extends LitElement {
     })
     const rounded = this.navClass.indexOf('round') === -1 ? 'sm:rounded' : ''
     this.className = `
-      white-glass sticky top-0 z-10 flex overflow-x-auto bg-white ${rounded} ${this.navClass}
+      white-glass sticky top-0 z-10 flex overflow-x-auto bg-white
+      ${rounded}
+      ${this.navClass}
+      ${this.mobileOnly ? 'lg:hidden' : ''}
     `
   }
 
