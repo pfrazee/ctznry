@@ -1,7 +1,7 @@
-import { LitElement, html, css } from '../../vendor/lit-element/lit-element.js'
-import { classMap } from '../../vendor/lit-element/lit-html/directives/class-map.js'
-import { ifDefined } from '../../vendor/lit-element/lit-html/directives/if-defined.js'
-import { asyncReplace } from '../../vendor/lit-element/lit-html/directives/async-replace.js'
+import { LitElement, html, css } from '../../vendor/lit/lit.min.js'
+import { classMap } from '../../vendor/lit/directives/class-map.js'
+import { ifDefined } from '../../vendor/lit/directives/if-defined.js'
+import { asyncReplace } from '../../vendor/lit/directives/async-replace.js'
 import { findParent } from '../lib/dom.js'
 import dropdownCSS from '../../css/com/dropdown.css.js'
 

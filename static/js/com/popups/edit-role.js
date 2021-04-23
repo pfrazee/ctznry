@@ -1,6 +1,6 @@
 /* globals beaker */
-import { html } from '../../../vendor/lit-element/lit-element.js'
-import { repeat } from '../../../vendor/lit-element/lit-html/directives/repeat.js'
+import { html } from '../../../vendor/lit/lit.min.js'
+import { repeat } from '../../../vendor/lit/directives/repeat.js'
 import { PERM_DESCRIPTIONS } from '../../lib/const.js'
 import { BasePopup } from './base.js'
 import * as session from '../../lib/session.js'

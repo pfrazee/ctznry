@@ -1,5 +1,5 @@
 /* globals beaker */
-import { html } from '../../../vendor/lit-element/lit-element.js'
+import { html } from '../../../vendor/lit/lit.min.js'
 import { BasePopup } from './base.js'
 import '../../ctzn-tags/post-view.js'
 

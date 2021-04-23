@@ -1,4 +1,4 @@
-import { LitElement, html } from '../../vendor/lit-element/lit-element.js'
+import { LitElement, html } from '../../vendor/lit/lit.min.js'
 import * as toast from '../com/toast.js'
 import * as contextMenu from '../com/context-menu.js'
 import { joinPath, ucfirst } from '../lib/strings.js'

@@ -1,5 +1,5 @@
 /* globals beaker */
-import { html } from '../../../vendor/lit-element/lit-element.js'
+import { html } from '../../../vendor/lit/lit.min.js'
 import { BasePopup } from './base.js'
 import * as session from '../../lib/session.js'
 import { AVATAR_URL, ITEM_CLASS_ICON_URL } from '../../lib/const.js'

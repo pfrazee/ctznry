@@ -1,4 +1,4 @@
-import { LitElement, html } from '../../vendor/lit-element/lit-element.js'
+import { LitElement, html } from '../../vendor/lit/lit.min.js'
 
 export class Iframe extends LitElement {
   static get properties () {

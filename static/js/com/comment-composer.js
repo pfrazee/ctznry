@@ -1,5 +1,5 @@
 /* globals beaker monaco */
-import { LitElement, html } from '../../vendor/lit-element/lit-element.js'
+import { LitElement, html } from '../../vendor/lit/lit.min.js'
 import * as toast from './toast.js'
 import * as session from '../lib/session.js'
 

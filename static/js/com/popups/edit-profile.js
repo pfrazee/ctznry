@@ -1,4 +1,4 @@
-import { html } from '../../../vendor/lit-element/lit-element.js'
+import { html } from '../../../vendor/lit/lit.min.js'
 import { BasePopup } from './base.js'
 import { AVATAR_URL, BLOB_URL } from '../../lib/const.js'
 import '../button.js'

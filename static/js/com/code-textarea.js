@@ -1,4 +1,4 @@
-import { LitElement, html } from '../../vendor/lit-element/lit-element.js'
+import { LitElement, html } from '../../vendor/lit/lit.min.js'
 import { Behave, BehaveHooks } from '../../vendor/behave.js'
 
 BehaveHooks.add(['keydown'], function(data){

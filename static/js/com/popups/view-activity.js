@@ -1,7 +1,7 @@
 /* globals beaker */
-import { html } from '../../../vendor/lit-element/lit-element.js'
-import { repeat } from '../../../vendor/lit-element/lit-html/directives/repeat.js'
-import { asyncReplace } from '../../../vendor/lit-element/lit-html/directives/async-replace.js'
+import { html } from '../../../vendor/lit/lit.min.js'
+import { repeat } from '../../../vendor/lit/directives/repeat.js'
+import { asyncReplace } from '../../../vendor/lit/directives/async-replace.js'
 import { BasePopup } from './base.js'
 import { AVATAR_URL, ITEM_CLASS_ICON_URL } from '../../lib/const.js'
 import * as displayNames from '../../lib/display-names.js'

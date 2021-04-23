@@ -1,4 +1,4 @@
-import { LitElement, html } from '../../vendor/lit-element/lit-element.js'
+import { LitElement, html } from '../../vendor/lit/lit.min.js'
 
 import * as postView from '../ctzn-tags-editor/post-view.js'
 import * as postsFeed from '../ctzn-tags-editor/posts-feed.js'

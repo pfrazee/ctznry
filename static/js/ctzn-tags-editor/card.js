@@ -1,4 +1,4 @@
-import { html } from '../../vendor/lit-element/lit-html/lit-html.js'
+import { html } from '../../vendor/lit/lit.min.js'
 import { createBaseClass } from './base.js'
 
 // exported api

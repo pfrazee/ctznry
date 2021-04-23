@@ -1,4 +1,4 @@
-import {LitElement, html, css} from '../../vendor/lit-element/lit-element.js'
+import {LitElement, html, css} from '../../vendor/lit/lit.min.js'
 
 /*
 Usage:

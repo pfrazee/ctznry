@@ -1,4 +1,4 @@
-import { LitElement, html } from '../vendor/lit-element/lit-element.js'
+import { LitElement, html } from '../vendor/lit/lit.min.js'
 import * as session from './lib/session.js'
 import { emit } from './lib/dom.js'
 import * as gestures from './lib/gestures.js'

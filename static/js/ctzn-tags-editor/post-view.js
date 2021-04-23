@@ -1,4 +1,4 @@
-import { html } from '../../vendor/lit-element/lit-html/lit-html.js'
+import { html } from '../../vendor/lit/lit.min.js'
 import { createWidgetBaseClass } from './base.js'
 import { makeSafe, parseSrcAttr } from '../lib/strings.js'
 

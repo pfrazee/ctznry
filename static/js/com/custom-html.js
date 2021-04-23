@@ -1,5 +1,5 @@
-import { LitElement, html } from '../../vendor/lit-element/lit-element.js'
-import { unsafeHTML } from '../../vendor/lit-element/lit-html/directives/unsafe-html.js'
+import { LitElement, html } from '../../vendor/lit/lit.min.js'
+import { unsafeHTML } from '../../vendor/lit/directives/unsafe-html.js'
 import * as ctznHtml from '../lib/ctzn-html.js'
 import * as session from '../lib/session.js'
 import { decodeBase64 } from '../lib/strings.js'

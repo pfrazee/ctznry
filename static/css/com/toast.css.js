@@ -1,4 +1,4 @@
-import {css} from '../../vendor/lit-element/lit-element.js'
+import {css} from '../../vendor/lit/lit.min.js'
 
 const cssStr = css`
 :host {

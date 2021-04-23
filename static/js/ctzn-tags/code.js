@@ -1,5 +1,5 @@
-import { LitElement, html } from '../../vendor/lit-element/lit-element.js'
-import { repeat } from '../../vendor/lit-element/lit-html/directives/repeat.js'
+import { LitElement, html } from '../../vendor/lit/lit.min.js'
+import { repeat } from '../../vendor/lit/directives/repeat.js'
 import { makeUnsafe } from '../lib/strings.js'
 
 export class Code extends LitElement {

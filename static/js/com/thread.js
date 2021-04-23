@@ -1,5 +1,5 @@
-import { LitElement, html } from '../../vendor/lit-element/lit-element.js'
-import { repeat } from '../../vendor/lit-element/lit-html/directives/repeat.js'
+import { LitElement, html } from '../../vendor/lit/lit.min.js'
+import { repeat } from '../../vendor/lit/directives/repeat.js'
 import { CommentComposerPopup } from './popups/comment-composer.js'
 import * as toast from './toast.js'
 import { emit } from '../lib/dom.js'

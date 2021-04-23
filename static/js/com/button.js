@@ -1,5 +1,5 @@
-import { LitElement, html } from '../../vendor/lit-element/lit-element.js'
-import { ifDefined } from '../../vendor/lit-element/lit-html/directives/if-defined.js'
+import { LitElement, html } from '../../vendor/lit/lit.min.js'
+import { ifDefined } from '../../vendor/lit/directives/if-defined.js'
 
 export class Button extends LitElement {
   static get properties () {

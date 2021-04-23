@@ -1,5 +1,5 @@
-import { LitElement, html } from '../../vendor/lit-element/lit-element.js'
-import { repeat } from '../../vendor/lit-element/lit-html/directives/repeat.js'
+import { LitElement, html } from '../../vendor/lit/lit.min.js'
+import { repeat } from '../../vendor/lit/directives/repeat.js'
 import * as session from '../lib/session.js'
 import { getFollowedUsersCommunities } from '../lib/algorithms.js'
 import { pluralize } from '../lib/strings.js'
