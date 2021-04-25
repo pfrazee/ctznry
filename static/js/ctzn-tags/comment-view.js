@@ -274,7 +274,7 @@ export class CommentView extends LitElement {
           </div>
           ${this.renderReactionsCtrl()}
           ${this.isReplyOpen ? html`
-            <div class="border border-gray-300 rounded py-2 px-3 my-2 mx-1 bg-white">
+            <div class="border border-gray-300 rounded py-2 px-2 my-2 mx-1 bg-white">
               <app-comment-composer
                 autofocus
                 .community=${this.comment.value.community}
@@ -327,7 +327,7 @@ export class CommentView extends LitElement {
     let cls
     let style
     if (this.mode === 'as-reply') {
-      cls = 'whitespace-pre-wrap break-words text-base leading-snug text-black pt-2 pb-1.5 pl-5 pr-2.5'
+      cls = 'whitespace-pre-wrap break-words text-sm leading-snug text-black pt-2 pb-1.5 pl-5 pr-2.5'
     } else {
       cls = 'whitespace-pre-wrap break-words text-black mt-1 mb-1 ml-1 mr-2.5'
       style = 'font-size: 16px; letter-spacing: 0.1px; line-height: 1.3;'
@@ -485,7 +485,7 @@ export class CommentView extends LitElement {
   onClickCard (e) {
     if (this.renderOpts.noclick) return
     for (let el of e.composedPath()) {
-      if (el.tagName === 'A' || el.tagName === 'IMG' || el.tagName === 'APP-COMPOSER' || el.tagName === 'APP-REACTION-INPUT') {
+      if (el.tagName === 'A' || el.tagName === 'IMG' || el.tagName === 'APP-COMMENT-COMPOSER' || el.tagName === 'APP-REACTION-INPUT') {
         return
       }
     }
@@ -496,7 +496,7 @@ export class CommentView extends LitElement {
   onMousedownCard (e) {
     if (this.renderOpts.noclick) return
     for (let el of e.composedPath()) {
-      if (el.tagName === 'A' || el.tagName === 'IMG' || el.tagName === 'APP-COMPOSER' || el.tagName === 'APP-REACTION-INPUT') return
+      if (el.tagName === 'A' || el.tagName === 'IMG' || el.tagName === 'APP-COMMENT-COMPOSER' || el.tagName === 'APP-REACTION-INPUT') return
     }
     this.isMouseDown = true
     this.isMouseDragging = false

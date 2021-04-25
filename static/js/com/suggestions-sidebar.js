@@ -129,7 +129,7 @@ export class SuggestionsSidebar extends LitElement {
   render () {
     return html`
       ${this.suggestedCommunities?.length ? html`
-        <section class="border-gray-200 border-l pl-6 pr-3 py-2">
+        <section class="px-3 py-2">
           <h4 class="font-bold mb-2 text-lg">Suggested communities</h4>
           ${repeat(this.suggestedCommunities, community => community.userId, community => {
             const hasJoined = session.isInCommunity(community.userId)
@@ -170,7 +170,7 @@ export class SuggestionsSidebar extends LitElement {
         </section>
       ` : ''}
       <hr class="mx-4">
-      <section class="sticky top-16 border-gray-200 border-l pl-6 pr-3 py-5">
+      <section class="sticky top-16 px-3 py-5">
         <h4 class="font-bold mb-2 text-lg">C T Z N</h4>
         <div class="text-sm bg-white rounded mb-6">
           <div class="text-base font-medium">

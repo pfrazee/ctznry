@@ -275,13 +275,13 @@ export class PostView extends LitElement {
         </div>
         <div class="block bg-white min-w-0">
           <div class="pr-2 py-2 min-w-0">
-            <div class="pl-1 pr-2.5 text-gray-600 truncate">
+            <div class="pl-1 pr-2.5 text-sm text-gray-600 truncate">
               <span class="sm:mr-1 whitespace-nowrap">
                 <a class="hov:hover:underline" href="/${this.post.author.userId}" title=${this.post.author.displayName}>
-                  <span class="text-gray-800 font-semibold">${displayNames.render(this.post.author.userId)}</span>
+                  <span class="text-black font-bold" style="font-size: 15px; letter-spacing: 0.1px;">${displayNames.render(this.post.author.userId)}</span>
                 </a>
               </span>
-              <span class="mr-2 text-sm">
+              <span class="mr-2">
                 <a class="hov:hover:underline" href="${POST_URL(this.post)}" data-tooltip=${(new Date(this.post.value.createdAt)).toLocaleString()}>
                   ${relativeDate(this.post.value.createdAt)}
                 </a>
@@ -331,7 +331,7 @@ export class PostView extends LitElement {
         @click=${this.renderOpts?.preview ? undefined : e => this.onClickImage(e, item)}
       >
         <img
-          class="box-border object-cover rounded border border-gray-300 w-full img-sizing-${size}"
+          class="box-border object-cover rounded w-full img-sizing-${size}"
           src="${url}"
           alt=${item.caption || 'Image'}
         >
@@ -383,7 +383,7 @@ export class PostView extends LitElement {
           <div class="flex-1 pr-0.5">${this.renderImg(media[0], 'medium')}</div>
           <div class="flex-1 pl-0.5">${this.renderImg(media[1], 'medium')}</div>
         ` : html`
-          <div class="flex-1">${this.renderImg(media[0], 'big')}</div>
+          <div class="flex-1">${this.renderImg(media[0], 'free')}</div>
         `}
       </div>
     `
@@ -512,7 +512,7 @@ export class PostView extends LitElement {
     return html`
       <div
         class="whitespace-pre-wrap break-words text-black ${this.showContentOnly ? '' : 'mt-1 mb-2 ml-1 mr-2.5'}"
-        style="font-size: 16px; letter-spacing: 0.1px; line-height: 1.3;"
+        style="font-size: 16px; line-height: 1.3;"
         @click=${this.onClickText}
       >${unsafeHTML(linkify(emojify(makeSafe(this.post.value.text))))}${this.post.value.extendedText
           ? html`<span class="bg-gray-200 ml-1 px-1 rounded text-gray-600 text-xs">more</span>`

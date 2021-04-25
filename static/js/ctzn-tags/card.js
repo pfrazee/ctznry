@@ -12,10 +12,10 @@ export class Card extends LitElement {
         this.userId = state.page.userId
       }
     }
+    this.classList.add('block')
+    this.classList.add('border')
+    this.classList.add('border-gray-300')
     if (context === 'post') {
-      this.classList.add('block')
-      this.classList.add('border')
-      this.classList.add('border-gray-300')
       this.classList.add('rounded')
       this.classList.add('mb-3')
     }
@@ -41,7 +41,6 @@ export class Card extends LitElement {
         div {
           background: #fff;
           padding: 0.8rem;
-          margin-bottom: 0.25rem;
           border-radius: 0.25rem;
         }
         @media (max-width: 639px /*sm:*/) {

@@ -52,8 +52,8 @@ class CommentComposer extends LitElement {
           <textarea
             id="text"
             class="
-              w-full box-border resize-none outline-none h-32 text-base
-              ${this.modalMode ? 'border border-gray-300 px-3 py-2 h-56 rounded' : 'h-32 px-1.5'}
+              w-full box-border resize-none outline-none h-32 text-sm text-black
+              ${this.modalMode ? 'border border-gray-300 px-3 py-2 h-56 rounded' : 'h-32 px-1'}
             "
             placeholder=${this.placeholder}
             @keyup=${this.onTextareaKeyup}

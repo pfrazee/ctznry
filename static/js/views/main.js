@@ -191,7 +191,7 @@ class CtznMainView extends LitElement {
         @post-created=${e => this.load()}
         @unread-notifications-changed=${this.onUnreadNotificationsChanged}
       ></app-header>
-      <!-- <div class="rainbow-gradient" style="height: 1px"></div> -->
+      <div class="rainbow-gradient" style="height: 1px"></div>
       <!-- <div class="rainbow-gradient-pattern" style="height: 4px"></div> -->
       <main class="col2">
         <div>
@@ -204,7 +204,7 @@ class CtznMainView extends LitElement {
           ${this.currentView === 'feed' ? html`
             ${this.renderMockComposer()}
             ${this.isEmpty ? this.renderEmptyMessage() : ''}
-            <h2 class="text-4xl font-bold mt-8 mb-4 hidden lg:block">What's new</h2>
+            <h2 class="text-2xl tracking-tight font-bold p-4 border-l border-r border-gray-300 hidden lg:block">What's new</h2>
             <ctzn-posts-feed
               view="ctzn.network/feed-view"
               @load-state-updated=${this.onFeedLoadStateUpdated}
@@ -277,7 +277,7 @@ class CtznMainView extends LitElement {
 
   renderRightSidebar () {
     return html`
-      <nav class="pt-12">
+      <nav class="pt-6">
         <app-suggestions-sidebar></app-suggestions-sidebar>
       </nav>
     `

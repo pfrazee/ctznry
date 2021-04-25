@@ -34,7 +34,7 @@ export class Subnav extends LitElement {
   
   getNavCls ({path, mobileOnly, rightAlign, thin}) {
     return `
-      text-center pt-2 pb-2.5 sm:pt-4 sm:pb-4 ${thin ? 'px-3 sm:px-4' : 'px-4 sm:px-7'} whitespace-nowrap font-semibold cursor-pointer
+      text-center pt-2 pb-2.5 sm:pt-3 sm:pb-3 ${thin ? 'px-3 sm:px-4' : 'px-4 sm:px-7'} whitespace-nowrap font-semibold cursor-pointer
       hov:hover:text-blue-600
       ${mobileOnly ? 'no-header-only' : 'block'}
       ${rightAlign ? 'ml-auto' : ''}
@@ -68,10 +68,8 @@ export class Subnav extends LitElement {
     gestures.setOnSwiping((dx, dxN) => {
       this.borderEl.style.left = `${this.borderLeft + -dxN * this.borderWidth * 0.15}px`
     })
-    const rounded = this.navClass.indexOf('round') === -1 ? 'sm:rounded' : ''
     this.className = `
       white-glass sticky top-0 z-10 flex overflow-x-auto bg-white
-      ${rounded}
       ${this.navClass}
       ${this.mobileOnly ? 'lg:hidden' : ''}
     `

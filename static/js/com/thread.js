@@ -109,7 +109,7 @@ export class Thread extends LitElement {
 
   render () {
     return html`
-      <div class="mb-1 sm:mb-4 bg-white sm:rounded-b">
+      <div class="mb-1 sm:pl-1 sm:pr-3 bg-white sm:rounded-b">
         ${this.post ? html`
           <ctzn-post-view
             mode="expanded"
@@ -120,10 +120,10 @@ export class Thread extends LitElement {
           <span class="spinner"></span>
         `}
       </div>
-      <hr class="mb-4 sm:ml-16">
+      <hr class="mb-4">
       ${this.post ? this.renderCommentBox() : ''}
       ${this.thread?.length ? html`
-        <div class="bg-white sm:rounded px-1 py-2 sm:px-3 sm:py-3 sm:pl-16">
+        <div class="bg-white sm:rounded px-1 py-2 sm:px-3 sm:py-3">
           ${this.renderReplies(this.thread)}
         </div>
       ` : ''}
@@ -182,7 +182,7 @@ export class Thread extends LitElement {
     if (this.post?.value?.community) {
       if (!session.isInCommunity(this.post.value.community.userId)) {
         return html`
-          <div class="bg-white p-3 mb-1 sm:rounded sm:pl-16">
+          <div class="bg-white p-3 mb-1 sm:rounded">
             <div class="italic text-gray-500 text-sm">
               Join <a href="/${this.post.value.community.userId}" class="hov:hover:underline">${displayNames.render(this.post.value.community.userId)}</a> to reply.
             </div>
@@ -192,7 +192,7 @@ export class Thread extends LitElement {
     } else {
       if (!session.isFollowingMe(this.post?.author?.userId)) {
         return html`
-          <div class="bg-white p-3 mb-1 sm:rounded sm:pl-16">
+          <div class="bg-white p-3 mb-1 sm:rounded">
             <div class="italic text-gray-500 text-sm">
               Only people followed by <a href="/${this.post.author.userId}" class="hov:hover:underline">${this.post.author.displayName}</a> can reply.
             </div>
@@ -201,7 +201,7 @@ export class Thread extends LitElement {
       }
     }
     return html`
-      <div class="pl-3 mb-2 pr-1 sm:pl-16">
+      <div class="px-3 mb-2">
         ${this.isReplying ? html`
           <app-comment-composer
             autofocus

@@ -240,11 +240,7 @@ export class PostsFeed extends LitElement {
         ${this.renderPlaceholderPost()}
         ${this.renderPlaceholderPost()}
         ${this.renderPlaceholderPost()}
-      `
-      return html`
-        <div class="bg-gray-100 text-gray-500 py-44 text-center mb-5">
-          <span class="spinner"></span>
-        </div>
+        <hr class="border-t border-gray-300">
       `
     }
     if (!this.results.length) {
@@ -264,10 +260,11 @@ export class PostsFeed extends LitElement {
       ${this.renderHasNewItems()}
       ${this.renderResults()}
       ${this.results?.length && !this.hasHitLimit ? html`
-        <div class="bottom-of-feed ${this.isLoadingMore ? 'bg-white' : ''} mb-10 py-4 sm:rounded text-center">
-          ${this.isLoadingMore ? html`<span class="spinner w-6 h-6 text-gray-500"></span>` : ''}
+        <div class="bottom-of-feed ${this.isLoadingMore ? 'bg-white' : ''}">
+          ${this.isLoadingMore ? this.renderPlaceholderPost() : ''}
         </div>
       ` : ''}
+      <hr class="border-t border-gray-300">
     `
   }
 
@@ -297,7 +294,7 @@ export class PostsFeed extends LitElement {
         <ctzn-post-view
           .post=${post}
           mode="default"
-          class="block pt-1 lg:pt-4 pb-1 lg:pb-4 border-t border-gray-200"
+          class="block pt-1 lg:pt-1 pb-1 lg:pb-1 border border-b-0 border-gray-300"
         ></ctzn-post-view>
       </div>
     `
@@ -305,7 +302,7 @@ export class PostsFeed extends LitElement {
 
   renderPlaceholderPost () {
     return html`
-      <div class="block pt-1 lg:pt-4 pb-1 lg:pb-4 border-t border-gray-200">
+      <div class="block pt-1 lg:pt-4 pb-1 lg:pb-4 border border-b-0 border-gray-300">
         <div class="grid grid-post px-1 py-0.5">
           <div class="pl-2 pt-2">
             <div class="block object-cover rounded-full mt-1 w-11 h-11 bg-gray-100"></div>

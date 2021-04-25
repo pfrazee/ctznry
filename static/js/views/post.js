@@ -91,15 +91,14 @@ class CtznPostView extends LitElement {
   }
 
   renderHeader () {
-    const spaceUserId = this.communityUserId || this.authorProfile?.userId
     const SUBNAV_ITEMS = [
       {back: true, label: html`<span class="fas fa-angle-left"></span>`},
-      {path: location.pathname, label: 'View thread'},
+      {path: location.pathname, label: 'View post'},
       {rightAlign: true, click: this.onClickMenu.bind(this), label: html`<span class="fas fa-ellipsis-h cursor-pointer hov:hover:text-gray-700 text-xl text-gray-600"></span>`} 
     ]
     return html`
       <app-subnav
-        nav-cls="mb-0.5 sm:mt-0.5 sm:relative sm:border-b sm:border-gray-200"
+        nav-cls="sm:relative sm:border sm:border-t-0 sm:border-gray-300"
         .items=${SUBNAV_ITEMS}
         current-path=${location.pathname}
       ></app-subnav>
@@ -152,11 +151,12 @@ class CtznPostView extends LitElement {
   renderThread () {
     return html`
       <main class="col2 mb-32">
-        <div>
+        <div class="">
           ${this.renderHeader()}
-          <div class="min-h-screen sm:bg-transparent sm:py-2">
+          <div class="min-h-screen sm:bg-transparent sm:pb-2">
             ${this.subject ? html`
               <app-thread
+                class="block sm:border sm:border-t-0 sm:border-gray-300 sm:pb-1"
                 .subject=${this.subject}
                 @load=${this.onLoadThread}
               ></app-thread>
