@@ -129,7 +129,7 @@ export class DbmethodsFeed extends LitElement {
 
     // ui state
     this.loadMoreObserver = undefined
-    setInterval(() => this.checkNewItems(), CHECK_NEW_ITEMS_INTERVAL)
+    // DISABLED setInterval(() => this.checkNewItems(), CHECK_NEW_ITEMS_INTERVAL)
 
     // query state
     this.activeQuery = undefined
