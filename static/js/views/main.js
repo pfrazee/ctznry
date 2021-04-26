@@ -191,7 +191,7 @@ class CtznMainView extends LitElement {
         @post-created=${e => this.load()}
         @unread-notifications-changed=${this.onUnreadNotificationsChanged}
       ></app-header>
-      <div class="rainbow-gradient" style="height: 1px"></div>
+      <!-- <div class="rainbow-gradient" style="height: 1px"></div> -->
       <!-- <div class="rainbow-gradient-pattern" style="height: 4px"></div> -->
       <main class="col2">
         <div>

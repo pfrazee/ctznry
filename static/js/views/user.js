@@ -402,8 +402,8 @@ class CtznUser extends LitElement {
           </div>
         </div>
         <div>
-          <div class="sticky" style="top: 66px">
-            <div class="absolute" style="top: -60px; right: 75px;">
+          <div class="sticky" style="top: 140px">
+            <div class="absolute" style="top: -70px; right: 75px;">
               <a href="/${this.userId}" title=${this.userProfile?.value.displayName}>
                 <img
                   class="border-2 border-white inline-block object-cover rounded-3xl shadow-md bg-white"
@@ -413,7 +413,7 @@ class CtznUser extends LitElement {
                 >
               </a>
             </div>
-            <div class="rounded bg-white px-5 pt-20 pb-4 mb-2 break-words">
+            <div class="rounded bg-white px-2 pt-20 pb-4 mb-2 break-words">
               <h2 class="text-2xl font-semibold">
                 <a
                   class="inline-block"
@@ -493,8 +493,8 @@ class CtznUser extends LitElement {
                 return html`
                   <a
                     class="
-                      block px-3 py-2 mb-0.5 cursor-pointer hover:bg-white hover:border-blue-600
-                      ${item.path === this.currentPath ? 'border-blue-600 bg-white' : 'border-gray-50 bg-gray-50'}
+                      block px-3 py-1.5 mb-1 cursor-pointer border-l-2 font-medium hover:bg-blue-50 hover:border-blue-600
+                      ${item.path === this.currentPath ? 'border-blue-600 text-blue-700 bg-blue-50' : 'border-gray-200 text-gray-700'}
                       ${i === 0 ? 'rounded-tr' : ''}
                       ${i === this.subnavItems.length - 1 ? 'rounded-br' : ''}
                     "
@@ -546,17 +546,21 @@ class CtznUser extends LitElement {
           </div>
           <div
             class="bg-blue-600"
-            style="height: 300px"
+            style="height: 400px"
           >
             <app-img-fallbacks id=${this.userId}>
               <img
                 slot="img1"
-                style="display: block; object-fit: cover; width: 100%; height: 300px;"
+                style="display: block; object-fit: cover; width: 100%; height: 400px;"
                 src=${BLOB_URL(this.userId, 'profile-banner')}
               >
               <div slot="img2"></div>
             </app-img-fallbacks>
           </div>
+          <div
+            class="absolute w-full pointer-events-none"
+            style="top: 80%; left: 0; height: 20%; background: linear-gradient(to top, rgba(0,0,0,0.15), rgba(0,0,0,0.05) 30%, rgba(0,0,0,0));"
+          ></div>
         </div>
         <div id="scroll-target"></div>
       </main>

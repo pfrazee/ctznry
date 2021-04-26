@@ -153,12 +153,12 @@ export class SuggestionsSidebar extends LitElement {
                 <div class="mt-1.5">
                   ${hasJoined ? html`
                     <button
-                      class="text-pink-600 cursor-default"
+                      class="text-blue-600 cursor-default"
                       disabled
                     >Joined!</button>
                   ` : html`
                     <button
-                      class="text-pink-600 hov:hover:underline cursor-pointer"
+                      class="text-blue-600 hov:hover:underline cursor-pointer"
                       @click=${e => this.onClickJoinSuggestedCommunity(e, community)}
                       ?disabled=${hasJoined}
                     >${community.isJoining ? html`<span class="spinner"></span>` : `Join community`}</button>
@@ -181,7 +181,7 @@ export class SuggestionsSidebar extends LitElement {
           </div>
           <div>
             <a
-              class="text-pink-600 hov:hover:underline cursor-pointer"
+              class="text-blue-600 hov:hover:underline cursor-pointer"
               href="https://patreon.com/paul_maf_and_andrew"
               target="_blank"
             >Join our Patreon</a>            
@@ -196,14 +196,14 @@ export class SuggestionsSidebar extends LitElement {
           </div>
           <div class="pb-1">
             <a
-              class="text-pink-600 py-1 hov:hover:underline cursor-pointer"
+              class="text-blue-600 py-1 hov:hover:underline cursor-pointer"
               href="https://www.youtube.com/channel/UCSkcL4my2wgDRFvjQOJzrlg"
               target="_blank"
             >Subscribe on YouTube</a>
           </div>
           <div>
             <a
-              class="text-pink-600 py-1 hov:hover:underline cursor-pointer"
+              class="text-blue-600 py-1 hov:hover:underline cursor-pointer"
               href="https://ctzn.network/dev-vlog"
               target="_blank"
             >Watch the archives</a>

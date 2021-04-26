@@ -67,7 +67,7 @@ export class Header extends LitElement {
     }
     let info = session.getSavedInfo()
     return html`
-      <div class="hidden lg:block white-glass sticky top-0 z-20 shadow">
+      <div class="hidden lg:block white-glass sticky top-0 z-20 border-b border-gray-300">
         <div class="flex items-center leading-none font-medium py-2 px-2">
           <a href="/" class=${this.getHeaderNavClass(undefined)} @click=${this.onClickLink}>
             CTZN <small>alpha</small>
