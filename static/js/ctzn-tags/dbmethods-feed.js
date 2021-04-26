@@ -10,7 +10,7 @@ import { emit } from '../lib/dom.js'
 import { extractSchemaId } from '../lib/strings.js'
 import './post-view.js'
 
-const CHECK_NEW_ITEMS_INTERVAL = 15e3
+const CHECK_NEW_ITEMS_INTERVAL = 30e3
 const _itemCache = {}
 
 const METHOD_COLORS = {
@@ -279,7 +279,7 @@ export class DbmethodsFeed extends LitElement {
   }
 
   async checkNewItems () {
-    if (!this.entries || this.hasHitLimit) {
+    if (!this.entries || this.hasHitLimit || !document.hasFocus()) {
       return
     }
     const viewRes = (this.view === 'ctzn.network/dbmethod-feed-view')

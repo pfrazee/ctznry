@@ -4,7 +4,7 @@ import * as displayNames from '../lib/display-names.js'
 import * as session from '../lib/session.js'
 import { emit } from '../lib/dom.js'
 
-const CHECK_NEW_ITEMS_INTERVAL = 15e3
+const CHECK_NEW_ITEMS_INTERVAL = 30e3
 
 export class DbmethodResultFeed extends LitElement {
   static get properties () {
@@ -101,7 +101,7 @@ export class DbmethodResultFeed extends LitElement {
   }
 
   async checkNewItems () {
-    if (!this.results) {
+    if (!this.results || !document.hasFocus()) {
       return
     }
     let results = (await session.ctzn.view('ctzn.network/dbmethod-results-view', this.userId, {limit: 1, reverse: true}))?.results

@@ -4,7 +4,7 @@ import * as session from '../lib/session.js'
 import { emit } from '../lib/dom.js'
 import './comment-view.js'
 
-const CHECK_NEW_ITEMS_INTERVAL = 15e3
+const CHECK_NEW_ITEMS_INTERVAL = 30e3
 let _cache = {
   id: undefined,
   results: undefined
@@ -167,7 +167,7 @@ export class CommentsFeed extends LitElement {
   }
 
   async checkNewItems () {
-    if (!this.results || this.hasHitLimit) {
+    if (!this.results || this.hasHitLimit || !document.hasFocus()) {
       return
     }
     const results = await session.ctzn.db(this.userId).table("ctzn.network/comment").list({limit: 1, reverse: true})
