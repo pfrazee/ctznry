@@ -29,7 +29,7 @@ export class DbmethodResultFeed extends LitElement {
 
     // ui state
     this.loadMoreObserver = undefined
-    // DISABLED setInterval(() => this.checkNewItems(), CHECK_NEW_ITEMS_INTERVAL)
+    setInterval(() => this.checkNewItems(), CHECK_NEW_ITEMS_INTERVAL)
 
     // query state
     this.activeQuery = undefined
@@ -101,7 +101,7 @@ export class DbmethodResultFeed extends LitElement {
   }
 
   async checkNewItems () {
-    if (!this.results || !document.hasFocus()) {
+    if (!this.results) {
       return
     }
     let results = (await session.ctzn.view('ctzn.network/dbmethod-results-view', this.userId, {limit: 1, reverse: true}))?.results

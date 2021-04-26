@@ -10,7 +10,6 @@ export async function getClearedAt () {
 }
 
 export async function updateClearedAt () {
-  console.log('clearing')
   await session.api.notifications.updateNotificationsClearedAt()
   setCache('unread', 0)
 }

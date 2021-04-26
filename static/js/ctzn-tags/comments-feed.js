@@ -36,7 +36,7 @@ export class CommentsFeed extends LitElement {
 
     // ui state
     this.loadMoreObserver = undefined
-    // DISABLED setInterval(() => this.checkNewItems(), CHECK_NEW_ITEMS_INTERVAL)
+    setInterval(() => this.checkNewItems(), CHECK_NEW_ITEMS_INTERVAL)
 
     // query state
     this.activeQuery = undefined
@@ -167,7 +167,7 @@ export class CommentsFeed extends LitElement {
   }
 
   async checkNewItems () {
-    if (!this.results || this.hasHitLimit || !document.hasFocus()) {
+    if (!this.results || this.hasHitLimit) {
       return
     }
     const results = await session.ctzn.db(this.userId).table("ctzn.network/comment").list({limit: 1, reverse: true})

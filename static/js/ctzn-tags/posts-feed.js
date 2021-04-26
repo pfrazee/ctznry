@@ -38,7 +38,7 @@ export class PostsFeed extends LitElement {
 
     // ui state
     this.loadMoreObserver = undefined
-    // DISABLED setInterval(() => this.checkNewItems(), CHECK_NEW_ITEMS_INTERVAL)
+    setInterval(() => this.checkNewItems(), CHECK_NEW_ITEMS_INTERVAL)
 
     // query state
     this.activeQuery = undefined
@@ -178,7 +178,7 @@ export class PostsFeed extends LitElement {
   }
 
   async checkNewItems () {
-    if (!this.results || this.hasHitLimit || !document.hasFocus()) {
+    if (!this.results || this.hasHitLimit) {
       return
     }
     let results

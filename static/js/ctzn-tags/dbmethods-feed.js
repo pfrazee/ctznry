@@ -129,7 +129,7 @@ export class DbmethodsFeed extends LitElement {
 
     // ui state
     this.loadMoreObserver = undefined
-    // DISABLED setInterval(() => this.checkNewItems(), CHECK_NEW_ITEMS_INTERVAL)
+    setInterval(() => this.checkNewItems(), CHECK_NEW_ITEMS_INTERVAL)
 
     // query state
     this.activeQuery = undefined
@@ -279,7 +279,7 @@ export class DbmethodsFeed extends LitElement {
   }
 
   async checkNewItems () {
-    if (!this.entries || this.hasHitLimit || !document.hasFocus()) {
+    if (!this.entries || this.hasHitLimit) {
       return
     }
     const viewRes = (this.view === 'ctzn.network/dbmethod-feed-view')
