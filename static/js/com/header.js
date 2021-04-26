@@ -1,5 +1,6 @@
 import {LitElement, html} from '../../vendor/lit/lit.min.js'
 import * as session from '../lib/session.js'
+import * as notifications from '../lib/notifications.js'
 import { AVATAR_URL } from '../lib/const.js'
 import { emit } from '../lib/dom.js'
 import { ComposerPopup } from './popups/composer.js'
@@ -8,7 +9,8 @@ import * as toast from './toast.js'
 import './button.js'
 import './searchable-user-list.js'
 
-const CHECK_NOTIFICATIONS_INTERVAL = 10e3
+// lib/notifications uses caching to only talk to the server every 30s
+const CHECK_NOTIFICATIONS_INTERVAL = 5e3
 
 export class Header extends LitElement {
   static get properties () {
@@ -43,9 +45,8 @@ export class Header extends LitElement {
 
   async checkNotifications () {
     if (!session.isActive()) return
-    const clearedAt = (await session.ctzn.view('ctzn.network/notifications-cleared-at-view'))?.notificationsClearedAt || undefined
     let oldCount = this.unreadNotificationsCount
-    this.unreadNotificationsCount = (await session.ctzn.view('ctzn.network/notifications-count-view', {after: clearedAt})).count
+    this.unreadNotificationsCount = await notifications.countUnread()
     if (oldCount !== this.unreadNotificationsCount) {
       emit(this, 'unread-notifications-changed', {detail: {count: this.unreadNotificationsCount}})
     }

@@ -1,6 +1,7 @@
 import { LitElement, html } from '../../vendor/lit/lit.min.js'
 import * as toast from '../com/toast.js'
 import * as session from '../lib/session.js'
+import * as notifications from '../lib/notifications.js'
 import { ComposerPopup } from '../com/popups/composer.js'
 import PullToRefresh from '../../vendor/pulltorefreshjs/index.js'
 import '../com/header.js'
@@ -63,12 +64,9 @@ class CtznMainView extends LitElement {
 
     if (this.currentView === 'notifications') {
       document.title = `Notifications | CTZN`
-      const res = await session.ctzn.view('ctzn.network/notifications-cleared-at-view')
-      this.notificationsClearedAt = res?.notificationsClearedAt ? Number(new Date(res?.notificationsClearedAt)) : 0
-
-      if (document.hasFocus) {
-        await session.api.notifications.updateNotificationsClearedAt()
-      }
+      let clearedAt = await notifications.getClearedAt()
+      this.notificationsClearedAt = clearedAt ? Number(new Date(clearedAt)) : 0
+      notifications.updateClearedAt()
     }
 
     if (this.querySelector('ctzn-posts-feed')) {
@@ -446,10 +444,7 @@ custom code</ctzn-code>
     if (this.currentView === 'notifications') {
       document.title = e.detail.count ? `(${e.detail.count}) Notifications | CTZN` : `Notifications | CTZN`
       this.querySelector('app-notifications-feed').loadNew(e.detail.count)
-
-      if (document.hasFocus()) {
-        session.api.notifications.updateNotificationsClearedAt()
-      }
+      notifications.updateClearedAt()
     }
   }
 }
