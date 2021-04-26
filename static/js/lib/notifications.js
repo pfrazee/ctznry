@@ -2,7 +2,7 @@ import * as session from './session.js'
 
 export async function getClearedAt () {
   const cached = getCache('cleared-at')
-  if (cached) return cached
+  if (typeof cached !== 'undefined') return cached
   setCache('cleared-at', undefined) // "lock" by updating the cache ttl
   const res = await session.ctzn.view('ctzn.network/notifications-cleared-at-view')
   setCache('cleared-at', res?.notificationsClearedAt)
@@ -10,16 +10,14 @@ export async function getClearedAt () {
 }
 
 export async function updateClearedAt () {
-  const cached = getCache('updated-cleared-at')
-  if (!cached && document.hasFocus()) {
-    setCache('updated-cleared-at', true)
-    await session.api.notifications.updateNotificationsClearedAt()
-  }
+  console.log('clearing')
+  await session.api.notifications.updateNotificationsClearedAt()
+  setCache('unread', 0)
 }
 
 export async function countUnread () {
   const cached = getCache('unread')
-  if (cached) return cached
+  if (typeof cached !== 'undefined') return cached
   setCache('unread', undefined) // "lock" by updating the cache ttl
   const clearedAt = await getClearedAt()
   const count = (await session.ctzn.view('ctzn.network/notifications-count-view', {after: clearedAt})).count
