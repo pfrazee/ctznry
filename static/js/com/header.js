@@ -91,13 +91,15 @@ export class Header extends LitElement {
           <div
             class="
               relative py-1.5 px-3.5 text-sm flex-1 flex items-center ml-2 mr-4 border
-              ${this.isSearchFocused ? 'bg-white rounded-t border-gray-300 shadow-lg' : 'border-transparent bg-gray-100 rounded-full'}
+              ${this.isSearchFocused ? 'bg-white rounded-t border-gray-300 shadow-lg' : 'border-transparent rounded-full'}
             "
+            style="${this.isSearchFocused ? '' : 'background: rgba(0,0,0,0.05)'}"
+            @click=${this.isSearchFocused ? undefined : () => this.querySelector('input').focus()}
           >
             <span class="fas fa-fw fa-search mr-2 text-gray-500"></span>
             <input
               type="text"
-              class="bg-transparent flex-1"
+              class="bg-transparent flex-1 placeholder-gray-600"
               placeholder="Search"
               @focus=${this.onFocusSearch}
               @blur=${this.onBlurSearch}
@@ -202,9 +204,6 @@ export class Header extends LitElement {
           </div>
         </div>
       </div>
-      ${''/*<div class="secondary-menu overflow-y-auto px-2 py-2">
-        <app-searchable-user-list></app-searchable-user-list>
-</div>*/}
       ${this.isMenuOpen ? html`
         <div
           class="fixed top-0 left-0 w-full h-full z-40" style="background: rgba(0, 0, 0, 0.5)"
