@@ -149,15 +149,17 @@ class CtznCommunities extends LitElement {
         ${session.isActive() ? html`
           <div>
             <app-subnav
+              mobile-only
               nav-cls="mb-0.5 sm:mt-0.5"
               .items=${SUBNAV_ITEMS}
               current-path=${this.currentPath}
             ></app-subnav>
+            <h2 class="text-2xl tracking-tight font-bold p-4 border border-t-0 border-gray-300 hidden lg:block">My Communities</h2>
             <div class="mb-4">
               ${this.memberships?.length ? html`
                 ${repeat(this.memberships, membership => html`
                   <a
-                    class="flex items-center bg-white mb-0.5 px-4 py-2 sm:rounded hov:hover:pointer hov:hover:bg-gray-50"
+                    class="flex items-center bg-white border border-t-0 border-gray-300 px-4 py-2 hov:hover:pointer hov:hover:bg-gray-50"
                     href="/${membership.value.community.userId}"
                     title="${membership.value.community.userId}"
                   >
@@ -168,29 +170,20 @@ class CtznCommunities extends LitElement {
                   </a>
                 `)}
               ` : html`
-                <div class="border border-gray-200 border-t-0 px-4 py-4 text-gray-500 tracking-tight">
+                <div class="border border-gray-300 border-t-0 px-4 py-4 text-gray-600 font-medium bg-gray-50">
                   Join a community to get connected to more people!
                 </div>
               `}
             </div>
           ` : ''}
           ${this.suggestedCommunities?.length ? html`
-            <div
-              class="sticky top-0 z-10 mb-0.5 px-4 py-3 sm:rounded"
-              style="
-                backdrop-filter: blur(4px);
-                -webkit-backdrop-filter: blur(4px);
-                background: rgba(255, 255, 255, 0.9);
-              "
-            >
-              <span class="ml-2 font-medium text-lg">Suggested Communities</span>
-            </div>
+            <h2 class="text-2xl tracking-tight font-bold p-4 border border-gray-300 hidden lg:block">Suggested Communities</h2>
             ${repeat(this.suggestedCommunities, community => community.userId, community => {
               const hasJoined = this.memberships?.find(m => community.userId === m.value.community.userId)
             let tooltipIds = community.members?.slice(0, 4).join(', ')
             if (community.members?.length > 4) tooltipIds += `, + ${community.members?.length - 4} more`
               return html`
-                <div class="flex bg-white px-4 py-3 mb-0.5 sm:rounded">
+                <div class="flex bg-white px-4 py-3 border border-gray-300 border-t-0">
                   <img class="block rounded-lg w-10 h-10 mr-4" src=${AVATAR_URL(community.userId)}>
                   <div class="flex-1 min-w-0">
                     <div>
