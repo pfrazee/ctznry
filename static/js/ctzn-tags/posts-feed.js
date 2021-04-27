@@ -4,7 +4,7 @@ import * as session from '../lib/session.js'
 import { emit } from '../lib/dom.js'
 import './post-view.js'
 
-const CHECK_NEW_ITEMS_INTERVAL = 15e3
+const CHECK_NEW_ITEMS_INTERVAL = 30e3
 let _cache = {
   id: undefined,
   results: undefined
