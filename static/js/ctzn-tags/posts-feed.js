@@ -235,12 +235,11 @@ export class PostsFeed extends LitElement {
         return ''
       }
       return html`
-        ${this.renderPlaceholderPost()}
-        ${this.renderPlaceholderPost()}
-        ${this.renderPlaceholderPost()}
-        ${this.renderPlaceholderPost()}
-        ${this.renderPlaceholderPost()}
-        <hr class="border-t border-gray-300">
+        ${this.renderPlaceholderPost(0)}
+        ${this.renderPlaceholderPost(1)}
+        ${this.renderPlaceholderPost(2)}
+        ${this.renderPlaceholderPost(3)}
+        ${this.renderPlaceholderPost(4)}
       `
     }
     if (!this.results.length) {
@@ -261,10 +260,9 @@ export class PostsFeed extends LitElement {
       ${this.renderResults()}
       ${this.results?.length && !this.hasHitLimit ? html`
         <div class="bottom-of-feed ${this.isLoadingMore ? 'bg-white' : ''}">
-          ${this.isLoadingMore ? this.renderPlaceholderPost() : ''}
+          ${this.isLoadingMore ? this.renderPlaceholderPost(-1) : ''}
         </div>
       ` : ''}
-      <hr class="border-t border-gray-300">
     `
   }
 
@@ -284,25 +282,25 @@ export class PostsFeed extends LitElement {
 
   renderResults () {
     return html`
-      ${repeat(this.results, result => result.url, result => this.renderResult(result))}
+      ${repeat(this.results, result => result.url, (result, i) => this.renderResult(result, i))}
     `
   }
   
-  renderResult (post) {
+  renderResult (post, index) {
     return html`
       <div style="content-visibility: auto; contain-intrinsic-size: 640px 120px;">
         <ctzn-post-view
           .post=${post}
           mode="default"
-          class="block pt-1 lg:pt-1 pb-1 lg:pb-1 border border-b-0 border-gray-300"
+          class="block pt-1 lg:pt-1 pb-1 lg:pb-1 ${index === 0 ? '' : 'border-t border-gray-300'}"
         ></ctzn-post-view>
       </div>
     `
   }
 
-  renderPlaceholderPost () {
+  renderPlaceholderPost (index) {
     return html`
-      <div class="block pt-1 lg:pt-4 pb-1 lg:pb-4 border border-b-0 border-gray-300">
+      <div class="block pt-1 lg:pt-4 pb-1 lg:pb-4 ${index === 0 ? '' : 'border-t border-gray-300'}">
         <div class="grid grid-post px-1 py-0.5">
           <div class="pl-2 pt-2">
             <div class="block object-cover rounded-full mt-1 w-11 h-11 bg-gray-100"></div>

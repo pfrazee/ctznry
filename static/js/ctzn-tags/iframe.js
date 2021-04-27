@@ -22,7 +22,7 @@ export class Iframe extends LitElement {
   render () {
     return html`
       ${this.isActivated ? html`
-        <div class="iframe-sizer bg-white sm:rounded mb-0.5">
+        <div class="iframe-sizer bg-white sm:rounded">
           <iframe
             src=${this.src}
             allow="autoplay;camera;encrypted-media;fullscreen;microphone;midi;payment;usb;web-share"
@@ -30,7 +30,7 @@ export class Iframe extends LitElement {
           ></iframe>
         </div>
       ` : html`
-        <div class="bg-white py-2 px-3 hov:hover:bg-gray-50 sm:rounded mb-0.5 cursor-pointer" @click=${this.onClickActivate}>
+        <div class="bg-white py-2 px-3 hov:hover:bg-gray-50 sm:rounded cursor-pointer" @click=${this.onClickActivate}>
           <div><span class="fas fa-play fa-fw"></span> Click to activate embed</div>
           <div class="text-sm text-gray-500">${this.src}</div>
         </div>

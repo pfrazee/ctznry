@@ -204,6 +204,7 @@ class CtznMainView extends LitElement {
             ${this.isEmpty ? this.renderEmptyMessage() : ''}
             <h2 class="text-2xl tracking-tight font-bold p-4 border-l border-r border-gray-300 hidden lg:block">What's new</h2>
             <ctzn-posts-feed
+              class="block border border-gray-300"
               view="ctzn.network/feed-view"
               @load-state-updated=${this.onFeedLoadStateUpdated}
               @publish-reply=${this.onPublishReply}

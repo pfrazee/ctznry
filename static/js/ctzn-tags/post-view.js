@@ -301,7 +301,7 @@ export class PostView extends LitElement {
                 ${this.renderReactions()}
               </div>
             ` : ''}
-            <div class="flex pl-1 mt-1.5 text-gray-500 text-sm items-center justify-between pr-12 sm:pr-80">
+            <div class="flex pl-1 mt-1.5 text-gray-500 text-sm items-center justify-between pr-12 sm:w-72">
               ${this.renderRepliesCtrl()}
               ${this.renderReactionsBtn()}
               ${this.renderGiftItemBtn()}
@@ -549,7 +549,8 @@ export class PostView extends LitElement {
 
   onClickText (e) {
     for (let el of e.composedPath()) {
-      if (el.tagName === 'A') {
+      if (el === this) break
+      if (el.tagName === 'A' && el.getAttribute('href')) {
         // open in a new window
         window.open(el.getAttribute('href'))
         e.preventDefault()
@@ -562,6 +563,7 @@ export class PostView extends LitElement {
   onClickCard (e) {
     if (this.renderOpts.noclick) return
     for (let el of e.composedPath()) {
+      if (el === this) break
       if (el.tagName === 'A' || el.tagName === 'IMG' || el.tagName === 'APP-COMPOSER' || el.tagName === 'APP-REACTION-INPUT') {
         return
       }
@@ -573,7 +575,10 @@ export class PostView extends LitElement {
   onMousedownCard (e) {
     if (this.renderOpts.noclick) return
     for (let el of e.composedPath()) {
-      if (el.tagName === 'A' || el.tagName === 'IMG' || el.tagName === 'APP-COMPOSER' || el.tagName === 'APP-REACTION-INPUT') return
+      if (el === this) break
+      if (el.tagName === 'A' || el.tagName === 'IMG' || el.tagName === 'APP-COMPOSER' || el.tagName === 'APP-REACTION-INPUT') {
+        return
+      }
     }
     this.isMouseDown = true
     this.isMouseDragging = false

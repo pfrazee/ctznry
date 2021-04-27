@@ -51,14 +51,14 @@ export class FollowingList extends LitElement {
   render () {
     if (typeof this.following === 'undefined') {
       return html`
-        <div class="bg-white sm:rounded my-1 px-5 py-3">
+        <div class="bg-white sm:rounded px-5 py-3">
           <span class="text-lg font-medium mr-1">Following</span>
           <span class="spinner text-gray-500"></span>
         </div>
       `
     }
     return html`
-      <div class="bg-white sm:rounded my-1 ${this.following ? 'pb-1' : ''}">
+      <div class="bg-white sm:rounded">
         <div
           class="px-5 py-3 sm:rounded ${this.following?.length ? 'cursor-pointer hov:hover:text-blue-600' : ''}"
           @click=${this.following?.length ? this.onToggleExpanded : undefined}
@@ -74,9 +74,7 @@ export class FollowingList extends LitElement {
           </div>
         </div>
         ${this.isExpanded ? html`
-          <div class="sm:mx-2 mb-1 sm:rounded px-1 py-1 bg-gray-100">
-            <app-simple-user-list .ids=${this.following?.map(f => f.value.subject.userId)} empty-message="${this.userId} is not following anybody."></app-simple-user-list>
-          </div>
+          <app-simple-user-list .ids=${this.following?.map(f => f.value.subject.userId)} empty-message="${this.userId} is not following anybody."></app-simple-user-list>
         ` : ''}
       </div>
     `

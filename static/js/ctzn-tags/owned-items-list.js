@@ -10,7 +10,8 @@ export class OwnedItemsList extends LitElement {
     return {
       userId: {type: String, attribute: 'user-id'},
       ownedItems: {type: Array},
-      databaseItems: {type: Array}
+      databaseItems: {type: Array},
+      isExpanded: {type: Boolean}
     }
   }
 
@@ -24,6 +25,7 @@ export class OwnedItemsList extends LitElement {
     this.userId = undefined
     this.ownedItems = undefined
     this.databaseItems = undefined
+    this.isExpanded = false
   }
 
   setContextState (state) {
@@ -32,6 +34,10 @@ export class OwnedItemsList extends LitElement {
         this.userId = state.page.userId
       }
     }
+  }
+
+  get canToggleExpanded () {
+    return this.databaseItems?.length
   }
 
   async load () {
@@ -70,24 +76,31 @@ export class OwnedItemsList extends LitElement {
     }
     return html`
       <div class="bg-white sm:rounded px-3 py-3">
-        <h3 class="text-lg font-medium px-2 pb-1">Owned items</h3>
-        ${this.databaseItems.length === 0 ? html`
-          <div class="bg-gray-50 text-gray-500 py-12 text-center">
-            <div>${displayNames.render(this.userId)}'s inventory is empty.</div>
-          </div>
-        ` : html`
+        <div
+          class="flex items-center justify-between px-2 pb-1 ${this.canToggleExpanded ? 'cursor-pointer hov:hover:text-blue-600' : ''}"
+          @click=${this.canToggleExpanded ? this.onToggleExpanded : undefined}
+        >
+          <span>
+            <span class="text-lg font-medium mr-1">Owned items</span>
+            <span class="text-gray-500 font-bold">${this.databaseItems?.length || '0'}</span>
+          </span>
+          ${this.canToggleExpanded ? html`
+            <span class="fas fa-angle-${this.isExpanded ? 'up' : 'down'}"></span>
+          ` : ''}
+        </div>
+        ${this.isExpanded ? html`
           <div>
             ${repeat(this.databaseItems, database => database.databaseId, (database, i) => html`
-              <div class="px-2 py-1 bg-gray-100 mb-2 rounded">
-                <div class="px-1 pb-1 pt-1">
-                  <a href="/${database.databaseId}" class="hov:hover:underline">
-                    <span class="">${displayNames.render(database.databaseId)}</span>
-                    <span class="text-sm text-gray-600">${database.databaseId}</span>
-                  </a>
-                </div>
-                ${repeat(database.items, item => item.key, item => html`
+              <div class="px-2 pb-1 pt-1 ${i === 0 ? '' : 'mt-2'}">
+                <a href="/${database.databaseId}" class="hov:hover:underline">
+                  <span class="">${displayNames.render(database.databaseId)}</span>
+                  <span class="text-sm text-gray-600">${database.databaseId}</span>
+                </a>
+              </div>
+              <div class="border border-gray-300 rounded">
+                ${repeat(database.items, item => item.key, (item, i) => html`
                   <div
-                    class="flex items-center px-3 py-3 mb-0.5 bg-white rounded cursor-pointer hov:hover:bg-gray-50"
+                    class="flex items-center px-3 py-3 text-sm ${i === 0 ? '' : 'border-t border-gray-200'} cursor-pointer hov:hover:bg-gray-50"
                     @click=${e => this.onClickViewItem(e, item)}
                   >
                     <span class="mr-2">
@@ -108,7 +121,7 @@ export class OwnedItemsList extends LitElement {
               </div>
             `)}
           </div>
-        `}
+        ` : ''}
       </div>
     `
   }
@@ -122,6 +135,10 @@ export class OwnedItemsList extends LitElement {
       item: item
     })
     this.load()
+  }
+
+  onToggleExpanded (e) {
+    this.isExpanded = !this.isExpanded
   }
 }
 

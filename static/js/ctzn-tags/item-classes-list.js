@@ -137,6 +137,7 @@ export class ItemClassesList extends LitElement {
     if (!this.itemClasses) {
       return html`<span class="spinner"></span>`
     }
+    let total = this.itemClasses.length + (this.canManageItemClasses ? 1 : 0)
     return html`
       ${this.itemClasses.length === 0 ? html`
         <div class="bg-gray-50 py-12 text-center">
@@ -150,11 +151,11 @@ export class ItemClassesList extends LitElement {
           ` : ''}
         </div>
       ` : html`
-        <div class="grid grid-2col gap-1">
-          ${repeat(this.itemClasses, cls => {
+        <div class="grid grid-2col">
+          ${repeat(this.itemClasses, (cls, i) => {
             return html`
               <div
-                class="bg-white flex flex-col justify-center px-6 py-4 sm:cursor-pointer hov:hover:bg-gray-50 sm:rounded sm:text-center"
+                class="bg-white flex flex-col justify-center px-6 py-4 sm:cursor-pointer hov:hover:bg-gray-50 sm:text-center ${itemClassBorders(i, total)}"
                 @click=${e => this.onClickViewItemClass(e, cls)}
               >
                 <div class="sm:text-center">
@@ -172,7 +173,7 @@ export class ItemClassesList extends LitElement {
           })}
           ${this.canManageItemClasses ? html`
             <div
-              class="bg-white flex flex-col justify-center px-6 py-4 sm:cursor-pointer hov:hover:bg-gray-50 sm:rounded sm:text-center"
+              class="bg-white flex flex-col justify-center px-6 py-4 sm:cursor-pointer hov:hover:bg-gray-50 sm:text-center ${itemClassBorders(this.itemClasses.length, total)}"
               @click=${this.onClickManageItemClasses}
             >
               <div class="text-xl font-medium">Manage</div>
@@ -200,7 +201,7 @@ export class ItemClassesList extends LitElement {
           ${repeat(this.currentItems, item => item.key, item => {
             return html`
               <div
-                class="flex items-center px-3 py-3 bg-white mb-0.5 cursor-pointer sm:rounded hov:hover:bg-gray-50"
+                class="flex items-center px-3 py-3 cursor-pointer border-t border-gray-200 hov:hover:bg-gray-50"
                 @click=${e => this.onClickViewItem(e, item)}
               >
                 <img src=${AVATAR_URL(item.value.owner.userId)} class="block rounded w-8 h-8 mr-2">
@@ -262,3 +263,19 @@ export class ItemClassesList extends LitElement {
 }
 
 customElements.define('ctzn-item-classes-list', ItemClassesList)
+
+function itemClassBorders (index, total) {
+  let lim = total + (total % 2) - 2
+  if (index >= lim) {
+    if (index % 2 === 0) {
+      return `${index == total - 2 ? 'border-b lg:border-b-0' : ''} lg:border-r border-gray-200`
+    } else {
+      return `${index == total - 2 ? 'border-b lg:border-b-0' : ''}`
+    }
+  }
+  if (index % 2 === 0) {
+    return 'lg:border-r border-b border-gray-200'
+  } else {
+    return 'border-b border-gray-200'
+  }
+}

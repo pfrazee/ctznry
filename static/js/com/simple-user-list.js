@@ -53,7 +53,7 @@ export class SimpleUserList extends LitElement {
       ${repeat(this.ids, (userId, i) => {
         const [username, domain] = userId.split('@')
         return html`
-          <div class="flex items-center px-2 py-2 bg-white rounded ${i !== 0 ? 'mt-1' : ''}">
+          <div class="flex items-center px-2 py-2 border-t border-gray-200">
             <a class="ml-1 mr-3" href="/${userId}" title=${userId}>
               <img class="block rounded-md w-10 h-10 object-cover" src=${AVATAR_URL(userId)}>
             </a>

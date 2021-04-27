@@ -166,9 +166,20 @@ app-custom-html svg {
 
 /* profile context */
 
-app-custom-html[context="profile"] > .sanitized[ctzn-elem="1"] {
+app-custom-html[context="profile"] .sanitized[ctzn-elem="1"] {
   display: block;
-  margin-bottom: 0.25rem;
+  border: 1px solid #D1D5DB;
+  border-radius: 0.25rem;
+  margin-bottom: 0.75rem;
+  overflow: hidden;
+}
+
+app-custom-html[context="profile"] ctzn-post-view.sanitized[mode="content-only"] {
+  padding: 0.5rem 0.75rem;
+}
+
+app-custom-html[context="profile"] ctzn-comment-view.sanitized[mode="content-only"] {
+  padding: 0.5rem 0.75rem;
 }
 
 app-custom-html[context="profile"] > .sanitized:not([ctzn-elem="1"]) {
@@ -176,12 +187,12 @@ app-custom-html[context="profile"] > .sanitized:not([ctzn-elem="1"]) {
   margin-right: 0.5rem;
 }
 
-app-custom-html[context="profile"] > .sanitized:not([ctzn-elem="1"]):first-child {
+app-custom-html[context="profile"] > .sanitized:not([ctzn-elem="1"]) {
   margin-top: 0.75rem;
 }
 
 app-custom-html[context="profile"] > .sanitized[ctzn-elem="1"] + .sanitized:not([ctzn-elem="1"]) {
-  margin-top: 0.75rem;
+  margin-top: 1rem;
 }
 
 app-custom-html[context="profile"] > blockquote.sanitized {

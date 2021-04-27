@@ -70,14 +70,14 @@ export class FollowersList extends LitElement {
   render () {
     if (typeof this.followers === 'undefined') {
       return html`
-        <div class="bg-white sm:rounded my-1 px-5 py-3">
+        <div class="bg-white sm:rounded px-5 py-3">
           <span class="text-lg font-medium mr-1">Followers</span>
           <span class="spinner text-gray-500"></span>
         </div>
       `
     }
     return html`
-      <div class="bg-white sm:rounded my-1 ${this.followers ? 'pb-1' : ''}">
+      <div class="bg-white sm:rounded">
         <div
           class="px-5 py-3 sm:rounded ${this.canToggleExpanded ? 'cursor-pointer hov:hover:text-blue-600' : ''}"
           @click=${this.canToggleExpanded ? this.onToggleExpanded : undefined}
@@ -104,9 +104,7 @@ export class FollowersList extends LitElement {
           ` : ''}
         </div>
         ${this.showExpanded ? html`
-          <div class="sm:mx-2 mb-1 sm:rounded px-1 py-1 bg-gray-100">
-            <app-simple-user-list .ids=${this.followers} empty-message="${this.userId} has no followers."></app-simple-user-list>
-          </div>
+          <app-simple-user-list .ids=${this.followers} empty-message="${this.userId} has no followers."></app-simple-user-list>
         ` : ''}
       </div>
     `

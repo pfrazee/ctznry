@@ -92,14 +92,14 @@ export class CommunityMembersList extends LitElement {
   render () {
     if (typeof this.members === 'undefined') {
       return html`
-        <div class="bg-white sm:rounded my-1 px-5 py-3">
+        <div class="bg-white sm:rounded px-5 py-3">
           <span class="text-lg font-medium mr-1">Members</span>
           <span class="spinner text-gray-500"></span>
         </div>
       `
     }
     return html`
-      <div class="bg-white sm:rounded my-1 ${this.members ? 'pb-1' : ''}">
+      <div class="bg-white sm:rounded">
         <div
           class="px-5 py-3 sm:rounded ${this.canToggleExpanded ? 'cursor-pointer hov:hover:text-blue-600' : ''}"
           @click=${this.canToggleExpanded ? this.onToggleExpanded : undefined}
@@ -126,13 +126,11 @@ export class CommunityMembersList extends LitElement {
           ` : ''}
         </div>
         ${this.showExpanded ? html`
-          <div class="sm:mx-2 mb-1 sm:rounded px-1 py-1 bg-gray-100">
-            <app-members-list
-              .members=${this.members}
-              ?canban=${this.canBan}
-              @ban=${this.onBan}
-            ></app-members-list>
-          </div>
+          <app-members-list
+            .members=${this.members}
+            ?canban=${this.canBan}
+            @ban=${this.onBan}
+          ></app-members-list>
         ` : ''}
       </div>
     `

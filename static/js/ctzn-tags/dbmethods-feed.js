@@ -369,13 +369,13 @@ export class DbmethodsFeed extends LitElement {
   renderEntries () {
     this.lastResultNiceDate = undefined // used by renderDateTitle
     return html`
-      ${repeat(this.entries, entry => entry.key, entry => html`
-        ${this.renderEntry(entry)}
+      ${repeat(this.entries, entry => entry.key, (entry, i) => html`
+        ${this.renderEntry(entry, i)}
       `)}
     `
   }
   
-  renderEntry (entry) {
+  renderEntry (entry, index) {
     if (entry.result.code !== 'success') return ''
     let [domain, methodName] = entry.call.method.split('/')
     methodName = methodName.replace(/(^(.)|[\-](.))/g, (match, _, char1, char2) => (char1 || char2).toUpperCase())
@@ -384,7 +384,7 @@ export class DbmethodsFeed extends LitElement {
     const hasSubject = methodName === 'TransferItemMethod' && entry.call.args.relatedTo
     return html`
       <div
-        class="flex bg-white px-2 py-3 sm:py-2 sm:rounded mb-0.5 hov:hover:bg-gray-50 cursor-pointer"
+        class="flex bg-white px-2 py-3 sm:py-2 sm:rounded mb-0.5 hov:hover:bg-gray-50 cursor-pointer ${index === 0 ? '' : 'border-t border-gray-300'}"
         @click=${e => this.onClickActivity(e, entry)}
       >
         <span class="block rounded bg-${METHOD_BGS[entry.call.method] || 'gray-200'} w-10 h-10 pt-1.5 mr-2">

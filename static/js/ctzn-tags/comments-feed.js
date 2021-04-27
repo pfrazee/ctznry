@@ -260,14 +260,15 @@ export class CommentsFeed extends LitElement {
 
   renderResults () {
     return html`
-      ${repeat(this.results, result => result.url, result => this.renderResult(result))}
+      ${repeat(this.results, result => result.url, (result, i) => this.renderResult(result, i))}
     `
   }
   
-  renderResult (comment) {
+  renderResult (comment, index) {
     return html`
       <div style="content-visibility: auto; contain-intrinsic-size: 640px 120px;">
         <ctzn-comment-view
+          class="block ${index === 0 ? '' : 'border-t border-gray-300'}"
           .comment=${comment}
           mode="default"
         ></ctzn-comment-view>
