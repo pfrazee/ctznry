@@ -211,6 +211,7 @@ class CtznMainView extends LitElement {
             ></ctzn-posts-feed>
           ` : this.currentView === 'notifications' ? html`
             ${this.isEmpty ? this.renderEmptyMessage() : ''}
+            <h2 class="text-2xl tracking-tight font-bold p-4 border-l border-r border-gray-300 hidden lg:block">Notifications</h2>
             <app-notifications-feed
               cleared-at=${this.notificationsClearedAt}
               @load-state-updated=${this.onFeedLoadStateUpdated}

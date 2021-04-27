@@ -203,9 +203,11 @@ export class NotificationsFeed extends LitElement {
     if (!this.results) {
       return html`
         ${this.title ? html`<h2  class="results-header"><span>${this.title}</span></h2>` : ''}
-        <div class="px-6 py-5 text-gray-500">
-          <span class="spinner"></span>
-        </div>
+        ${this.renderPlaceholderNotification(0)}
+        ${this.renderPlaceholderNotification(1)}
+        ${this.renderPlaceholderNotification(2)}
+        ${this.renderPlaceholderNotification(3)}
+        ${this.renderPlaceholderNotification(4)}
       `
     }
     if (!this.results.length) {
@@ -226,9 +228,9 @@ export class NotificationsFeed extends LitElement {
   renderResults () {
     this.lastResultNiceDate = undefined // used by renderDateTitle
     return html`
-      ${repeat(this.results, result => result.url, result => html`
+      ${repeat(this.results, result => result.url, (result, i) => html`
         ${this.renderDateTitle(result)}
-        ${this.renderNotification(result)}
+        ${this.renderNotification(result, i)}
       `)}
     `
   }
@@ -243,19 +245,39 @@ export class NotificationsFeed extends LitElement {
     `
   }
   
-  renderNotification (note) {
+  renderNotification (note, index) {
     const schemaId = extractSchemaId(note.itemUrl)
     if (schemaId !== 'ctzn.network/comment' && schemaId !== 'ctzn.network/follow' && schemaId !== 'ctzn.network/reaction') {
       return ''
     }
     let blendedCreatedAt = Number(new Date(note.blendedCreatedAt))
+    const isUnread = blendedCreatedAt > this.clearedAt
     return html`
       <app-notification
-        class="block bg-white mb-0.5 sm:rounded"
+        class="block bg-white border ${index !== 0 ? 'border-t-0' : ''} ${isUnread ? 'border-blue-400' : 'border-gray-300'}"
         style="content-visibility: auto; contain-intrinsic-size: 640px 120px;"
         .notification=${note}
-        ?is-unread=${blendedCreatedAt > this.clearedAt}
+        ?is-unread=${isUnread}
       ></app-notification>
+    `
+  }
+
+  renderPlaceholderNotification (index) {
+    return html`
+      <div class="block pt-1 lg:pt-4 pb-1 lg:pb-4 border border-gray-300 ${index !== 0 ? 'border-t-0' : ''}">
+        <div class="grid grid-post px-1 py-0.5">
+          <div class="pl-2 pt-2">
+            <div class="block object-cover rounded-full mt-1 w-11 h-11 bg-gray-100"></div>
+          </div>
+          <div class="block bg-white min-w-0">
+            <div class="pr-2 py-2 min-w-0">
+              <div class="pl-1 pr-2.5 text-gray-600 truncate">
+                <div class="bg-loading-gradient rounded h-32"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     `
   }
 
