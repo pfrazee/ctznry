@@ -1,7 +1,6 @@
 import {LitElement, html} from '../../vendor/lit/lit.min.js'
 import * as session from '../lib/session.js'
 import * as notifications from '../lib/notifications.js'
-import { AVATAR_URL } from '../lib/const.js'
 import { emit } from '../lib/dom.js'
 import { ComposerPopup } from './popups/composer.js'
 import { CreateCommunityPopup } from './popups/create-community.js'
@@ -16,6 +15,8 @@ export class Header extends LitElement {
   static get properties () {
     return {
       currentPath: {type: String, attribute: 'current-path'},
+      isSearchFocused: {type: Boolean},
+      currentSearch: {type: String},
       isMenuOpen: {type: Boolean},
       unreadNotificationsCount: {type: Number},
       community: {type: Object}
@@ -29,6 +30,8 @@ export class Header extends LitElement {
   constructor () {
     super()
     this.currentPath = location.pathname
+    this.isSearchFocused = false
+    this.currentSearch = ''
     this.isMenuOpen = false
     this.unreadNotificationsCount = 0
     this.community = undefined
@@ -85,9 +88,33 @@ export class Header extends LitElement {
           <a href="/communities" class="${this.getHeaderNavClass('/communities')}" @click=${this.onClickLink} data-tooltip="Communities">
             <span class="fas fa-fw navicon fa-users"></span>
           </a>
-          <div class="bg-gray-100 rounded-full py-1.5 px-3.5 text-sm flex-1 flex items-center ml-2 mr-4">
+          <div
+            class="
+              relative py-1.5 px-3.5 text-sm flex-1 flex items-center ml-2 mr-4 border
+              ${this.isSearchFocused ? 'bg-white rounded-t border-gray-300 shadow-lg' : 'border-transparent bg-gray-100 rounded-full'}
+            "
+          >
             <span class="fas fa-fw fa-search mr-2 text-gray-500"></span>
-            <input type="text" class="bg-gray-100 flex-1" placeholder="Search">
+            <input
+              type="text"
+              class="bg-transparent flex-1"
+              placeholder="Search"
+              @focus=${this.onFocusSearch}
+              @blur=${this.onBlurSearch}
+              @keyup=${this.onKeyupSearch}
+              @keydown=${this.onKeyDownSearch}
+            >
+            ${this.isSearchFocused ? html`
+              <div
+                class="absolute rounded-b bg-white z-20 border border-gray-300 overflow-x-hidden overflow-y-auto shadow-lg"
+                style="max-height: 75vh; top: 100%; left: -1px; right: -1px"
+              >
+                <app-searchable-user-list
+                  no-search-input
+                  .filter=${this.currentSearch}
+                ></app-searchable-user-list>
+              </div>
+            ` : ''}
           </div>
           <app-button
             primary
@@ -223,6 +250,37 @@ export class Header extends LitElement {
 
   onClickMenuOverlay (e) {
     this.isMenuOpen = false
+  }
+
+  onFocusSearch (e) {
+    this.isSearchFocused = true
+  }
+
+  onBlurSearch (e) {
+    setTimeout(() => { // hack to deal with input blur hiding
+      this.isSearchFocused = false
+    }, 100)
+  }
+
+  onKeyupSearch (e) {
+    this.currentSearch = e.currentTarget.value.trim()
+  }
+
+  onKeyDownSearch (e) {
+    if (e.code === 'Enter') {
+      e.preventDefault()
+      e.stopPropagation()
+      this.querySelector('app-searchable-user-list').navigateToSelection()
+      this.querySelector('input').blur()
+    } else if (e.code === 'ArrowUp') {
+      e.preventDefault()
+      e.stopPropagation()
+      this.querySelector('app-searchable-user-list').moveSelectionUp()
+    } else if (e.code === 'ArrowDown') {
+      e.preventDefault()
+      e.stopPropagation()
+      this.querySelector('app-searchable-user-list').moveSelectionDown()
+    }
   }
 
   async onLogOut () {

@@ -2,14 +2,15 @@ import { LitElement, html } from '../../vendor/lit/lit.min.js'
 import { repeat } from '../../vendor/lit/directives/repeat.js'
 import { AVATAR_URL } from '../lib/const.js'
 import { emit } from '../lib/dom.js'
-import { CreateCommunityPopup } from './popups/create-community.js'
 import * as session from '../lib/session.js'
 import * as displayNames from '../lib/display-names.js'
 
 export class SearchableUserList extends LitElement {
   static get properties () {
     return {
-      filter: {type: String}
+      filter: {type: String},
+      noSearchInput: {type: Boolean, attribute: 'no-search-input'},
+      highlightIndex: {type: Number}
     }
   }
 
@@ -20,6 +21,28 @@ export class SearchableUserList extends LitElement {
   constructor () {
     super()
     this.filter = ''
+    this.noSearchInput = false
+    this.highlightIndex = 0
+  }
+
+  updated (changedProperties) {
+    if (changedProperties.has('filter')) {
+      this.highlightIndex = Math.min(this.highlightIndex, this.numResults - 1)
+    }
+  }
+
+  moveSelectionUp () {
+    this.highlightIndex = Math.max(this.highlightIndex - 1, 0)
+  }
+
+  moveSelectionDown () {
+    this.highlightIndex = Math.min(this.highlightIndex + 1, this.numResults - 1)
+  }
+
+  navigateToSelection () {
+    let el = this.querySelector('.current-selection')
+    if (!el || !el.getAttribute('href')) return
+    emit(this, 'navigate-to', {detail: {url: el.getAttribute('href')}})
   }
 
   // rendering
@@ -27,6 +50,14 @@ export class SearchableUserList extends LitElement {
 
   get hasFilter () {
     return !!this.filter
+  }
+
+  get numResults () {
+    const me = this.getFilteredMe()
+    const users = this.getFilteredUsers()
+    const communities = this.getFilteredCommunities()
+    const looksLikeUserId = this.filter?.includes('@') && !this.filter?.includes(' ')
+    return (!!me ? 1 : 0) + (looksLikeUserId ? 1 : 0) + users?.length + communities?.length
   }
 
   testUserId (userId) {
@@ -55,102 +86,85 @@ export class SearchableUserList extends LitElement {
     const me = this.getFilteredMe()
     const users = this.getFilteredUsers()
     const communities = this.getFilteredCommunities()
-    return html`
-      <div class="flex items-center border border-gray-300 bg-gray-100 rounded-2xl mb-3 mr-2 px-3 py-1.5 sm:py-1">
-        <span class="fas fa-search text-sm text-gray-500 mr-2"></span>
-        <input
-          type="text"
-          class="w-full bg-transparent"
-          placeholder="Search"
-          @keyup=${this.onKeyupFilter}
-        >
-      </div>
-      ${me ? html`
+    const looksLikeUserId = this.filter?.includes('@') && !this.filter?.includes(' ')
+    let itemIndex = 0
+    const renderItem = (href, title, inner) => {
+      let isHighlighted = (itemIndex++ === this.highlightIndex)
+      return html`
         <a
-          class="flex items-center pl-2 pr-4 py-1 text-sm rounded hov:hover:bg-gray-100"
-          href="/${me}"
-          title=${me}
+          class="
+            flex items-center pl-2 pr-4 py-2 text-sm border-b border-gray-200 hov:hover:bg-gray-100
+            ${isHighlighted ? 'current-selection bg-gray-100' : ''}
+          "
+          href=${href}
+          title=${title}
         >
+          ${inner}
+        </a>
+      `
+    }
+    return html`
+      ${!this.noSearchInput ? html`
+        <div class="flex items-center border border-gray-300 bg-gray-100 rounded-2xl mb-3 mr-2 px-3 py-1.5 sm:py-1">
+          <span class="fas fa-search text-sm text-gray-500 mr-2"></span>
+          <input
+            type="text"
+            class="w-full bg-transparent"
+            placeholder="Search"
+            @keyup=${this.onKeyupFilter}
+          >
+        </div>
+      ` : ''}
+      ${looksLikeUserId ? html`
+        ${renderItem(`/${this.filter}`, this.filter, html`
+          <span class="bg-gray-100 fa-arrow-right fas mr-2 py-2 rounded text-center w-8"></span>
+          Go to ${this.filter}
+        `)}
+      ` : ''}
+      ${me ? html`
+        ${renderItem(`/${me}`, me, html`
           <img class="w-8 h-8 object-cover rounded-md mr-2" src=${AVATAR_URL(me)} style="left: 10px; top: 6px">
           ${displayNames.render(me)}
-        </a>
+        `)}
       ` : ''}
       ${!this.hasFilter || communities?.length ? html`
-        <h3 class="font-bold pl-2 mt-4 text-gray-500 text-xs">
+        <h3 class="font-bold px-2 py-2 text-xs border-b border-gray-200">
           My Communities
         </h3>
-        <div class="mb-4">
+        <div>
           ${communities?.length ? html`
-            ${repeat(communities, userId => userId, userId => html`
-              <a
-                class="flex items-center pl-2 pr-4 py-1 text-sm rounded hov:hover:bg-gray-100"
-                href="/${userId}"
+            ${repeat(communities, userId => userId, userId => renderItem(`/${userId}`, userId, html`
+              <img
+                class="lazyload w-8 h-8 object-cover rounded-md mr-2"
+                data-src=${AVATAR_URL(userId)}
               >
-                <img
-                  class="lazyload w-8 h-8 object-cover rounded-md mr-2"
-                  data-src=${AVATAR_URL(userId)}
-                >
-                <span class="truncate">${displayNames.render(userId)}</span>
-              </a>
-            `)}
+              <span class="truncate">${displayNames.render(userId)}</span>
+            `))}
           ` : html`
             <div class="pl-2 pr-5 mb-1 text-base text-gray-700">
               Join a community to get connected to more people!
             </div>
           `}
-          ${!this.hasFilter ? html`
-            <a
-              class="flex items-center pl-2 pr-4 py-1 text-sm rounded cursor-pointer hov:hover:bg-gray-100"
-              @click=${this.onClickCreateCommunity}
-            >
-              <span
-                class="w-8 py-1.5 text-center object-cover rounded-md mr-2 bg-gray-300 text-gray-600"
-              ><span class="fas fa-plus"></span></span>
-              <span class="truncate font-semibold text-gray-600">Create community</span>
-            </a>
-            <a
-              class="flex items-center pl-2 pr-4 py-1 text-sm rounded cursor-pointer hov:hover:bg-gray-100"
-              href="/communities"
-            >
-              <span
-                class="w-8 py-1.5 text-center object-cover rounded-md mr-2 bg-gray-300 text-gray-600"
-              ><span class="fas fa-users"></span></span>
-              <span class="truncate font-semibold text-gray-600">Browse</span>
-            </a>
-          ` : ''}
         </div>
       ` : ''}
       ${users?.length ? html`
-        <h3 class="font-bold pl-2 mt-4 text-gray-500 text-xs">
-          My Follows
+        <h3 class="font-bold px-2 py-2 text-xs border-b border-gray-200">
+          Following
         </h3>
-        ${repeat(users, f => f, userId => html`
-          <a
-            class="flex items-center pl-2 pr-4 py-1 text-sm rounded hov:hover:bg-gray-100"
-            href="/${userId}"
+        ${repeat(users, f => f, userId => renderItem(`/${userId}`, userId, html`
+          <img
+            class="lazyload w-8 h-8 object-cover rounded-md mr-2"
+            data-src=${AVATAR_URL(userId)}
           >
-            <img
-              class="lazyload w-8 h-8 object-cover rounded-md mr-2"
-              data-src=${AVATAR_URL(userId)}
-            >
-            <span class="truncate">${displayNames.render(userId)}</span>
-          </a>
-        `)}
+          <span class="truncate">${displayNames.render(userId)}</span>
+        </a>
+      `))}
       ` : ''}
     `
   }
 
   // events
   // =
-
-  async onClickCreateCommunity (e) {
-    e.preventDefault()
-    e.stopPropagation()
-    this.isMenuOpen = false
-    const res = await CreateCommunityPopup.create()
-    console.log(res)
-    window.location = `/${res.userId}`
-  }
 
   onKeyupFilter (e) {
     this.filter = e.currentTarget.value.toLowerCase()
