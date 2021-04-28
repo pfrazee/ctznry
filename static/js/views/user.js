@@ -333,7 +333,7 @@ class CtznUser extends LitElement {
       ${this.renderMobileHeader()}
       <main class="col2">
         <div>
-          <div class="widescreen-hidden">
+          <div class="widescreen-hidden sm:border-l sm:border-r border-gray-300">
             ${this.isCitizen ? html`
               <div class="bg-white text-center pb-4">
                 <span
@@ -391,13 +391,13 @@ class CtznUser extends LitElement {
               </div>
             ` : ''}
             <div id="scroll-target"></div>
+          </div>
+          <div class="min-h-screen">
             <app-subnav
-              nav-cls="mb-1 sm:rounded-b"
+              mobile-only
               .items=${this.subnavItems}
               current-path=${this.currentPath}
             ></app-subnav>
-          </div>
-          <div class="min-h-screen">
             ${this.renderCurrentView()}
           </div>
         </div>
@@ -570,7 +570,7 @@ class CtznUser extends LitElement {
   renderMobileHeader () {
     return html`
       <main class="widescreen-hidden" style="padding: 0">
-        <div class="relative">
+        <div class="relative sm:border-l sm:border-r border-gray-300">
           <div class="absolute" style="top: 8px; left: 10px">
             <app-button
               btn-class="px-3 py-1 rounded-full text-base text-white"
@@ -584,13 +584,11 @@ class CtznUser extends LitElement {
             ${this.renderProfileControls()}
           </div>
           <div
-            class="sm:mt-1 sm:rounded-t"
             style="height: 200px; background: linear-gradient(0deg, #3c4af6, #2663eb);"
           >
             <app-img-fallbacks>
               <img
                 slot="img1"
-                class="sm:rounded-t"
                 style="display: block; object-fit: cover; width: 100%; height: 200px;"
                 src=${BLOB_URL(this.userId, 'profile-banner')}
               >

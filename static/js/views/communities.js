@@ -147,78 +147,76 @@ class CtznCommunities extends LitElement {
       <app-header current-path=${'/communities'}></app-header>
       <main class="pb-16">
         ${session.isActive() ? html`
-          <div>
-            <app-subnav
-              mobile-only
-              nav-cls="mb-0.5 sm:mt-0.5"
-              .items=${SUBNAV_ITEMS}
-              current-path=${this.currentPath}
-            ></app-subnav>
-            <h2 class="text-2xl tracking-tight font-bold p-4 border border-t-0 border-gray-300 hidden lg:block">My Communities</h2>
-            <div class="mb-4">
-              ${this.memberships?.length ? html`
-                ${repeat(this.memberships, membership => html`
-                  <a
-                    class="flex items-center bg-white border border-t-0 border-gray-300 px-4 py-2 hov:hover:pointer hov:hover:bg-gray-50"
-                    href="/${membership.value.community.userId}"
-                    title="${membership.value.community.userId}"
-                  >
-                    <img class="block rounded-lg w-8 h-8 mr-4" src=${AVATAR_URL(membership.value.community.userId)}>
-                    <span class="flex-1 min-w-0">
-                      <span class="block font-medium">${displayNames.render(membership.value.community.userId)}</span>
-                    </span>
-                  </a>
-                `)}
-              ` : html`
-                <div class="border border-gray-300 border-t-0 px-4 py-4 text-gray-600 font-medium bg-gray-50">
-                  Join a community to get connected to more people!
-                </div>
-              `}
-            </div>
-          ` : ''}
-          ${this.suggestedCommunities?.length ? html`
-            <h2 class="text-2xl tracking-tight font-bold p-4 border border-gray-300 hidden lg:block">Suggested Communities</h2>
-            ${repeat(this.suggestedCommunities, community => community.userId, community => {
-              const hasJoined = this.memberships?.find(m => community.userId === m.value.community.userId)
+          <app-subnav
+            mobile-only
+            nav-cls="mb-0.5 sm:mt-0.5"
+            .items=${SUBNAV_ITEMS}
+            current-path=${this.currentPath}
+          ></app-subnav>
+          <h2 class="text-2xl tracking-tight font-bold p-4 border border-t-0 border-gray-300 hidden lg:block">My Communities</h2>
+          <div class="mb-4">
+            ${this.memberships?.length ? html`
+              ${repeat(this.memberships, membership => html`
+                <a
+                  class="flex items-center bg-white border border-t-0 border-gray-300 px-4 py-2 hov:hover:pointer hov:hover:bg-gray-50"
+                  href="/${membership.value.community.userId}"
+                  title="${membership.value.community.userId}"
+                >
+                  <img class="block rounded-lg w-8 h-8 mr-4" src=${AVATAR_URL(membership.value.community.userId)}>
+                  <span class="flex-1 min-w-0">
+                    <span class="block font-medium">${displayNames.render(membership.value.community.userId)}</span>
+                  </span>
+                </a>
+              `)}
+            ` : html`
+              <div class="border border-gray-300 border-t-0 px-4 py-4 text-gray-600 font-medium bg-gray-50">
+                Join a community to get connected to more people!
+              </div>
+            `}
+          </div>
+        ` : ''}
+        ${this.suggestedCommunities?.length ? html`
+          <h2 class="text-2xl tracking-tight font-bold p-4 border border-gray-300 hidden lg:block">Suggested Communities</h2>
+          ${repeat(this.suggestedCommunities, community => community.userId, community => {
+            const hasJoined = this.memberships?.find(m => community.userId === m.value.community.userId)
             let tooltipIds = community.members?.slice(0, 4).join(', ')
             if (community.members?.length > 4) tooltipIds += `, + ${community.members?.length - 4} more`
-              return html`
-                <div class="flex bg-white px-4 py-3 border border-gray-300 border-t-0">
-                  <img class="block rounded-lg w-10 h-10 mr-4" src=${AVATAR_URL(community.userId)}>
-                  <div class="flex-1 min-w-0">
-                    <div>
-                      <a class="font-medium hov:hover:pointer hov:hover:underline" href="/${community.userId}" title=${community.displayName}>
-                        ${community.displayName || community.userId}
-                      </a>
-                    </div>
-                    <div class="text-gray-600 mb-1">${community.description}</div>
-                    ${community.members?.length ? html`
-                      <div class="mb-2 text-sm text-gray-500 font-semibold">
-                        <span class="hov:hover:underline" data-tooltip=${tooltipIds}>
-                          ${community.members.length} ${pluralize(community.members.length, 'member')} you follow
-                        </span>
-                      </div>
-                    ` : ''}
-                    ${session.isActive() ? html`<div>
-                      ${hasJoined ? html`
-                        <button
-                          class="border border-blue-400 px-6 py-1 rounded-2xl text-blue-600 text-sm cursor-default"
-                          disabled
-                        >Joined!</button>
-                      ` : html`
-                        <button
-                          class="border border-blue-400 hov:hover:bg-gray-100 hov:hover:pointer px-6 py-1 rounded-2xl text-blue-600 text-sm"
-                          @click=${e => this.onClickJoinSuggestedCommunity(e, community)}
-                          ?disabled=${hasJoined}
-                        >${community.isJoining ? html`<span class="spinner"></span>` : 'Join'}</button>
-                      `}
-                    </div>` : ''}
+            return html`
+              <div class="flex bg-white px-4 py-3 border border-gray-300 border-t-0">
+                <img class="block rounded-lg w-10 h-10 mr-4" src=${AVATAR_URL(community.userId)}>
+                <div class="flex-1 min-w-0">
+                  <div>
+                    <a class="font-medium hov:hover:pointer hov:hover:underline" href="/${community.userId}" title=${community.displayName}>
+                      ${community.displayName || community.userId}
+                    </a>
                   </div>
+                  <div class="text-gray-600 mb-1">${community.description}</div>
+                  ${community.members?.length ? html`
+                    <div class="mb-2 text-sm text-gray-500 font-semibold">
+                      <span class="hov:hover:underline" data-tooltip=${tooltipIds}>
+                        ${community.members.length} ${pluralize(community.members.length, 'member')} you follow
+                      </span>
+                    </div>
+                  ` : ''}
+                  ${session.isActive() ? html`<div>
+                    ${hasJoined ? html`
+                      <button
+                        class="border border-blue-400 px-6 py-1 rounded-2xl text-blue-600 text-sm cursor-default"
+                        disabled
+                      >Joined!</button>
+                    ` : html`
+                      <button
+                        class="border border-blue-400 hov:hover:bg-gray-100 hov:hover:pointer px-6 py-1 rounded-2xl text-blue-600 text-sm"
+                        @click=${e => this.onClickJoinSuggestedCommunity(e, community)}
+                        ?disabled=${hasJoined}
+                      >${community.isJoining ? html`<span class="spinner"></span>` : 'Join'}</button>
+                    `}
+                  </div>` : ''}
                 </div>
-              `
-            })}
-          ` : ''}
-        </div>
+              </div>
+            `
+          })}
+        ` : ''}
       </main>
     `
   }

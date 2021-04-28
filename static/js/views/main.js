@@ -204,7 +204,7 @@ class CtznMainView extends LitElement {
             ${this.isEmpty ? this.renderEmptyMessage() : ''}
             <h2 class="text-2xl tracking-tight font-bold p-4 border-l border-r border-gray-300 hidden lg:block">What's new</h2>
             <ctzn-posts-feed
-              class="block border border-gray-300"
+              class="block sm:border border-t border-gray-300"
               view="ctzn.network/feed-view"
               @load-state-updated=${this.onFeedLoadStateUpdated}
               @publish-reply=${this.onPublishReply}
@@ -218,8 +218,8 @@ class CtznMainView extends LitElement {
               @publish-reply=${this.onPublishReply}
             ></app-notifications-feed>
           ` : this.currentView === 'search' ? html`
-            <div class="bg-white px-2 py-4">
-              <div class="text-sm px-2 pb-3 text-gray-500">
+            <div class="bg-white sm:border sm:border-t-0 border-gray-300">
+              <div class="text-sm px-3 py-3 text-gray-500">
                 <span class="fas fa-info mr-1 text-xs"></span>
                 Search is limited to your communities and follows.
               </div>
@@ -234,7 +234,7 @@ class CtznMainView extends LitElement {
 
   renderMockComposer () {
     return html`
-      <div class="border-t border-gray-200 px-3 py-3 lg:hidden" @click=${this.onClickCreatePost}>
+      <div class="sm:border-l sm:border-r border-gray-300 px-3 py-3 lg:hidden" @click=${this.onClickCreatePost}>
         <div class="flex items-center">
           <div
             class="flex-1 mr-1 py-1 px-3 bg-gray-100 text-gray-600 text-base rounded cursor-text"

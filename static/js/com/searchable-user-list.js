@@ -9,7 +9,7 @@ export class SearchableUserList extends LitElement {
   static get properties () {
     return {
       filter: {type: String},
-      noSearchInput: {type: Boolean, attribute: 'no-search-input'},
+      widgetMode: {type: Boolean, attribute: 'widget-mode'},
       highlightIndex: {type: Number}
     }
   }
@@ -21,8 +21,12 @@ export class SearchableUserList extends LitElement {
   constructor () {
     super()
     this.filter = ''
-    this.noSearchInput = false
+    this.widgetMode = false
     this.highlightIndex = 0
+  }
+
+  firstUpdated () {
+    this.querySelector('input').focus()
   }
 
   updated (changedProperties) {
@@ -40,7 +44,7 @@ export class SearchableUserList extends LitElement {
   }
 
   navigateToSelection () {
-    let el = this.querySelector('.current-selection')
+    let el = this.querySelector(this.widgetMode ? '.current-selection' : '.result')
     if (!el || !el.getAttribute('href')) return
     emit(this, 'navigate-to', {detail: {url: el.getAttribute('href')}})
   }
@@ -89,11 +93,11 @@ export class SearchableUserList extends LitElement {
     const looksLikeUserId = this.filter?.includes('@') && !this.filter?.includes(' ')
     let itemIndex = 0
     const renderItem = (href, title, inner) => {
-      let isHighlighted = (itemIndex++ === this.highlightIndex)
+      let isHighlighted = (this.widgetMode && itemIndex++ === this.highlightIndex)
       return html`
         <a
           class="
-            flex items-center pl-2 pr-4 py-2 text-sm border-b border-gray-200 hov:hover:bg-gray-100
+            result flex items-center pl-2 pr-4 py-2 text-sm border-b border-gray-200 hov:hover:bg-gray-100
             ${isHighlighted ? 'current-selection bg-gray-100' : ''}
           "
           href=${href}
@@ -104,17 +108,23 @@ export class SearchableUserList extends LitElement {
       `
     }
     return html`
-      ${!this.noSearchInput ? html`
-        <div class="flex items-center border border-gray-300 bg-gray-100 rounded-2xl mb-3 mr-2 px-3 py-1.5 sm:py-1">
-          <span class="fas fa-search text-sm text-gray-500 mr-2"></span>
-          <input
-            type="text"
-            class="w-full bg-transparent"
-            placeholder="Search"
-            @keyup=${this.onKeyupFilter}
-          >
-        </div>
-      ` : ''}
+      <div class="
+        flex items-center border-gray-300
+        ${this.widgetMode
+          ? 'border-b py-3 px-4 text-sm'
+          : 'border-t border-b bg-gray-100 px-3 py-2'
+        }
+      ">
+        <span class="fas fa-search text-sm text-gray-500 mr-3"></span>
+        <input
+          type="text"
+          class="w-full bg-transparent"
+          placeholder="Search"
+          @keyup=${this.onKeyupFilter}
+          @keydown=${this.onKeydownFilter}
+          @blur=${e => emit(this, 'blur')}
+        >
+      </div>
       ${looksLikeUserId ? html`
         ${renderItem(`/${this.filter}`, this.filter, html`
           <span class="bg-gray-100 fa-arrow-right fas mr-2 py-2 rounded text-center w-8"></span>
@@ -167,9 +177,20 @@ export class SearchableUserList extends LitElement {
   // =
 
   onKeyupFilter (e) {
-    this.filter = e.currentTarget.value.toLowerCase()
+    this.filter = e.currentTarget.value.toLowerCase().trim()
+  }
+
+  onKeydownFilter (e) {
     if (e.code === 'Enter') {
-      emit(this, 'navigate-to', {detail: {url: `/${this.filter}`}})
+      e.preventDefault()
+      this.navigateToSelection()
+      this.querySelector('input').blur()
+    } else if (e.code === 'ArrowUp') {
+      e.preventDefault()
+      this.moveSelectionUp()
+    } else if (e.code === 'ArrowDown') {
+      e.preventDefault()
+      this.moveSelectionDown()
     }
   }
 }

@@ -81,11 +81,10 @@ export class RichEditor extends LitElement {
   }
 
   get editorContentStyle () {
-    const bg = (this.context === 'profile') ? '#E5E7EB' : '#FFF'
     return `
       body {
         margin: 0.6rem 0.7rem;
-        background: ${bg};
+        background: #FFF;
       }
       h1,
       h2,

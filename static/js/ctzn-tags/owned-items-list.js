@@ -77,7 +77,7 @@ export class OwnedItemsList extends LitElement {
     return html`
       <div class="bg-white sm:rounded px-3 py-3">
         <div
-          class="flex items-center justify-between px-2 pb-1 ${this.canToggleExpanded ? 'cursor-pointer hov:hover:text-blue-600' : ''}"
+          class="flex items-center justify-between px-2 ${this.canToggleExpanded ? 'cursor-pointer hov:hover:text-blue-600' : ''}"
           @click=${this.canToggleExpanded ? this.onToggleExpanded : undefined}
         >
           <span>

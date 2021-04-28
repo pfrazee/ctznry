@@ -16,7 +16,6 @@ export class Header extends LitElement {
     return {
       currentPath: {type: String, attribute: 'current-path'},
       isSearchFocused: {type: Boolean},
-      currentSearch: {type: String},
       isMenuOpen: {type: Boolean},
       unreadNotificationsCount: {type: Number},
       community: {type: Object}
@@ -31,7 +30,6 @@ export class Header extends LitElement {
     super()
     this.currentPath = location.pathname
     this.isSearchFocused = false
-    this.currentSearch = ''
     this.isMenuOpen = false
     this.unreadNotificationsCount = 0
     this.community = undefined
@@ -88,35 +86,30 @@ export class Header extends LitElement {
           <a href="/communities" class="${this.getHeaderNavClass('/communities')}" @click=${this.onClickLink} data-tooltip="Communities">
             <span class="fas fa-fw navicon fa-users"></span>
           </a>
-          <div
-            class="
-              relative py-1.5 px-3.5 text-sm flex-1 flex items-center ml-2 mr-4 border
-              ${this.isSearchFocused ? 'bg-white rounded-t border-gray-300 shadow-lg' : 'border-transparent rounded-full'}
-            "
-            style="${this.isSearchFocused ? '' : 'background: rgba(0,0,0,0.05)'}"
-            @click=${this.isSearchFocused ? undefined : () => this.querySelector('input').focus()}
-          >
-            <span class="fas fa-fw fa-search mr-2 text-gray-500"></span>
-            <input
-              type="text"
-              class="bg-transparent flex-1 placeholder-gray-600"
-              placeholder="Search"
-              @focus=${this.onFocusSearch}
-              @blur=${this.onBlurSearch}
-              @keyup=${this.onKeyupSearch}
-              @keydown=${this.onKeyDownSearch}
-            >
+          <div class="relative flex-1 ml-2 mr-4 h-8" @click=${e => { this.isSearchFocused = true }}>
             ${this.isSearchFocused ? html`
               <div
-                class="absolute rounded-b bg-white z-20 border border-gray-300 overflow-x-hidden overflow-y-auto shadow-lg"
-                style="max-height: 75vh; top: 100%; left: -1px; right: -1px"
+                class="absolute rounded bg-white z-20 border border-gray-300 overflow-x-hidden overflow-y-auto shadow-lg"
+                style="max-height: 75vh; top: -6px; left: -1px; right: -1px"
               >
                 <app-searchable-user-list
-                  no-search-input
-                  .filter=${this.currentSearch}
+                  widget-mode
+                  @blur=${this.onBlurSearch}
                 ></app-searchable-user-list>
               </div>
-            ` : ''}
+            ` : html`
+              <div
+                class="
+                  py-1.5 px-3.5 text-sm flex items-center border
+                  border-transparent rounded-full
+                "
+                style="background: rgba(0,0,0,0.05)"
+                @click=${this.isSearchFocused ? undefined : () => this.querySelector('input').focus()}
+              >
+                <span class="fas fa-fw fa-search mr-2 text-gray-500"></span>
+                <span class="text-gray-600">Search</span>
+              </div>
+            `}
           </div>
           <app-button
             primary
@@ -259,27 +252,6 @@ export class Header extends LitElement {
     setTimeout(() => { // hack to deal with input blur hiding
       this.isSearchFocused = false
     }, 100)
-  }
-
-  onKeyupSearch (e) {
-    this.currentSearch = e.currentTarget.value.trim()
-  }
-
-  onKeyDownSearch (e) {
-    if (e.code === 'Enter') {
-      e.preventDefault()
-      e.stopPropagation()
-      this.querySelector('app-searchable-user-list').navigateToSelection()
-      this.querySelector('input').blur()
-    } else if (e.code === 'ArrowUp') {
-      e.preventDefault()
-      e.stopPropagation()
-      this.querySelector('app-searchable-user-list').moveSelectionUp()
-    } else if (e.code === 'ArrowDown') {
-      e.preventDefault()
-      e.stopPropagation()
-      this.querySelector('app-searchable-user-list').moveSelectionDown()
-    }
   }
 
   async onLogOut () {

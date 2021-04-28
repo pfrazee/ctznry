@@ -70,6 +70,7 @@ export class Subnav extends LitElement {
     })
     this.className = `
       white-glass sticky top-0 z-10 flex overflow-x-auto bg-white
+      border-gray-300 border-b sm:border-l sm:border-r
       ${this.navClass}
       ${this.mobileOnly ? 'lg:hidden' : ''}
     `

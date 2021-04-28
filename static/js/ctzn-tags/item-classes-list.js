@@ -141,10 +141,10 @@ export class ItemClassesList extends LitElement {
     return html`
       ${this.itemClasses.length === 0 ? html`
         <div class="bg-gray-50 py-12 text-center">
-          <div class="mb-6 text-gray-500">This community has no virtual items.</div>
+          <div class="text-gray-500">This community has no virtual items.</div>
           ${this.canManageItemClasses ? html`
             <app-button
-              btn-class="rounded-full"
+              btn-class="rounded-full mt-6"
               label="Create an item class"
               @click=${this.onClickManageItemClasses}
             ></app-button>

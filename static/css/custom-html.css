@@ -174,6 +174,26 @@ app-custom-html[context="profile"] .sanitized[ctzn-elem="1"] {
   overflow: hidden;
 }
 
+@media (max-width: 1024px) {
+  app-custom-html[context="profile"] > .sanitized[ctzn-elem="1"]:first-child {
+    border-top: 0;
+  }
+  app-custom-html[context="profile"] > .sanitized[ctzn-elem="1"] {
+    border-radius: 0;
+  }
+  app-custom-html[context="profile"] > .sanitized[ctzn-elem="1"] + .sanitized[ctzn-elem="1"] {
+    border-top: 0;
+    margin-top: -0.75rem;
+  }
+}
+
+@media (max-width: 640px) {
+  app-custom-html[context="profile"] > .sanitized[ctzn-elem="1"] {
+    border-left: 0;
+    border-right: 0;
+  }
+}
+
 app-custom-html[context="profile"] ctzn-post-view.sanitized[mode="content-only"] {
   padding: 0.5rem 0.75rem;
 }
@@ -185,6 +205,13 @@ app-custom-html[context="profile"] ctzn-comment-view.sanitized[mode="content-onl
 app-custom-html[context="profile"] > .sanitized:not([ctzn-elem="1"]) {
   margin-left: 0.5rem;
   margin-right: 0.5rem;
+}
+
+@media (max-width: 640px) {
+  app-custom-html[context="profile"] > .sanitized:not([ctzn-elem="1"]) {
+    margin-left: 0.75rem;
+    margin-right: 0.75rem;
+  }
 }
 
 app-custom-html[context="profile"] > .sanitized:not([ctzn-elem="1"]) {

@@ -52,12 +52,8 @@ export class ViewCustomHtmlPopup extends BasePopup {
   // =
 
   renderBody () {
-    let cls = 'overflow-auto'
-    if (this.context === 'profile') {
-      cls += ' bg-gray-200 rounded-xl p-4'
-    }
     return html`
-      <div class=${cls} style="max-height: calc(100vh - 100px)">
+      <div class="overflow-auto" style="max-height: calc(100vh - 100px)">
         <app-custom-html
           .userId=${this.userId}
           .blobName=${this.blobName}
