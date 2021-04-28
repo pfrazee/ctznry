@@ -9,8 +9,8 @@ import * as toast from '../com/toast.js'
 import {
   AVATAR_URL,
   BLOB_URL,
-  DEFAULT_COMMUNITY_PROFILE_SECTIONS,
-  DEFAULT_CITIZEN_PROFILE_SECTIONS
+  FIXED_COMMUNITY_PROFILE_SECTIONS,
+  FIXED_CITIZEN_PROFILE_SECTIONS
 } from '../lib/const.js'
 import * as session from '../lib/session.js'
 import * as gestures from '../lib/gestures.js'
@@ -207,9 +207,11 @@ class CtznUser extends LitElement {
       }
       document.title = `${this.userProfile?.value.displayName || this.userId} | CTZN`
       if (this.isCitizen) {
-        this.sections = this.userProfile?.value?.sections?.length
-          ? this.userProfile.value.sections
-          : DEFAULT_CITIZEN_PROFILE_SECTIONS
+        this.sections = FIXED_CITIZEN_PROFILE_SECTIONS.concat(
+          this.userProfile?.value?.sections?.length
+            ? this.userProfile.value.sections
+            : []
+        ).reduce(dedupSectionsReducer, [])
         const [followers, following, memberships] = await Promise.all([
           session.ctzn.listFollowers(this.userId),
           session.ctzn.db(this.userId).table('ctzn.network/follow').list(),
@@ -229,9 +231,11 @@ class CtznUser extends LitElement {
         }
         console.log({userProfile: this.userProfile, followers, following, memberships})
       } else if (this.isCommunity) {
-        this.sections = this.userProfile?.value?.sections?.length
-          ? this.userProfile.value.sections
-          : DEFAULT_COMMUNITY_PROFILE_SECTIONS
+        this.sections = FIXED_COMMUNITY_PROFILE_SECTIONS.concat(
+          this.userProfile?.value?.sections?.length
+            ? this.userProfile.value.sections
+            : []
+        ).reduce(dedupSectionsReducer, [])
         const [communityConfigEntry, members, roles] = await Promise.all([
           session.ctzn.db(this.userId).table('ctzn.network/community-config').get('self').catch(e => undefined),
           listAllMembers(this.userId),
@@ -915,4 +919,11 @@ function intersect (a, b) {
     }
   }
   return arr
+}
+
+function dedupSectionsReducer (acc, section) {
+  if (!acc.find(section2 => section2.id === section.id)) {
+    acc.push(section)
+  }
+  return acc
 }

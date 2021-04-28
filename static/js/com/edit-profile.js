@@ -9,8 +9,6 @@ import { emit } from '../lib/dom.js'
 import {
   AVATAR_URL,
   BLOB_URL,
-  DEFAULT_COMMUNITY_PROFILE_SECTIONS,
-  DEFAULT_CITIZEN_PROFILE_SECTIONS,
   PERM_DESCRIPTIONS
 } from '../lib/const.js'
 import { UiEditorPopup } from './popups/ui-editor.js'
@@ -34,7 +32,6 @@ export class EditProfile extends LitElement {
       _hasChanges: {type: Boolean},
       values: {type: Object},
       communityConfigValues: {type: Object},
-      customUIOverride: {type: Boolean},
       currentView: {type: String},
       currentError: {type: String},
       isProcessing: {type: Boolean}
@@ -60,7 +57,6 @@ export class EditProfile extends LitElement {
     this.hasChanges = false
     this.values = undefined
     this.communityConfigValues = undefined
-    this.customUIOverride = undefined
     this.currentView = 'basics'
     this.currentError = undefined
     this.img = undefined
@@ -75,13 +71,6 @@ export class EditProfile extends LitElement {
 
   get isCommunity () {
     return this.profile?.dbType === 'ctzn.network/public-community-db'
-  }
-
-  get hasCustomUI () {
-    if (typeof this.customUIOverride === 'boolean') {
-      return this.customUIOverride
-    }
-    return this.values?.sections?.length
   }
 
   updated (changedProperties) {
@@ -142,19 +131,6 @@ export class EditProfile extends LitElement {
       setByPath(this.values, path, v)
       this.hasChanges = true
     }
-  }
-
-  setCustomUI (v) {
-    this.hasChanges = true
-    this.customUIOverride = v
-    if (v && !this.values?.sections?.length) {
-      if (this.isCommunity) {
-        this.setValue(['sections'], deepClone(DEFAULT_COMMUNITY_PROFILE_SECTIONS))
-      } else {
-        this.setValue(['sections'], deepClone(DEFAULT_CITIZEN_PROFILE_SECTIONS))
-      }
-    }
-    this.requestUpdate()
   }
 
   get canEditProfile () {
@@ -280,40 +256,11 @@ export class EditProfile extends LitElement {
             </div>
 
             <div class="${this.currentView === 'advanced' ? 'block' : 'hidden'}">
-              <label class="block font-semibold p-1">Profile UI</label>
-              <div class="mb-2">
-                <app-button
-                  transparent
-                  icon="far fa-${this.hasCustomUI ? 'circle' : 'check-circle'}"
-                  label="Default UI"
-                  @click=${e => this.setCustomUI(false)}
-                  ?disabled=${!this.canEditProfile}
-                ></app-button>
-                <app-button
-                  transparent
-                  icon="far fa-${!this.hasCustomUI ? 'circle' : 'check-circle'}"
-                  label="Custom UI"
-                  @click=${e => this.setCustomUI(true)}
-                  ?disabled=${!this.canEditProfile}
-                ></app-button>
+              <label class="block font-semibold p-1">Custom sections</label>
+              <div class="px-1 pb-3 text-gray-500 text-sm font-medium">
+                You can add new sections to your profile below.
               </div>
-              ${!this.hasCustomUI ? html`
-                <div class="py-4 pl-4 pr-6 text-gray-500 text-sm bg-gray-100 rounded">
-                  <p class="mb-2 text-black"><strong class="text-black">Default UI.</strong> CTZN will create your profile's User Interface for you.</p>
-                  <p>
-                    You can create a custom UI if you're familiar with HTML.
-                    If something goes wrong, you can go back to the Default UI!
-                  </p>
-                </div>
-              ` : html`
-                <div class="py-4 pl-4 pr-6 mb-2 text-gray-500 text-sm bg-gray-100 rounded">
-                  <p class="mb-2 text-black"><strong class="text-black">Custom UI.</strong> Design your profile's User Interface.</p>
-                  <p>
-                    Add, edit, and re-order the sections of your profile below.
-                  </p>
-                </div>
-              `}
-              <div class="${this.hasCustomUI ? 'block' : 'hidden'} rounded border border-gray-200">
+              <div class="block rounded border border-gray-200">
                 ${this.values?.sections?.length ? html`
                   ${repeat(this.values.sections, section => section.id, this.renderSection.bind(this))}
                 ` : ''}
@@ -516,6 +463,7 @@ export class EditProfile extends LitElement {
   }
 
   onAddSection (e) {
+    this.values.sections = this.values.sections || []
     this.values.sections.push({id: '', label: '', html: ''})
     this.hasChanges = true
     this.requestUpdate()
@@ -675,10 +623,6 @@ export class EditProfile extends LitElement {
     try {
       let isPending = false
 
-      if (this.customUIOverride === false) {
-        this.values.sections = undefined
-      }
-
       // update community settings
       if (this.isCommunity && hasChanges(this.communityConfigValues, this.communityConfig)) {
         let res = await session.ctzn.db(this.userId).method(
@@ -819,7 +763,6 @@ export class EditProfile extends LitElement {
       }
       this.isProcessing = false
       this.hasChanges = false
-      this.customUIOverride = undefined
     } catch (e) {
       this.isProcessing = false
       this.currentError = e.toString()

@@ -69,16 +69,11 @@ export const SUGGESTED_REACTIONS = [
   '😢'
 ]
 
-export const DEFAULT_COMMUNITY_PROFILE_SECTIONS = [
+export const FIXED_COMMUNITY_PROFILE_SECTIONS = [
   {
     id: 'feed',
     label: 'Feed',
     html: `<ctzn-posts-feed></ctzn-posts-feed>`
-  },
-  {
-    id: 'activity',
-    label: 'Activity',
-    html: `<ctzn-dbmethods-feed view="results"></ctzn-dbmethods-feed>`
   },
   {
     id: 'about',
@@ -88,16 +83,11 @@ export const DEFAULT_COMMUNITY_PROFILE_SECTIONS = [
   }
 ]
 
-export const DEFAULT_CITIZEN_PROFILE_SECTIONS = [
+export const FIXED_CITIZEN_PROFILE_SECTIONS = [
   {
     id: 'feed',
     label: 'Feed',
     html: `<ctzn-posts-feed></ctzn-posts-feed>`
-  },
-  {
-    id: 'activity',
-    label: 'Activity',
-    html: `<ctzn-dbmethods-feed view="calls"></ctzn-dbmethods-feed>`
   },
   {
     id: 'about',
