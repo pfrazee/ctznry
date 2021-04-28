@@ -44,7 +44,8 @@ class CtznUser extends LitElement {
       roles: {type: Array},
       isUserInvited: {type: Boolean},
       isEmpty: {type: Boolean},
-      isJoiningOrLeaving: {type: Boolean}
+      isJoiningOrLeaving: {type: Boolean},
+      showMiniRightNavProfile: {type: Boolean}
     }
   }
 
@@ -60,7 +61,7 @@ class CtznUser extends LitElement {
 
     // ui helper state
     this.lastScrolledToUserId = undefined
-    this.positionStickyObserver = undefined
+    this.miniProfileObserver = undefined
 
     const pathParts = (new URL(location)).pathname.split('/')
     this.userId = pathParts[1]
@@ -84,6 +85,7 @@ class CtznUser extends LitElement {
     this.roles = undefined
     this.isUserInvited = undefined
     this.isEmpty = false
+    this.showMiniRightNavProfile = false
   }
 
   updated (changedProperties) {
@@ -185,7 +187,8 @@ class CtznUser extends LitElement {
       if (el) {
         let top = el.getBoundingClientRect().top
         if (top < 0) {
-          window.scrollTo({top: window.scrollY + top})
+          const isDesktop = window.innerWidth >= 1024
+          window.scrollTo({top: window.scrollY + top - (isDesktop ? 140 : 0)})
         }
       }
     } else {
@@ -268,12 +271,12 @@ class CtznUser extends LitElement {
       this.querySelector('ctzn-dbmethods-feed').load()
     }
 
-    const scrollTargetEl = this.querySelector('#scroll-target')
-    if (!this.positionStickyObserver && scrollTargetEl) {
-      this.positionStickyObserver = new IntersectionObserver((entries) => {
-        this.querySelector('app-subnav').setOpaque(entries[0]?.isIntersecting)
-      }, {threshold: 1.0})
-      this.positionStickyObserver.observe(scrollTargetEl)
+    const rightNavProfileEl = this.querySelector('#right-nav-profile')
+    if (!this.miniProfileObserver && rightNavProfileEl) {
+      this.miniProfileObserver = new IntersectionObserver((entries) => {
+        this.showMiniRightNavProfile = !entries[0]?.isIntersecting
+      }, {threshold: 0.0, rootMargin: '-80px 0px 0px 0px'})
+      this.miniProfileObserver.observe(rightNavProfileEl)
     }
   }
 
@@ -305,8 +308,8 @@ class CtznUser extends LitElement {
   disconnectedCallback (...args) {
     super.disconnectedCallback(...args)
     PullToRefresh.destroyAll()
-    if (this.positionStickyObserver) {
-      this.positionStickyObserver.disconnect()
+    if (this.miniProfileObserver) {
+      this.miniProfileObserver.disconnect()
     }
   }
 
@@ -390,8 +393,8 @@ class CtznUser extends LitElement {
                 ></app-button>
               </div>
             ` : ''}
-            <div id="scroll-target"></div>
           </div>
+          <div id="scroll-target"></div>
           <div class="min-h-screen">
             <app-subnav
               mobile-only
@@ -402,7 +405,7 @@ class CtznUser extends LitElement {
           </div>
         </div>
         <div>
-          <div class="sticky" style="top: 140px">
+          <div id="right-nav-profile" class="relative">
             <div class="absolute" style="top: -70px; right: 75px;">
               <a href="/${this.userId}" title=${this.userProfile?.value.displayName}>
                 <img
@@ -487,24 +490,52 @@ class CtznUser extends LitElement {
                 </div>
               ` : ''}
             </div>
-            <div>
-              ${repeat(this.subnavItems, (item, i) => {
-                if (item.mobileOnly) return ''
-                return html`
-                  <a
-                    class="
-                      block px-3 py-1.5 mb-1 cursor-pointer border-l-2 font-medium hover:bg-blue-50 hover:border-blue-600
-                      ${item.path === this.currentPath ? 'border-blue-600 text-blue-700 bg-blue-50' : 'border-gray-200 text-gray-700'}
-                      ${i === 0 ? 'rounded-tr' : ''}
-                      ${i === this.subnavItems.length - 1 ? 'rounded-br' : ''}
-                    "
-                    href="${item.path}"
+          </div>
+          <div class="sticky" style="top: 130px">
+            <div
+              class="absolute"
+              style="
+                top: -60px;
+                opacity: ${this.showMiniRightNavProfile ? '1' : '0'};
+                transition: opacity 0.1s;
+              "
+            >
+              <div class="flex items-center">
+                <a href="/${this.userId}" title=${this.userProfile?.value.displayName}>
+                  <img
+                    class="inline-block object-cover rounded-md mr-2"
+                    src=${AVATAR_URL(this.userId)}
+                    style="width: 40px; height: 40px"
+                    @click=${this.onClickAvatar}
                   >
-                    ${item.label}
+                </a>
+                <h2 class="text-xl font-semibold flex-1 truncate">
+                  <a
+                    class="inline-block"
+                    href="/${this.userId}"
+                    title=${this.userProfile?.value.displayName}
+                  >
+                    ${unsafeHTML(emojify(makeSafe(this.userProfile?.value.displayName), 'w-6', '0'))}
                   </a>
-                `
-              })}
+                </h2>
+              </div>
             </div>
+            ${repeat(this.subnavItems, (item, i) => {
+              if (item.mobileOnly) return ''
+              return html`
+                <a
+                  class="
+                    block px-3 py-1.5 mb-1 cursor-pointer border-l-2 font-medium hover:bg-blue-50 hover:border-blue-600
+                    ${item.path === this.currentPath ? 'border-blue-600 text-blue-700 bg-blue-50' : 'border-gray-200 text-gray-700'}
+                    ${i === 0 ? 'rounded-tr' : ''}
+                    ${i === this.subnavItems.length - 1 ? 'rounded-br' : ''}
+                  "
+                  href="${item.path}"
+                >
+                  ${item.label}
+                </a>
+              `
+            })}
           </div>
         </div>
       </main>
@@ -562,7 +593,6 @@ class CtznUser extends LitElement {
             style="top: 80%; left: 0; height: 20%; background: linear-gradient(to top, rgba(0,0,0,0.15), rgba(0,0,0,0.05) 30%, rgba(0,0,0,0));"
           ></div>
         </div>
-        <div id="scroll-target"></div>
       </main>
     `
   }
