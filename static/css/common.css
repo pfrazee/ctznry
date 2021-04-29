@@ -28,6 +28,16 @@ textarea {
   top: 4.5rem;
 }
 
+.top-inbox-toolbar {
+  top: 56px
+}
+
+@media (max-width: 640px) {
+  .top-inbox-toolbar {
+    top: 42px
+  }
+}
+
 app-header .menu {
   display: none;
   position: fixed;

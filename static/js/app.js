@@ -105,9 +105,10 @@ class CtznApp extends LitElement {
       case '/':
       case '/index':
       case '/index.html':
+      case '/inbox':
       case '/notifications':
       case '/search':
-        gestures.setCurrentNav(['/', '/notifications', '/search'])
+        gestures.setCurrentNav(['/', '/inbox', '/notifications', '/search'])
         return
       case '/communities':
         gestures.setCurrentNav([{back: true}, '/communities'])
@@ -168,6 +169,7 @@ class CtznApp extends LitElement {
       case '/':
       case '/index':
       case '/index.html':
+      case '/inbox':
       case '/notifications':
       case '/search':
       case '/activity':

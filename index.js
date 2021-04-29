@@ -44,6 +44,7 @@ export async function start ({port, configDir, domain}) {
   app.use('/webfonts', staticDir('static/webfonts'))
   app.get('/signup', staticFile('static/index.html'))
   app.get('/forgot-password', staticFile('static/index.html'))
+  app.get('/inbox', staticFile('static/index.html'))
   app.get('/notifications', staticFile('static/index.html'))
   app.get('/communities', staticFile('static/index.html'))
   app.get('/account', staticFile('static/index.html'))

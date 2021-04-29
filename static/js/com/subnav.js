@@ -32,9 +32,9 @@ export class Subnav extends LitElement {
     this.onViewportWidthChange = () => this.recalculateUnderline()
   }
   
-  getNavCls ({path, mobileOnly, rightAlign, thin}) {
+  getNavCls ({path, mobileOnly, rightAlign, thick, thin}) {
     return `
-      text-center pt-2 pb-2.5 sm:pt-3 sm:pb-3 ${thin ? 'px-3 sm:px-4' : 'px-4 sm:px-7'} whitespace-nowrap font-semibold cursor-pointer
+      text-center pt-2 pb-2.5 sm:pt-3 sm:pb-3 ${thick ? 'px-5 sm:px-8' : thin ? 'px-3 sm:px-4' : 'px-4 sm:px-7'} whitespace-nowrap font-semibold cursor-pointer
       hov:hover:text-blue-600
       ${mobileOnly ? 'no-header-only' : 'block'}
       ${rightAlign ? 'ml-auto' : ''}

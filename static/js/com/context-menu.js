@@ -159,7 +159,6 @@ export class ContextMenu extends LitElement {
           : html`
             <div class="${cls}" style="${ifDefined(this.customStyle)}">
               ${this.items.map(item => {
-                console.log(item)
                 if (item instanceof Promise) {
                   return html`${asyncReplace(renderPromiseItem(item))}`
                 }

@@ -79,14 +79,14 @@ export class Header extends LitElement {
           <a href="/" class=${this.getHeaderNavClass('/')} @click=${this.onClickLink} data-tooltip="Home">
             <span class="fas fa-fw navicon fa-home"></span>
           </a>
+          <a href="/inbox" class="${this.getHeaderNavClass('/inbox')}" @click=${this.onClickLink} data-tooltip="Communities">
+            <span class="fas fa-fw navicon fa-inbox"></span>
+          </a>
           <a href="/notifications" class="relative ${this.getHeaderNavClass('/notifications')}" @click=${this.onClickLink} data-tooltip="Notfications">
             ${this.unreadNotificationsCount > 0 ? html`
               <span class="absolute bg-blue-500 font-medium leading-none px-1.5 py-0.5 rounded-2xl text-white text-xs" style="top: 5px; left: 32px">${this.unreadNotificationsCount}</span>
             ` : ''}
             <span class="fas fa-fw navicon fa-bell"></span>
-          </a>
-          <a href="/communities" class="${this.getHeaderNavClass('/communities')}" @click=${this.onClickLink} data-tooltip="Communities">
-            <span class="fas fa-fw navicon fa-users"></span>
           </a>
           <div class="relative flex-1 ml-2 mr-4 h-8" @click=${e => { this.isSearchFocused = true }}>
             ${this.isSearchFocused ? html`
@@ -131,11 +131,11 @@ export class Header extends LitElement {
           >
             <span class="fas fa-fw navicon fa-user"></span>
           </a>
-          <a class=${this.getHeaderNavClass('/account')} href="/account" @click=${this.onClickLink} data-tooltip="Account">
-            <span class="fas fa-fw fa-cog"></span>
+          <a href="/communities" class="${this.getHeaderNavClass('/communities')}" @click=${this.onClickLink} data-tooltip="Communities">
+            <span class="fas fa-fw navicon fa-users"></span>
           </a>
-          <a class=${this.getHeaderNavClass()} href="#" @click=${this.onLogOut} data-tooltip="Log">
-            <span class="fas fa-fw fa-sign-out-alt"></span>
+          <a class=${this.getHeaderNavClass()} @click=${this.onClickAccountMenu}>
+            <span class="fas fa-fw fa-caret-down"></span>
           </a>
         </div>
       </div>
@@ -151,6 +151,10 @@ export class Header extends LitElement {
           <a href="/" class=${this.getMenuNavClass('/')} @click=${this.onClickLink}>
             <span class="fas mr-2 fa-fw navicon fa-home"></span>
             Home
+          </a>
+          <a href="/inbox" class="relative ${this.getMenuNavClass('/inbox')}" @click=${this.onClickLink}>
+            <span class="fas mr-2 fa-fw navicon fa-inbox"></span>
+            Inbox
           </a>
           <a href="/notifications" class="relative ${this.getMenuNavClass('/notifications')}" @click=${this.onClickLink}>
             ${this.unreadNotificationsCount > 0 ? html`
@@ -318,6 +322,30 @@ export class Header extends LitElement {
     const res = await CreateCommunityPopup.create()
     console.log(res)
     window.location = `/${res.userId}`
+  }
+
+  onClickAccountMenu (e) {
+    e.preventDefault()
+    e.stopPropagation()
+    let rect = e.currentTarget.getClientRects()[0]
+    contextMenu.create({
+      x: rect.right - 14,
+      y: rect.bottom,
+      right: true,
+      noBorders: true,
+      rounded: true,
+      withTriangle: true,
+      style: `padding: 4px 0 4px; font-size: 14px`,
+      items: [{
+        icon: 'fas fa-cog',
+        label: 'Account',
+        click: () => { window.location = `/account` }
+      }, '-', {
+        icon: 'fas fa-sign-out-alt',
+        label: 'Log Out',
+        click: () => this.onLogOut()
+      }]
+    })
   }
 
   async onLogOut () {

@@ -8,6 +8,7 @@ import '../com/header.js'
 import '../com/button.js'
 import '../com/login.js'
 import '../ctzn-tags/posts-feed.js'
+import '../com/inbox.js'
 import '../com/notifications-feed.js'
 import '../com/post-composer.js'
 import '../com/img-fallbacks.js'
@@ -167,9 +168,9 @@ class CtznMainView extends LitElement {
     const SUBNAV_ITEMS = [
       {menu: true, mobileOnly: true, label: html`<span class="fas fa-bars"></span>`},
       {path: '/', label: 'Feed'},
+      {path: '/inbox', label: 'Inbox'},
       {
         path: '/notifications',
-        mobileOnly: true,
         label: html`
           ${this.numUnreadNotifications > 0 ? html`
             <span class="inline-block text-sm px-2 bg-blue-600 text-white rounded-full">${this.numUnreadNotifications}</span>
@@ -177,12 +178,30 @@ class CtznMainView extends LitElement {
           Notifications
         `
       },
-      {
-        path: '/search',
-        mobileOnly: true,
-        label: 'Search'
-      }
+      {path: '/search', label: 'Search'}
     ]
+    if (this.currentView === 'inbox') {
+      return html`
+        <app-header
+          current-path=${this.currentPath}
+          @post-created=${e => this.load()}
+          @unread-notifications-changed=${this.onUnreadNotificationsChanged}
+        ></app-header>
+        <main class="wide">
+          <app-subnav
+            mobile-only
+            nav-cls=""
+            .items=${SUBNAV_ITEMS}
+            current-path=${this.currentPath}
+          ></app-subnav>
+          <h2 class="text-2xl tracking-tight font-bold p-4 border-l border-r border-gray-300 hidden lg:block">Inbox</h2>
+          <app-inbox
+            @load-state-updated=${this.onFeedLoadStateUpdated}
+            @publish-reply=${this.onPublishReply}
+          ></app-inbox>
+        </main>
+      `
+    }
     return html`
       <app-header
         current-path=${this.currentPath}
