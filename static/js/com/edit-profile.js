@@ -636,7 +636,7 @@ export class EditProfile extends LitElement {
       if (this.canEditProfile && hasChanges(this.values, this.profile.value)) {
         let usedSectionIds = new Set()
         for (let section of (this.values.sections || [])) {
-          const baseId = (slugify(section.label) || 'page').toLocaleLowerCase()
+          const baseId = (slugify(section.label) || 'section').toLocaleLowerCase()
           let id = baseId
           let n = 2
           while (usedSectionIds.has(id)) {

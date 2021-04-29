@@ -90,13 +90,17 @@ pre > code {
   padding: 0.6rem 1rem !important;
 }
 
-.mobile-only {
+.mobile-only,
+.mobile-only-flex {
   display: none;
 }
 
 @media (max-width: 640px) and (max-height: 900px) {
   .mobile-only {
     display: block;
+  }
+  .mobile-only-flex {
+    display: flex;
   }
 }
 
@@ -306,7 +310,7 @@ app-subnav::-webkit-scrollbar-thumb {
   color: rgba(255, 255, 255, 0.925);
   text-transform: none;
   text-align: center;
-  font-weight: 500;
+  font-weight: 700;
   white-space: pre;
   line-height: 1;
   pointer-events: none;

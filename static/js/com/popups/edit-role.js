@@ -55,6 +55,21 @@ export class EditRolePopup extends BasePopup {
   // =
 
   renderBody () {
+    const renderPerm = (permId) => {
+      return html`
+        <div class="flex items-center">
+          <input
+            id="perm-${permId}"
+            type="checkbox"
+            class="mx-2"
+            ?checked=${this.permissions.find(p => p.permId === permId)}
+            @click=${e => this.onTogglePerm(e, permId)}
+          >
+          <label for="perm-${permId}">${PERM_DESCRIPTIONS[permId]}</label>
+        </div>
+      `
+    }
+
     return html`
       <form class="px-2" @submit=${this.onSubmit}>
         <h2 class="text-3xl py-4">${this.isNewRole ? 'Create' : 'Edit'} role</h2>
@@ -80,20 +95,24 @@ export class EditRolePopup extends BasePopup {
             <div class="text-gray-500 px-1">Admin has full permissions.</div>
           ` : html`
             <div>
-              ${repeat(Object.entries(PERM_DESCRIPTIONS), ([permId, permDesc], index) => {
-                return html`
-                  <div class="flex items-center">
-                    <input
-                      id="perm-${index}"
-                      type="checkbox"
-                      class="mx-2"
-                      ?checked=${this.permissions.find(p => p.permId === permId)}
-                      @click=${e => this.onTogglePerm(e, permId)}
-                    >
-                    <label for="perm-${index}">${permDesc}</label>
-                  </div>
-                `
-              })}
+              <div class="font-bold px-1 text-gray-500 text-xs">SETTINGS</div>
+              ${renderPerm('ctzn.network/perm-community-update-config')}
+              ${renderPerm('ctzn.network/perm-community-edit-profile')}
+              ${renderPerm('ctzn.network/perm-community-manage-roles')}
+              ${renderPerm('ctzn.network/perm-community-assign-roles')}
+              <div class="font-bold px-1 text-gray-500 text-xs mt-3">MEMBERSHIP</div>
+              ${renderPerm('ctzn.network/perm-community-invite')}
+              ${renderPerm('ctzn.network/perm-community-ban')}
+              <div class="font-bold px-1 text-gray-500 text-xs mt-3">MODERATION</div>
+              ${renderPerm('ctzn.network/perm-community-remove-post')}
+              ${renderPerm('ctzn.network/perm-community-remove-comment')}
+              <div class="font-bold px-1 text-gray-500 text-xs mt-3">CONTENT</div>
+              ${renderPerm('ctzn.network/perm-manage-pages')}
+              <div class="font-bold px-1 text-gray-500 text-xs mt-3">ITEMS</div>
+              ${renderPerm('ctzn.network/perm-manage-item-classes')}
+              ${renderPerm('ctzn.network/perm-create-item')}
+              ${renderPerm('ctzn.network/perm-transfer-unowned-item')}
+              ${renderPerm('ctzn.network/perm-destroy-unowned-item')}
             </div>
           `}
         </section>

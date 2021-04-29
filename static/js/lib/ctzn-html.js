@@ -14,7 +14,7 @@ DOMPurify.addHook('beforeSanitizeElements', currentNode => {
 })
 
 export function sanitize (str, context = undefined) {
-  if (context === 'profile') {
+  if (context === 'profile' || context === 'page') {
     return DOMPurify.sanitize(str, {
       ADD_TAGS: [
         'ctzn-card',
@@ -30,7 +30,8 @@ export function sanitize (str, context = undefined) {
         'ctzn-owned-items-list',
         'ctzn-item-classes-list',
         'ctzn-comment-view',
-        'ctzn-comments-feed'
+        'ctzn-comments-feed',
+        'ctzn-pages-list'
       ],
       ADD_ATTR: ['view', 'user-id', 'mode', 'limit', 'methods-filter'],
       FORBID_TAGS: ['form', 'style'],

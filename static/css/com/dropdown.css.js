@@ -59,7 +59,6 @@ const cssStr = css`
   border: 1px solid var(--border-color--dropdown);
   border-radius: 0px;
   box-shadow: 0 2px 15px rgba(0, 0, 0, 0.3);
-  overflow: hidden;
 }
 
 .dropdown-items .section {
@@ -119,7 +118,7 @@ const cssStr = css`
 }
 
 .dropdown-items.rounded {
-  border-radius: 16px;
+  border-radius: 4px;
 }
 
 .dropdown-items.no-border .dropdown-item {
@@ -148,16 +147,15 @@ const cssStr = css`
 .dropdown-items.with-triangle:before {
   content: '';
   position: absolute;
-  top: -8px;
+  top: -6px;
   right: 10px;
-  width: 12px;
-  height: 12px;
-  z-index: 3;
-  width: 0;
-  height: 0;
-  border-left: 8px solid transparent;
-  border-right: 8px solid transparent;
-  border-bottom: 8px solid var(--bg-color--dropdown);
+  width: 10px;
+  height: 10px;
+  z-index: -1;
+  transform: rotate(45deg);
+  border-left: 1px solid #ddd;
+  border-top: 1px solid #ddd;
+  background: var(--bg-color--dropdown);
 }
 
 .dropdown-items.with-triangle.left:before {
@@ -165,7 +163,7 @@ const cssStr = css`
 }
 
 .dropdown-items.with-triangle.center:before {
-  left: 43%;
+  left: 46%;
 }
 
 .dropdown-title {

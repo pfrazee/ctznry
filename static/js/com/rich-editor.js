@@ -38,6 +38,7 @@ const PROFILE_TAGS = [
   code,
   card
 ]
+const PAGE_TAGS = PROFILE_TAGS
 
 export class RichEditor extends LitElement {
   static get properties () {
@@ -68,6 +69,9 @@ export class RichEditor extends LitElement {
     if (this.context === 'profile') {
       return PROFILE_TAGS
     }
+    if (this.context === 'page') {
+      return PAGE_TAGS
+    }
     return []
   }
 
@@ -75,7 +79,7 @@ export class RichEditor extends LitElement {
     if (this.context === 'post') {
       return 'undo redo | formatselect | bold italic underline strikethrough | link | post-embeds | bullist numlist | ctzn-code | table | removeformat | code'
     }
-    if (this.context === 'profile') {
+    if (this.context === 'profile' || this.context === 'page') {
       return 'undo redo | formatselect | bold italic underline strikethrough | link | content-widgets user-widgets item-widgets | bullist numlist | ctzn-code | table | removeformat | code'
     }
   }

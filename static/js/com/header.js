@@ -3,7 +3,9 @@ import * as session from '../lib/session.js'
 import * as notifications from '../lib/notifications.js'
 import { emit } from '../lib/dom.js'
 import { ComposerPopup } from './popups/composer.js'
+import { PageEditorPopup } from '../com/popups/page-editor.js'
 import { CreateCommunityPopup } from './popups/create-community.js'
+import * as contextMenu from './context-menu.js'
 import * as toast from './toast.js'
 import './button.js'
 import './searchable-user-list.js'
@@ -104,7 +106,6 @@ export class Header extends LitElement {
                   border-transparent rounded-full
                 "
                 style="background: rgba(0,0,0,0.05)"
-                @click=${this.isSearchFocused ? undefined : () => this.querySelector('input').focus()}
               >
                 <span class="fas fa-fw fa-search mr-2 text-gray-500"></span>
                 <span class="text-gray-600">Search</span>
@@ -118,12 +119,9 @@ export class Header extends LitElement {
             label="Create Post"
             @click=${this.onClickCreatePost}
           ></app-button>
-          <app-button
-            class="mr-2"
-            btn-class="text-gray-600 text-base sm:text-sm font-semibold w-full py-1 rounded-full"
-            label="Create Community"
-            @click=${this.onClickCreateCommunity}
-          ></app-button>
+          <a class=${this.getHeaderNavClass()} @click=${this.onClickCreateNew}>
+            <span class="fas fa-fw fa-plus"></span>
+          </a>
           <a
             class="${this.getHeaderNavClass(`/${info.userId}`)}"
             href="/${info.userId}"
@@ -181,6 +179,11 @@ export class Header extends LitElement {
             btn-class="text-base sm:text-sm font-semibold w-full mb-2"
             label="Create Post"
             @click=${this.onClickCreatePost}
+          ></app-button>
+          <app-button
+            btn-class="text-gray-600 text-base sm:text-sm font-semibold w-full mb-2"
+            label="Create Page"
+            @click=${this.onClickCreatePage}
           ></app-button>
           <app-button
             btn-class="text-gray-600 text-base sm:text-sm font-semibold w-full"
@@ -254,11 +257,6 @@ export class Header extends LitElement {
     }, 100)
   }
 
-  async onLogOut () {
-    await session.doLogout()
-    location.reload()
-  }
-
   async onClickCreatePost (e) {
     e.preventDefault()
     e.stopPropagation()
@@ -275,13 +273,56 @@ export class Header extends LitElement {
     }
   }
 
-  async onClickCreateCommunity (e) {
+  onClickCreateNew (e) {
     e.preventDefault()
     e.stopPropagation()
+    let rect = e.currentTarget.getClientRects()[0]
+    contextMenu.create({
+      x: (rect.left + rect.right) / 2,
+      y: rect.bottom,
+      center: true,
+      noBorders: true,
+      rounded: true,
+      withTriangle: true,
+      style: `padding: 4px 0 4px; font-size: 14px`,
+      items: [{
+        label: 'New Page',
+        click: () => this.onClickCreatePage()
+      }, {
+        label: 'New Community',
+        click: () => this.onClickCreateCommunity()
+      }]
+    })
+  }
+
+  async onClickCreatePage (e) {
+    e?.preventDefault()
+    e?.stopPropagation()
+    this.isMenuOpen = false
+
+    const res = await PageEditorPopup.create({
+      userId: session.info.userId,
+      context: 'page',
+      contextState: {page: {userId: session.info.userId}},
+      placeholder: 'Create your page here!',
+      canSave: true
+    })
+    console.log(res)
+    window.location = `/${session.info.userId}/ctzn.network/page/${res.id}`
+  }
+
+  async onClickCreateCommunity (e) {
+    e?.preventDefault()
+    e?.stopPropagation()
     this.isMenuOpen = false
     const res = await CreateCommunityPopup.create()
     console.log(res)
     window.location = `/${res.userId}`
+  }
+
+  async onLogOut () {
+    await session.doLogout()
+    location.reload()
   }
 }
 

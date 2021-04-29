@@ -1,6 +1,13 @@
 {
   "routes": [
     {
+      "src": "/([^/]+@[^/]+)/ctzn.network/page/([^/]+)",
+      "dest": "/index.html",
+      "headers": {
+        "Content-Security-Policy": "script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self';"
+      }
+    },
+    {
       "src": "/([^/]+@[^/]+)/ctzn.network/post/([^/]+)",
       "dest": "/index.html",
       "headers": {

@@ -241,6 +241,133 @@ app-custom-html[context="profile"] ctzn-comment-view.sanitized[mode="content-onl
   }
 }
 
+/* page context */
+
+app-custom-html[context="page"] .sanitized[ctzn-elem="1"] {
+  display: block;
+  border: 1px solid #D1D5DB;
+  border-radius: 0.25rem;
+  margin-bottom: 1.25rem;
+  overflow: hidden;
+}
+
+app-custom-html[context="page"] > * {
+  max-width: 660px;
+}
+
+app-custom-html[context="page"] ctzn-post-view.sanitized[mode="content-only"] {
+  padding: 0.5rem 0.75rem;
+}
+
+app-custom-html[context="page"] ctzn-comment-view.sanitized[mode="content-only"] {
+  padding: 0.5rem 0.75rem;
+}
+
+app-custom-html[context="page"] > .sanitized[ctzn-elem="1"] + .sanitized:not([ctzn-elem="1"]) {
+  margin-top: 1rem;
+}
+
+app-custom-html[context="page"] h1.sanitized,
+app-custom-html[context="page"] h2.sanitized,
+app-custom-html[context="page"] h3.sanitized,
+app-custom-html[context="page"] h4.sanitized,
+app-custom-html[context="page"] h5.sanitized,
+app-custom-html[context="page"] h6.sanitized,
+app-custom-html[context="page"] p.sanitized,
+app-custom-html[context="page"] ul.sanitized,
+app-custom-html[context="page"] ol.sanitized,
+app-custom-html[context="page"] table.sanitized,
+app-custom-html[context="page"] blockquote.sanitized,
+app-custom-html[context="page"] figcaption.sanitized,
+app-custom-html[context="page"] dl.sanitized {
+  margin-top: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+app-custom-html[context="page"] h1.sanitized {
+  font-size: 2.5rem;
+  line-height: 2.25rem;
+  letter-spacing: 0.05rem;
+  margin-top: 2rem;
+}
+
+@media (max-width: 640px) {
+  app-custom-html[context="page"] h1.sanitized {
+    font-size: 1.75rem;
+    line-height: 1.5rem;
+  }
+}
+
+app-custom-html[context="page"] h2.sanitized {
+  font-size: 1.75rem;
+  font-weight: 600;
+  margin-top: 2rem;
+}
+
+@media (max-width: 640px) {
+  app-custom-html[context="page"] h2.sanitized {
+    font-size: 1.5rem;
+  }
+}
+
+app-custom-html[context="page"] h3.sanitized {
+  font-size: 1.5rem;
+  margin-top: 2rem;
+}
+
+@media (max-width: 640px) {
+  app-custom-html[context="page"] h3.sanitized {
+    font-size: 1.25rem;
+  }
+}
+
+app-custom-html[context="page"] h4.sanitized {
+  font-size: 1.25rem;
+  margin-top: 2rem;
+}
+
+@media (max-width: 640px) {
+  app-custom-html[context="page"] h3.sanitized {
+    font-size: 1.15rem;
+  }
+}
+
+app-custom-html[context="page"] h5.sanitized {
+  font-size: 1.15rem;
+  margin-top: 2rem;
+}
+
+@media (max-width: 640px) {
+  app-custom-html[context="page"] h3.sanitized {
+    font-size: 1.05rem;
+  }
+}
+
+app-custom-html[context="page"] h6.sanitized {
+  font-size: 1.0rem;
+  font-weight: 800;
+  margin-top: 2rem;
+}
+
+app-custom-html[context="page"] > blockquote.sanitized {
+  border-left-color: #9CA3AF;
+  color: #1F2937;
+}
+
+app-custom-html[context="page"] ctzn-post-view.sanitized[mode="content-only"],
+app-custom-html[context="page"] ctzn-comment-view.sanitized[mode="content-only"] {
+  padding: 0.5rem 0.75rem;
+  background: #fff;
+  border-radius: 0.25rem;
+}
+
+@media (max-width: 639px) {
+  app-custom-html[context="page"] ctzn-post-view.sanitized[mode="content-only"],
+  app-custom-html[context="page"] ctzn-comment-view.sanitized[mode="content-only"] {
+    border-radius: 0;
+  }
+}
+
 /* post context */
 
 app-custom-html[context="post"] .sanitized[ctzn-elem="1"] {

@@ -159,13 +159,14 @@ export class ContextMenu extends LitElement {
           : html`
             <div class="${cls}" style="${ifDefined(this.customStyle)}">
               ${this.items.map(item => {
+                console.log(item)
                 if (item instanceof Promise) {
                   return html`${asyncReplace(renderPromiseItem(item))}`
                 }
                 if (item === '-') {
                   return html`<hr />`
                 }
-                if (item.type === 'html') {
+                if (item._$litType$) {
                   return item
                 }
                 var icon = item.icon

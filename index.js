@@ -49,6 +49,7 @@ export async function start ({port, configDir, domain}) {
   app.get('/account', staticFile('static/index.html'))
   app.get('/profile', staticFile('static/index.html'))
   app.get('/search', staticFile('static/index.html'))
+  app.get('/:username([^\/]{3,})/ctzn.network/page/:key', staticFile('static/index.html'))
   app.get('/:username([^\/]{3,})/ctzn.network/post/:key', staticFile('static/index.html'))
   app.get('/:username([^\/]{3,})/ctzn.network/comment/:key', staticFile('static/index.html'))
   app.get('/:username([^\/]{3,})/:subview', staticFile('static/index.html'))

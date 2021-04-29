@@ -51,6 +51,7 @@ export const PERM_DESCRIPTIONS = {
   'ctzn.network/perm-community-edit-profile': `Can edit the profile of the community.`,
   'ctzn.network/perm-community-manage-roles': `Can create, edit, and delete roles.`,
   'ctzn.network/perm-community-assign-roles': `Can assign roles to community members.`,
+  'ctzn.network/perm-manage-pages': 'Can create, edit, and delete pages.',
   'ctzn.network/perm-manage-item-classes': 'Can create, edit, and delete item class records.',
   'ctzn.network/perm-create-item': 'Can create new items.',
   'ctzn.network/perm-transfer-unowned-item': 'Can transfer ownership of items they do not own.',
@@ -80,6 +81,11 @@ export const FIXED_COMMUNITY_PROFILE_SECTIONS = [
     label: 'About',
     html: `<ctzn-community-members-list></ctzn-community-members-list>
 <ctzn-item-classes-list></ctzn-item-classes-list>`
+  },
+  {
+    id: 'pages',
+    label: 'Pages',
+    html: `<ctzn-pages-list></ctzn-pages-list>`
   }
 ]
 
@@ -96,5 +102,10 @@ export const FIXED_CITIZEN_PROFILE_SECTIONS = [
 <ctzn-following-list></ctzn-following-list>
 <ctzn-community-memberships-list></ctzn-community-memberships-list>
 <ctzn-owned-items-list></ctzn-owned-items-list>`
+  },
+  {
+    id: 'pages',
+    label: 'Pages',
+    html: `<ctzn-pages-list></ctzn-pages-list>`
   }
 ]
