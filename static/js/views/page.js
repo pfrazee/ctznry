@@ -76,13 +76,11 @@ class CtznPageView extends LitElement {
         if (this.subject.authorId === session.info?.userId) {
           this.canEdit = true
         } else {
-          console.log('checking perm')
           const perm = await session.ctzn.getCommunityUserPermission(
             this.subject.authorId,
             session.info.userId,
             'ctzn.network/perm-manage-pages'
-          )
-          console.log(perm)
+          ).catch(e => undefined)
           if (!!perm) {
             this.canEdit = true
           }
@@ -142,9 +140,9 @@ class CtznPageView extends LitElement {
             ${this.authorProfile?.value?.displayName || this.subject.authorId}
           </a>
           <span class="fas fa-chevron-right text-gray-500 mr-3" style="font-size: 10px"></span>
-          <a class="font-bold text-gray-500 text-sm truncate mr-3 hov:hover:underline" href="">
+          <span class="font-bold text-gray-500 text-sm truncate mr-3">
             ${this.pageRecord?.value?.title || this.subject.pageId}
-          </a>
+          </span>
           <span class="ml-auto mobile-hidden">
             Updated
             ${this.pageRecord?.value ? shortDate(this.pageRecord.value.updatedAt || this.pageRecord.value.createdAt) : ''}
