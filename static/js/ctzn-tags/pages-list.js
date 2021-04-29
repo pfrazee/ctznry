@@ -50,7 +50,7 @@ export class PagesList extends LitElement {
           this.userId,
           session.info.userId,
           'ctzn.network/perm-manage-pages'
-        )
+        ).catch(e => undefined)
         if (!!perm) {
           this.canEdit = true
         }
