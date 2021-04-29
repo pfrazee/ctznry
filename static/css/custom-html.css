@@ -83,6 +83,27 @@ app-custom-html table.sanitized {
 app-custom-html td.sanitized {
   border: 1px solid rgb(209, 213, 219);
   padding: 0.25rem 0.5rem;
+  word-break: initial;
+}
+
+@media (max-width: 640px) {
+  app-custom-html table.sanitized,
+  app-custom-html tr.sanitized,
+  app-custom-html td.sanitized {
+    display: block;
+  }
+  app-custom-html th.sanitized {
+    display: none;
+  }
+  app-custom-html tr.sanitized {
+    margin-bottom: 0.5rem;
+  }
+  app-custom-html td.sanitized {
+    padding: 0.5rem 0.75rem;
+  }
+  app-custom-html td.sanitized:not(:first-child) {
+    border-top: 0;
+  }
 }
 
 app-custom-html blockquote.sanitized {
@@ -255,6 +276,10 @@ app-custom-html[context="page"] > * {
   max-width: 660px;
 }
 
+app-custom-html[context="page"] > table {
+  max-width: none;
+}
+
 app-custom-html[context="page"] ctzn-post-view.sanitized[mode="content-only"] {
   padding: 0.5rem 0.75rem;
 }
@@ -295,29 +320,33 @@ app-custom-html[context="page"] h1.sanitized {
   app-custom-html[context="page"] h1.sanitized {
     font-size: 1.75rem;
     line-height: 1.5rem;
+    margin-top: 1.5rem;
   }
 }
 
 app-custom-html[context="page"] h2.sanitized {
-  font-size: 1.75rem;
-  font-weight: 600;
+  font-size: 2rem;
+  font-weight: 500;
   margin-top: 2rem;
 }
 
 @media (max-width: 640px) {
   app-custom-html[context="page"] h2.sanitized {
     font-size: 1.5rem;
+    margin-top: 1.5rem;
   }
 }
 
 app-custom-html[context="page"] h3.sanitized {
   font-size: 1.5rem;
+  font-weight: 600;
   margin-top: 2rem;
 }
 
 @media (max-width: 640px) {
   app-custom-html[context="page"] h3.sanitized {
     font-size: 1.25rem;
+    margin-top: 1.5rem;
   }
 }
 
@@ -329,6 +358,7 @@ app-custom-html[context="page"] h4.sanitized {
 @media (max-width: 640px) {
   app-custom-html[context="page"] h3.sanitized {
     font-size: 1.15rem;
+    margin-top: 1.5rem;
   }
 }
 
@@ -340,6 +370,7 @@ app-custom-html[context="page"] h5.sanitized {
 @media (max-width: 640px) {
   app-custom-html[context="page"] h3.sanitized {
     font-size: 1.05rem;
+    margin-top: 1.5rem;
   }
 }
 
