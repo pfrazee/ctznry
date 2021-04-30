@@ -79,7 +79,7 @@ export class Header extends LitElement {
           <a href="/" class=${this.getHeaderNavClass('/')} @click=${this.onClickLink} data-tooltip="Home">
             <span class="fas fa-fw navicon fa-home"></span>
           </a>
-          <a href="/inbox" class="${this.getHeaderNavClass('/inbox')}" @click=${this.onClickLink} data-tooltip="Communities">
+          <a href="/inbox" class="${this.getHeaderNavClass('/inbox')}" @click=${this.onClickLink} data-tooltip="Inbox">
             <span class="fas fa-fw navicon fa-inbox"></span>
           </a>
           <a href="/notifications" class="relative ${this.getHeaderNavClass('/notifications')}" @click=${this.onClickLink} data-tooltip="Notfications">

@@ -44,7 +44,7 @@ class CtznUser extends LitElement {
       roles: {type: Array},
       isUserInvited: {type: Boolean},
       isEmpty: {type: Boolean},
-      isJoiningOrLeaving: {type: Boolean},
+      isProcessingSocialAction: {type: Boolean},
       showMiniRightNavProfile: {type: Boolean}
     }
   }
@@ -57,7 +57,7 @@ class CtznUser extends LitElement {
     super()
     this.reset()
     this.currentView = undefined
-    this.isJoiningOrLeaving = false
+    this.isProcessingSocialAction = false // joining, leaving, following, unfollowing
 
     // ui helper state
     this.lastScrolledToUserId = undefined
@@ -382,6 +382,8 @@ class CtznUser extends LitElement {
                   btn-class="font-semibold py-1 text-base block w-full rounded-lg sm:px-10 sm:inline sm:w-auto sm:rounded-full"
                   @click=${this.onClickFollow}
                   label="Follow ${this.userProfile?.value.displayName || this.userId}"
+                  ?spinner=${this.isProcessingSocialAction}
+                  ?disabled=${this.isProcessingSocialAction}
                   primary
                 ></app-button>
               </div>
@@ -392,7 +394,8 @@ class CtznUser extends LitElement {
                   btn-class="font-semibold py-1 text-base block w-full rounded-lg sm:px-10 sm:inline sm:w-auto sm:rounded-full"
                   @click=${this.onClickJoin}
                   label="Join community"
-                  ?spinner=${this.isJoiningOrLeaving}
+                  ?spinner=${this.isProcessingSocialAction}
+                  ?disabled=${this.isProcessingSocialAction}
                   primary
                 ></app-button>
               </div>
@@ -478,6 +481,8 @@ class CtznUser extends LitElement {
                     btn-class="font-semibold py-1 text-base block w-full rounded-lg"
                     @click=${this.onClickFollow}
                     label="Follow ${this.userProfile?.value.displayName || this.userId}"
+                    ?spinner=${this.isProcessingSocialAction}
+                    ?disabled=${this.isProcessingSocialAction}
                     primary
                   ></app-button>
                 </div>
@@ -488,7 +493,8 @@ class CtznUser extends LitElement {
                     btn-class="font-semibold py-1 text-base block w-full rounded-lg"
                     @click=${this.onClickJoin}
                     label="Join community"
-                    ?spinner=${this.isJoiningOrLeaving}
+                    ?spinner=${this.isProcessingSocialAction}
+                    ?disabled=${this.isProcessingSocialAction}
                     primary
                   ></app-button>
                 </div>
@@ -682,6 +688,8 @@ class CtznUser extends LitElement {
                   btn-class="font-medium px-5 py-1 rounded-full text-base text-white"
                   @click=${this.onClickUnfollow}
                   label="Unfollow"
+                  ?spinner=${this.isProcessingSocialAction}
+                  ?disabled=${this.isProcessingSocialAction}
                   transparent
                   btn-style=${btnStyle}
                 ></app-button>
@@ -690,6 +698,8 @@ class CtznUser extends LitElement {
                   btn-class="font-medium px-6 py-1 rounded-full text-base text-white"
                   @click=${this.onClickFollow}
                   label="Follow"
+                  ?spinner=${this.isProcessingSocialAction}
+                  ?disabled=${this.isProcessingSocialAction}
                   transparent
                   btn-style=${btnStyle}
                 ></app-button>
@@ -717,7 +727,8 @@ class CtznUser extends LitElement {
                 btn-class="font-semibold px-5 py-1 rounded-full text-base text-white"
                 @click=${this.onClickJoin}
                 label="Join"
-                ?spinner=${this.isJoiningOrLeaving}
+                ?spinner=${this.isProcessingSocialAction}
+                ?disabled=${this.isProcessingSocialAction}
                 transparent
                 btn-style=${btnStyle}
               ></app-button>
@@ -770,20 +781,36 @@ class CtznUser extends LitElement {
   }
 
   async onClickFollow (e) {
-    await session.ctzn.user.table('ctzn.network/follow').create({
-      subject: {userId: this.userId, dbUrl: this.userProfile.dbUrl}
-    })
-    this.followers = await session.ctzn.listFollowers(this.userId)
+    this.isProcessingSocialAction = true
+    try {
+      await session.ctzn.user.table('ctzn.network/follow').create({
+        subject: {userId: this.userId, dbUrl: this.userProfile.dbUrl}
+      })
+      await session.loadSecondaryState()
+      this.followers = await session.ctzn.listFollowers(this.userId)
+    } catch (e) {
+      console.log(e)
+      toast.create('There was an error while trying to follow this user', 'error')
+    }
+    this.isProcessingSocialAction = false
   }
 
   async onClickUnfollow (e) {
-    await session.ctzn.user.table('ctzn.network/follow').delete(this.userId)
-    this.followers = await session.ctzn.listFollowers(this.userId)
+    this.isProcessingSocialAction = true
+    try {
+      await session.ctzn.user.table('ctzn.network/follow').delete(this.userId)
+      await session.loadSecondaryState()
+      this.followers = await session.ctzn.listFollowers(this.userId)
+    } catch (e) {
+      console.log(e)
+      toast.create('There was an error while trying to unfollow this user', 'error')
+    }
+    this.isProcessingSocialAction = false
   }
 
   async onClickJoin (e) {
+    this.isProcessingSocialAction = true
     try {
-      this.isJoiningOrLeaving = true
       await session.api.communities.join(this.userId)
       await session.loadSecondaryState()
       this.members = await listAllMembers(this.userId)
@@ -791,12 +818,12 @@ class CtznUser extends LitElement {
       console.log(e)
       toast.create(e.toString(), 'error')
     }
-    this.isJoiningOrLeaving = false
+    this.isProcessingSocialAction = false
   }
 
   async onClickLeave (e) {
+    this.isProcessingSocialAction = true
     try {
-      this.isJoiningOrLeaving = true
       await session.api.communities.leave(this.userId)
       await session.loadSecondaryState()
       this.members = await listAllMembers(this.userId)
@@ -804,7 +831,7 @@ class CtznUser extends LitElement {
       console.log(e)
       toast.create(e.toString(), 'error')
     }
-    this.isJoiningOrLeaving = false
+    this.isProcessingSocialAction = false
   }
 
   async onClickCreatePost (e) {
