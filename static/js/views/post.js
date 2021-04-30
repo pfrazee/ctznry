@@ -109,6 +109,7 @@ class CtznPostView extends LitElement {
     return html`
       <nav class="pt-4">
         <app-user-list
+          id="profile-card"
           class="block sticky top-18"
           cols="1"
           .ids=${[this.authorProfile.userId]}

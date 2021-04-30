@@ -66,7 +66,7 @@ export class UserList extends LitElement {
     return html`
       <link rel="stylesheet" href="/css/fontawesome.css">
       <div>
-        ${repeat(this.profiles, profile => {
+        ${repeat(this.profiles, profile => profile.userId, profile => {
           if (profile.error) {
             return html`
               <div class="profile error">
