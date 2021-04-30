@@ -37,16 +37,33 @@ export class SearchableUserList extends LitElement {
 
   moveSelectionUp () {
     this.highlightIndex = Math.max(this.highlightIndex - 1, 0)
+    this.updateComplete.then(() => this.scrollToSelection())
   }
 
   moveSelectionDown () {
     this.highlightIndex = Math.min(this.highlightIndex + 1, this.numResults - 1)
+    this.updateComplete.then(() => this.scrollToSelection())
   }
 
   navigateToSelection () {
     let el = this.querySelector(this.widgetMode ? '.current-selection' : '.result')
     if (!el || !el.getAttribute('href')) return
     emit(this, 'navigate-to', {detail: {url: el.getAttribute('href')}})
+  }
+
+  scrollToSelection () {
+    const el = this.querySelector('.current-selection')
+    const container = this.querySelector('#results-container')
+    if (!el || !container) return
+    const containerRect = container.getClientRects()[0]
+    const elementRect = el.getClientRects()[0]
+    const {offsetTop} = el
+    const scrolledTop = el.getBoundingClientRect().top
+    if (scrolledTop < 20) {
+      container.scrollTo(0, offsetTop)
+    } else if (scrolledTop > containerRect.bottom) {
+      container.scrollTo(0, offsetTop - containerRect.height + elementRect.height)
+    }
   }
 
   // rendering
@@ -102,6 +119,7 @@ export class SearchableUserList extends LitElement {
           "
           href=${href}
           title=${title}
+          @mousedown=${this.onMousedownResult}
         >
           ${inner}
         </a>
@@ -125,51 +143,57 @@ export class SearchableUserList extends LitElement {
           @blur=${e => emit(this, 'blur')}
         >
       </div>
-      ${looksLikeUserId ? html`
-        ${renderItem(`/${this.filter}`, this.filter, html`
-          <span class="bg-gray-100 fa-arrow-right fas mr-2 py-2 rounded text-center w-8"></span>
-          Go to ${this.filter}
-        `)}
-      ` : ''}
-      ${me ? html`
-        ${renderItem(`/${me}`, me, html`
-          <img class="w-8 h-8 object-cover rounded-md mr-2" src=${AVATAR_URL(me)} style="left: 10px; top: 6px">
-          ${displayNames.render(me)}
-        `)}
-      ` : ''}
-      ${!this.hasFilter || communities?.length ? html`
-        <h3 class="font-bold px-2 py-2 text-xs border-b border-gray-200">
-          My Communities
-        </h3>
-        <div>
-          ${communities?.length ? html`
-            ${repeat(communities, userId => userId, userId => renderItem(`/${userId}`, userId, html`
-              <img
-                class="lazyload w-8 h-8 object-cover rounded-md mr-2"
-                data-src=${AVATAR_URL(userId)}
-              >
-              <span class="truncate">${displayNames.render(userId)}</span>
-            `))}
-          ` : html`
-            <div class="pl-2 pr-5 mb-1 text-base text-gray-700">
-              Join a community to get connected to more people!
-            </div>
-          `}
-        </div>
-      ` : ''}
-      ${users?.length ? html`
-        <h3 class="font-bold px-2 py-2 text-xs border-b border-gray-200">
-          Following
-        </h3>
-        ${repeat(users, f => f, userId => renderItem(`/${userId}`, userId, html`
-          <img
-            class="lazyload w-8 h-8 object-cover rounded-md mr-2"
-            data-src=${AVATAR_URL(userId)}
-          >
-          <span class="truncate">${displayNames.render(userId)}</span>
-        </a>
-      `))}
-      ` : ''}
+      <div
+        id="results-container"
+        class="relative ${this.widgetMode ? 'overflow-y-auto' : ''}"
+        style="${this.widgetMode ? 'max-height: 75vh' : ''}"
+      >
+        ${looksLikeUserId ? html`
+          ${renderItem(`/${this.filter}`, this.filter, html`
+            <span class="bg-gray-100 fa-arrow-right fas mr-2 py-2 rounded text-center w-8"></span>
+            Go to ${this.filter}
+          `)}
+        ` : ''}
+        ${me ? html`
+          ${renderItem(`/${me}`, me, html`
+            <img class="w-8 h-8 object-cover rounded-md mr-2" src=${AVATAR_URL(me)} style="left: 10px; top: 6px">
+            ${displayNames.render(me)}
+          `)}
+        ` : ''}
+        ${!this.hasFilter || communities?.length ? html`
+          <h3 class="font-bold px-2 py-2 text-xs border-b border-gray-200">
+            My Communities
+          </h3>
+          <div>
+            ${communities?.length ? html`
+              ${repeat(communities, userId => userId, userId => renderItem(`/${userId}`, userId, html`
+                <img
+                  class="lazyload w-8 h-8 object-cover rounded-md mr-2"
+                  data-src=${AVATAR_URL(userId)}
+                >
+                <span class="truncate">${displayNames.render(userId)}</span>
+              `))}
+            ` : html`
+              <div class="pl-2 pr-5 mb-1 text-base text-gray-700">
+                Join a community to get connected to more people!
+              </div>
+            `}
+          </div>
+        ` : ''}
+        ${users?.length ? html`
+          <h3 class="font-bold px-2 py-2 text-xs border-b border-gray-200">
+            Following
+          </h3>
+          ${repeat(users, f => f, userId => renderItem(`/${userId}`, userId, html`
+            <img
+              class="lazyload w-8 h-8 object-cover rounded-md mr-2"
+              data-src=${AVATAR_URL(userId)}
+            >
+            <span class="truncate">${displayNames.render(userId)}</span>
+          </a>
+        `))}
+        ` : ''}
+      </div>
     `
   }
 
@@ -192,6 +216,11 @@ export class SearchableUserList extends LitElement {
       e.preventDefault()
       this.moveSelectionDown()
     }
+  }
+
+  onMousedownResult (e) {
+    const href = e.currentTarget.getAttribute('href')
+    if (href) emit(this, 'navigate-to', {detail: {url: href}})
   }
 }
 

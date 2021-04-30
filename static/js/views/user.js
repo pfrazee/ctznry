@@ -554,18 +554,20 @@ class CtznUser extends LitElement {
 
   renderError () {
     return html`
-      <main class="bg-gray-100 min-h-screen">
-        <app-header></app-header>
-        <div class="text-center py-48">
-          <h2 class="text-5xl text-gray-600 font-semibold mb-4">404 Not Found</h2>
-          <div class="text-lg text-gray-600 mb-4">We couldn't find ${this.userId}</div>
-          <div class="text-lg text-gray-600">
-            <a class="text-blue-600 hov:hover:underline" href="/" title="Back to home">
-              <span class="fas fa-angle-left fa-fw"></span> Home</div>
-            </a>
+      <app-header></app-header>
+      <div class="bg-gray-100">
+        <main class="min-h-screen">
+          <div class="text-center py-48">
+            <h2 class="text-5xl text-gray-600 font-semibold mb-4">404 Not Found</h2>
+            <div class="text-lg text-gray-600 mb-4">We couldn't find ${this.userId}</div>
+            <div class="text-lg text-gray-600">
+              <a class="text-blue-600 hov:hover:underline" href="/" title="Back to home">
+                <span class="fas fa-angle-left fa-fw"></span> Home</div>
+              </a>
+            </div>
           </div>
-        </div>
-      </main>
+        </main>
+    </div>
     `
   }
 

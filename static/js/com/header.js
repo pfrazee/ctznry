@@ -90,15 +90,12 @@ export class Header extends LitElement {
           </a>
           <div class="relative flex-1 ml-2 mr-4 h-8" @click=${e => { this.isSearchFocused = true }}>
             ${this.isSearchFocused ? html`
-              <div
-                class="absolute rounded bg-white z-20 border border-gray-300 overflow-x-hidden overflow-y-auto shadow-lg"
-                style="max-height: 75vh; top: -6px; left: -1px; right: -1px"
-              >
-                <app-searchable-user-list
-                  widget-mode
-                  @blur=${this.onBlurSearch}
-                ></app-searchable-user-list>
-              </div>
+              <app-searchable-user-list
+                class="block absolute rounded bg-white z-20 border border-gray-300 overflow-x-hidden shadow-lg"
+                style="top: -6px; left: -1px; right: -1px"
+                widget-mode
+                @blur=${this.onBlurSearch}
+              ></app-searchable-user-list>
             ` : html`
               <div
                 class="
@@ -256,9 +253,7 @@ export class Header extends LitElement {
   }
 
   onBlurSearch (e) {
-    setTimeout(() => { // hack to deal with input blur hiding
-      this.isSearchFocused = false
-    }, 100)
+    this.isSearchFocused = false
   }
 
   async onClickCreatePost (e) {
