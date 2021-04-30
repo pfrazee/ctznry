@@ -213,8 +213,8 @@ export class Header extends LitElement {
   renderLoggedOut () {
     return html`
       <header>
-        <div class="logged-out-prompt bg-white mb-4">
-          <div class="block sm:flex pt-2 pb-4">
+        <div class="logged-out-prompt bg-white border-b border-gray-300">
+          <div class="block sm:flex pt-4 sm:pt-2 pb-2 sm:pb-4">
             <div class="px-4 sm:px-0 flex-1">
               <div class="font-bold text-3xl text-gray-800">
                 CTZN
@@ -224,7 +224,12 @@ export class Header extends LitElement {
                 (pronounced "Citizen")
               </div>
               <div class="">
-                A decentralized social network for communities.
+                An open-alpha decentralized social network.
+                <a
+                  class="text-blue-600 py-1 hov:hover:underline cursor-pointer"
+                  href="https://www.youtube.com/channel/UCSkcL4my2wgDRFvjQOJzrlg"
+                  target="_blank"
+                >Follow the development livestreams every weekday on YouTube</a>.
               </div>
             </div>
             <div class="">
