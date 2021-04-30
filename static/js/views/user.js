@@ -503,7 +503,7 @@ class CtznUser extends LitElement {
           </div>
           <div class="sticky" style="top: 130px">
             <div
-              class="absolute"
+              class="absolute ${this.showMiniRightNavProfile ? '' : 'pointer-events-none'}"
               style="
                 top: -60px;
                 opacity: ${this.showMiniRightNavProfile ? '1' : '0'};
