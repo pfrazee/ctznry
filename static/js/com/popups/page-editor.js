@@ -97,7 +97,7 @@ export class PageEditorPopup extends BasePopup {
         placeholder=${this.placeholder}
       ></app-rich-editor>
       ${this.currentError ? html`
-        <div class="bg-red-100 px-6 py-4 mb-4 text-red-600">${this.currentError}</div>
+        <div class="bg-red-100 px-6 py-4 mt-2 mb-4 text-red-600">${this.currentError}</div>
       ` : ''}
       <div class="flex pt-2 pb-2">
         <app-button
@@ -160,6 +160,12 @@ export class PageEditorPopup extends BasePopup {
     this.isProcessing = true
 
     try {
+      if (!values.id) {
+        throw 'The Page ID is required.'
+      } else if (/^([a-zA-Z][a-zA-Z0-9-]{1,62}[a-zA-Z0-9])$/.test(values.id) !== true) {
+        throw 'The Page ID must start with a character, and can only contain characters, numbers, and dashes.'
+      }
+
       const userProfile = await session.ctzn.getProfile(this.userId)
       if (!userProfile) throw new Error('Unable to load profile information needed to create this page')
       const isCommunity = userProfile.dbType === 'ctzn.network/public-community-db'
