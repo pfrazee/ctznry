@@ -77,14 +77,17 @@ export class PageEditorPopup extends BasePopup {
         @change=${this.onChangeTitle}
       />
       <div
-        class="bg-gray-100 border-gray-300 border-l border-r box-border flex font-medium items-center px-2 py-1 text-sm w-full"
+        class="border-gray-300 border-l border-r box-border flex font-medium items-center px-2 py-1 text-sm w-full"
+        @click=${e => this.querySelector('input[name="id"]').focus()}
       >
-        <span class="text-gray-600 font-mono mobile-hidden">/${this.userId}/ctzn.network/page/</span>
+        <span class="fas fa-link mr-2 sm:mr-1 mt-0.5 text-gray-600 text-xs"></span>
+        <!-- <span class="text-gray-600 font-mono mobile-hidden">/${this.userId}/ctzn.network/page/</span> -->
+        <span class="mr-2">Page slug:</span>
         <input
           name="id"
           type="text"
           value=${this.pageRecord?.value?.id}
-          class="bg-transparent flex-1 font-mono"
+          class="bg-transparent flex-1"
           placeholder="untitled"
           @change=${this.onChangeId}
         />
@@ -163,7 +166,7 @@ export class PageEditorPopup extends BasePopup {
       if (!values.id) {
         values.id = 'untitled'
       } else if (/^([a-zA-Z][a-zA-Z0-9-]{1,62}[a-zA-Z0-9])$/.test(values.id) !== true) {
-        throw 'The Page ID must start with a character, and can only contain characters, numbers, and dashes.'
+        throw 'The page slug must start with a character, and can only contain characters, numbers, and dashes.'
       }
 
       if (!this.pageRecord) {
