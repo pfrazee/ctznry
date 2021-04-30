@@ -397,6 +397,26 @@ class CtznSignup extends LitElement {
         this.isProcessing = false
         return
       }
+    } else if (this.currentStage === 4) {
+      // account
+      if (!this.values.username) {
+        this.currentError = 'A username is required.'
+        return
+      } else if (this.values.username.length < 3) {
+        this.currentError = 'Your username must be at least 3 characters long.'
+        return
+      } else if (/^([a-zA-Z][a-zA-Z0-9-]{1,62}[a-zA-Z0-9])$/.test(this.values.username) !== true) {
+        if (/^[a-zA-Z]/.test(this.values.username) !== true) {
+          this.currentError = 'Your username must start with a character.'
+          return
+        } else if (/[a-zA-Z0-9]$/.test(this.values.username) !== true) {
+          this.currentError = 'Your username must end with a character or number.'
+          return
+        } else {
+          this.currentError = 'Your username can only contain characters, numbers, and dashes.'
+          return
+        }
+      }
     }
 
     this.captureValues()
