@@ -160,7 +160,7 @@ export class SearchableUserList extends LitElement {
             ${displayNames.render(me)}
           `)}
         ` : ''}
-        ${!this.hasFilter || communities?.length ? html`
+        ${communities?.length ? html`
           <h3 class="font-bold px-2 py-2 text-xs border-b border-gray-200">
             My Communities
           </h3>
@@ -173,11 +173,7 @@ export class SearchableUserList extends LitElement {
                 >
                 <span class="truncate">${displayNames.render(userId)}</span>
               `))}
-            ` : html`
-              <div class="pl-2 pr-5 mb-1 text-base text-gray-700">
-                Join a community to get connected to more people!
-              </div>
-            `}
+            ` : ''}
           </div>
         ` : ''}
         ${users?.length ? html`

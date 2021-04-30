@@ -22,7 +22,6 @@ class CtznMainView extends LitElement {
       currentPath: {type: String, attribute: 'current-path'},
       currentView: {type: String},
       searchQuery: {type: String},
-      isEmpty: {type: Boolean},
       numUnreadNotifications: {type: Number},
       lastFeedFetch: {type: Number}
     }
@@ -35,7 +34,6 @@ class CtznMainView extends LitElement {
   constructor () {
     super()
     this.searchQuery = ''
-    this.isEmpty = false
     this.notificationsClearedAt = undefined
     this.numUnreadNotifications = 0
     this.lastFeedFetch = undefined
@@ -224,7 +222,6 @@ class CtznMainView extends LitElement {
           ></app-subnav>
           ${this.currentView === 'feed' ? html`
             ${this.renderMockComposer()}
-            ${this.isEmpty ? this.renderEmptyMessage() : ''}
             <h2 class="p-4 border-l border-r border-gray-300 hidden lg:flex items-baseline">
               <span class="text-2xl tracking-tight font-bold">What's new</span>
               <span class="ml-2 text-gray-400 text-sm tracking-tight">${this.lastFeedFetch ? `Updated ${this.lastFeedFetch}` : ''}</span>
@@ -232,16 +229,13 @@ class CtznMainView extends LitElement {
             <ctzn-posts-feed
               class="block sm:border border-t border-gray-300"
               view="ctzn.network/feed-view"
-              @load-state-updated=${this.onFeedLoadStateUpdated}
               @publish-reply=${this.onPublishReply}
               @fetched-latest=${e => {this.lastFeedFetch = (new Date()).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}}
             ></ctzn-posts-feed>
           ` : this.currentView === 'notifications' ? html`
-            ${this.isEmpty ? this.renderEmptyMessage() : ''}
             <h2 class="text-2xl tracking-tight font-bold p-4 border-l border-r border-gray-300 hidden lg:block">Notifications</h2>
             <app-notifications-feed
               cleared-at=${this.notificationsClearedAt}
-              @load-state-updated=${this.onFeedLoadStateUpdated}
               @publish-reply=${this.onPublishReply}
             ></app-notifications-feed>
           ` : this.currentView === 'search' ? html`
@@ -274,30 +268,6 @@ class CtznMainView extends LitElement {
             @click=${e => this.onClickCreatePost(e, {intent: 'image'})}
           ></app-button>
         </div>
-      </div>
-    `
-  }
-
-  renderEmptyMessage () {
-    if (this.searchQuery) {
-      return html`
-        <div class="bg-gray-100 text-gray-500 py-44 text-center my-5">
-            <div class="fas fa-search text-6xl text-gray-300 mb-8"></div>
-          <div>No results found for "${this.searchQuery}"</div>
-        </div>
-      `
-    }
-    if (this.currentView === 'notifications') {
-      return html`
-        <div class="bg-gray-100 text-gray-500 py-44 text-center border border-t-0 border-gray-200">
-          <div class="fas fa-bell text-6xl text-gray-300 mb-8"></div>
-          <div>You have no notifications!</div>
-        </div>
-      `}
-    return html`
-      <div class="bg-gray-100 text-gray-500 py-44 text-center my-4">
-        <div class="fas fa-stream text-6xl text-gray-300 mb-8"></div>
-        <div>Follow people and<br>join communities to see what's new.</div>
       </div>
     `
   }
@@ -433,13 +403,6 @@ custom code</ctzn-code>
 
   // events
   // =
-
-  onFeedLoadStateUpdated (e) {
-    if (typeof e.detail?.isEmpty !== 'undefined') {
-      this.isEmpty = e.detail.isEmpty
-    }
-    this.requestUpdate()
-  }
 
   onKeyupSearch (e) {
     if (e.code === 'Enter') {

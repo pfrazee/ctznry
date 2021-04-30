@@ -218,7 +218,12 @@ export class Inbox extends LitElement {
       `
     }
     if (!this.results.length) {
-      return html``
+      return html`
+        <div class="bg-gray-100 text-gray-500 py-44 text-center border-b sm:border border-gray-300">
+          <div class="fas fa-inbox text-6xl text-gray-300 mb-8"></div>
+          <div>Your inbox is empty!</div>
+        </div>
+      `
     }
     return html`
       <link rel="stylesheet" href="/css/fontawesome.css">
