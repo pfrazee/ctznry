@@ -3,7 +3,7 @@ import * as session from './session.js'
 export async function getClearedAt () {
   const cached = getCache('cleared-at')
   if (typeof cached !== 'undefined') return cached
-  setCache('cleared-at', undefined) // "lock" by updating the cache ttl
+  setCache('cleared-at', cached) // "lock" by updating the cache ttl
   const res = await session.ctzn.view('ctzn.network/notifications-cleared-at-view')
   setCache('cleared-at', res?.notificationsClearedAt)
   return res?.notificationsClearedAt

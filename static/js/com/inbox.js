@@ -311,7 +311,6 @@ export class Inbox extends LitElement {
               : 'bg-gray-100 text-gray-600 border-gray-300 hov:hover:bg-gray-200'
           }
         "
-        style="content-visibility: auto; contain-intrinsic-size: 640px 40px;"
         @click=${e => this.onClickResult(e, result)}
       >
         <div class="py-2 px-3 text-gray-600" @click=${e => this.onToggleSelected(e, result)}>

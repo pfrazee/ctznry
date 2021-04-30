@@ -198,6 +198,7 @@ export class PostsFeed extends LitElement {
   }
 
   async pageLoadScrollTo (y) {
+    await this.requestUpdate()
     window.scrollTo(0, y)
     let first = true
     while (true) {
@@ -295,13 +296,11 @@ export class PostsFeed extends LitElement {
   
   renderResult (post, index) {
     return html`
-      <div style="content-visibility: auto; contain-intrinsic-size: 640px 120px;">
-        <ctzn-post-view
-          .post=${post}
-          mode="default"
-          class="block pt-1 lg:pt-1 pb-1 lg:pb-1 ${index === 0 ? '' : 'border-t border-gray-300'}"
-        ></ctzn-post-view>
-      </div>
+      <ctzn-post-view
+        .post=${post}
+        mode="default"
+        class="block pt-1 lg:pt-1 pb-1 lg:pb-1 ${index === 0 ? '' : 'border-t border-gray-300'}"
+      ></ctzn-post-view>
     `
   }
 

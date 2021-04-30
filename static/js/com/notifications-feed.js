@@ -173,6 +173,7 @@ export class NotificationsFeed extends LitElement {
   }
 
   async pageLoadScrollTo (y) {
+    await this.requestUpdate()
     window.scrollTo(0, y)
     let first = true
     while (true) {
@@ -265,7 +266,6 @@ export class NotificationsFeed extends LitElement {
     return html`
       <app-notification
         class="block bg-white sm:border border-b ${index !== 0 ? 'sm:border-t-0' : ''} ${isUnread ? 'border-blue-400' : 'border-gray-300'}"
-        style="content-visibility: auto; contain-intrinsic-size: 640px 120px;"
         .notification=${note}
         ?is-unread=${isUnread}
       ></app-notification>
