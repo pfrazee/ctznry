@@ -67,7 +67,9 @@ class CtznMainView extends LitElement {
       document.title = `Notifications | CTZN`
       let clearedAt = await notifications.getClearedAt()
       this.notificationsClearedAt = clearedAt ? Number(new Date(clearedAt)) : 0
-      notifications.updateClearedAt()
+      if (document.hasFocus()) {
+        notifications.updateClearedAt()
+      }
     }
 
     if (this.querySelector('ctzn-posts-feed')) {
@@ -469,7 +471,9 @@ custom code</ctzn-code>
     if (this.currentView === 'notifications') {
       document.title = e.detail.count ? `(${e.detail.count}) Notifications | CTZN` : `Notifications | CTZN`
       this.querySelector('app-notifications-feed').loadNew(e.detail.count)
-      notifications.updateClearedAt()
+      if (document.hasFocus()) {
+        notifications.updateClearedAt()
+      }
     }
   }
 }
