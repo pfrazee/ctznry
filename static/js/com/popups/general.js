@@ -14,6 +14,7 @@ export class GeneralPopup extends BasePopup {
 
   constructor (opts) {
     super()
+    this.customBodyClass = opts.bodyClass
     this.renderFn = opts.render
   }
 
@@ -31,6 +32,13 @@ export class GeneralPopup extends BasePopup {
 
   get maxWidth () {
     return '710px'
+  }
+
+  get bodyClass () {
+    if (this.customBodyClass) {
+      return this.customBodyClass
+    }
+    return 'px-4 pt-4 lg:pb-4 pb-24'
   }
 
   // management

@@ -890,6 +890,18 @@ class CtznUser extends LitElement {
     })
   }
 
+  onClickViewAuditLog () {
+    GeneralPopup.create({
+      bodyClass: 'px-0 pt-4 lg:pb-4 pb-24',
+      render: () => html`
+        <h2 class="border-b border-gray-300 px-4 pb-2 font-semibold text-3xl">Audit log</h2>
+        <app-dbmethod-result-feed
+          user-id=${this.userId}
+        ></app-dbmethod-result-feed>
+      `
+    })
+  }
+
   onClickControlsMenu (e) {
     e.preventDefault()
     e.stopPropagation()
@@ -907,7 +919,7 @@ class CtznUser extends LitElement {
         })
         items.push('-')
       }
-      items.push({label: 'Audit log', click: () => setView('audit-log')})
+      items.push({label: 'Audit log', click: () => this.onClickViewAuditLog()})
       if (this.amIAMember) {
         items.push('-')
         items.push({label: 'Leave community', click: () => this.onClickLeave()})
