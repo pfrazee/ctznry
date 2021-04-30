@@ -17,7 +17,8 @@ export class CommentsFeed extends LitElement {
       limit: {type: Number},
       results: {type: Array},
       hasNewItems: {type: Boolean},
-      isLoadingMore: {type: Boolean}
+      isLoadingMore: {type: Boolean},
+      hasReachedEnd: {type: Boolean}
     }
   }
 
@@ -33,6 +34,7 @@ export class CommentsFeed extends LitElement {
     this.results = undefined
     this.hasNewItems = false
     this.isLoadingMore = false
+    this.hasReachedEnd = false
 
     // ui state
     this.loadMoreObserver = undefined
@@ -55,7 +57,7 @@ export class CommentsFeed extends LitElement {
   }
 
   get hasHitLimit () {
-    return (this.limit > 0 && this.results?.length >= this.limit)
+    return this.hasReachedEnd || (this.limit > 0 && this.results?.length >= this.limit)
   }
 
   setContextState (state) {
@@ -141,6 +143,7 @@ export class CommentsFeed extends LitElement {
     results = results.concat(await Promise.all(entries.map(entry => (
       session.ctzn.getComment(this.userId, entry.key)
     ))))
+    this.hasReachedEnd = entries.length === 0
     this.requestUpdate()
     if (this.limit > 0 && results.length > this.limit) {
       results = results.slice(0, this.limit)
@@ -238,7 +241,7 @@ export class CommentsFeed extends LitElement {
       ${this.renderResults()}
       ${this.results?.length && !this.hasHitLimit ? html`
         <div class="bottom-of-feed ${this.isLoadingMore ? 'bg-white' : ''} mb-10 py-4 sm:rounded text-center">
-          ${this.isLoadingMore ? html`<span class="spinner w-6 h-6 text-gray-500"></span>` : ''}
+          <span class="spinner w-6 h-6 text-gray-500"></span>
         </div>
       ` : ''}
     `

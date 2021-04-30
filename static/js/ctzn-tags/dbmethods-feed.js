@@ -107,7 +107,8 @@ export class DbmethodsFeed extends LitElement {
       limit: {type: Number},
       entries: {type: Array},
       hasNewEntries: {type: Boolean},
-      isLoadingMore: {type: Boolean}
+      isLoadingMore: {type: Boolean},
+      hasReachedEnd: {type: Boolean}
     }
   }
 
@@ -125,6 +126,7 @@ export class DbmethodsFeed extends LitElement {
     this.entries = undefined
     this.hasNewEntries = false
     this.isLoadingMore = false
+    this.hasReachedEnd = false
     this.userProfile = undefined
 
     // ui state
@@ -183,7 +185,7 @@ export class DbmethodsFeed extends LitElement {
   }
 
   get hasHitLimit () {
-    return (this.limit > 0 && this.entries?.length >= this.limit)
+    return this.hasReachedEnd || (this.limit > 0 && this.entries?.length >= this.limit)
   }
 
   async load ({clearCurrent} = {clearCurrent: false}) {
@@ -258,6 +260,9 @@ export class DbmethodsFeed extends LitElement {
       newEntries = viewRes.calls.map(entry => callToGeneric(this.userId, entry))
     } else if (viewRes.feed) {
       newEntries = viewRes.feed.map(feedToGeneric)
+    }
+    if (newEntries.length === 0) {
+      this.hasReachedEnd = true
     }
 
     if (this.methodsFilter) {
@@ -345,8 +350,8 @@ export class DbmethodsFeed extends LitElement {
       ${this.renderHasNewEntries()}
       ${this.renderEntries()}
       ${this.entries?.length && !this.hasHitLimit ? html`
-        <div class="bottom-of-feed ${this.isLoadingMore ? 'bg-white' : ''} mb-10 py-4 sm:rounded text-center">
-          ${this.isLoadingMore ? html`<span class="spinner w-6 h-6 text-gray-500"></span>` : ''}
+        <div class="bottom-of-feed ${this.isLoadingMore ? 'bg-white' : ''} sm:rounded text-center">
+          <span class="spinner w-6 h-6 text-gray-500"></span>
         </div>
       ` : ''}
     `

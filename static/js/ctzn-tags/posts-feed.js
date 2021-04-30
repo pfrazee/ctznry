@@ -18,7 +18,8 @@ export class PostsFeed extends LitElement {
       limit: {type: Number},
       results: {type: Array},
       hasNewItems: {type: Boolean},
-      isLoadingMore: {type: Boolean}
+      isLoadingMore: {type: Boolean},
+      hasReachedEnd: {type: Boolean}
     }
   }
 
@@ -35,6 +36,7 @@ export class PostsFeed extends LitElement {
     this.results = undefined
     this.hasNewItems = false
     this.isLoadingMore = false
+    this.hasReachedEnd = false
 
     // ui state
     this.loadMoreObserver = undefined
@@ -67,7 +69,7 @@ export class PostsFeed extends LitElement {
   }
 
   get hasHitLimit () {
-    return (this.limit > 0 && this.results?.length >= this.limit)
+    return this.hasReachedEnd || (this.limit > 0 && this.results?.length >= this.limit)
   }
 
   setContextState (state) {
@@ -149,11 +151,13 @@ export class PostsFeed extends LitElement {
 
     let results = more ? (this.results || []) : []
     let lt = more ? results[results?.length - 1]?.key : undefined
+    const orgLen = results.length
     if (this.view === 'ctzn.network/feed-view') {
       results = results.concat((await session.ctzn.view(this.view, {limit: 15, reverse: true, lt}))?.feed)
     } else {
       results = results.concat((await session.ctzn.viewByHomeServer(this.userId, this.view, this.userId, {limit: 15, reverse: true, lt}))?.posts)
     }
+    this.hasReachedEnd = orgLen === results.length
     if (this.limit > 0 && results.length > this.limit) {
       results = results.slice(0, this.limit)
     }
@@ -260,7 +264,7 @@ export class PostsFeed extends LitElement {
       ${this.renderResults()}
       ${this.results?.length && !this.hasHitLimit ? html`
         <div class="bottom-of-feed ${this.isLoadingMore ? 'bg-white' : ''}">
-          ${this.isLoadingMore ? this.renderPlaceholderPost(-1) : ''}
+          ${this.renderPlaceholderPost(-1)}
         </div>
       ` : ''}
     `

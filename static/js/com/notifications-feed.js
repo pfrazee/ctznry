@@ -17,7 +17,8 @@ export class NotificationsFeed extends LitElement {
       sort: {type: String},
       limit: {type: Number},
       results: {type: Array},
-      isLoadingMore: {type: Boolean}
+      isLoadingMore: {type: Boolean},
+      hasReachedEnd: {type: Boolean}
     }
   }
 
@@ -35,6 +36,7 @@ export class NotificationsFeed extends LitElement {
     this.limit = undefined
     this.results = undefined
     this.isLoadingMore = false
+    this.hasReachedEnd = false
 
     // ui state
     this.loadMoreObserver = undefined
@@ -119,7 +121,10 @@ export class NotificationsFeed extends LitElement {
     }
     do {
       let subresults = (await session.ctzn.view('ctzn.network/notifications-view', {lt}))?.notifications
-      if (subresults.length === 0) break
+      if (subresults.length === 0) {
+        this.hasReachedEnd = true
+        break
+      }
       
       lt = subresults[subresults.length - 1].key
       results = results.concat(subresults)
@@ -217,9 +222,9 @@ export class NotificationsFeed extends LitElement {
       <link rel="stylesheet" href="/css/fontawesome.css">
       ${this.title ? html`<h2  class="results-header"><span>${this.title}</span></h2>` : ''}
       ${this.renderResults()}
-      ${this.results?.length ? html`
+      ${this.results?.length && !this.hasReachedEnd ? html`
         <div class="bottom-of-feed ${this.isLoadingMore ? 'bg-white' : ''} mb-10 py-4 sm:rounded text-center">
-          ${this.isLoadingMore ? html`<span class="spinner w-6 h-6 text-gray-500"></span>` : ''}
+          <span class="spinner w-6 h-6 text-gray-500"></span>
         </div>
       ` : ''}
     `
