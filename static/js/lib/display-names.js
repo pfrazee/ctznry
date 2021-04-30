@@ -14,7 +14,7 @@ export function render (userId) {
 
 export async function* fetcher (userId) {
   let displayName = get(userId)
-  if (displayName) {
+  if (typeof displayName === 'string' && displayName.trim()) {
     yield displayName
     return
   }
@@ -27,8 +27,10 @@ export async function* fetcher (userId) {
     })()
   }
   displayName = await _activeFetches[userId]
-  yield html`${unsafeHTML(emojify(makeSafe(displayName), 'w-4', '0'))}`
-  set(userId, displayName)
+  if (typeof displayName === 'string' && displayName.trim()) {
+    yield html`${unsafeHTML(emojify(makeSafe(displayName), 'w-4', '0'))}`
+    set(userId, displayName)
+  }
 }
 
 export function get (userId) {

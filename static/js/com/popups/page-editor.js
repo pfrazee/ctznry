@@ -79,13 +79,13 @@ export class PageEditorPopup extends BasePopup {
       <div
         class="bg-gray-100 border-gray-300 border-l border-r box-border flex font-medium items-center px-2 py-1 text-sm w-full"
       >
-        <span class="text-gray-600 mr-1 font-mono mobile-hidden">/${this.userId}/ctzn.network/page/</span>
+        <span class="text-gray-600 font-mono mobile-hidden">/${this.userId}/ctzn.network/page/</span>
         <input
           name="id"
           type="text"
           value=${this.pageRecord?.value?.id}
           class="bg-transparent flex-1 font-mono"
-          placeholder="Page ID"
+          placeholder="untitled"
           @change=${this.onChangeId}
         />
       </div>
@@ -161,9 +161,22 @@ export class PageEditorPopup extends BasePopup {
 
     try {
       if (!values.id) {
-        throw 'The Page ID is required.'
+        values.id = 'untitled'
       } else if (/^([a-zA-Z][a-zA-Z0-9-]{1,62}[a-zA-Z0-9])$/.test(values.id) !== true) {
         throw 'The Page ID must start with a character, and can only contain characters, numbers, and dashes.'
+      }
+
+      if (!this.pageRecord) {
+        // find a free ID
+        const existingPages = await session.ctzn.db(this.userId).table('ctzn.network/page').list()
+        const baseId = values.id
+        let id = values.id
+        let n = 2
+        while (existingPages.find(page => page.value.id === id)) {
+          id = `${baseId}-${n}`
+          n++
+        }
+        values.id = id
       }
 
       const userProfile = await session.ctzn.getProfile(this.userId)
