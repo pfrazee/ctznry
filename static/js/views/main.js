@@ -23,7 +23,8 @@ class CtznMainView extends LitElement {
       currentView: {type: String},
       searchQuery: {type: String},
       isEmpty: {type: Boolean},
-      numUnreadNotifications: {type: Number}
+      numUnreadNotifications: {type: Number},
+      lastFeedFetch: {type: Number}
     }
   }
 
@@ -37,6 +38,7 @@ class CtznMainView extends LitElement {
     this.isEmpty = false
     this.notificationsClearedAt = undefined
     this.numUnreadNotifications = 0
+    this.lastFeedFetch = undefined
 
     const pathParts = (new URL(location)).pathname.split('/')
     this.currentView = pathParts[1] || 'feed'
@@ -223,12 +225,16 @@ class CtznMainView extends LitElement {
           ${this.currentView === 'feed' ? html`
             ${this.renderMockComposer()}
             ${this.isEmpty ? this.renderEmptyMessage() : ''}
-            <h2 class="text-2xl tracking-tight font-bold p-4 border-l border-r border-gray-300 hidden lg:block">What's new</h2>
+            <h2 class="p-4 border-l border-r border-gray-300 hidden lg:flex items-baseline">
+              <span class="text-2xl tracking-tight font-bold">What's new</span>
+              <span class="ml-2 text-gray-400 text-sm tracking-tight">${this.lastFeedFetch ? `Updated ${this.lastFeedFetch}` : ''}</span>
+            </h2>
             <ctzn-posts-feed
               class="block sm:border border-t border-gray-300"
               view="ctzn.network/feed-view"
               @load-state-updated=${this.onFeedLoadStateUpdated}
               @publish-reply=${this.onPublishReply}
+              @fetched-latest=${e => {this.lastFeedFetch = (new Date()).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}}
             ></ctzn-posts-feed>
           ` : this.currentView === 'notifications' ? html`
             ${this.isEmpty ? this.renderEmptyMessage() : ''}

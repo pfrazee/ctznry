@@ -179,6 +179,9 @@ export class PostsFeed extends LitElement {
     this.hasNewItems = false
     this.isLoadingMore = false
     emit(this, 'load-state-updated', {detail: {isEmpty: this.results.length === 0}})
+    if (!more) {
+      emit(this, 'fetched-latest')
+    }
   }
 
   async checkNewItems () {

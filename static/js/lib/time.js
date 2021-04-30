@@ -20,7 +20,7 @@ export function shortDate (ts) {
 }
 
 // simple timediff fn
-// replace this with Intl.RelativeTimeFormat when it lands in Beaker
+// replace this with Intl.RelativeTimeFormat when it lands in most browsers
 // https://stackoverflow.com/questions/6108819/javascript-timestamp-to-relative-time-eg-2-seconds-ago-one-week-ago-etc-best
 const msPerMinute = 60 * 1000
 const msPerHour = msPerMinute * 60
