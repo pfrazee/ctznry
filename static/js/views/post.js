@@ -67,6 +67,10 @@ class CtznPostView extends LitElement {
     document.title = `${ucfirst(schemaName)} by ${this.authorProfile?.value.displayName || userId} | CTZN`
   }
 
+  async refresh () {
+    await this.querySelector('app-thread')?.load()
+  }
+
   updated (changedProperties) {
     if (changedProperties.get('currentPath')) {
       this.load()

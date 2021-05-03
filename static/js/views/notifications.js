@@ -1,7 +1,6 @@
 import { LitElement, html } from '../../vendor/lit/lit.min.js'
 import * as toast from '../com/toast.js'
 import * as notifications from '../lib/notifications.js'
-import PullToRefresh from '../../vendor/pulltorefreshjs/index.js'
 import '../com/header.js'
 import '../com/button.js'
 import '../com/notifications-feed.js'
@@ -36,27 +35,13 @@ class CtznNotificationsView extends LitElement {
     }
   }
 
+  async refresh () {
+    await this.querySelector('app-notifications-feed')?.load()
+  }
+
   async pageLoadScrollTo (y) {
     await this.requestUpdate()
-    const feed = this.querySelector('app-notifications-feed')
-    feed?.pageLoadScrollTo(y)
-  }
-
-  connectedCallback () {
-    super.connectedCallback(
-    this.ptr = PullToRefresh.init({
-      mainElement: 'body',
-      onRefresh: () => {
-        if (this.querySelector('app-notifications-feed')) {
-          this.querySelector('app-notifications-feed').load()
-        }
-      }
-    }))
-  }
-
-  disconnectedCallback (...args) {
-    super.disconnectedCallback(...args)
-    PullToRefresh.destroyAll()
+    this.querySelector('app-notifications-feed')?.pageLoadScrollTo(y)
   }
 
   // rendering

@@ -92,6 +92,10 @@ class CtznPageView extends LitElement {
     }
   }
 
+  async refresh () {
+    await this.load()
+  }
+
   updated (changedProperties) {
     if (changedProperties.get('currentPath')) {
       this.load()

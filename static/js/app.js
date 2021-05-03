@@ -1,4 +1,5 @@
 import { LitElement, html } from '../vendor/lit/lit.min.js'
+import PullToRefresh from '../../vendor/pulltorefreshjs/index.js'
 import * as session from './lib/session.js'
 import { emit } from './lib/dom.js'
 import * as gestures from './lib/gestures.js'
@@ -82,6 +83,22 @@ class CtznApp extends LitElement {
     } finally {
       this.isLoading = false
     }
+  }
+
+  connectedCallback () {
+    super.connectedCallback()
+    this.ptr = PullToRefresh.init({
+      mainElement: 'body',
+      onRefresh: async (done) => {
+        await this.querySelector('#view')?.refresh()
+        done()
+      }
+    })
+  }
+
+  disconnectedCallback (...args) {
+    super.disconnectedCallback(...args)
+    PullToRefresh.destroyAll()
   }
 
   navigateTo (pathname, replace = false) {

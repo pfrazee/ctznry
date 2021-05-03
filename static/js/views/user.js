@@ -17,7 +17,6 @@ import * as gestures from '../lib/gestures.js'
 import { pluralize, makeSafe, linkify } from '../lib/strings.js'
 import { emit } from '../lib/dom.js'
 import { emojify } from '../lib/emojify.js'
-import PullToRefresh from '../../vendor/pulltorefreshjs/index.js'
 import '../com/header.js'
 import '../com/button.js'
 import '../com/img-fallbacks.js'
@@ -267,13 +266,10 @@ class CtznUser extends LitElement {
       emit(this, 'navigate-to', {detail: {url: `/${this.userId}/${this.sections[0].id}`, replace: true}})
     }
 
-    if (this.querySelector('ctzn-posts-feed')) {
-      this.querySelector('ctzn-posts-feed').load()
-    } else if (this.querySelector('ctzn-dbresults-feed-feed')) {
-      this.querySelector('ctzn-dbresults-feed-feed').load()
-    } else if (this.querySelector('ctzn-dbmethods-feed')) {
-      this.querySelector('ctzn-dbmethods-feed').load()
-    }
+    this.querySelector('ctzn-posts-feed')?.load()
+    this.querySelector('ctzn-comments-feed')?.load()
+    this.querySelector('ctzn-dbresults-feed-feed')?.load()
+    this.querySelector('ctzn-dbmethods-feed')?.load()
 
     const rightNavProfileEl = this.querySelector('#right-nav-profile')
     if (!this.miniProfileObserver && rightNavProfileEl) {
@@ -282,6 +278,13 @@ class CtznUser extends LitElement {
       }, {threshold: 0.0, rootMargin: '-80px 0px 0px 0px'})
       this.miniProfileObserver.observe(rightNavProfileEl)
     }
+  }
+
+  async refresh () {
+    await this.querySelector('ctzn-posts-feed')?.load()
+    await this.querySelector('ctzn-comments-feed')?.load()
+    await this.querySelector('ctzn-dbresults-feed-feed')?.load()
+    await this.querySelector('ctzn-dbmethods-feed')?.load()
   }
 
   get isLoading () {
@@ -299,19 +302,8 @@ class CtznUser extends LitElement {
     }
   }
 
-  connectedCallback () {
-    super.connectedCallback(
-    this.ptr = PullToRefresh.init({
-      mainElement: 'body',
-      onRefresh: () => {
-        this.load()
-      }
-    }))
-  }
-
   disconnectedCallback (...args) {
     super.disconnectedCallback(...args)
-    PullToRefresh.destroyAll()
     if (this.miniProfileObserver) {
       this.miniProfileObserver.disconnect()
     }

@@ -1,9 +1,7 @@
 import { LitElement, html } from '../../vendor/lit/lit.min.js'
 import * as toast from '../com/toast.js'
 import * as session from '../lib/session.js'
-import * as notifications from '../lib/notifications.js'
 import { ComposerPopup } from '../com/popups/composer.js'
-import PullToRefresh from '../../vendor/pulltorefreshjs/index.js'
 import '../com/header.js'
 import '../com/button.js'
 import '../com/login.js'
@@ -34,7 +32,6 @@ class CtznMainView extends LitElement {
   constructor () {
     super()
     this.searchQuery = ''
-    this.notificationsClearedAt = undefined
     this.numUnreadNotifications = 0
     this.lastFeedFetch = undefined
 
@@ -62,44 +59,16 @@ class CtznMainView extends LitElement {
       }
       return this.requestUpdate()
     }
+    this.querySelector('ctzn-posts-feed')?.load()
+  }
 
-    if (this.currentView === 'notifications') {
-      document.title = `Notifications | CTZN`
-      let clearedAt = await notifications.getClearedAt()
-      this.notificationsClearedAt = clearedAt ? Number(new Date(clearedAt)) : 0
-      if (document.hasFocus()) {
-        notifications.updateClearedAt()
-      }
-    }
-
-    if (this.querySelector('ctzn-posts-feed')) {
-      this.querySelector('ctzn-posts-feed').load()
-    }
+  async refresh () {
+    await this.querySelector('ctzn-posts-feed')?.load()
   }
 
   async pageLoadScrollTo (y) {
     await this.requestUpdate()
-    const feed = this.querySelector('ctzn-posts-feed') || this.querySelector('app-notifications-feed')
-    feed.pageLoadScrollTo(y)
-  }
-
-  connectedCallback () {
-    super.connectedCallback(
-    this.ptr = PullToRefresh.init({
-      mainElement: 'body',
-      onRefresh: () => {
-        if (this.querySelector('ctzn-posts-feed')) {
-          this.querySelector('ctzn-posts-feed').load()
-        } else if (this.querySelector('app-notifications-feed')) {
-          this.querySelector('app-notifications-feed').load()
-        }
-      }
-    }))
-  }
-
-  disconnectedCallback (...args) {
-    super.disconnectedCallback(...args)
-    PullToRefresh.destroyAll()
+    this.querySelector('ctzn-posts-feed')?.pageLoadScrollTo(y)
   }
 
   // rendering
@@ -232,12 +201,6 @@ class CtznMainView extends LitElement {
               @publish-reply=${this.onPublishReply}
               @fetched-latest=${e => {this.lastFeedFetch = (new Date()).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}}
             ></ctzn-posts-feed>
-          ` : this.currentView === 'notifications' ? html`
-            <h2 class="text-2xl tracking-tight font-bold p-4 border-l border-r border-gray-300 hidden lg:block">Notifications</h2>
-            <app-notifications-feed
-              .clearedAt=${this.notificationsClearedAt}
-              @publish-reply=${this.onPublishReply}
-            ></app-notifications-feed>
           ` : this.currentView === 'search' ? html`
             <div class="bg-white sm:border sm:border-t-0 border-gray-300">
               <div class="text-sm px-3 py-3 text-gray-500">
@@ -437,13 +400,6 @@ custom code</ctzn-code>
 
   onUnreadNotificationsChanged (e) {
     this.numUnreadNotifications = e.detail.count
-    if (this.currentView === 'notifications') {
-      document.title = e.detail.count ? `(${e.detail.count}) Notifications | CTZN` : `Notifications | CTZN`
-      this.querySelector('app-notifications-feed').loadNew(e.detail.count)
-      if (document.hasFocus()) {
-        notifications.updateClearedAt()
-      }
-    }
   }
 }
 
