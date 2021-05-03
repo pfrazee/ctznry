@@ -123,6 +123,11 @@ class CtznApp extends LitElement {
       window.history.pushState({}, null, pathname)
     }
     this.currentPath = pathname
+    if (this.currentPath === '/' || this.currentPath === '/notifications') {
+      this.updateComplete.then(() => {
+        window.scrollTo(0, 0)
+      })
+    }
     this.setGestureNav()
   }
 
