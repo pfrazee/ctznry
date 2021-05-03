@@ -56,9 +56,7 @@ export class Subnav extends LitElement {
   }
 
   updated (changedProperties) {
-    if (changedProperties.has('currentPath') || changedProperties.has('items')) {
-      this.recalculateUnderline()
-    }
+    this.recalculateUnderline()
   }
 
   connectedCallback () {
@@ -66,7 +64,7 @@ export class Subnav extends LitElement {
     this.mediaQueryObserver = window.matchMedia("(max-width: 1150px)")
     this.mediaQueryObserver.addListener(this.onViewportWidthChange)
     gestures.setOnSwiping((dx, dxN) => {
-      this.borderEl.style.left = `${this.borderLeft + -dxN * this.borderWidth * 0.15}px`
+      this.borderEl.style.left = `${this.borderLeft + -dxN * this.borderWidth * 0.5}px`
     })
     this.className = `
       white-glass sticky top-0 z-10 flex overflow-x-auto bg-white
@@ -74,7 +72,6 @@ export class Subnav extends LitElement {
       ${this.navClass}
       ${this.mobileOnly ? 'lg:hidden' : ''}
     `
-    this.recalculateUnderline()
   }
 
   disconnectedCallback () {

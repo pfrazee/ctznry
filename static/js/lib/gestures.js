@@ -27,7 +27,9 @@ export function setup () {
   function onTouchMove (e) {
     if (onSwiping) {
       let diffX = e.changedTouches[0].screenX - touchstartX
-      onSwiping(diffX, diffX / SWIPE_X_THRESH)
+      let diffTs = Date.now() - touchstartTs
+      let velX = diffX / diffTs
+      onSwiping(diffX, velX / window.SWIPE_VEL_THRESH)
     }
   }
   function onCancel () {
