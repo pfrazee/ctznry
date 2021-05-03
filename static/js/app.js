@@ -20,6 +20,7 @@ const PAGE_PATH_REGEX = new RegExp('/([^/]+@[^/]+)/ctzn.network/page/([^/]+)', '
 const POST_PATH_REGEX = new RegExp('/([^/]+@[^/]+)/ctzn.network/post/([^/]+)', 'i')
 const COMMENT_PATH_REGEX = new RegExp('/([^/]+@[^/]+)/ctzn.network/comment/([^/]+)', 'i')
 const USER_PATH_REGEX = new RegExp('/([^/]+@[^/]+)')
+const USER_PAGE_REGEX = new RegExp('^/([^/]+@[^/]+)/([^/]+)$')
 
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', async () => {
@@ -54,8 +55,14 @@ class CtznApp extends LitElement {
     this.isLoading = true
     this.pageHasChanges = false
     this.currentPath = window.location.pathname
+
+    // "cached view" helper state
+    this.hasVisitedHome = false
+    this.lastUserPath = undefined
+
     gestures.setup()
     this.setGestureNav()
+    
     document.body.addEventListener('click', this.onGlobalClick.bind(this))
     document.body.addEventListener('view-thread', this.onViewThread.bind(this))
     document.body.addEventListener('navigate-to', this.onNavigateTo.bind(this))
@@ -165,49 +172,79 @@ class CtznApp extends LitElement {
       `
     }
 
-    switch (this.currentPath) {
-      case '/':
-      case '/index':
-      case '/index.html':
-      case '/inbox':
-      case '/notifications':
-      case '/search':
-      case '/activity':
-        return html`<app-main-view id="view" current-path=${this.currentPath}></app-main-view>`
-      case '/forgot-password':
-        return html`<app-forgot-password-view id="view" current-path=${this.currentPath}></app-forgot-password-view>`
-      case '/communities':
-        return html`<app-communities-view id="view" current-path=${this.currentPath}></app-communities-view>`
-      case '/account':
-        return html`<app-account-view id="view" current-path=${this.currentPath}></app-account-view>`
-      case '/signup':
-        return html`<app-signup-view id="view" current-path=${this.currentPath}></app-signup-view>`
+    /**
+     * NOTE
+     * We keep the DOM of the home view and the last-viewed user in
+     * the document with "display: none". This is so they will load
+     * quickly and preserve the scroll state.
+     * -prf
+     */
+
+    if (this.currentPath === '/') {
+      this.hasVisitedHome = true
+    } else if (USER_PAGE_REGEX.test(this.currentPath)) {
+      this.lastUserPath = this.currentPath
     }
-    if (PAGE_PATH_REGEX.test(this.currentPath)) {
-      return html`<app-page-view id="view" current-path=${this.currentPath}></app-page-view>`
-    }
-    if (POST_PATH_REGEX.test(this.currentPath)) {
-      return html`<app-post-view id="view" current-path=${this.currentPath}></app-post-view>`
-    }
-    if (COMMENT_PATH_REGEX.test(this.currentPath)) {
-      return html`<app-post-view id="view" current-path=${this.currentPath}></app-post-view>`
-    }
-    if (USER_PATH_REGEX.test(this.currentPath)) {
-      return html`<app-user-view id="view" current-path=${this.currentPath}></app-user-view>`
-    }
-    return html`
-      <main class="bg-gray-100 min-h-screen">
-        <app-header></app-header>
-        <div class="text-center py-48">
-          <h2 class="text-5xl text-gray-600 font-semibold mb-4">404 Not Found</h2>
-          <div class="text-lg text-gray-600 mb-4">No page exists at this URL.</div>
-          <div class="text-lg text-gray-600">
-            <a class="text-blue-600 hov:hover:underline" href="/" title="Back to home">
-              <span class="fas fa-angle-left fa-fw"></span> Home</div>
-            </a>
+
+    let renderedViews = new Set()
+    const renderView = (path) => {
+      if (renderedViews.has(path)) {
+        return ''
+      }
+      renderedViews.add(path)
+      const isCurrentView = this.currentPath === path
+      const id = isCurrentView ? 'view' : undefined
+      const cls = isCurrentView ? 'block' : 'hidden'
+      switch (path) {
+        case '/':
+        case '/index':
+        case '/index.html':
+        case '/inbox':
+        case '/notifications':
+        case '/search':
+        case '/activity':
+          return html`<app-main-view id=${id} class=${cls} current-path=${path}></app-main-view>`
+        case '/forgot-password':
+          return html`<app-forgot-password-view id="view" current-path=${path}></app-forgot-password-view>`
+        case '/communities':
+          return html`<app-communities-view id="view" current-path=${path}></app-communities-view>`
+        case '/account':
+          return html`<app-account-view id="view" current-path=${path}></app-account-view>`
+        case '/signup':
+          return html`<app-signup-view id="view" current-path=${path}></app-signup-view>`
+      }
+      if (PAGE_PATH_REGEX.test(path)) {
+        return html`<app-page-view id="view" current-path=${path}></app-page-view>`
+      }
+      if (POST_PATH_REGEX.test(path)) {
+        return html`<app-post-view id="view" current-path=${path}></app-post-view>`
+      }
+      if (COMMENT_PATH_REGEX.test(path)) {
+        return html`<app-post-view id="view" current-path=${path}></app-post-view>`
+      }
+      if (USER_PATH_REGEX.test(path)) {
+        return html`<app-user-view id=${id} class=${cls} current-path=${path}></app-user-view>`
+      }
+      return html`
+        <main class="bg-gray-100 min-h-screen">
+          <app-header></app-header>
+          <div class="text-center py-48">
+            <h2 class="text-5xl text-gray-600 font-semibold mb-4">404 Not Found</h2>
+            <div class="text-lg text-gray-600 mb-4">No page exists at this URL.</div>
+            <div class="text-lg text-gray-600">
+              <a class="text-blue-600 hov:hover:underline" href="/" title="Back to home">
+                <span class="fas fa-angle-left fa-fw"></span> Home</div>
+              </a>
+            </div>
           </div>
-        </div>
-      </main>
+        </main>
+      `
+    }
+
+    return html`
+      ${this.hasVisitedHome ? renderView('/') : ''}
+      ${this.lastUserPath ? renderView(this.lastUserPath) : ''}
+      ${renderView(this.currentPath)}
     `
   }
 
