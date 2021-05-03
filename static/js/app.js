@@ -11,6 +11,7 @@ import './views/account.js'
 import './views/communities.js'
 import './views/forgot-password.js'
 import './views/main.js'
+import './views/notifications.js'
 import './views/post.js'
 import './views/page.js'
 import './views/signup.js'
@@ -58,6 +59,7 @@ class CtznApp extends LitElement {
 
     // "cached view" helper state
     this.hasVisitedHome = false
+    this.hasVisitedNotifications = false
     this.lastUserPath = undefined
 
     gestures.setup()
@@ -182,6 +184,8 @@ class CtznApp extends LitElement {
 
     if (this.currentPath === '/') {
       this.hasVisitedHome = true
+    } else if (this.currentPath === '/notifications') {
+      this.hasVisitedNotifications = true
     } else if (USER_PAGE_REGEX.test(this.currentPath)) {
       this.lastUserPath = this.currentPath
     }
@@ -200,10 +204,11 @@ class CtznApp extends LitElement {
         case '/index':
         case '/index.html':
         case '/inbox':
-        case '/notifications':
         case '/search':
         case '/activity':
           return html`<app-main-view id=${id} class=${cls} current-path=${path}></app-main-view>`
+        case '/notifications':
+          return html`<app-notifications-view id=${id} class=${cls} current-path=${path}></app-notifications-view>`
         case '/forgot-password':
           return html`<app-forgot-password-view id="view" current-path=${path}></app-forgot-password-view>`
         case '/communities':
@@ -243,6 +248,7 @@ class CtznApp extends LitElement {
 
     return html`
       ${this.hasVisitedHome ? renderView('/') : ''}
+      ${this.hasVisitedNotifications ? renderView('/notifications') : ''}
       ${this.lastUserPath ? renderView(this.lastUserPath) : ''}
       ${renderView(this.currentPath)}
     `

@@ -74,6 +74,7 @@ export class Subnav extends LitElement {
       ${this.navClass}
       ${this.mobileOnly ? 'lg:hidden' : ''}
     `
+    this.recalculateUnderline()
   }
 
   disconnectedCallback () {
