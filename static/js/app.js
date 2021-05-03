@@ -148,6 +148,8 @@ class CtznApp extends LitElement {
         // NOTE: user-view specifies the gestures nav since it uses custom UIs
         if (!USER_PATH_REGEX.test(this.currentPath)) {
           gestures.setCurrentNav(undefined)
+        } else if (this.querySelector('app-user-view')) {
+          this.querySelector('app-user-view').setGesturesNav()
         }
     }
     if (PAGE_PATH_REGEX.test(this.currentPath)) {

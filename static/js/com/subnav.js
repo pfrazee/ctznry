@@ -30,6 +30,10 @@ export class Subnav extends LitElement {
     this.borderWidth = 0
     this.mediaQueryObserver = undefined
     this.onViewportWidthChange = () => this.recalculateUnderline()
+    this.onSwiping = (e) => {
+      const dxN = e.detail.pct
+      this.borderEl.style.left = `${this.borderLeft + -dxN * this.borderWidth * 0.5}px`
+    }
   }
   
   getNavCls ({path, mobileOnly, rightAlign, thick, thin}) {
@@ -46,6 +50,7 @@ export class Subnav extends LitElement {
     const el = this.querySelector(`a[href="${this.currentPath}"]`)
     if (!el) return
     const rect = el.getClientRects()[0]
+    if (!rect?.width) return
     this.borderLeft = el.offsetLeft
     this.borderWidth = rect?.width
 
@@ -56,16 +61,16 @@ export class Subnav extends LitElement {
   }
 
   updated (changedProperties) {
-    this.recalculateUnderline()
+    if (changedProperties.has('currentPath') || changedProperties.has('items')) {
+      this.recalculateUnderline()
+    }
   }
 
   connectedCallback () {
     super.connectedCallback()
     this.mediaQueryObserver = window.matchMedia("(max-width: 1150px)")
     this.mediaQueryObserver.addListener(this.onViewportWidthChange)
-    gestures.setOnSwiping((dx, dxN) => {
-      this.borderEl.style.left = `${this.borderLeft + -dxN * this.borderWidth * 0.5}px`
-    })
+    gestures.events.addEventListener('swiping', this.onSwiping)
     this.className = `
       white-glass sticky top-0 z-10 flex overflow-x-auto bg-white
       border-gray-300 border-b sm:border-l sm:border-r
@@ -76,7 +81,7 @@ export class Subnav extends LitElement {
 
   disconnectedCallback () {
     super.disconnectedCallback()
-    gestures.setOnSwiping(undefined)
+    gestures.events.removeEventListener('swiping', this.onSwiping)
     this.mediaQueryObserver?.removeListener(this.onViewportWidthChange)
   }
 

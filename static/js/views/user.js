@@ -135,11 +135,7 @@ class CtznUser extends LitElement {
 
   set sections (v) {
     this._sections = v
-    gestures.setCurrentNav([
-      {back: true},
-      ...v.map(s => `/${this.userId}/${s.id}`),
-      `/${this.userId}/settings`
-    ])
+    this.setGesturesNav()
   }
 
   get currentSection () {
@@ -176,6 +172,14 @@ class CtznUser extends LitElement {
       }
     }
     return false
+  }
+
+  setGesturesNav () {
+    gestures.setCurrentNav([
+      {back: true},
+      ...this._sections.map(s => `/${this.userId}/${s.id}`),
+      `/${this.userId}/settings`
+    ])
   }
 
   async load ({force} = {force: false}) {

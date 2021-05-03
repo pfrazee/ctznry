@@ -12,7 +12,6 @@ window.SWIPE_LOG = false
 // =
 
 let currentNav = undefined
-let onSwiping = undefined
 
 // exported api
 // =
@@ -25,15 +24,13 @@ export function setup () {
   let touchstartX = 0
   let touchstartY = 0
   function onTouchMove (e) {
-    if (onSwiping) {
-      let diffX = e.changedTouches[0].screenX - touchstartX
-      let diffTs = Date.now() - touchstartTs
-      let velX = diffX / diffTs
-      onSwiping(diffX, velX / window.SWIPE_VEL_THRESH)
-    }
+    let diffX = e.changedTouches[0].screenX - touchstartX
+    let diffTs = Date.now() - touchstartTs
+    let velX = diffX / diffTs
+    events.dispatchEvent(new CustomEvent('swiping', {detail: {diffX, pct: velX / window.SWIPE_VEL_THRESH}}))
   }
   function onCancel () {
-    if (onSwiping) onSwiping(0, 0)
+    events.dispatchEvent(new CustomEvent('swiping', {detail: {diffX: 0, pct: 0}}))
   }
   document.body.addEventListener('touchstart', e => {
     for (let el of e.composedPath()) {
@@ -49,10 +46,7 @@ export function setup () {
     touchstartX = e.changedTouches[0].screenX
     touchstartY = e.changedTouches[0].screenY
     touchstartTs = Date.now()
-
-    if (onSwiping) {
-      document.body.addEventListener('touchmove', onTouchMove)
-    }
+    document.body.addEventListener('touchmove', onTouchMove)
   }, false)
   document.body.addEventListener('touchend', e => {
     document.body.removeEventListener('touchmove', onTouchMove)
@@ -109,10 +103,6 @@ export function setup () {
 
 export function setCurrentNav (nav) {
   currentNav = nav
-}
-
-export function setOnSwiping (fn) {
-  onSwiping = fn
 }
 
 // internal methods
