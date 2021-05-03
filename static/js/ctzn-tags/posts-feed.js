@@ -194,6 +194,7 @@ export class PostsFeed extends LitElement {
     } else {
       results = (await session.ctzn.viewByHomeServer(this.userId, this.view, this.userId, {limit: 1, reverse: true}))?.posts
     }
+    emit(this, 'fetched-latest')
     this.hasNewItems = (results[0] && results[0].key !== this.results[0].key)
   }
 
