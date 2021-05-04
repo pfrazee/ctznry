@@ -102,13 +102,20 @@ export function setup () {
 }
 
 export function setCurrentNav (nav) {
+  const oldNav = currentNav
   currentNav = nav
+  return oldNav
 }
 
 // internal methods
 // =
 
 function moveNav (dir) {
+  if (typeof currentNav === 'function') {
+    currentNav(dir)
+    return
+  }
+
   if (BasePopup.getActive()) {
     if (BasePopup.getActive().shouldCloseOnOuterClick) {
       BasePopup.destroy()
@@ -117,15 +124,15 @@ function moveNav (dir) {
   }
 
   if (!currentNav) return
-  const url = currentNav[getCurrentNavPosition() + dir]
-  if (url?.back) {
+  const item = currentNav[getCurrentNavPosition() + dir]
+  if (item?.back) {
     if (window.history.length > 1) {
       window.history.back()
     } else {
       document.body.dispatchEvent(new CustomEvent('navigate-to', {detail: {url: '/', replace: true}}))
     }
-  } else if (url) {
-    document.body.dispatchEvent(new CustomEvent('navigate-to', {detail: {url, replace: true}}))
+  } else if (item) {
+    document.body.dispatchEvent(new CustomEvent('navigate-to', {detail: {url: item, replace: true}}))
   } else if (dir === -1) {
     document.body.dispatchEvent(new CustomEvent('open-main-menu'))
   }

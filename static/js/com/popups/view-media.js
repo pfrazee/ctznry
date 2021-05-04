@@ -1,6 +1,7 @@
 /* globals beaker */
 import { html } from '../../../vendor/lit/lit.min.js'
 import { BasePopup } from './base.js'
+import * as gestures from '../../lib/gestures.js'
 
 // exported api
 // =
@@ -8,12 +9,54 @@ import { BasePopup } from './base.js'
 export class ViewMediaPopup extends BasePopup {
   static get properties () {
     return {
+      url: {type: String}
     }
   }
 
   constructor (opts) {
     super()
     this.url = opts.url
+    this.urls = opts.urls
+    this.oldGestures = gestures.setCurrentNav(dir => this.move(dir))
+    this.onSwiping = e => {
+      const dxN = e.detail.pct
+      this.querySelector('img').style.transform = `translateX(${dxN * 10}%)`
+    }
+    gestures.events.addEventListener('swiping', this.onSwiping)
+  }
+
+  teardown () {
+    gestures.events.removeEventListener('swiping', this.onSwiping)
+    if (this.oldGestures) {
+      gestures.setCurrentNav(this.oldGestures)
+    }
+  }
+
+  get currentIndex () {
+    if (!this.urls) return 1
+    return this.urls.indexOf(this.url) + 1
+  }
+
+  get isLeftMost () {
+    return this.currentIndex === 1
+  }
+
+  get isRightMost () {
+    return !this.urls || this.currentIndex === this.urls.length
+  }
+
+  move (dir) {
+    if (!this.urls) return
+    let current = this.urls.indexOf(this.url)
+    if (dir === -1) {
+      if (current > 0) {
+        this.url = this.urls[current - 1]
+      }
+    } else if (dir === 1) {
+      if (current < this.urls.length - 1) {
+        this.url = this.urls[current + 1]
+      }
+    }
   }
 
   get shouldShowHead () {
@@ -57,16 +100,30 @@ export class ViewMediaPopup extends BasePopup {
         >
           <span class="fas fa-times"></span>
         </span>
-        <div class="flex w-full h-full items-center justify-center pointer-events-none">
-          <img class="block border border-white shadow-lg" src=${this.url}>
+        <div class="flex flex-col w-full h-full items-center justify-center" @click=${this.onReject}>
+          <div class="text-white text-lg mb-1">${this.currentIndex} / ${this.urls?.length || 1}</div>
+          <div class="flex items-center">
+            <div class="hidden sm:block text-white text-3xl px-10 cursor-pointer ${this.isLeftMost ? 'opacity-20' : ''}" @click=${e => this.onClickDir(e, -1)}>
+              <span class="fas fa-angle-left"></span>
+            </div>
+            <img class="block border border-white shadow-lg" src=${this.url}>
+            <div class="hidden sm:block text-white text-3xl px-10 cursor-pointer ${this.isRightMost ? 'opacity-20' : ''}" @click=${e => this.onClickDir(e, 1)}>
+              <span class="fas fa-angle-right"></span>
+            </div>
+          </div>
         </div>
       </div>
     `
   }
 
-
   // events
   // =
+
+  onClickDir (e, dir) {
+    e.preventDefault()
+    e.stopPropagation()
+    this.move(dir)
+  }
 }
 
 customElements.define('view-media-popup', ViewMediaPopup)

@@ -329,7 +329,7 @@ export class PostView extends LitElement {
         @click=${this.renderOpts?.preview ? undefined : e => this.onClickImage(e, item)}
       >
         <img
-          class="box-border object-cover rounded w-full img-sizing-${size}"
+          class="box-border object-cover border border-gray-200 rounded w-full img-sizing-${size}"
           src="${url}"
           alt=${item.caption || 'Image'}
         >
@@ -375,7 +375,7 @@ export class PostView extends LitElement {
           <div class="flex-1 pr-0.5">${this.renderImg(media[0], 'big')}</div>
           <div class="flex-1 flex flex-col pl-0.5">
             <div class="flex-1 pb-0.5">${this.renderImg(media[1], 'smaller')}</div>
-            <div class="flex-1 pt-0.5">${this.renderImg(media[2], 'smaller')}</div>
+            <div class="flex-1 pt-0.5">${this.renderImg(media[2], 'small')}</div>
           </div>
         ` : media.length === 2 ? html`
           <div class="flex-1 pr-0.5">${this.renderImg(media[0], 'medium')}</div>
@@ -723,7 +723,8 @@ export class PostView extends LitElement {
     e.preventDefault()
     e.stopPropagation()
     ViewMediaPopup.create({
-      url: BLOB_URL(this.post.author.userId, (item.blobs.thumb || item.blobs.original).blobName)
+      url: BLOB_URL(this.post.author.userId, (item.blobs.thumb || item.blobs.original).blobName),
+      urls: this.post.value.media.map(item2 => BLOB_URL(this.post.author.userId, (item2.blobs.thumb || item2.blobs.original).blobName))
     })
   }
 }

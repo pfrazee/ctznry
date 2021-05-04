@@ -23,6 +23,7 @@ export class BasePopup extends LitElement {
 
     // cleanup function called on cancel
     this.cleanup = () => {
+      this.teardown()
       document.removeEventListener('keyup', onGlobalKeyUp)
       document.removeEventListener('close-all-popups', onGlobalCloseAllPopups)
     }
@@ -30,6 +31,10 @@ export class BasePopup extends LitElement {
 
   createRenderRoot() {
     return this // dont use shadow dom
+  }
+
+  teardown () {
+    // overrideme
   }
 
   get shouldShowHead () {
