@@ -317,7 +317,7 @@ class CtznApp extends LitElement {
     emit(document, 'close-all-popups')
     this.currentPath = window.location.pathname
     this.setGestureNav()
-    if (e.state.scrollY) {
+    if (typeof e.state.scrollY === 'number') {
       this.scrollToAfterLoad(e.state.scrollY)
     }
   }

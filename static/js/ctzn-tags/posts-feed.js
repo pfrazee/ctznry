@@ -201,6 +201,9 @@ export class PostsFeed extends LitElement {
   async pageLoadScrollTo (y) {
     await this.requestUpdate()
     window.scrollTo(0, y)
+    await new Promise(r => setTimeout(r, 100))
+    window.scrollTo(0, y)
+    
     let first = true
     while (true) {
       if (Math.abs(window.scrollY - y) < 10) {
@@ -215,17 +218,12 @@ export class PostsFeed extends LitElement {
         await this.queueQuery({more: true})
       }
       await this.requestUpdate()
+      await new Promise(r => setTimeout(r, 100))
       window.scrollTo(0, y)
-      if (numResults === this.results?.length || 0) {
+      if (numResults === (this.results?.length || 0)) {
         break
       }
     }
-
-    setTimeout(() => {
-      if (Math.abs(window.scrollY - y) > 10) {
-        window.scrollTo(0, y)
-      }
-    }, 500)
   }
 
   requestResultUpdates () {
