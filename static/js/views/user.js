@@ -66,8 +66,6 @@ class CtznUser extends LitElement {
     this.userId = pathParts[1]
     this.currentView = pathParts[2] || undefined
     document.title = `Loading... | CTZN`
-
-    this.load()
   }
 
   reset () {
@@ -87,15 +85,6 @@ class CtznUser extends LitElement {
     this.showMiniRightNavProfile = false
   }
 
-  updated (changedProperties) {
-    if (changedProperties.get('currentPath')) {
-      const urlp = new URL(location)
-      const pathParts = urlp.pathname.split('/')
-      this.userId = pathParts[1]
-      this.currentView = pathParts[2]
-      this.load()
-    }
-  }
 
   get isMe () {
     return session.info?.userId === this.userId
@@ -183,6 +172,11 @@ class CtznUser extends LitElement {
   }
 
   async load ({force} = {force: false}) {
+    const urlp = new URL(location)
+    const pathParts = urlp.pathname.split('/')
+    this.userId = pathParts[1]
+    this.currentView = pathParts[2]
+
     // 1. If opening a profile for the first time (change of lastScrolledToUserId) go to top
     // 2. If we're scrolled beneath the header, jump to just below the header
     if (this.lastScrolledToUserId && this.lastScrolledToUserId === this.userId) {

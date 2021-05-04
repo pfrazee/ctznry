@@ -34,8 +34,6 @@ class CtznPostView extends LitElement {
     this.post = undefined
     this.loadError = undefined
     this.scrollToOnLoad = undefined
-
-    this.load()
   }
 
   get communityUserId () {
@@ -69,12 +67,6 @@ class CtznPostView extends LitElement {
 
   async refresh () {
     await this.querySelector('app-thread')?.load()
-  }
-
-  updated (changedProperties) {
-    if (changedProperties.get('currentPath')) {
-      this.load()
-    }
   }
 
   async pageLoadScrollTo (y) {

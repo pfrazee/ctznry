@@ -40,7 +40,6 @@ class CtznSignup extends LitElement {
     this.isServersExpanded = false
     this.isCustomServer = false
     this.isAvatarSet = false
-    this.load()
   }
 
   async load () {

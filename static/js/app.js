@@ -85,12 +85,18 @@ class CtznApp extends LitElement {
     }
   }
 
+  updated (changedProperties) {
+    if (changedProperties.has('currentPath')) {
+      this.querySelector('#view')?.load?.()
+    }
+  }
+
   connectedCallback () {
     super.connectedCallback()
     this.ptr = PullToRefresh.init({
       mainElement: 'body',
       onRefresh: async (done) => {
-        await this.querySelector('#view')?.refresh()
+        await this.querySelector('#view')?.refresh?.()
         done()
       }
     })

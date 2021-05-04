@@ -21,18 +21,15 @@ class CtznNotificationsView extends LitElement {
 
   constructor () {
     super()
-    this.notificationsClearedAt = undefined
     this.numUnreadNotifications = 0
-    this.load()
   }
 
   async load () {
     document.title = `Notifications | CTZN`
-    let clearedAt = await notifications.getClearedAt()
-    this.notificationsClearedAt = clearedAt ? Number(new Date(clearedAt)) : 0
     if (document.hasFocus()) {
       notifications.updateClearedAt()
     }
+    await this.querySelector('app-notifications-feed')?.load()
   }
 
   async refresh () {
@@ -109,7 +106,7 @@ class CtznNotificationsView extends LitElement {
     this.numUnreadNotifications = e.detail.count
     document.title = e.detail.count ? `(${e.detail.count}) Notifications | CTZN` : `Notifications | CTZN`
     this.querySelector('app-notifications-feed').loadNew(e.detail.count)
-    if (document.hasFocus()) {
+    if (document.hasFocus() && this.id === 'view') {
       notifications.updateClearedAt()
     }
   }

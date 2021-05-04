@@ -91,8 +91,6 @@ class CtznCommunities extends LitElement {
     this.isEmpty = false
     this.memberships = undefined
     this.suggestedCommunities = undefined
-
-    this.load()
   }
 
   async load () {

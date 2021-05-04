@@ -26,10 +26,14 @@ export async function countUnread () {
 }
 
 function setCache (key, value, ttl = 30e3/* 30 seconds */) {
-  localStorage.setItem(`notes-cache:${key}`, JSON.stringify({
-    expires: Date.now() + ttl,
-    value
-  }))
+  if (typeof value === 'undefined') {
+    localStorage.removeItem(`notes-cache:${key}`)
+  } else {
+    localStorage.setItem(`notes-cache:${key}`, JSON.stringify({
+      expires: Date.now() + ttl,
+      value
+    }))
+  }
 }
 
 function getCache (key) {

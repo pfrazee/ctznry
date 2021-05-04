@@ -3,6 +3,7 @@ import { repeat } from '../../vendor/lit/directives/repeat.js'
 import { emit } from '../lib/dom.js'
 import { extractSchemaId } from '../lib/strings.js'
 import * as session from '../lib/session.js'
+import * as notifications from '../lib/notifications.js'
 import './notification.js'
 
 let _cache = undefined
@@ -109,6 +110,11 @@ export class NotificationsFeed extends LitElement {
     let results = more ? (this.results || []) : []
     this.isLoadingMore = more
 
+    if (!this.clearedAt) {
+      let clearedAt = await notifications.getClearedAt()
+      this.clearedAt = clearedAt ? Number(new Date(clearedAt)) : 0
+    }
+
     // because we collapse results, we need to run the query until the limit is fulfilled
     // let lt = more ? results[results?.length - 1]?.key : undefined
     let lt = undefined
@@ -168,7 +174,16 @@ export class NotificationsFeed extends LitElement {
       num -= subresults.length
     }
     if (results?.length) {
-      this.results = results.concat(results)
+      results = results.concat(this.results)
+
+      // apply dedup, results may sometimes have duplicates
+      results = results.filter((entry, index) => {
+        return results.findIndex(entry2 => entry2.itemUrl === entry.itemUrl) === index
+      })
+
+      // group together notifications
+      results = results.reduce(reduceSimilarNotifications, [])
+      this.results = results
     }
   }
 

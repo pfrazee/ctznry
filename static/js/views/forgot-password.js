@@ -24,8 +24,6 @@ class CtznForgotPassword extends LitElement {
     this.userHasPasswordChangeCode = false
     this.isFinished = false
     this.userId = ''
-
-    this.load()
   }
 
   async load () {

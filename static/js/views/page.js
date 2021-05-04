@@ -39,8 +39,6 @@ class CtznPageView extends LitElement {
     this.pageContent = undefined
     this.canEdit = false
     this.loadError = undefined
-
-    this.load()
   }
 
 

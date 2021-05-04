@@ -37,16 +37,6 @@ class CtznMainView extends LitElement {
 
     const pathParts = (new URL(location)).pathname.split('/')
     this.currentView = pathParts[1] || 'feed'
-
-    this.load()
-  }
-
-  updated (changedProperties) {
-    if (changedProperties.get('currentPath')) {
-      const pathParts = (new URL(location)).pathname.split('/')
-      this.currentView = pathParts[1] || 'feed'
-      this.load()
-    }
   }
 
   async load () {
@@ -59,6 +49,8 @@ class CtznMainView extends LitElement {
       }
       return this.requestUpdate()
     }
+    const pathParts = (new URL(location)).pathname.split('/')
+    this.currentView = pathParts[1] || 'feed'
     this.querySelector('ctzn-posts-feed')?.load()
   }
 
