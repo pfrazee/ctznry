@@ -1,5 +1,4 @@
 /* globals beaker */
-import { html } from '../../../vendor/lit/lit.min.js'
 import { BasePopup } from './base.js'
 import '../custom-html.js'
 
@@ -14,8 +13,10 @@ export class GeneralPopup extends BasePopup {
 
   constructor (opts) {
     super()
+    this.customMaxWidth = opts.maxWidth
     this.customBodyClass = opts.bodyClass
-    this.renderFn = opts.render
+    this.customFirstUpdated = opts.firstUpdated
+    this.customRender = opts.render
   }
 
   get shouldShowHead () {
@@ -31,7 +32,7 @@ export class GeneralPopup extends BasePopup {
   }
 
   get maxWidth () {
-    return '710px'
+    return this.customMaxWidth || '710px'
   }
 
   get bodyClass () {
@@ -39,6 +40,11 @@ export class GeneralPopup extends BasePopup {
       return this.customBodyClass
     }
     return 'px-4 pt-4 lg:pb-4 pb-24'
+  }
+
+  firstUpdated () {
+    super.firstUpdated()
+    this.customFirstUpdated?.()
   }
 
   // management
@@ -56,7 +62,7 @@ export class GeneralPopup extends BasePopup {
   // =
 
   renderBody () {
-    return this.renderFn()
+    return this.customRender.call(this)
   }
 }
 

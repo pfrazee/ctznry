@@ -10,7 +10,6 @@ import { emojify } from '../lib/emojify.js'
 import { ReactionsListPopup } from './popups/reactions-list.js'
 import { RelatedItemTransfersListPopup } from './popups/related-item-transfers-list.js'
 import * as displayNames from '../lib/display-names.js'
-import './reaction-input.js'
 
 export class PostExpanded extends LitElement {
   static get properties () {

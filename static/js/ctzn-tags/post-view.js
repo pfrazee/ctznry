@@ -14,8 +14,8 @@ import { emojify } from '../lib/emojify.js'
 import { writeToClipboard } from '../lib/clipboard.js'
 import * as displayNames from '../lib/display-names.js'
 import * as contextMenu from '../com/context-menu.js'
+import * as reactMenu from '../com/menus/react.js'
 import * as toast from '../com/toast.js'
-import '../com/reaction-input.js'
 
 export class PostView extends LitElement {
   static get properties () {
@@ -249,7 +249,6 @@ export class PostView extends LitElement {
               ${this.renderGiftItemBtn()}
               ${this.renderActionsSummary()}
             </div>
-            ${this.renderReactionsCtrl()}
           `}
         </div>
       </div>
@@ -311,7 +310,6 @@ export class PostView extends LitElement {
                 </a>
               </div>
             </div>
-            ${this.renderReactionsCtrl()}
           </div>
         </div>
       </div>
@@ -421,15 +419,16 @@ export class PostView extends LitElement {
   }
 
   renderReactionsBtn () {
-    let aCls = `inline-block ml-1 mr-6 rounded`
+    let aCls = `inline-block px-1 ml-1 mr-6 rounded`
     if (this.canInteract) {
       aCls += ` text-gray-500 hov:hover:bg-gray-200`
     } else {
       aCls += ` text-gray-400`
     }
+    if (this.isReactionsOpen) aCls += ' bg-gray-200'
     return html`
-      <a class=${aCls} @click=${this.canInteract ? e => {this.isReactionsOpen = !this.isReactionsOpen} : undefined}>
-        <span class="fas fa-fw fa-${this.isReactionsOpen ? 'minus' : 'plus'}"></span>
+      <a class=${aCls} @click=${this.canInteract ? this.onClickReactBtn : undefined}>
+        <span class="far fa-fw fa-heart"></span>
       </a>
     `
   }
@@ -454,18 +453,6 @@ export class PostView extends LitElement {
         </a>
       `
     }
-  }
-
-  renderReactionsCtrl () {
-    if (!this.isReactionsOpen) {
-      return ''
-    }
-    return html`
-      <app-reaction-input
-        .reactions=${this.post.reactions}
-        @toggle-reaction=${this.onToggleReaction}
-      ></app-reaction-input>
-    `
   }
 
   renderGiftedItems () {
@@ -564,7 +551,7 @@ export class PostView extends LitElement {
     if (this.renderOpts.noclick) return
     for (let el of e.composedPath()) {
       if (el === this) break
-      if (el.tagName === 'A' || el.tagName === 'IMG' || el.tagName === 'APP-COMPOSER' || el.tagName === 'APP-REACTION-INPUT') {
+      if (el.tagName === 'A' || el.tagName === 'IMG' || el.tagName === 'APP-COMPOSER') {
         return
       }
     }
@@ -576,7 +563,7 @@ export class PostView extends LitElement {
     if (this.renderOpts.noclick) return
     for (let el of e.composedPath()) {
       if (el === this) break
-      if (el.tagName === 'A' || el.tagName === 'IMG' || el.tagName === 'APP-COMPOSER' || el.tagName === 'APP-REACTION-INPUT') {
+      if (el.tagName === 'A' || el.tagName === 'IMG' || el.tagName === 'APP-COMPOSER') {
         return
       }
     }
@@ -611,7 +598,6 @@ export class PostView extends LitElement {
     e.preventDefault()
     e.stopPropagation()
 
-    this.isReactionsOpen = false
     if (this.haveIReacted(reaction)) {
       this.post.reactions[reaction] = this.post.reactions[reaction].filter(userId => userId !== session.info.userId)
       this.requestUpdate()
@@ -626,31 +612,21 @@ export class PostView extends LitElement {
     }
     this.reloadSignals()
   }
-
-  async onClickCustomReaction (e) {
+  
+  async onClickReactBtn (e) {
     e.preventDefault()
     e.stopPropagation()
-
-    let reaction
-    do {
-      reaction = prompt('Type your reaction')
-      if (!reaction) return
-      reaction = reaction.toLowerCase()
-      if (reaction.length < 16) break
-      alert('Sorry, reactions can be no longer than 16 characters.')
-    } while (true)
-
-    if (this.haveIReacted(reaction)) {
-      return
-    }
-    this.isReactionsOpen = false
-    await session.ctzn.user.table('ctzn.network/reaction').create({
-      subject: {dbUrl: this.post.url, authorId: this.post.author.userId},
-      reaction
+    const rect = e.currentTarget.getClientRects()[0]
+    const parentRect = this.getClientRects()[0]
+    this.isReactionsOpen = true
+    await reactMenu.create({
+      parent: this,
+      x: rect.left - parentRect.left,
+      y: 0,
+      reactions: this.post.reactions,
+      onToggleReaction: e => this.onToggleReaction(e)
     })
-    this.post.reactions[reaction] = (this.post.reactions[reaction] || []).concat([session.info.userId])
-    this.requestUpdate()
-    this.reloadSignals()
+    this.isReactionsOpen = false
   }
 
   async onClickGiftItem () {

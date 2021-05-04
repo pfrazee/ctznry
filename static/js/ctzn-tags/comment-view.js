@@ -3,7 +3,7 @@ import { unsafeHTML } from '../../vendor/lit/directives/unsafe-html.js'
 import { ifDefined } from '../../vendor/lit/directives/if-defined.js'
 import { repeat } from '../../vendor/lit/directives/repeat.js'
 import { asyncReplace } from '../../vendor/lit/directives/async-replace.js'
-import { AVATAR_URL, ITEM_CLASS_ICON_URL, COMMENT_URL, FULL_COMMENT_URL, SUGGESTED_REACTIONS } from '../lib/const.js'
+import { AVATAR_URL, ITEM_CLASS_ICON_URL, COMMENT_URL, FULL_COMMENT_URL } from '../lib/const.js'
 import { writeToClipboard } from '../lib/clipboard.js'
 import { CommentComposerPopup } from '../com/popups/comment-composer.js'
 import { TransferItemRelatedPopup } from '../com/popups/transfer-item-related.js'
@@ -16,9 +16,9 @@ import { relativeDate } from '../lib/time.js'
 import { emojify } from '../lib/emojify.js'
 import * as displayNames from '../lib/display-names.js'
 import * as contextMenu from '../com/context-menu.js'
+import * as reactMenu from '../com/menus/react.js'
 import * as toast from '../com/toast.js'
 import '../com/comment-composer.js'
-import '../com/reaction-input.js'
 
 export class CommentView extends LitElement {
   static get properties () {
@@ -221,7 +221,6 @@ export class CommentView extends LitElement {
                   </a>
                 </div>
               </div>
-              ${this.renderReactionsCtrl()}
             </div>
           </div>
         </div>
@@ -272,7 +271,6 @@ export class CommentView extends LitElement {
               <span class="fas fa-fw fa-ellipsis-h"></span>
             </a>
           </div>
-          ${this.renderReactionsCtrl()}
           ${this.isReplyOpen ? html`
             <div class="border border-gray-300 rounded py-2 px-2 my-2 mx-1 bg-white">
               <app-comment-composer
@@ -364,27 +362,16 @@ export class CommentView extends LitElement {
     return html`
       <a
         class="
-          tooltip-right px-2 py-1
+          tooltip-right pl-2 pr-1 mr-1 py-1
           ${this.mode === 'as-reply' ? 'text-xs font-bold' : ''}
           ${this.canInteract ? 'cursor-pointer text-gray-500 hov:hover:bg-gray-100' : 'text-gray-400'}
+          ${this.isReactionsOpen ? 'bg-gray-200' : ''}
         "
         data-tooltip=${ifDefined(this.ctrlTooltip)}
-        @click=${this.canInteract ? (e => {this.isReactionsOpen = !this.isReactionsOpen}) : undefined}
+        @click=${this.canInteract ? this.onClickReactBtn : undefined}
       >
-        <span class="fas fa-fw fa-${this.isReactionsOpen ? 'minus' : 'plus'}"></span>
+        <span class="far fa-fw fa-heart"></span>
       </a>
-    `
-  }
-
-  renderReactionsCtrl () {
-    if (!this.isReactionsOpen) {
-      return ''
-    }
-    return html`
-      <app-reaction-input
-        .reactions=${this.comment.reactions}
-        @toggle-reaction=${this.onToggleReaction}
-      ></app-reaction-input>
     `
   }
 
@@ -487,7 +474,7 @@ export class CommentView extends LitElement {
     if (this.renderOpts.noclick) return
     for (let el of e.composedPath()) {
       if (el === this) break
-      if (el.tagName === 'A' || el.tagName === 'IMG' || el.tagName === 'APP-COMMENT-COMPOSER' || el.tagName === 'APP-REACTION-INPUT') {
+      if (el.tagName === 'A' || el.tagName === 'IMG' || el.tagName === 'APP-COMMENT-COMPOSER') {
         return
       }
     }
@@ -499,7 +486,7 @@ export class CommentView extends LitElement {
     if (this.renderOpts.noclick) return
     for (let el of e.composedPath()) {
       if (el === this) break
-      if (el.tagName === 'A' || el.tagName === 'IMG' || el.tagName === 'APP-COMMENT-COMPOSER' || el.tagName === 'APP-REACTION-INPUT') {
+      if (el.tagName === 'A' || el.tagName === 'IMG' || el.tagName === 'APP-COMMENT-COMPOSER') {
         return
       }
     }
@@ -565,7 +552,6 @@ export class CommentView extends LitElement {
     e.preventDefault()
     e.stopPropagation()
 
-    this.isReactionsOpen = false
     if (this.haveIReacted(reaction)) {
       this.comment.reactions[reaction] = this.comment.reactions[reaction].filter(userId => userId !== session.info.userId)
       this.requestUpdate()
@@ -581,30 +567,20 @@ export class CommentView extends LitElement {
     this.reloadSignals()
   }
 
-  async onClickCustomReaction (e) {
+  async onClickReactBtn (e) {
     e.preventDefault()
     e.stopPropagation()
-
-    let reaction
-    do {
-      reaction = prompt('Type your reaction')
-      if (!reaction) return
-      reaction = reaction.toLowerCase()
-      if (reaction.length < 16) break
-      alert('Sorry, reactions can be no longer than 16 characters.')
-    } while (true)
-
-    if (this.haveIReacted(reaction)) {
-      return
-    }
-    this.isReactionsOpen = false
-    await session.ctzn.user.table('ctzn.network/reaction').create({
-      subject: {dbUrl: this.comment.url, authorId: this.comment.author.userId},
-      reaction
+    const rect = e.currentTarget.getClientRects()[0]
+    const parentRect = this.getClientRects()[0]
+    this.isReactionsOpen = true
+    await reactMenu.create({
+      parent: this,
+      x: rect.left - parentRect.left,
+      y: 0,
+      reactions: this.comment.reactions,
+      onToggleReaction: e => this.onToggleReaction(e)
     })
-    this.comment.reactions[reaction] = (this.comment.reactions[reaction] || []).concat([session.info.userId])
-    this.requestUpdate()
-    this.reloadSignals()
+    this.isReactionsOpen = false
   }
 
   async onClickGiftItem () {
