@@ -362,7 +362,7 @@ export class CommentView extends LitElement {
     return html`
       <a
         class="
-          tooltip-right pl-2 pr-1 mr-1 py-1
+          tooltip-right pl-2 pr-1 mr-2 py-1
           ${this.mode === 'as-reply' ? 'text-xs font-bold' : ''}
           ${this.canInteract ? 'cursor-pointer text-gray-500 hov:hover:bg-gray-100' : 'text-gray-400'}
           ${this.isReactionsOpen ? 'bg-gray-200' : ''}
@@ -416,7 +416,7 @@ export class CommentView extends LitElement {
   }
 
   renderGiftItemBtn () {
-    let aCls = `inline-block px-1 rounded px-2 py-1`
+    let aCls = `inline-block px-1 rounded px-2 py-1 mr-1`
     if (this.mode === 'as-reply') aCls += ' text-xs'
     if (this.communityUserId && this.canInteract && !this.isMyComment) {
       return html`
