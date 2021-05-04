@@ -91,16 +91,15 @@ export class Thread extends LitElement {
     }
   }
 
-  scrollHighlightedPostIntoView () {
+  async scrollHighlightedPostIntoView () {
     try {
+      await this.requestUpdate()
       const el = this.querySelector('.highlight')
       const y = el.getBoundingClientRect().top - 50
-      window.scrollTo(0, y)
-      setTimeout(() => {
-        if (Math.abs(window.scrollY - y) > 10) {
-          window.scrollTo(0, y)
-        }
-      }, 500)
+      while (Math.abs(window.scrollY - y) > 10) {
+        window.scrollTo(0, y)
+        await new Promise(r => setTimeout(r, 100))
+      }
     } catch (e) { /* ignore */ }
   }
 
