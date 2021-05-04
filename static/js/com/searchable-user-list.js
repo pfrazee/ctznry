@@ -31,7 +31,7 @@ export class SearchableUserList extends LitElement {
 
   updated (changedProperties) {
     if (changedProperties.has('filter')) {
-      this.highlightIndex = Math.min(this.highlightIndex, this.numResults - 1)
+      this.highlightIndex = Math.max(0, Math.min(this.highlightIndex, this.numResults - 1))
     }
   }
 
