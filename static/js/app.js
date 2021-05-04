@@ -82,7 +82,7 @@ class CtznApp extends LitElement {
       await session.setup()
     } finally {
       this.isLoading = false
-      await this.requestUpdate()
+      await this.updateComplete
       this.querySelector('#view')?.load?.()
     }
   }
