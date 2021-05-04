@@ -29,11 +29,11 @@ class CtznNotificationsView extends LitElement {
     if (document.hasFocus()) {
       notifications.updateClearedAt()
     }
-    await this.querySelector('app-notifications-feed')?.load()
+    await this.querySelector('app-notifications-feed')?.load({updateClearedAt: true})
   }
 
   async refresh () {
-    await this.querySelector('app-notifications-feed')?.load()
+    await this.querySelector('app-notifications-feed')?.load({updateClearedAt: true})
   }
 
   async pageLoadScrollTo (y) {
@@ -77,7 +77,6 @@ class CtznNotificationsView extends LitElement {
           <h2 class="text-2xl tracking-tight font-bold p-4 border-l border-r border-gray-300 hidden lg:block">Notifications</h2>
           <app-notifications-feed
             .clearedAt=${this.notificationsClearedAt}
-            @publish-reply=${this.onPublishReply}
           ></app-notifications-feed>
         </div>
         ${this.renderRightSidebar()}
@@ -95,12 +94,6 @@ class CtznNotificationsView extends LitElement {
 
   // events
   // =
-
-
-  onPublishReply (e) {
-    toast.create('Reply published', '', 10e3)
-    this.load()
-  }
 
   onUnreadNotificationsChanged (e) {
     this.numUnreadNotifications = e.detail.count

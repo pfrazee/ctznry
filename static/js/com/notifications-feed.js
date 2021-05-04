@@ -57,7 +57,12 @@ export class NotificationsFeed extends LitElement {
     return !this.results || !!this.activeQuery
   }
 
-  async load ({clearCurrent} = {clearCurrent: false}) {
+  async load ({clearCurrent, updateClearedAt} = {clearCurrent: false, updateClearedAt: false}) {
+    if (updateClearedAt) {
+      let clearedAt = await notifications.getClearedAt()
+      this.clearedAt = clearedAt ? Number(new Date(clearedAt)) : 0
+    }
+
     if (!session.isActive()) {
       session.onChange(() => this.load({clearCurrent}), {once: true})
       return
