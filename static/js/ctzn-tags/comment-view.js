@@ -619,6 +619,7 @@ export class CommentView extends LitElement {
     e.preventDefault()
     e.stopPropagation()
     const rect = e.currentTarget.getClientRects()[0]
+    const parentRect = this.getClientRects()[0]
     let items = [
       {
         icon: 'fas fa-fw fa-link',
@@ -664,8 +665,10 @@ export class CommentView extends LitElement {
       )
     }
     contextMenu.create({
-      x: rect.left,
-      y: rect.bottom,
+      parent: this,
+      x: rect.left - parentRect.left + 30,
+      y: 0,
+      right: true,
       roomy: true,
       noBorders: true,
       style: `padding: 4px 0; font-size: 13px`,

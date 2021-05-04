@@ -103,6 +103,7 @@ class PostComposer extends LitElement {
               Post to: ${this.communityIcon} ${this.communityName} <span class="fas fa-fw fa-caret-down"></span>
             </button>
           </div>
+          <div class="community-selector-container"></div>
           <div class="p-1 pt-1.5 text-gray-500">
             ${this.communityExplanation}
           </div>
@@ -296,12 +297,12 @@ class PostComposer extends LitElement {
     e.preventDefault()
     e.stopPropagation()
     const _this = this
-    const rect = e.currentTarget.getClientRects()[0]
     const communities = session.myCommunities.slice()
     communities.sort((a, b) => a.userId.toLowerCase().localeCompare(b.userId.toLowerCase()))
     contextMenu.create({
-      x: rect.left,
-      y: rect.bottom,
+      parent: this.querySelector('.community-selector-container'),
+      x: 0,
+      y: 0,
       render () {
         return html`
           <div class="dropdown-items left no-border" style="padding: 4px 0; max-height: 50vh; overflow-y: scroll">

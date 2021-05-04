@@ -326,6 +326,7 @@ class CtznUser extends LitElement {
         @post-created=${e => this.load()}
         .community=${this.isCommunity && this.amIAMember ? ({userId: this.userId, dbUrl: this.userProfile?.dbUrl}) : undefined}
       ></app-header>
+      <div class="controls-menu-container"></div>
       ${this.renderDesktopHeader()}
       ${this.renderMobileHeader()}
       <main class="col2">
@@ -915,10 +916,12 @@ class CtznUser extends LitElement {
         items.push({label: 'Leave community', click: () => this.onClickLeave()})
       }
     }
-    let rect = e.currentTarget.getClientRects()[0]
+    const parent = this.querySelector('.controls-menu-container')
+    const rect = parent.getClientRects()[0]
     contextMenu.create({
-      x: rect.right,
-      y: rect.bottom,
+      parent,
+      x: rect.width - 10,
+      y: 50,
       right: true,
       roomy: true,
       noBorders: true,

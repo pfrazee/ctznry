@@ -98,6 +98,7 @@ class CtznPostView extends LitElement {
         .items=${SUBNAV_ITEMS}
         current-path=${location.pathname}
       ></app-subnav>
+      <div class="context-menu-container"></div>
     `
   }
 
@@ -198,7 +199,6 @@ class CtznPostView extends LitElement {
   onClickMenu (e) {
     e.preventDefault()
     e.stopPropagation()
-    const rect = e.currentTarget.getClientRects()[0]
     let items = [
       {
         icon: 'fas fa-fw fa-link',
@@ -243,9 +243,23 @@ class CtznPostView extends LitElement {
         })
       )
     }
+
+    let parent, x, y
+    if (matchMedia('(max-width: 640px)').matches) {
+      let rect = e.currentTarget.getClientRects()[0]
+      x = rect.right
+      y = rect.bottom
+    } else {
+      parent = this.querySelector('.context-menu-container')
+      let rect = parent.getClientRects()[0]
+      x = rect.width
+      y = 0
+    }
+
     contextMenu.create({
-      x: rect.right,
-      y: rect.bottom,
+      parent,
+      x,
+      y,
       right: true,
       roomy: true,
       noBorders: true,

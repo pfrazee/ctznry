@@ -108,8 +108,9 @@ function onClickAnywhere (e) {
 // =
 
 export class ContextMenu extends LitElement {
-  constructor ({x, y, right, center, top, withTriangle, roomy, veryRoomy, rounded, noBorders, style, items, fontAwesomeCSSUrl, render}) {
+  constructor ({parent, x, y, right, center, top, withTriangle, roomy, veryRoomy, rounded, noBorders, style, items, fontAwesomeCSSUrl, render}) {
     super()
+    this.hasParent = !!parent
     this.x = x
     this.y = y
     this.right = right || false
@@ -153,7 +154,7 @@ export class ContextMenu extends LitElement {
     if (this.y) style += `top: ${this.y}px; `
     return html`
       ${this.fontAwesomeCSSUrl ? html`<link rel="stylesheet" href="${this.fontAwesomeCSSUrl}">` : ''}
-      <div class="context-menu dropdown" style="${style}">
+      <div class="context-menu dropdown ${this.hasParent ? 'has-parent' : ''}" style="${style}">
         ${this.customRender
           ? this.customRender.call(this)
           : html`
@@ -210,11 +211,19 @@ async function* renderPromiseItem (item) {
 }
 
 ContextMenu.styles = css`
+:host {
+  position: relative;
+}
+
 ${dropdownCSS}
 
 .context-menu {
   position: fixed;
   z-index: 10000;
+}
+
+.context-menu.has-parent {
+  position: absolute;
 }
 
 .dropdown-items {
