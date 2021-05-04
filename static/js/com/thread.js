@@ -95,11 +95,8 @@ export class Thread extends LitElement {
     try {
       await this.requestUpdate()
       const el = this.querySelector('.highlight')
-      const y = el.getBoundingClientRect().top - 50
-      while (Math.abs(window.scrollY - y) > 10) {
-        window.scrollTo(0, y)
-        await new Promise(r => setTimeout(r, 100))
-      }
+      let y = window.pageYOffset + el.getBoundingClientRect().top - 50
+      window.scrollTo(0, y)
     } catch (e) { /* ignore */ }
   }
 
