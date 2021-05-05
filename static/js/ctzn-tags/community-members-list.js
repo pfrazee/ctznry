@@ -1,5 +1,6 @@
 import { LitElement, html } from '../../vendor/lit/lit.min.js'
 import { repeat } from '../../vendor/lit/directives/repeat.js'
+import { BanPopup } from '../com/popups/ban.js'
 import { intersect } from '../lib/functions.js'
 import * as session from '../lib/session.js'
 import { AVATAR_URL } from '../lib/const.js'
@@ -141,6 +142,18 @@ export class CommunityMembersList extends LitElement {
 
   onToggleExpanded (e) {
     this.isExpanded = !this.isExpanded
+  }
+
+  async onBan (e) {
+    try {
+      await BanPopup.create({
+        communityId: this.userId,
+        member: e.detail.member
+      })
+      this.load()
+    } catch (e) {
+      // ignore
+    }
   }
 }
 
