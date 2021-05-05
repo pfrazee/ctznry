@@ -195,61 +195,62 @@ export class PostView extends LitElement {
 
   renderExpanded () {
     return html`
-    <div
-      class="grid grid-post px-1 py-0.5 bg-white sm:rounded ${this.renderOpts.noclick ? '' : 'cursor-pointer'} text-gray-600"
-      @click=${this.onClickCard}
-      @mousedown=${this.onMousedownCard}
-      @mouseup=${this.onMouseupCard}
-      @mousemove=${this.onMousemoveCard}
-    >
-      <div class="pl-2 pt-2">
-        <a class="block" href="/${this.post.author.userId}" title=${this.post.author.displayName}>
-          <img
-            class="block object-cover rounded-full mt-1 w-11 h-11"
-            src=${AVATAR_URL(this.post.author.userId)}
-          >
-        </a>
-      </div>
-      <div class="block bg-white min-w-0">
-        <div class="pl-2 pr-2 py-2 min-w-0">
-          <div class="pr-2.5 text-gray-600 truncate sm:mb-2">
-            <span class="sm:mr-1 whitespace-nowrap">
-              <a class="hov:hover:underline" href="/${this.post.author.userId}" title=${this.post.author.displayName}>
-                <span class="text-gray-800 font-semibold">${displayNames.render(this.post.author.userId)}</span>
-              </a>
-            </span>
-            <span class="mr-2 text-sm">
-              <a class="hov:hover:underline" href="${POST_URL(this.post)}" data-tooltip=${(new Date(this.post.value.createdAt)).toLocaleString()}>
-                ${relativeDate(this.post.value.createdAt)}
-              </a>
-              ${this.post.value.community ? html`
-                in
-                <a href="/${this.communityUserId}" class="whitespace-nowrap font-semibold text-gray-700 hov:hover:underline">
-                  ${displayNames.render(this.communityUserId)}
+      <div
+        class="grid grid-post px-1 py-0.5 bg-white sm:rounded ${this.renderOpts.noclick ? '' : 'cursor-pointer'} text-gray-600"
+        @click=${this.onClickCard}
+        @mousedown=${this.onMousedownCard}
+        @mouseup=${this.onMouseupCard}
+        @mousemove=${this.onMousemoveCard}
+      >
+        <div class="pl-2 pt-2">
+          <a class="block" href="/${this.post.author.userId}" title=${this.post.author.displayName}>
+            <img
+              class="block object-cover rounded-full mt-1 w-11 h-11"
+              src=${AVATAR_URL(this.post.author.userId)}
+            >
+          </a>
+        </div>
+        <div class="block bg-white min-w-0">
+          <div class="pl-2 pr-2 py-2 min-w-0">
+            <div class="pr-2.5 text-gray-600 truncate sm:mb-2">
+              <span class="sm:mr-1 whitespace-nowrap">
+                <a class="hov:hover:underline" href="/${this.post.author.userId}" title=${this.post.author.displayName}>
+                  <span class="text-gray-800 font-semibold">${displayNames.render(this.post.author.userId)}</span>
                 </a>
-              ` : ''}
-            </span>
-          </div>
-          <div
-            class="whitespace-pre-wrap break-words text-black mb-4"
-            @click=${this.onClickText}
-          >${unsafeHTML(linkify(emojify(makeSafe(this.post.value.text))))}</div>
-          ${this.renderMedia()}
-          ${this.renderPostExtendedText()}
-          ${this.noctrls ? '' : html`
-            ${this.hasReactionsOrGifts ? html`
-              <div class="my-1.5">
-                ${this.renderGiftedItems()}
-                ${this.renderReactions()}
-              </div>
-            ` : ''}
-            <div class="flex items-center justify-around text-sm text-gray-600 px-1 pt-1 pr-8 sm:pr-60">
-              ${this.renderRepliesCtrl()}
-              ${this.renderReactionsBtn()}
-              ${this.renderGiftItemBtn()}
-              ${this.renderActionsSummary()}
+              </span>
+              <span class="mr-2 text-sm">
+                <a class="hov:hover:underline" href="${POST_URL(this.post)}" data-tooltip=${(new Date(this.post.value.createdAt)).toLocaleString()}>
+                  ${relativeDate(this.post.value.createdAt)}
+                </a>
+                ${this.post.value.community ? html`
+                  in
+                  <a href="/${this.communityUserId}" class="whitespace-nowrap font-semibold text-gray-700 hov:hover:underline">
+                    ${displayNames.render(this.communityUserId)}
+                  </a>
+                ` : ''}
+              </span>
             </div>
-          `}
+            <div
+              class="whitespace-pre-wrap break-words text-black mb-4"
+              @click=${this.onClickText}
+            >${unsafeHTML(linkify(emojify(makeSafe(this.post.value.text))))}</div>
+            ${this.renderMedia()}
+            ${this.renderPostExtendedText()}
+            ${this.noctrls ? '' : html`
+              ${this.hasReactionsOrGifts ? html`
+                <div class="my-1.5">
+                  ${this.renderGiftedItems()}
+                  ${this.renderReactions()}
+                </div>
+              ` : ''}
+              <div class="flex items-center justify-around text-sm text-gray-600 px-1 pt-1 pr-8 sm:pr-60">
+                ${this.renderRepliesCtrl()}
+                ${this.renderReactionsBtn()}
+                ${this.renderGiftItemBtn()}
+                ${this.renderActionsSummary()}
+              </div>
+            `}
+          </div>
         </div>
       </div>
     `
@@ -515,7 +516,7 @@ export class PostView extends LitElement {
     if (this.post.value.extendedTextMimeType === 'text/html') {
       return html`
         <app-custom-html
-          class="py-4 mt-4 mb-3 text-black"
+          class="block pt-4 mt-4 mb-3 text-black border-t border-dashed border-gray-200"
           context="post"
           .contextState=${{page: {userId: this.post.author.userId}}}
           .html=${this.post.value.extendedText}
@@ -525,7 +526,7 @@ export class PostView extends LitElement {
     }
     return html`
       <div
-        class="whitespace-pre-wrap break-words leading-snug text-black my-2"
+        class="block pt-4 mt-4 mb-3 whitespace-pre-wrap break-words leading-snug text-black border-t border-dashed border-gray-200"
         @click=${this.onClickText}
       >${unsafeHTML(emojify(linkify(makeSafe(this.post.value.extendedText))))}</div>
     `
