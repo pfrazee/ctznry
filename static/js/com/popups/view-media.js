@@ -18,15 +18,11 @@ export class ViewMediaPopup extends BasePopup {
     this.url = opts.url
     this.urls = opts.urls
     this.oldGestures = gestures.setCurrentNav(dir => this.move(dir))
-    this.onSwiping = e => {
-      const dxN = e.detail.pct
-      this.querySelector('img').style.transform = `translateX(${dxN * 10}%)`
-    }
-    gestures.events.addEventListener('swiping', this.onSwiping)
+    document.body.classList.add('overflow-hidden')
   }
 
   teardown () {
-    gestures.events.removeEventListener('swiping', this.onSwiping)
+    document.body.classList.remove('overflow-hidden')
     if (this.oldGestures) {
       gestures.setCurrentNav(this.oldGestures)
     }
@@ -101,7 +97,15 @@ export class ViewMediaPopup extends BasePopup {
           <span class="fas fa-times"></span>
         </span>
         <div class="flex flex-col w-full h-full items-center justify-center" @click=${this.onReject}>
-          <div class="text-white text-lg mb-1">${this.currentIndex} / ${this.urls?.length || 1}</div>
+          <div class="flex items-center mb-1">
+            <div class="block sm:hidden text-white text-3xl px-10 cursor-pointer ${this.isLeftMost ? 'opacity-20' : ''}" @click=${e => this.onClickDir(e, -1)}>
+              <span class="fas fa-angle-left"></span>
+            </div>
+            <div class="text-white text-lg">${this.currentIndex} / ${this.urls?.length || 1}</div>
+            <div class="block sm:hidden text-white text-3xl px-10 cursor-pointer ${this.isRightMost ? 'opacity-20' : ''}" @click=${e => this.onClickDir(e, 1)}>
+              <span class="fas fa-angle-right"></span>
+            </div>
+          </div>
           <div class="flex items-center">
             <div class="hidden sm:block text-white text-3xl px-10 cursor-pointer ${this.isLeftMost ? 'opacity-20' : ''}" @click=${e => this.onClickDir(e, -1)}>
               <span class="fas fa-angle-left"></span>
