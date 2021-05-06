@@ -131,7 +131,6 @@ class CtznMainView extends LitElement {
     const SUBNAV_ITEMS = [
       {menu: true, mobileOnly: true, label: html`<span class="fas fa-bars"></span>`},
       {path: '/', label: 'Feed'},
-      {path: '/inbox', label: 'Inbox'},
       {
         path: '/notifications',
         label: html`

@@ -79,9 +79,6 @@ export class Header extends LitElement {
           <a href="/" class=${this.getHeaderNavClass('/')} @click=${this.onClickLink} data-tooltip="Home">
             <span class="fas fa-fw navicon fa-home"></span>
           </a>
-          <a href="/inbox" class="${this.getHeaderNavClass('/inbox')}" @click=${this.onClickLink} data-tooltip="Inbox">
-            <span class="fas fa-fw navicon fa-inbox"></span>
-          </a>
           <a href="/notifications" class="relative ${this.getHeaderNavClass('/notifications')}" @click=${this.onClickLink} data-tooltip="Notfications">
             ${this.unreadNotificationsCount > 0 ? html`
               <span class="absolute bg-blue-500 font-medium leading-none px-1.5 py-0.5 rounded-2xl text-white text-xs" style="top: 5px; left: 32px">${this.unreadNotificationsCount}</span>
@@ -148,10 +145,6 @@ export class Header extends LitElement {
           <a href="/" class=${this.getMenuNavClass('/')} @click=${this.onClickLink}>
             <span class="fas mr-2 fa-fw navicon fa-home"></span>
             Home
-          </a>
-          <a href="/inbox" class="relative ${this.getMenuNavClass('/inbox')}" @click=${this.onClickLink}>
-            <span class="fas mr-2 fa-fw navicon fa-inbox"></span>
-            Inbox
           </a>
           <a href="/notifications" class="relative ${this.getMenuNavClass('/notifications')}" @click=${this.onClickLink}>
             ${this.unreadNotificationsCount > 0 ? html`
