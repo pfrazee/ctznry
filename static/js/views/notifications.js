@@ -96,10 +96,12 @@ class CtznNotificationsView extends LitElement {
 
   onUnreadNotificationsChanged (e) {
     this.numUnreadNotifications = e.detail.count
-    document.title = e.detail.count ? `(${e.detail.count}) Notifications | CTZN` : `Notifications | CTZN`
-    this.querySelector('app-notifications-feed').loadNew(e.detail.count)
-    if (document.hasFocus() && this.id === 'view') {
-      notifications.updateClearedAt()
+    if (this.id === 'view') {
+      document.title = e.detail.count ? `(${e.detail.count}) Notifications | CTZN` : `Notifications | CTZN`
+      this.querySelector('app-notifications-feed').loadNew(e.detail.count)
+      if (document.hasFocus()) {
+        notifications.updateClearedAt()
+      }
     }
   }
 }
